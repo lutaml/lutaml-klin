@@ -1,0 +1,46 @@
+<div class="welcome-screen">
+  <header class="welcome-header">
+    <h1>{{ metadata.name }}</h1>
+    <p class="subtitle">{{ metadata.description }}</p>
+    <div class="metadata-badges">
+      <span class="badge version-badge">Version {{ metadata.version }}</span>
+      <span class="badge generated-badge">Generated {{ metadata.generated_at | date: "%Y-%m-%d" }}</span>
+    </div>
+  </header>
+
+  <section class="schema-overview">
+    <h2>Available Schemas</h2>
+    <div class="schema-grid">
+      {% for schema in schemas %}
+        <div class="schema-card" data-schema-id="{{ schema.id }}">
+          <h3>{{ schema.name }}</h3>
+          <p class="schema-namespace">{{ schema.namespace }}</p>
+          <div class="component-counts">
+            <div class="count-item">
+              <span class="count-number">{{ schema.components.elements }}</span>
+              <span class="count-label">Elements</span>
+            </div>
+            <div class="count-item">
+              <span class="count-number">{{ schema.components.complex_types }}</span>
+              <span class="count-label">Complex Types</span>
+            </div>
+            <div class="count-item">
+              <span class="count-number">{{ schema.components.simple_types }}</span>
+              <span class="count-label">Simple Types</span>
+            </div>
+          </div>
+          <button class="explore-button" onclick="app.navigation.selectSchema('{{ schema.id }}')">
+            Explore Schema
+          </button>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if statistics %}
+    <section class="repository-stats">
+      <h2>Repository Statistics</h2>
+      {% include 'statistics', stats: statistics %}
+    </section>
+  {% endif %}
+</div>

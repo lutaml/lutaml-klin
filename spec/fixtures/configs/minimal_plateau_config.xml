@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ShapeChangeConfiguration xmlns="http://www.interactive-instruments.de/ShapeChange/Configuration/1.1">
+  <input>
+    <xmlNamespaces>
+      <XmlNamespace nsabr="urf" ns="https://www.geospatial.jp/iur/urf/3.2" location="urbanFunction.xsd"/>
+      <XmlNamespace nsabr="uro" ns="https://www.geospatial.jp/iur/uro/3.2" location="urbanObject.xsd"/>
+    </xmlNamespaces>
+    <xsdMapEntries>
+      <XsdMapEntry type="xs:string" xmlType="xs:string" xmlPropertyType="xs:string"/>
+      <XsdMapEntry type="xs:integer" xmlType="xs:integer" xmlPropertyType="xs:integer"/>
+    </xsdMapEntries>
+  </input>
+</ShapeChangeConfiguration>

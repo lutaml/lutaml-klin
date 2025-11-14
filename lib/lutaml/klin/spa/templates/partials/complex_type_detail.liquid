@@ -1,0 +1,47 @@
+<article class="component-detail type-detail">
+  <header class="component-header">
+    <h1 class="component-name">
+      <span class="prefix">{{ type.prefix }}:</span>{{ type.name }}
+    </h1>
+    <div class="component-meta">
+      <span class="badge category-badge">Complex Type</span>
+      {% if type.abstract %}
+        <span class="badge abstract-badge">Abstract</span>
+      {% endif %}
+    </div>
+  </header>
+
+  {% if type.documentation %}
+    <section class="documentation">
+      <h2>Documentation</h2>
+      <p>{{ type.documentation }}</p>
+    </section>
+  {% endif %}
+
+  {% if type.base_type %}
+    <section class="inheritance">
+      <h2>Inheritance</h2>
+      <div class="inheritance-chain">
+        <span class="extends-label">Extends:</span>
+        <a href="#" class="type-link" data-ref="{{ type.base_type }}">
+          {{ type.base_type }}
+        </a>
+      </div>
+    </section>
+  {% endif %}
+
+  {% if type.structure %}
+    <section class="structure">
+      <h2>Structure</h2>
+      {% include 'type_structure', structure: type.structure %}
+    </section>
+  {% endif %}
+
+  {% if type.cross_references %}
+    {% include 'cross_references', refs: type.cross_references %}
+  {% endif %}
+
+  {% if type.uml_mapping %}
+    {% include 'uml_mapping', mapping: type.uml_mapping %}
+  {% endif %}
+</article>

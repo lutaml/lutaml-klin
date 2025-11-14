@@ -1,0 +1,37 @@
+<section class="uml-mapping">
+  <h2>UML Mapping</h2>
+  <dl class="mapping-details">
+    <dt>UML Class:</dt>
+    <dd class="uml-class">{{ mapping.uml_class }}</dd>
+
+    <dt>UML Package:</dt>
+    <dd class="uml-package">{{ mapping.uml_package }}</dd>
+
+    <dt>Stereotype:</dt>
+    <dd>
+      <span class="stereotype-badge">{{ mapping.stereotype }}</span>
+    </dd>
+
+    <dt>Resolution Strategy:</dt>
+    <dd>
+      <span class="strategy-badge">{{ mapping.resolution_strategy }}</span>
+    </dd>
+  </dl>
+
+  <div class="mapping-diagram">
+    <div class="mapping-flow">
+      <div class="mapping-source">
+        <strong>UML</strong>
+        <span>{{ mapping.uml_class }}</span>
+      </div>
+      <div class="mapping-arrow">
+        <span class="strategy-label">{{ mapping.resolution_strategy }}</span>
+        →
+      </div>
+      <div class="mapping-target">
+        <strong>XSD</strong>
+        <span>{{ element.qualified_name | default: type.qualified_name }}</span>
+      </div>
+    </div>
+  </div>
+</section>

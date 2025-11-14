@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ theme | default: 'default' }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{{ metadata.description }}">
+  <title>{{ metadata.name }} - XSD Schema Documentation</title>
+
+  {% if mode == 'embedded' %}
+    <style>{{ inline_css }}</style>
+  {% else %}
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/navigation.css">
+    <link rel="stylesheet" href="assets/css/content.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+  {% endif %}
+</head>
+<body>
+  <div class="app-container">
+    <!-- Mobile header with hamburger -->
+    <header class="mobile-header">
+      <button class="hamburger-menu" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <h1 class="site-title">{{ metadata.name }}</h1>
+    </header>
+
+    <!-- Overlay for mobile nav -->
+    <div class="nav-overlay"></div>
+
+    <!-- Three-tier navigation sidebar -->
+    <nav class="sidebar" role="navigation" aria-label="Schema navigation">
+      {% include 'navigation' %}
+    </nav>
+
+    <!-- Main content area -->
+    <main class="content-area" role="main">
+      {% include 'breadcrumbs' %}
+
+      <div id="content-body">
+        {{ content }}
+      </div>
+    </main>
+  </div>
+
+  <!-- Data embedding based on mode -->
+  {% if mode == 'embedded' %}
+    <script id="schema-data" type="application/json">
+      {{ schema_json }}
+    </script>
+    <script>{{ inline_js }}</script>
+  {% else %}
+    <script src="assets/js/app.js" type="module"></script>
+  {% endif %}
+</body>
+</html>

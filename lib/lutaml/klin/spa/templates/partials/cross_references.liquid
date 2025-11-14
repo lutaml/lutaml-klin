@@ -1,0 +1,47 @@
+<section class="cross-references">
+  <h2>Cross References</h2>
+
+  {% if refs.type_ref %}
+    <div class="ref-section">
+      <h3>Type</h3>
+      <a href="#" class="ref-link" data-ref="{{ refs.type_ref }}">
+        {{ refs.type_ref }}
+      </a>
+    </div>
+  {% endif %}
+
+  {% if refs.base_type_ref %}
+    <div class="ref-section">
+      <h3>Base Type</h3>
+      <a href="#" class="ref-link" data-ref="{{ refs.base_type_ref }}">
+        {{ refs.base_type_ref }}
+      </a>
+    </div>
+  {% endif %}
+
+  {% if refs.used_by and refs.used_by.size > 0 %}
+    <div class="ref-section">
+      <h3>Used By</h3>
+      <ul class="ref-list">
+        {% for ref in refs.used_by %}
+          <li>
+            <a href="#" class="ref-link" data-ref="{{ ref }}">{{ ref }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if refs.uses_types and refs.uses_types.size > 0 %}
+    <div class="ref-section">
+      <h3>Uses Types</h3>
+      <ul class="ref-list">
+        {% for ref in refs.uses_types %}
+          <li>
+            <a href="#" class="ref-link" data-ref="{{ ref }}">{{ ref }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+</section>

@@ -1,0 +1,1713 @@
+= Lutaml-Klin
+
+image:https://img.shields.io/gem/v/lutaml-klin.svg[RubyGems Version]
+image:https://img.shields.io/github/license/lutaml/lutaml-klin.svg[License]
+image:https://github.com/lutaml/lutaml-klin/actions/workflows/rake.yml/badge.svg["Build", link="https://github.com/lutaml/lutaml-klin/actions/workflows/rake.yml"]
+
+== Purpose
+
+Lutaml-Klin orchestrates UML-to-XSD transformation workflows using pre-built
+LUR (LutaML UML Repository) and LXR (LutaML XSD Repository) packages for
+optimal performance and reliability.
+
+It provides a complete solution for:
+
+* **Mapping generation**: Create YAML mappings showing UML class ↔ XSD element relationships
+* **Type resolution**: Resolve UML types to XSD types using multiple strategies
+* **Validation**: Generate comprehensive reports tracking resolution status
+* **Interactive browsing**: Generate SPA websites for exploring mappings
+* **Bidirectional lookup**: Query mappings in both directions (UML→XSD or XSD→UML)
+
+The system is designed around pre-built packages that are created once and used
+many times, eliminating the need for repeated parsing of large XMI and XSD files.
+
+== Features
+
+* <<lur-lxr-integration,LUR+LXR Package Integration>>: Fast loading from pre-built packages
+* <<mapping-generation,UML-to-XSD Mapping>>: Comprehensive mapping with resolution tracking
+* <<xsd-generation,XSD Schema Generation>>: Generate ShapeChange-compatible XSD schemas from UML
+* <<type-resolution,Type Resolution Engine>>: Multi-strategy resolution (overrides, ShapeChange, schema repository)
+* <<validation,Validation Reports>>: JSON and Markdown reports with statistics
+* <<bidirectional-lookup,Bidirectional Lookup>>: Query mappings in both directions
+* <<spa-generation,Interactive SPA Website>>: Browse mappings in a web interface
+* <<unified-process,Unified Process Command>>: Single command for complete workflow
+* <<cli-interface,CLI Interface>>: Thor-based command-line tools for all operations
+
+== Architecture
+
+Lutaml-Klin follows a clean 4-layer architecture with strict separation of concerns:
+
+.High-level architecture with LUR+LXR integration
+[source]
+----
+┌────────────────────────────────────────────────────────────┐
+│  Input: Pre-built Packages (Built Once, Used Many Times)   │
+│                                                             │
+│  LUR Package (.lur)     LXR Package (.lxr)                 │
+│  UML Model from XMI     XSD Schemas                        │
+│  Built by: lutaml       Built by: lutaml-xsd               │
+│  Load time: <100ms      Load time: <100ms                  │
+└────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌────────────────────────────────────────────────────────────┐
+│  lutaml-klin: Pure Orchestration (No Parsing!)             │
+│                                                             │
+│  1. Load LUR → UmlRepository API                           │
+│  2. Load LXR → SchemaRepository API                        │
+│  3. Load ShapeChange Config                                │
+│  4. Execute Resolution (Strategy Pattern)                  │
+│  5. Generate Outputs (YAML, Reports, SPA)                  │
+└────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌────────────────────────────────────────────────────────────┐
+│  Output: Three Formats                                      │
+│                                                             │
+│  ├─ YAML Mappings (per package)                            │
+│  ├─ Validation Reports (JSON/Markdown)                     │
+│  └─ SPA Website (Interactive HTML/JS)                      │
+└────────────────────────────────────────────────────────────┘
+----
+
+.Resolution Engine with Strategy Pattern
+[source]
+----
+┌──────────────────────────────────────────────────────┐
+│           Type Resolution Strategies                  │
+│          (Ordered by Priority)                        │
+└──────────────────────────────────────────────────────┘
+                        │
+        ┌───────────────┼───────────────┐
+        │               │               │
+        ▼               ▼               ▼
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│   Override   │ │ ShapeChange  │ │   Schema     │
+│   Strategy   │ │   Strategy   │ │ Repository   │
+│  (Priority 1)│ │  (Priority 2)│ │  Strategy    │
+│              │ │              │ │  (Priority 3)│
+└──────────────┘ └──────────────┘ └──────────────┘
+     │                  │                  │
+     └──────────────────┴──────────────────┘
+                        │
+                        ▼
+              ┌──────────────────┐
+              │ Resolution Result │
+              │  - Status         │
+              │  - Method         │
+              │  - Confidence     │
+              │  - Metadata       │
+              └──────────────────┘
+----
+
+For detailed architecture documentation, see link:MAPPING_WORKFLOW_ARCHITECTURE.md[Mapping Workflow Architecture].
+
+[[shapechange-process]]
+== ShapeChange Integration
+
+=== General
+
+Lutaml-klin integrates with ShapeChange by using ShapeChange XML configuration
+files to drive the mapping process. This provides compatibility with existing
+ShapeChange-based workflows while offering significant performance improvements.
+
+=== How It Works
+
+Lutaml-klin uses ShapeChange configurations in three ways:
+
+1. **For Mapping Documentation** (`process` command): Extract encoding rules and
+   type mappings to document how UML maps to existing XSD schemas
+
+2. **For XSD Generation** (`xsd` command): Apply encoding rules to generate new
+   XSD schemas from UML models
+
+3. **For Automatic LXR Creation** (`--auto-lxr` flag): Extract schema locations
+   from config to automatically build LXR packages
+
+.ShapeChange configuration usage workflow
+[source]
+----
+ShapeChange Config XML
+       │
+       ├─ Package Information
+       │  └─→ Maps UML packages to XSD namespaces
+       │
+       ├─ Type Mappings (xsdMapEntries)
+       │  └─→ Defines UML type → XSD type rules
+       │
+       ├─ Encoding Rules
+       │  └─→ Transformation rules for XSD generation
+       │
+       └─ Namespace Declarations
+          └─→ XML namespace prefix → URI mappings
+----
+
+=== Running ShapeChange-Compatible Workflows
+
+==== Complete PLATEAU Mapping Workflow
+
+[example]
+====
+[source,shell]
+----
+# Step 1: Build LUR package from PLATEAU XMI (one-time)
+lutaml xmi package build \
+  /path/to/plateau/20251010-242.xmi \
+  -o packages/plateau_all.lur
+
+# Step 2: Process with ShapeChange config using auto-LXR
+# This automatically extracts schema info from config and creates LXR
+lutaml-klin process \
+  --lur packages/plateau_all.lur \
+  --shapechange reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --auto-lxr \
+  --packages "**::urf,**::uro" \
+  --output plateau_output/ \
+  --verbose
+
+# Step 3: Query the generated mappings
+lutaml-klin lookup "UrbanPlanningArea" \
+  --mapping plateau_output/mappings/schema_mapping.yaml
+
+# Step 4: Browse interactive SPA
+open plateau_output/spa/index.html
+----
+
+This workflow:
+
+* Uses ShapeChange config to extract schema locations
+* Automatically creates cached LXR package
+* Applies ShapeChange encoding rules for type resolution
+* Generates complete documentation with traceability
+
+The `--auto-lxr` flag means you don't need to manually create the LXR package—
+lutaml-klin extracts schema information from the ShapeChange config and builds
+it automatically with intelligent caching.
+====
+
+==== Manual LXR Package Creation
+
+If you prefer to create and reuse LXR packages manually:
+
+[example]
+====
+[source,shell]
+----
+# Step 1: Extract schema info from ShapeChange config
+lutaml-klin create-lxr \
+  --shapechange reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --output packages/plateau_schemas.lxr \
+  --name "PLATEAU Schemas" \
+  --version "3.2" \
+  --validate
+
+# Step 2: Use the LXR package for processing
+lutaml-klin process \
+  --lur packages/plateau_all.lur \
+  --lxr packages/plateau_schemas.lxr \
+  --config reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --packages "**" \
+  --output output/
+----
+
+The LXR package can be reused across multiple runs and projects, loading in
+<100ms vs seconds for XSD parsing.
+====
+
+=== ShapeChange Config Features Supported
+
+✅ **XsdMapEntry**: Type mappings with encoding rule filters
+✅ **XmlNamespace**: Namespace prefix and URI declarations
+✅ **PackageInfo**: Package-to-namespace mappings
+✅ **EncodingRule**: Rule inheritance and composition
+✅ **XInclude**: Modular configuration files
+✅ **Target parameters**: Output directory, encoding rule defaults
+
+Not yet supported (future enhancements):
+- Some advanced transformation rules
+- Constraint mapping
+- Profile-based filtering
+
+== Installation
+
+Add this line to your application's Gemfile:
+
+[source,ruby]
+----
+gem "lutaml-klin"
+gem "lutaml", "~> 1.0"      # For LUR packages
+gem "lutaml-xsd", "~> 1.0"  # For LXR packages
+----
+
+And then execute:
+
+[source,shell]
+----
+bundle install
+----
+
+Or install it yourself as:
+
+[source,shell]
+----
+gem install lutaml-klin
+gem install lutaml lutaml-xsd
+----
+
+[[quick-start]]
+== Quick Start
+
+=== General
+
+The fastest way to get started is using the unified `process` command that
+handles the complete workflow in a single operation.
+
+=== Prerequisites
+
+Before running lutaml-klin, you need to build LUR and LXR packages from your
+source files:
+
+[source,shell]
+----
+# 1. Build LUR package from XMI (one-time operation)
+lutaml xmi package build model.xmi -o model.lur
+
+# 2. Build LXR package from XSD schemas (one-time operation)
+lutaml-xsd package build config.yaml -o schemas.lxr
+----
+
+=== Complete Workflow
+
+[source,shell]
+----
+# 3. Generate mappings, validation, and SPA website
+lutaml-klin process \
+  --lur model.lur \
+  --lxr schemas.lxr \
+  --config shapechange.xml \
+  --packages "**" \
+  --output output/
+----
+
+This single command will:
+
+* Load the UML model from the LUR package
+* Load the XSD schemas from the LXR package
+* Parse the ShapeChange configuration
+* Generate YAML mappings for all packages
+* Create validation reports (JSON and Markdown)
+* Generate an interactive SPA website
+
+.Output directory structure
+====
+[source]
+----
+output/
+├── mappings/
+│   ├── ModelRoot_Core.yaml
+│   ├── ModelRoot_Extensions.yaml
+│   └── ...
+├── validation/
+│   ├── validation_report.json
+│   └── validation_report.md
+└── spa/
+    ├── index.html
+    ├── assets/
+    │   ├── css/
+    │   └── js/
+    └── data/
+        └── mappings.json
+----
+====
+
+[[cli-interface]]
+== CLI Commands
+
+Lutaml-Klin provides several commands via the `lutaml-klin` executable.
+
+All commands support the `--verbose` flag for detailed output.
+
+[[unified-process]]
+=== Process Command (Unified Workflow)
+
+==== General
+
+The `process` command is the recommended way to use lutaml-klin. It executes
+the complete UML-to-XSD mapping workflow in a single operation.
+
+==== Syntax
+
+[source,shell]
+----
+lutaml-klin process \
+  --lur PATH \
+  --lxr PATH \
+  --config PATH \
+  --packages PATTERN \
+  --output PATH \
+  [--type-overrides PATH] \
+  [--generate-mappings] \
+  [--generate-spa] \
+  [--validate] \
+  [--verbose]
+----
+
+Where,
+
+`--lur PATH`:: Path to the LUR package file (.lur)
+`--lxr PATH`:: Path to the LXR package file (.lxr)
+`--config PATH`:: Path to the ShapeChange configuration XML file
+`--packages PATTERN`:: Package filter pattern (e.g., "i-UR::**", default: "**")
+`--output PATH`:: Output directory path
+`--type-overrides PATH`:: Optional path to type override YAML file
+`--generate-mappings`:: Generate YAML mappings (default: true)
+`--generate-spa`:: Generate SPA website (default: true)
+`--validate`:: Generate validation reports (default: true)
+`--verbose`:: Enable detailed logging
+
+==== Example: Full workflow for PLATEAU URF package
+
+[example]
+====
+[source,shell]
+----
+lutaml-klin process \
+  --lur plateau_uml.lur \
+  --lxr plateau_schemas.lxr \
+  --config reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --packages "ModelRoot::i-UR::**" \
+  --output output/ \
+  --verbose
+----
+
+This generates:
+
+* YAML mappings for all packages matching the filter
+* JSON validation report with statistics
+* Markdown validation report for human review
+* Interactive SPA website for browsing mappings
+====
+
+==== Example: With type overrides
+
+[example]
+====
+Create a type override file `overrides.yaml`:
+
+[source,yaml]
+----
+type_overrides:
+  OldTypeName: NewTypeName
+  CharacterString: string
+  Integer: integer
+----
+
+Then run:
+
+[source,shell]
+----
+lutaml-klin process \
+  --lur model.lur \
+  --lxr schemas.lxr \
+  --config config.xml \
+  --packages "**" \
+  --output output/ \
+  --type-overrides overrides.yaml
+----
+====
+
+==== Example: Mappings only (skip validation and SPA)
+
+[example]
+====
+[source,shell]
+----
+lutaml-klin process \
+  --lur model.lur \
+  --lxr schemas.lxr \
+  --config config.xml \
+  --packages "**" \
+  --output output/ \
+  --no-validate \
+  --no-generate-spa
+----
+====
+
+[[bidirectional-lookup]]
+=== Lookup Commands
+
+==== General
+
+The lookup commands provide bidirectional query capabilities for exploring
+mappings.
+
+==== Auto-detection Lookup
+
+The `lookup` command auto-detects the lookup direction based on the identifier
+format.
+
+[source,shell]
+----
+lutaml-klin lookup IDENTIFIER \
+  --mapping PATH \
+  [--format text|json|yaml] \
+  [--fuzzy] \
+  [--verbose]
+----
+
+Where,
+
+`IDENTIFIER`:: UML class/attribute name or XSD type/element name
+`--mapping PATH`:: Path to mapping YAML file
+`--format FORMAT`:: Output format (text, json, or yaml; default: text)
+`--fuzzy`:: Enable fuzzy matching
+`--verbose`:: Enable detailed logging
+
+.Example: Lookup UML class
+[example]
+====
+[source,shell]
+----
+lutaml-klin lookup "ModelRoot::i-UR::urf::UrbanPlanningArea" \
+  --mapping output/mappings/ModelRoot_i-UR_urf.yaml
+----
+
+Output:
+[source,text]
+----
+=== Lookup Result ===
+Query: ModelRoot::i-UR::urf::UrbanPlanningArea
+Direction: uml_to_xsd
+Matches: 1
+
+--- Match 1 ---
+UML Class: UrbanPlanningArea
+  Package: ModelRoot::i-UR::urf
+  Stereotype: FeatureType
+XSD Element: UrbanPlanningArea
+XSD Type: urf:UrbanPlanningAreaType
+XSD Namespace: http://www.opengis.net/citygml/ext/urf/2.0
+Resolution Status: resolved
+Resolution Method: schema_repository
+----
+====
+
+.Example: Lookup XSD type
+[example]
+====
+[source,shell]
+----
+lutaml-klin lookup "gml:CodeType" \
+  --mapping output/mappings/complete.yaml \
+  --format json
+----
+
+Output:
+[source,json]
+----
+{
+  "query": "gml:CodeType",
+  "direction": "xsd_to_uml",
+  "match_count": 3,
+  "matches": [
+    {
+      "xsd_type": "gml:CodeType",
+      "uml_class": "BuildingStructureType",
+      "uml_package": "ModelRoot::i-UR::urf",
+      "resolution_status": "resolved"
+    },
+    ...
+  ]
+}
+----
+====
+
+==== UML-to-XSD Lookup
+
+[source,shell]
+----
+lutaml-klin lookup-uml IDENTIFIER \
+  --mapping PATH \
+  [--format text|json|yaml] \
+  [--fuzzy]
+----
+
+.Example: Lookup UML attribute
+[example]
+====
+[source,shell]
+----
+lutaml-klin lookup-uml "UrbanPlanningArea::areaType" \
+  --mapping output/mappings/ModelRoot_i-UR_urf.yaml
+----
+====
+
+==== XSD-to-UML Lookup
+
+[source,shell]
+----
+lutaml-klin lookup-xsd IDENTIFIER \
+  --mapping PATH \
+  [--format text|json|yaml] \
+  [--fuzzy]
+----
+
+.Example: Lookup XSD element
+[example]
+====
+[source,shell]
+----
+lutaml-klin lookup-xsd "urf:UrbanPlanningAreaType" \
+  --mapping output/mappings/ModelRoot_i-UR_urf.yaml
+----
+====
+
+==== Interactive Lookup Mode
+
+[source,shell]
+----
+lutaml-klin interactive-lookup --mapping PATH
+----
+
+.Example: Interactive session
+[example]
+====
+[source,shell]
+----
+lutaml-klin interactive-lookup --mapping output/mappings/complete.yaml
+----
+
+Session:
+[source,text]
+----
+=== Lutaml-Klin Interactive Lookup ===
+Enter 'exit' or 'quit' to exit
+Enter 'help' for usage instructions
+
+lookup> UrbanPlanningArea
+=== Lookup Result ===
+...
+
+lookup> --fuzzy CodeType
+=== Lookup Result ===
+...
+
+lookup> exit
+Goodbye!
+----
+====
+
+[[mapping-generation]]
+=== Legacy Generate Command
+
+==== General
+
+The `generate` command is maintained for backward compatibility but the
+`process` command is recommended for new workflows.
+
+==== Syntax
+
+[source,shell]
+----
+lutaml-klin generate CONFIG XMI XSD_DIR OUTPUT \
+  --package PACKAGE_NAME \
+  [--encoding-rule RULE] \
+  [--type-mapping PATH] \
+  [--verbose]
+----
+
+=== Merge Command
+
+==== General
+
+The `merge` command combines multiple YAML mapping files into a single file.
+
+==== Syntax
+
+[source,shell]
+----
+lutaml-klin merge INPUT_FILE1 INPUT_FILE2 ... OUTPUT_FILE [--verbose]
+----
+
+.Example: Merge multiple package mappings
+[example]
+====
+[source,shell]
+----
+lutaml-klin merge \
+  output/mappings/package1.yaml \
+  output/mappings/package2.yaml \
+  output/mappings/package3.yaml \
+  output/mappings/complete.yaml
+----
+====
+
+[[validation]]
+=== Validate Command
+
+==== General
+
+The `validate` command checks mapping files for structure and content validity.
+
+==== Syntax
+
+[source,shell]
+----
+lutaml-klin validate MAPPING_FILE [--schema SCHEMA_FILE] [--verbose]
+----
+
+.Example: Validate mapping file
+[example]
+====
+[source,shell]
+----
+lutaml-klin validate output/mappings/ModelRoot_i-UR_urf.yaml --verbose
+----
+====
+
+=== Report Command
+
+==== General
+
+The `report` command generates human-readable transformation reports from
+mapping files.
+
+==== Syntax
+
+[source,shell]
+----
+lutaml-klin report MAPPING_FILE [--output OUTPUT_FILE] [--verbose]
+----
+
+.Example: Generate investigation report
+[example]
+====
+[source,shell]
+----
+lutaml-klin report output/mappings/ModelRoot_i-UR_urf.yaml \
+  --output reports/investigation.txt
+----
+====
+
+=== Version Command
+
+[source,shell]
+----
+lutaml-klin version
+----
+
+[[ruby-api]]
+== Ruby API
+
+=== General
+
+Lutaml-Klin provides a comprehensive Ruby API for programmatic usage.
+
+=== Mapping Generation
+
+.Basic mapping workflow
+[example]
+====
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Initialize repositories
+uml_repo = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(
+  lur_path: "model.lur"
+)
+xsd_repo = Lutaml::Klin::Repositories::SchemaRepositoryAdapter.new(
+  lxr_path: "schemas.lxr"
+)
+
+# Load ShapeChange configuration
+config = Lutaml::Klin::ShapeChange::ConfigParser.parse_file(
+  "shapechange.xml"
+)
+
+# Create mapping workflow
+workflow = Lutaml::Klin::Application::MappingWorkflow.new(
+  uml_repository: uml_repo,
+  xsd_repository: xsd_repo,
+  shapechange_config: config,
+  type_overrides: {"OldType" => "NewType"}
+)
+
+# Generate mapping for a package
+mapping = workflow.generate_mapping_for_package("ModelRoot::Core")
+
+# Save to file
+workflow.save_mapping(mapping, "output/core_mapping.yaml")
+----
+====
+
+.Multiple packages
+[example]
+====
+[source,ruby]
+----
+# Generate mappings for multiple packages
+packages = ["ModelRoot::Core", "ModelRoot::Extensions"]
+schema_mapping = workflow.generate_mappings_for_packages(packages)
+
+# Access mapping data
+schema_mapping.package_mappings.each do |pkg_mapping|
+  puts "Package: #{pkg_mapping.uml_package_name}"
+  puts "Resolution rate: #{pkg_mapping.resolution_rate}%"
+
+  pkg_mapping.class_mappings.each do |class_mapping|
+    puts "  Class: #{class_mapping.uml_name}"
+    puts "  XSD Type: #{class_mapping.xsd_type_name}"
+    puts "  Status: #{class_mapping.resolution_status}"
+  end
+end
+----
+====
+
+=== Validation Workflow
+
+.Generate validation reports
+[example]
+====
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load existing mapping
+mapping = Lutaml::Klin::Mapping::SchemaMapping.from_yaml(
+  File.read("output/mappings/complete.yaml")
+)
+
+# Create validation workflow
+validation = Lutaml::Klin::Application::ValidationWorkflow.new
+
+# Generate reports
+result = validation.validate_and_report(mapping, "output/validation/")
+
+# Access validation results
+puts "Total classes: #{result.statistics[:total_classes]}"
+puts "Resolved: #{result.statistics[:resolved_classes]}"
+puts "Resolution rate: #{result.statistics[:resolution_rate]}%"
+
+# Check specific issues
+result.issues.each do |issue|
+  puts "#{issue[:severity]}: #{issue[:message]}"
+end
+----
+====
+
+=== Lookup Workflow
+
+.Programmatic lookups
+[example]
+====
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Initialize lookup workflow
+lookup = Lutaml::Klin::Application::LookupWorkflow.new(
+  "output/mappings/complete.yaml"
+)
+
+# UML to XSD lookup
+result = lookup.lookup_uml_to_xsd(
+  "ModelRoot::i-UR::urf::UrbanPlanningArea"
+)
+
+if result.found?
+  result.matches.each do |match|
+    puts "UML: #{match[:uml_class]}"
+    puts "XSD: #{match[:xsd_type]}"
+    puts "Namespace: #{match[:xsd_namespace]}"
+  end
+end
+
+# XSD to UML lookup
+result = lookup.lookup_xsd_to_uml("gml:CodeType", fuzzy: true)
+
+# Format result as JSON
+json_output = lookup.format_result(result, format: :json)
+puts json_output
+----
+====
+
+=== SPA Generation
+
+.Generate interactive website
+[example]
+====
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load mapping
+mapping = Lutaml::Klin::Mapping::SchemaMapping.from_yaml(
+  File.read("output/mappings/complete.yaml")
+)
+
+# Create SPA workflow
+spa = Lutaml::Klin::Application::SpaWorkflow.new
+
+# Generate website
+spa.generate_spa(
+  mapping: mapping,
+  output_path: "output/spa/",
+  title: "My UML-XSD Mappings",
+  theme: "dark"
+)
+
+puts "SPA generated at: output/spa/index.html"
+----
+====
+
+[[output-structure]]
+== Output Structure
+
+=== General
+
+The `process` command generates a structured output directory with three main
+components.
+
+=== Directory Layout
+
+[source]
+----
+output/
+├── mappings/              # YAML mapping files (one per package)
+│   ├── ModelRoot_Core.yaml
+│   ├── ModelRoot_Extensions.yaml
+│   └── ...
+├── validation/            # Validation reports
+│   ├── validation_report.json      # Machine-readable
+│   └── validation_report.md        # Human-readable
+└── spa/                   # Interactive website
+    ├── index.html         # Main page
+    ├── assets/
+    │   ├── css/
+    │   │   └── style.css
+    │   └── js/
+    │       ├── app.js
+    │       └── search.js
+    └── data/
+        └── mappings.json  # Mapping data for UI
+----
+
+=== YAML Mapping Files
+
+Each package mapping is saved as a separate YAML file with the following structure:
+
+[source,yaml]
+----
+---
+version: "1.0"
+created_at: "2024-01-15T10:30:00Z"
+uml_name: Core
+uml_package_name: ModelRoot::Core
+xsd_namespace: http://example.org/core
+xsd_namespace_prefix: core
+resolution_statistics:
+  total_classes: 25
+  resolved_classes: 23
+  resolution_rate: 0.92
+class_mappings:
+  - uml_name: Building
+    uml_qualified_name: ModelRoot::Core::Building
+    uml_stereotype: FeatureType
+    xsd_element_name: Building
+    xsd_type_name: BuildingType
+    xsd_namespace: http://example.org/core
+    resolution_status: resolved
+    resolution_method: schema_repository
+    resolution_confidence: 1.0
+    attribute_mappings:
+      - uml_name: buildingID
+        uml_type: CharacterString
+        uml_multiplicity: 0..1
+        xsd_name: buildingID
+        xsd_type: string
+        xsd_min_occurs: 0
+        xsd_max_occurs: 1
+        resolution_status: resolved
+        resolution_method: shapechange_mapping
+----
+
+=== Validation Reports
+
+==== JSON Report
+
+Machine-readable validation report with comprehensive statistics:
+
+[source,json]
+----
+{
+  "version": "1.0",
+  "generated_at": "2024-01-15T10:30:00Z",
+  "statistics": {
+    "total_packages": 3,
+    "total_classes": 75,
+    "resolved_classes": 70,
+    "total_attributes": 350,
+    "resolved_attributes": 340,
+    "overall_resolution_rate": 0.933
+  },
+  "packages": [
+    {
+      "name": "ModelRoot::Core",
+      "resolution_rate": 0.92,
+      "issues": [
+        {
+          "severity": "warning",
+          "class": "ObsoleteClass",
+          "message": "No XSD mapping found"
+        }
+      ]
+    }
+  ]
+}
+----
+
+==== Markdown Report
+
+Human-readable validation report:
+
+[source,markdown]
+----
+# Validation Report
+
+Generated: 2024-01-15 10:30:00 UTC
+
+## Summary
+
+- Total Packages: 3
+- Total Classes: 75
+- Resolved Classes: 70 (93.3%)
+- Total Attributes: 350
+- Resolved Attributes: 340 (97.1%)
+
+## Package Details
+
+### ModelRoot::Core
+
+Resolution Rate: 92.0%
+
+#### Issues
+
+⚠️ **Warning**: ObsoleteClass - No XSD mapping found
+----
+
+=== SPA Website
+
+The interactive SPA website provides:
+
+* **Search functionality**: Find classes and attributes by name
+* **Filtering**: Filter by resolution status, package, stereotype
+* **Navigation**: Browse package hierarchy
+* **Details view**: See complete mapping details for each class
+* **Statistics dashboard**: Overall resolution statistics
+* **Export capability**: Download filtered results as JSON
+
+[[examples]]
+== Examples
+
+=== Example: PLATEAU Complete Workflow with Auto-LXR
+
+.Complete PLATEAU workflow with automatic LXR package creation
+[example]
+====
+This example demonstrates the complete workflow for processing PLATEAU i-UR data,
+including automatic LXR package creation from ShapeChange configurations.
+
+[source,shell]
+----
+# Step 1: Build LUR package from PLATEAU XMI (one-time)
+lutaml xmi package build \
+  /path/to/plateau/sources/xmi/20251010-242.xmi \
+  -o packages/plateau_all.lur
+
+# Step 2: Process URO package with auto-LXR
+# The --auto-lxr flag automatically creates and caches LXR packages
+lutaml-klin process \
+  --lur packages/plateau_all.lur \
+  --shapechange reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --auto-lxr \
+  --packages "**::uro" \
+  --output output/uro/ \
+  --verbose
+
+# Step 3: Process URF package (reuses cached LXR)
+lutaml-klin process \
+  --lur packages/plateau_all.lur \
+  --shapechange reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --auto-lxr \
+  --packages "**::urf" \
+  --output output/urf/ \
+  --verbose
+
+# Step 4: Query the generated mappings
+lutaml-klin lookup "UrbanPlanningArea" \
+  --mapping output/urf/mappings/schema_mapping.yaml
+
+# Step 5: Browse interactive SPA
+open output/urf/spa/index.html
+----
+
+The generated YAML mappings include full traceability:
+
+[source,yaml]
+----
+version: "1.0"
+generated_at: "2025-10-31T10:00:00+09:00"
+
+source_lur: "packages/plateau_all.lur"
+source_lxr: ".lutaml-klin/cache/ShapeChangeConfig_Plateau_urf_1730337600.lxr"
+source_config: "reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml"
+
+traceability:
+  resolution_strategies:
+    - "TypeOverrideStrategy"
+    - "ShapeChangeStrategy"
+    - "SchemaRepositoryStrategy"
+  lxr_package_info:
+    name: "PLATEAU Schema Repository"
+    version: "3.2"
+    total_types: 2764
+  lur_package_info:
+    total_classes: 662
+    total_packages: 58
+
+package_mappings:
+  # ... mappings ...
+----
+====
+
+=== Example: Manual LXR Package Creation for PLATEAU
+
+.Build PLATEAU LXR package manually for reuse across projects
+[example]
+====
+[source,shell]
+----
+# Step 1: Create LXR configuration file
+cat > examples/plateau_schemas_config.yaml <<'EOF'
+files:
+  - /path/to/plateau/reference-docs/xsd/i-ur/urbanObject.xsd
+  - /path/to/plateau/reference-docs/xsd/i-ur/urbanFunction.xsd
+
+namespace_mappings:
+  - prefix: "urf"
+    uri: "https://www.geospatial.jp/iur/urf/3.2"
+  - prefix: "uro"
+    uri: "https://www.geospatial.jp/iur/uro/3.2"
+  - prefix: "gml"
+    uri: "http://www.opengis.net/gml/3.2"
+
+metadata:
+  name: "PLATEAU Schema Repository"
+  version: "3.2"
+  description: "i-UR Urban Function and Object schemas"
+EOF
+
+# Step 2: Build LXR package using lutaml-klin
+bin/lutaml-klin create-lxr \
+  --shapechange reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --output packages/plateau_schemas.lxr \
+  --name "PLATEAU Schema Repository" \
+  --version "3.2" \
+  --validate \
+  --verbose
+
+# Step 3: Use the LXR package for fast processing
+lutaml-klin process \
+  --lur packages/plateau_all.lur \
+  --lxr packages/plateau_schemas.lxr \
+  --config reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --packages "**" \
+  --output output/ \
+  --verbose
+
+# The LXR package loads in <100ms vs seconds for XSD parsing
+----
+====
+
+=== Example: PLATEAU URF Package Mapping
+
+.Complete workflow for PLATEAU Urban Function data
+[example]
+====
+[source,shell]
+----
+# 1. Build packages (one-time)
+lutaml xmi package build plateau_data/urf.xmi -o packages/plateau_urf.lur
+lutaml-xsd package build plateau_data/schemas_config.yaml -o packages/plateau_schemas.lxr
+
+# 2. Generate all outputs
+lutaml-klin process \
+  --lur packages/plateau_urf.lur \
+  --lxr packages/plateau_schemas.lxr \
+  --config reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --packages "ModelRoot::i-UR::urf::**" \
+  --output plateau_output/ \
+  --verbose
+
+# 3. Query the results
+lutaml-klin lookup "UrbanPlanningArea" \
+  --mapping plateau_output/mappings/ModelRoot_i-UR_urf.yaml \
+  --fuzzy
+
+# 4. Open the SPA website
+open plateau_output/spa/index.html
+----
+====
+
+=== Example: Validation with Type Overrides
+
+.Handle custom type mappings
+[example]
+====
+Create `custom_types.yaml`:
+
+[source,yaml]
+----
+type_overrides:
+  # Override standard types
+  CharacterString: string
+  Integer: integer
+  Real: double
+  Boolean: boolean
+
+  # Custom domain types
+  BuildingTypeCode: gml:CodeType
+  MeasureValue: gml:MeasureType
+----
+
+Generate with overrides:
+
+[source,shell]
+----
+lutaml-klin process \
+  --lur model.lur \
+  --lxr schemas.lxr \
+  --config config.xml \
+  --packages "**" \
+  --output output/ \
+  --type-overrides custom_types.yaml
+----
+
+Review results:
+
+[source,shell]
+----
+# Check validation report
+cat output/validation/validation_report.md
+
+# Query specific type
+lutaml-klin lookup "BuildingTypeCode" \
+  --mapping output/mappings/complete.yaml
+----
+====
+
+=== Example: Incremental Package Processing
+
+.Process specific packages only
+[example]
+====
+[source,shell]
+----
+# Process only Building-related packages
+lutaml-klin process \
+  --lur citygml.lur \
+  --lxr citygml_schemas.lxr \
+  --config config.xml \
+  --packages "CityGML::Building::**" \
+  --output output/building/
+
+# Process Transportation packages separately
+lutaml-klin process \
+  --lur citygml.lur \
+  --lxr citygml_schemas.lxr \
+  --config config.xml \
+  --packages "CityGML::Transportation::**" \
+  --output output/transportation/
+
+# Merge the results
+lutaml-klin merge \
+  output/building/mappings/*.yaml \
+  output/transportation/mappings/*.yaml \
+  output/complete_mapping.yaml
+----
+====
+
+=== Example: Automated CI/CD Integration
+
+.Continuous validation of mappings
+[example]
+====
+[source,shell]
+----
+#!/bin/bash
+# ci-validate-mappings.sh
+
+set -e
+
+echo "Generating mappings..."
+lutaml-klin process \
+  --lur packages/model.lur \
+  --lxr packages/schemas.lxr \
+  --config config/shapechange.xml \
+  --packages "**" \
+  --output build/mappings/ \
+  --no-generate-spa
+
+echo "Validating mappings..."
+lutaml-klin validate build/mappings/complete.yaml
+
+echo "Checking resolution rate..."
+RESOLUTION_RATE=$(cat build/mappings/validation/validation_report.json | \
+  jq -r '.statistics.overall_resolution_rate')
+
+THRESHOLD=0.95
+if (( $(echo "$RESOLUTION_RATE < $THRESHOLD" | bc -l) )); then
+  echo "Error: Resolution rate $RESOLUTION_RATE below threshold $THRESHOLD"
+  exit 1
+fi
+
+echo "Success: Resolution rate $RESOLUTION_RATE meets threshold"
+----
+====
+
+[[lur-lxr-integration]]
+== LUR+LXR Integration
+
+=== General
+
+Lutaml-Klin leverages pre-built packages for performance and reliability:
+
+* **LUR packages** (`.lur`): Built from XMI files using `lutaml`
+* **LXR packages** (`.lxr`): Built from XSD schemas using `lutaml-xsd`
+
+=== Benefits
+
+* **Fast loading**: Packages load in <100ms vs. seconds for XML parsing
+* **Consistency**: Same parsed model used across all operations
+* **Validation**: Packages are validated at build time
+* **Portability**: Single file contains complete model
+* **Version control**: Track model changes through package files
+
+=== Building Packages
+
+.Build LUR package from XMI
+[example]
+====
+[source,shell]
+----
+lutaml xmi package build model.xmi -o model.lur
+----
+====
+
+.Build LXR package from XSD schemas
+[example]
+====
+Create a configuration file `schemas_config.yaml`:
+
+[source,yaml]
+----
+schemas:
+  - path: schemas/core.xsd
+    namespace: http://example.org/core
+  - path: schemas/extensions.xsd
+    namespace: http://example.org/ext
+----
+
+Build the package:
+
+[source,shell]
+----
+lutaml-xsd package build schemas_config.yaml -o schemas.lxr
+----
+====
+
+[[type-resolution]]
+== Type Resolution
+
+=== General
+
+The Resolution Engine uses a strategy pattern with three ordered strategies:
+
+1. **Type Override Strategy**: User-defined type mappings (highest priority)
+2. **ShapeChange Mapping Strategy**: Mappings from ShapeChange configuration
+3. **Schema Repository Strategy**: Direct XSD schema lookups (lowest priority)
+
+=== Resolution Result
+
+Each resolution produces a result with:
+
+* **Status**: `resolved`, `partial`, or `unresolved`
+* **Method**: Which strategy resolved the type
+* **Confidence**: Confidence score (0.0 to 1.0)
+* **Metadata**: Additional resolution details
+* **Error**: Error message if unresolved
+
+=== Example Resolution Flow
+
+[source]
+----
+UML Type: "CharacterString"
+     │
+     ▼
+1. Type Override Strategy
+   Check: type_overrides["CharacterString"]
+   Result: "string" ✓ (confidence: 1.0)
+
+   → Resolution complete, skip remaining strategies
+----
+
+[[spa-generation]]
+== SPA Website Generation
+
+=== General
+
+The SPA (Single Page Application) generator creates an interactive website for
+exploring UML-XSD mappings.
+
+=== Features
+
+* **Responsive design**: Works on desktop and mobile
+* **Search**: Full-text search across all mappings
+* **Filtering**: Filter by package, stereotype, resolution status
+* **Navigation**: Tree view of package hierarchy
+* **Details**: Complete mapping details with resolution metadata
+* **Statistics**: Real-time resolution statistics
+* **Export**: Download filtered results as JSON or YAML
+
+=== Customization
+
+The SPA can be customized through options:
+
+[source,ruby]
+----
+spa = Lutaml::Klin::Application::SpaWorkflow.new
+
+spa.generate_spa(
+  mapping: mapping,
+  output_path: "output/spa/",
+  title: "My Project Mappings",
+  theme: "dark",  # or "light"
+  enable_search: true,
+  enable_export: true
+)
+----
+
+[[xsd-generation]]
+== XSD Schema Generation
+
+=== General
+
+Lutaml-Klin provides complete XSD schema generation from UML models, offering a
+pure Ruby alternative to ShapeChange. The implementation follows ShapeChange's
+encoding rules and generates identical XSD output.
+
+=== Features
+
+* **ShapeChange compatibility**: Generates XSD schemas matching ShapeChange output
+* **Rule-based processing**: Implements standard ShapeChange encoding rules
+* **Multiple processors**: Object elements, complex types, sequences, property types, enumerations, code lists
+* **Configurable**: Uses ShapeChange XML configuration files
+* **Package-based**: Generate schemas for specific packages or all packages
+
+=== Architecture
+
+.XSD Generation workflow
+[source]
+----
+┌─────────────────────────────────────────────────────────┐
+│  Input: UML Model + ShapeChange Configuration           │
+│                                                          │
+│  LUR Package (.lur)     ShapeChange Config (.xml)       │
+│  UML Classes, Enums     Encoding Rules, Map Entries     │
+└─────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│  XSD Generator (Rule-Based Processor Chain)             │
+│                                                          │
+│  1. Load encoding rules from config                     │
+│  2. Select packages to process                          │
+│  3. Apply processors to each class:                     │
+│     • ObjectElementProcessor    → <xs:element>          │
+│     • ComplexTypeProcessor      → <xs:complexType>      │
+│     • SequenceProcessor         → <xs:sequence>         │
+│     • PropertyElementProcessor  → property elements     │
+│     • PropertyTypeProcessor     → property types        │
+│     • EnumerationProcessor      → <xs:simpleType>       │
+│     • CodeListProcessor         → code list types       │
+│  4. Generate XSD document with namespaces               │
+└─────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│  Output: XSD Schema Files                               │
+│                                                          │
+│  ├─ urbanObject.xsd (URO package)                       │
+│  ├─ urbanFunction.xsd (URF package)                     │
+│  └─ ... (one file per package)                          │
+└─────────────────────────────────────────────────────────┘
+----
+
+=== Command Line Usage
+
+==== Basic XSD Generation
+
+[source,shell]
+----
+lutaml-klin xsd \
+  --lur packages/plateau_all.lur \
+  --config reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --packages "uro,urf" \
+  --output schemas/
+----
+
+This generates XSD schemas for the specified packages.
+
+Where,
+
+`--lur PATH`:: Path to the LUR package file containing UML model
+`--config PATH`:: Path to ShapeChange configuration XML file
+`--packages LIST`:: Comma-separated list of package names to process
+`--output PATH`:: Output directory for generated XSD files
+`--verbose`:: Enable detailed logging (optional)
+
+==== Example: Generate URO Schema
+
+[example]
+====
+[source,shell]
+----
+lutaml-klin xsd \
+  --lur packages/plateau_all.lur \
+  --config reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --packages "uro" \
+  --output output/schemas/ \
+  --verbose
+----
+
+Output:
+[source,text]
+----
+Generating XSD schemas...
+  Package: uro
+    Namespace: https://www.geospatial.jp/iur/uro/3.2
+    Prefix: uro
+    Classes processed: 232
+    Types generated: 487
+    Output: output/schemas/urbanObject.xsd
+Done!
+----
+====
+
+==== Example: Generate Multiple Packages
+
+[example]
+====
+[source,shell]
+----
+lutaml-klin xsd \
+  --lur packages/plateau_all.lur \
+  --config reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --packages "uro,urf,bldg" \
+  --output output/schemas/
+----
+
+This generates:
+* `urbanObject.xsd` (URO package)
+* `urbanFunction.xsd` (URF package)
+* `building.xsd` (Building package)
+====
+
+=== Ruby API Usage
+
+.Programmatic XSD generation
+[example]
+====
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load UML repository
+uml_repo = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(
+  "packages/plateau_all.lur"
+)
+
+# Parse ShapeChange configuration
+config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(
+  "reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml"
+)
+
+# Create XSD generator
+generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+  uml_repo.repository,
+  config
+)
+
+# Generate schemas for specific packages
+results = generator.generate_schemas(
+  ["uro", "urf"],
+  "output/schemas/"
+)
+
+# Review results
+results.each do |result|
+  puts "Package: #{result[:package]}"
+  puts "  File: #{result[:file]}"
+  puts "  Namespace: #{result[:namespace]}"
+  puts "  Classes: #{result[:classes_processed]}"
+end
+----
+====
+
+=== Generated XSD Structure
+
+The generated XSD files follow GML/ISO 19136 conventions:
+
+.Sample generated XSD (simplified)
+[example]
+====
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:uro="https://www.geospatial.jp/iur/uro/3.2"
+  xmlns:gml="http://www.opengis.net/gml/3.2"
+  targetNamespace="https://www.geospatial.jp/iur/uro/3.2"
+  elementFormDefault="qualified"
+  version="3.2.0">
+
+  <!-- Object element -->
+  <xs:element name="Building"
+              type="uro:BuildingType"
+              substitutionGroup="gml:AbstractFeature"/>
+
+  <!-- Complex type -->
+  <xs:complexType name="BuildingType">
+    <xs:complexContent>
+      <xs:extension base="gml:AbstractFeatureType">
+        <xs:sequence>
+          <xs:element name="class" type="gml:CodeType" minOccurs="0"/>
+          <xs:element name="function" type="gml:CodeType"
+                      minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="usage" type="gml:CodeType"
+                      minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Property type -->
+  <xs:complexType name="BuildingPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="uro:Building"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+
+</xs:schema>
+----
+====
+
+=== Encoding Rules
+
+The XSD generator implements ShapeChange encoding rules:
+
+* `rule-xsd-cls-object-element`: Generate global element for each class
+* `rule-xsd-cls-type`: Generate complex type for each class
+* `rule-xsd-cls-sequence`: Generate xs:sequence for properties
+* `rule-xsd-prop-element`: Generate property elements
+* `rule-xsd-prop-propertyType`: Generate property type wrappers
+* `rule-xsd-cls-enum-object-element`: Generate enumeration types
+* `rule-xsd-cls-codelist-object-element`: Generate code list types
+
+These rules are configured in the ShapeChange XML configuration file.
+
+=== Validation
+
+Generated XSD schemas are validated against:
+
+* XML Schema specification compliance
+* GML/ISO 19136 conventions
+* ShapeChange output parity
+
+.Run validation tests
+[source,shell]
+----
+bundle exec rspec spec/integration/xsd_validation_against_lxr_spec.rb
+----
+
+=== Known Limitations
+
+* **Enumeration support**: Requires `enums_in_package` method in lutaml-xmi (future enhancement)
+* **Documentation annotations**: xs:annotation elements not yet generated (future enhancement)
+
+These limitations are tracked and will be addressed in future releases.
+
+== Documentation Links
+
+* link:MAPPING_WORKFLOW_ARCHITECTURE.md[Mapping Workflow Architecture] - Complete workflow and architecture guide
+* link:docs/UNIFIED_OO_ARCHITECTURE.md[OO Architecture Documentation] - Object-oriented design patterns
+* link:docs/SPA_AND_VALIDATION_ARCHITECTURE.md[SPA and Validation] - Website and validation design
+* link:docs/PHASE_9_INTEGRATION_TESTS.md[Integration Tests] - Comprehensive test suite
+* link:STATUS_FINAL.md[Project Status] - Current implementation status and metrics
+* link:LUTAML-KLIN-UNIFIED-PLAN.adoc[Unified Plan] - Overall project plan
+
+== Development
+
+Run all tests:
+
+[source,shell]
+----
+bundle exec rake spec
+----
+
+Run specific test file:
+
+[source,shell]
+----
+bundle exec rspec spec/lutaml/klin/application/mapping_workflow_spec.rb
+----
+
+Run integration tests:
+
+[source,shell]
+----
+bundle exec rspec spec/integration/
+----
+
+Run with code coverage:
+
+[source,shell]
+----
+COVERAGE=true bundle exec rake spec
+----
+
+Run RuboCop:
+
+[source,shell]
+----
+bundle exec rubocop -A
+----
+
+== Project Status
+
+See link:STATUS.md[STATUS.md] for detailed project status, metrics, and
+implementation progress.
+
+Current status: **Phase 9 Complete** - All integration tests passing (389 total tests)
+
+== License
+
+This gem is available as open source under the terms of the MIT License.
+
+== Contributing
+
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/lutaml/lutaml-klin.

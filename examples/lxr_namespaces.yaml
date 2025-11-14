@@ -1,0 +1,71 @@
+# Example namespace configuration for LXR package creation
+# Use this file with the manual input strategy (--namespaces option)
+#
+# This configuration defines namespace prefix-to-URI mappings for XSD schemas
+# that will be included in the LXR package.
+
+namespace_mappings:
+  # PLATEAU i-UR namespaces
+  - prefix: "urf"
+    uri: "https://www.geospatial.jp/iur/urf/3.2"
+
+  - prefix: "uro"
+    uri: "https://www.geospatial.jp/iur/uro/3.2"
+
+  # OGC GML namespaces
+  - prefix: "gml"
+    uri: "http://www.opengis.net/gml/3.2"
+
+  - prefix: "gmlcov"
+    uri: "http://www.opengis.net/gmlcov/1.0"
+
+  # ISO standard namespaces
+  - prefix: "gco"
+    uri: "http://www.isotc211.org/2005/gco"
+
+  - prefix: "gmd"
+    uri: "http://www.isotc211.org/2005/gmd"
+
+  - prefix: "gmx"
+    uri: "http://www.isotc211.org/2005/gmx"
+
+  - prefix: "gss"
+    uri: "http://www.isotc211.org/2005/gss"
+
+  - prefix: "gsr"
+    uri: "http://www.isotc211.org/2005/gsr"
+
+  - prefix: "gts"
+    uri: "http://www.isotc211.org/2005/gts"
+
+  # XML standard namespaces
+  - prefix: "xlink"
+    uri: "http://www.w3.org/1999/xlink"
+
+  - prefix: "xsi"
+    uri: "http://www.w3.org/2001/XMLSchema-instance"
+
+  - prefix: "xs"
+    uri: "http://www.w3.org/2001/XMLSchema"
+
+# Usage Examples:
+#
+# 1. Create LXR package from XSD directory with this config:
+#    lutaml-klin create-lxr output.lxr \
+#      --xsd-dir path/to/schemas \
+#      --namespaces examples/lxr_namespaces.yaml
+#
+# 2. With custom package metadata:
+#    lutaml-klin create-lxr plateau_schemas.lxr \
+#      --xsd-dir final_schemas \
+#      --namespaces examples/lxr_namespaces.yaml \
+#      --name "PLATEAU Schemas" \
+#      --version "5.0.0" \
+#      --description "PLATEAU v5.0 XSD schema repository"
+#
+# 3. With validation:
+#    lutaml-klin create-lxr output.lxr \
+#      --xsd-dir schemas \
+#      --namespaces examples/lxr_namespaces.yaml \
+#      --validate \
+#      --verbose

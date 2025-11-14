@@ -1,0 +1,92 @@
+# PLATEAU i-UR Schema Repository Configuration
+# Creates LXR package from PLATEAU XSD schemas for complete workflow validation
+
+# Primary XSD schema files to include in the package
+files:
+  - /Users/mulgogi/src/mn/mn-samples-plateau/reference-docs/xsd/i-ur/urbanObject.xsd
+  - /Users/mulgogi/src/mn/mn-samples-plateau/reference-docs/xsd/i-ur/urbanFunction.xsd
+
+# Schema location mappings
+# Maps references in XSD imports/includes to actual file locations
+schema_location_mappings:
+  # Map relative URO schema path to actual location
+  - from: "../../uro/3.2/urbanObject.xsd"
+    to: "/Users/mulgogi/src/mn/mn-samples-plateau/reference-docs/xsd/i-ur/urbanObject.xsd"
+
+  # Map relative URF schema path to actual location
+  - from: "../../urf/3.2/urbanFunction.xsd"
+    to: "/Users/mulgogi/src/mn/mn-samples-plateau/reference-docs/xsd/i-ur/urbanFunction.xsd"
+
+  # Map GML schema references using regex pattern
+  - from: !ruby/regexp /(?:\.\.\/)+gml\/(.+\.xsd)$/
+    to: "/Users/mulgogi/src/mn/mn-samples-plateau/reference-docs/xsd/gml/\\1"
+
+  # Map ISO/TC 211 schema references
+  - from: !ruby/regexp /https:\/\/schemas\.isotc211\.org\/(.+)/
+    to: "/Users/mulgogi/src/mn/mn-samples-plateau/reference-docs/xsd/iso/\\1"
+
+  # Map OGC schema references
+  - from: !ruby/regexp /http:\/\/schemas\.opengis\.net\/(.+)/
+    to: "/Users/mulgogi/src/mn/mn-samples-plateau/reference-docs/xsd/ogc/\\1"
+
+# Namespace prefix-to-URI mappings
+namespace_mappings:
+  # PLATEAU i-UR Urban Function namespace
+  - prefix: "urf"
+    uri: "https://www.geospatial.jp/iur/urf/3.2"
+
+  # PLATEAU i-UR Urban Object namespace
+  - prefix: "uro"
+    uri: "https://www.geospatial.jp/iur/uro/3.2"
+
+  # OGC GML 3.2 namespace
+  - prefix: "gml"
+    uri: "http://www.opengis.net/gml/3.2"
+
+  # W3C XLink namespace
+  - prefix: "xlink"
+    uri: "http://www.w3.org/1999/xlink"
+
+  # ISO 19115 Geographic Metadata - Common Classes
+  - prefix: "gco"
+    uri: "http://www.isotc211.org/2005/gco"
+
+  # ISO 19115 Geographic Metadata
+  - prefix: "gmd"
+    uri: "http://www.isotc211.org/2005/gmd"
+
+  # ISO 19115 Geographic Metadata - Extensions
+  - prefix: "gmx"
+    uri: "http://www.isotc211.org/2005/gmx"
+
+  # ISO 19107 Spatial Schema
+  - prefix: "gss"
+    uri: "http://www.isotc211.org/2005/gss"
+
+  # ISO 19111 Spatial Referencing
+  - prefix: "gsr"
+    uri: "http://www.isotc211.org/2005/gsr"
+
+  # ISO 19108 Temporal Schema
+  - prefix: "gts"
+    uri: "http://www.isotc211.org/2005/gts"
+
+# Package metadata
+metadata:
+  name: "PLATEAU Schema Repository"
+  version: "3.2"
+  description: "i-UR Urban Function and Object schemas with dependencies for PLATEAU workflow validation"
+
+# LXR package build options
+build_options:
+  # XSD bundling mode: include_all, include_referenced, minimal
+  xsd_mode: "include_all"
+
+  # Resolution mode: resolved, unresolved, mixed
+  resolution_mode: "resolved"
+
+  # Serialization format: marshal, json, yaml
+  serialization_format: "marshal"
+
+  # Validate package after creation
+  validate: true

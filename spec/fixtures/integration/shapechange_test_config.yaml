@@ -1,0 +1,61 @@
+# Minimal ShapeChange-style configuration for integration testing
+# This represents key sections of a ShapeChange configuration
+
+namespaces:
+  - namespace: http://www.w3.org/2001/XMLSchema
+    prefix: xs
+  - namespace: http://www.opengis.net/gml/3.2
+    prefix: gml
+  - namespace: http://example.org/test
+    prefix: test
+
+type_mappings:
+  # Basic ISO/OGC type mappings
+  - uml_type: CharacterString
+    xml_type: gml:CodeType
+    xml_property_type: gml:CodePropertyType
+    xml_element: gml:Code
+
+  - uml_type: Integer
+    xml_type: xs:integer
+
+  - uml_type: Real
+    xml_type: xs:double
+
+  - uml_type: Boolean
+    xml_type: xs:boolean
+
+  - uml_type: Date
+    xml_type: xs:date
+
+  - uml_type: DateTime
+    xml_type: xs:dateTime
+
+  # Geometric types
+  - uml_type: GM_Point
+    xml_type: gml:PointType
+    xml_property_type: gml:PointPropertyType
+
+  - uml_type: GM_Curve
+    xml_type: gml:CurveType
+    xml_property_type: gml:CurvePropertyType
+
+  - uml_type: GM_Surface
+    xml_type: gml:SurfaceType
+    xml_property_type: gml:SurfacePropertyType
+
+package_mappings:
+  - uml_package: ModelRoot::TestPackage
+    xsd_namespace: http://example.org/test
+    xsd_prefix: test
+    schema_location: test.xsd
+
+  - uml_package: ModelRoot::Core
+    xsd_namespace: http://example.org/core
+    xsd_prefix: core
+    schema_location: core.xsd
+
+encoding_rules:
+  - name: iso19136_2007
+    version: 1.0
+    description: ISO 19136:2007 GML 3.2 encoding

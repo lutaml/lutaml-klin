@@ -1,0 +1,55 @@
+<article class="component-detail element-detail">
+  <header class="component-header">
+    <h1 class="component-name">
+      <span class="prefix">{{ element.prefix }}:</span>{{ element.name }}
+    </h1>
+    <div class="component-meta">
+      <span class="badge category-badge">Element</span>
+      {% if element.abstract %}
+        <span class="badge abstract-badge">Abstract</span>
+      {% endif %}
+      <span class="namespace-badge">{{ element.namespace }}</span>
+    </div>
+  </header>
+
+  {% if element.documentation %}
+    <section class="documentation">
+      <h2>Documentation</h2>
+      <p>{{ element.documentation }}</p>
+    </section>
+  {% endif %}
+
+  {% if element.type %}
+    <section class="type-info">
+      <h2>Type Information</h2>
+      <dl>
+        <dt>Type:</dt>
+        <dd>
+          <a href="#" class="type-link" data-ref="{{ element.type }}">
+            {{ element.type }}
+          </a>
+        </dd>
+
+        {% if element.substitution_group %}
+          <dt>Substitution Group:</dt>
+          <dd>
+            <a href="#" class="type-link" data-ref="{{ element.substitution_group }}">
+              {{ element.substitution_group }}
+            </a>
+          </dd>
+        {% endif %}
+
+        <dt>Cardinality:</dt>
+        <dd>{{ element.min_occurs }}..{{ element.max_occurs }}</dd>
+      </dl>
+    </section>
+  {% endif %}
+
+  {% if element.cross_references %}
+    {% include 'cross_references', refs: element.cross_references %}
+  {% endif %}
+
+  {% if element.uml_mapping %}
+    {% include 'uml_mapping', mapping: element.uml_mapping %}
+  {% endif %}
+</article>

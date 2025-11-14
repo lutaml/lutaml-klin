@@ -1,0 +1,65 @@
+<div class="nav-container">
+  <!-- Tier 1: Schema Selector -->
+  <div class="nav-tier nav-tier-1" role="navigation" aria-label="Schema selection">
+    <h3 class="nav-tier-title">Schemas</h3>
+    <select id="schema-selector" class="schema-select" aria-label="Select schema">
+      {% for schema in schemas %}
+        <option value="{{ schema.id }}"
+                data-namespace="{{ schema.namespace }}"
+                {% if forloop.first %}selected{% endif %}>
+          {{ schema.name }}
+        </option>
+      {% endfor %}
+    </select>
+    <div class="schema-info" aria-live="polite">
+      <span class="schema-version"></span>
+      <span class="schema-namespace"></span>
+    </div>
+  </div>
+
+  <!-- Tier 2: Category List -->
+  <div class="nav-tier nav-tier-2" role="navigation" aria-label="Component categories">
+    <h4 class="nav-tier-title">Components</h4>
+    <ul class="category-list" role="list">
+      {% assign categories = "elements,complex-types,simple-types,attributes" | split: "," %}
+      {% assign category_names = "Elements,Complex Types,Simple Types,Attributes" | split: "," %}
+      {% assign category_icons = "icon-element,icon-type,icon-simple,icon-attr" | split: "," %}
+
+      {% for category in categories %}
+        <li class="category-item"
+            data-category="{{ category }}"
+            role="listitem"
+            tabindex="0"
+            aria-label="{{ category_names[forloop.index0] }}">
+          <svg class="icon" aria-hidden="true">
+            <use href="#{{ category_icons[forloop.index0] }}"></use>
+          </svg>
+          <span class="category-name">{{ category_names[forloop.index0] }}</span>
+          <span class="category-count" aria-label="count"></span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Tier 3: Item List with Search -->
+  <div class="nav-tier nav-tier-3" role="navigation" aria-label="Component items">
+    <!-- Search box -->
+    <div class="search-container">
+      <input type="search"
+             id="item-search"
+             class="search-input"
+             placeholder="Search items..."
+             aria-label="Search schema components"
+             autocomplete="off">
+      <button class="search-clear" aria-label="Clear search">&times;</button>
+    </div>
+
+    <!-- Item list (populated by JavaScript) -->
+    <ul class="item-list" id="item-list" role="list">
+      <!-- Dynamically populated -->
+    </ul>
+  </div>
+</div>
+
+<!-- SVG icon sprite -->
+{% include 'icon_sprite' %}

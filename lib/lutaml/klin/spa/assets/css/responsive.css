@@ -1,0 +1,242 @@
+/* ============================================
+   Responsive Design Enhancements
+   ============================================ */
+
+/* ============================================
+   Tablet and Below (< 1024px)
+   ============================================ */
+@media (max-width: 1023px) {
+  /* Typography adjustments */
+  h1 { font-size: var(--font-size-2xl); }
+  h2 { font-size: var(--font-size-xl); }
+
+  /* Component detail */
+  .component-name {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Type info layout */
+  .type-info dl {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+
+  .type-info dt {
+    margin-top: var(--space-md);
+  }
+
+  .type-info dt:first-child {
+    margin-top: 0;
+  }
+
+  /* Mapping diagram */
+  .mapping-flow {
+    flex-direction: column;
+  }
+
+  .mapping-arrow {
+    transform: rotate(90deg);
+  }
+
+  /* Schema grid */
+  .schema-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Component counts */
+  .component-counts {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============================================
+   Mobile (< 640px)
+   ============================================ */
+@media (max-width: 639px) {
+  /* Base font size */
+  html {
+    font-size: 14px;
+  }
+
+  /* Further typography adjustments */
+  h1 { font-size: var(--font-size-xl); }
+
+  /* Breadcrumbs */
+  .breadcrumb-list {
+    flex-wrap: wrap;
+  }
+
+  /* Component meta */
+  .component-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Badges */
+  .badge {
+    margin-bottom: var(--space-xs);
+  }
+
+  /* Mapping details */
+  .mapping-details {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+
+  .mapping-details dt {
+    margin-top: var(--space-md);
+    font-weight: 700;
+  }
+
+  .mapping-details dt:first-child {
+    margin-top: 0;
+  }
+
+  /* Component counts - stack vertically on very small screens */
+  .component-counts {
+    grid-template-columns: 1fr;
+  }
+
+  /* Metadata badges */
+  .metadata-badges {
+    flex-direction: column;
+  }
+}
+
+/* ============================================
+   Large Desktop (> 1440px)
+   ============================================ */
+@media (min-width: 1440px) {
+  /* Increase sidebar width on large screens */
+  :root {
+    --sidebar-width: 380px;
+  }
+
+  /* Adjust content area padding */
+  .content-area {
+    padding: var(--space-2xl);
+  }
+
+  /* Schema grid - more columns on large screens */
+  .schema-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+  /* Hide navigation */
+  .sidebar,
+  .mobile-header,
+  .nav-overlay,
+  .breadcrumbs {
+    display: none;
+  }
+
+  /* Adjust layout for print */
+  .app-container {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .content-area {
+    padding: 0;
+    overflow: visible;
+  }
+
+  /* Ensure links are visible */
+  a {
+    text-decoration: underline;
+  }
+
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: var(--color-text-secondary);
+  }
+
+  /* Page breaks */
+  .component-detail,
+  .schema-card {
+    page-break-inside: avoid;
+  }
+
+  /* Remove shadows and borders for cleaner print */
+  .schema-card,
+  .documentation,
+  .cross-references,
+  .uml-mapping {
+    box-shadow: none;
+    border: 1px solid var(--color-border);
+  }
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .content-area,
+  .item-list {
+    scroll-behavior: auto;
+  }
+}
+
+/* ============================================
+   High Contrast Mode
+   ============================================ */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: #000000;
+    --color-text-secondary: #000000;
+  }
+
+  [data-theme="dark"] {
+    --color-border: #ffffff;
+    --color-text-secondary: #ffffff;
+  }
+
+  .badge,
+  .category-badge,
+  .abstract-badge,
+  .namespace-badge {
+    border: 2px solid currentColor;
+  }
+}
+
+/* ============================================
+   Touch Device Optimizations
+   ============================================ */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase touch targets */
+  .category-item,
+  .item-list li,
+  button,
+  a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Remove hover effects that don't work on touch */
+  .category-item:hover,
+  .item-list li:hover,
+  .schema-card:hover {
+    transform: none;
+  }
+
+  /* Make search clear button larger for easier tapping */
+  .search-clear {
+    width: 32px;
+    height: 32px;
+  }
+}

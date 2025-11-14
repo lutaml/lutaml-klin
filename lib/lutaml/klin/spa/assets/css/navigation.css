@@ -1,0 +1,249 @@
+/* ============================================
+   Navigation Styles
+   ============================================ */
+
+.nav-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ============================================
+   Navigation Tiers
+   ============================================ */
+.nav-tier {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nav-tier-title {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-sm);
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   Tier 1: Schema Selector
+   ============================================ */
+.nav-tier-1 {
+  flex-shrink: 0;
+}
+
+.schema-select {
+  width: 100%;
+  padding: var(--space-sm);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: border-color var(--transition-speed);
+}
+
+.schema-select:hover {
+  border-color: var(--color-primary);
+}
+
+.schema-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.schema-info {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.schema-info span {
+  display: block;
+  margin-top: var(--space-xs);
+}
+
+/* ============================================
+   Tier 2: Category List
+   ============================================ */
+.nav-tier-2 {
+  flex-shrink: 0;
+}
+
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  margin-bottom: var(--space-xs);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.category-item:hover,
+.category-item:focus {
+  background: var(--color-surface-hover);
+  outline: none;
+}
+
+.category-item.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.category-item .icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.category-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.category-count {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  background: var(--color-surface);
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+}
+
+.category-item.active .category-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* ============================================
+   Tier 3: Item List with Search
+   ============================================ */
+.nav-tier-3 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-bottom: none;
+}
+
+.search-container {
+  position: relative;
+  margin-bottom: var(--space-sm);
+}
+
+.search-input {
+  width: 100%;
+  padding: var(--space-sm);
+  padding-right: var(--space-xl);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  transition: border-color var(--transition-speed);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.search-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.search-clear {
+  position: absolute;
+  right: var(--space-sm);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition-speed);
+  font-size: var(--font-size-xl);
+  line-height: 1;
+}
+
+.search-input:not(:placeholder-shown) + .search-clear {
+  opacity: 1;
+}
+
+.search-clear:hover {
+  color: var(--color-text-primary);
+}
+
+/* ============================================
+   Item List
+   ============================================ */
+.item-list {
+  flex: 1;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.item-list li {
+  padding: var(--space-sm);
+  margin-bottom: 1px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+  font-size: var(--font-size-sm);
+}
+
+.item-list li:hover {
+  background: var(--color-surface-hover);
+}
+
+.item-list li.active {
+  background: var(--color-primary);
+  color: white;
+  font-weight: 600;
+}
+
+.item-list li.hidden {
+  display: none;
+}
+
+/* ============================================
+   Scrollbar Styling
+   ============================================ */
+.item-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.item-list::-webkit-scrollbar-track {
+  background: var(--color-surface);
+  border-radius: 4px;
+}
+
+.item-list::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.item-list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}

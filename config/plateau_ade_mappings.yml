@@ -1,0 +1,664 @@
+---
+# PLATEAU CityGML ADE Hook Element Mappings
+# Extracted from VBA_MODIFICATIONS_ANALYSIS.md
+#
+# Purpose: Enable PLATEAU URO/URF attributes to hook into CityGML base types
+# Pattern: Each mapping generates a global element with substitutionGroup
+#
+# Encoding Rule: X-plateau (custom rule using X- prefix convention)
+# Usage: Configured in ShapeChange XML config, not as CLI option
+
+ade_hooks:
+  # ============================================================================
+  # Building Module Extensions (bldg:_GenericApplicationPropertyOfAbstractBuilding)
+  # Total: 14 elements
+  # ============================================================================
+  - class: DataQualityAttribute
+    element_name: bldgDataQualityAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: DisasterRiskAttribute
+    element_name: bldgDisasterRiskAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: DmAttribute
+    element_name: bldgDmAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: FacilityAttribute
+    element_name: bldgFacilityAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: FacilityIdAttribute
+    element_name: bldgFacilityIdAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: FacilityTypeAttribute
+    element_name: bldgFacilityTypeAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: KeyValuePairAttribute
+    element_name: bldgKeyValuePairAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: RealEstateIDAttribute
+    element_name: bldgRealEstateIDAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: UsecaseAttribute
+    element_name: bldgUsecaseAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: BuildingDetailAttribute
+    element_name: buildingDetailAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: BuildingIDAttribute
+    element_name: buildingIDAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: IfcAttribute
+    element_name: ifcBuildingAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: IndoorAttribute
+    element_name: indoorBuildingAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: LargeCustomerFacilityAttribute
+    element_name: largeCustomerFacilityAttribute
+    citygml_prefix: bldg
+    citygml_base: AbstractBuilding
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  # ============================================================================
+  # Bridge Module Extensions (brid:_GenericApplicationPropertyOfAbstractBridge)
+  # Total: 11 elements
+  # ============================================================================
+  - class: ConstructionBaseAttribute
+    element_name: bridBaseAttribute
+    citygml_prefix: brid
+    citygml_base: AbstractBridge
+    citygml_namespace: http://www.opengis.net/citygml/bridge/2.0
+
+  - class: DataQualityAttribute
+    element_name: bridDataQualityAttribute
+    citygml_prefix: brid
+    citygml_base: AbstractBridge
+    citygml_namespace: http://www.opengis.net/citygml/bridge/2.0
+
+  - class: DisasterRiskAttribute
+    element_name: bridDisasterRiskAttribute
+    citygml_prefix: brid
+    citygml_base: AbstractBridge
+    citygml_namespace: http://www.opengis.net/citygml/bridge/2.0
+
+  - class: DmAttribute
+    element_name: bridDmAttribute
+    citygml_prefix: brid
+    citygml_base: AbstractBridge
+    citygml_namespace: http://www.opengis.net/citygml/bridge/2.0
+
+  - class: FacilityAttribute
+    element_name: bridFacilityAttribute
+    citygml_prefix: brid
+    citygml_base: AbstractBridge
+    citygml_namespace: http://www.opengis.net/citygml/bridge/2.0
+
+  - class: FacilityIdAttribute
+    element_name: bridFacilityIdAttribute
+    citygml_prefix: brid
+    citygml_base: AbstractBridge
+    citygml_namespace: http://www.opengis.net/citygml/bridge/2.0
+
+  - class: FacilityTypeAttribute
+    element_name: bridFacilityTypeAttribute
+    citygml_prefix: brid
+    citygml_base: AbstractBridge
+    citygml_namespace: http://www.opengis.net/citygml/bridge/2.0
+
+  - class: ConstructionFunctionalAttribute
+    element_name: bridFunctionalAttribute
+    citygml_prefix: brid
+    citygml_base: AbstractBridge
+    citygml_namespace: http://www.opengis.net/citygml/bridge/2.0
+
+  - class: KeyValuePairAttribute
+    element_name: bridKeyValuePairAttribute
+    citygml_prefix: brid
+    citygml_base: AbstractBridge
+    citygml_namespace: http://www.opengis.net/citygml/bridge/2.0
+
+  - class: ConstructionRiskAssessmentAttribute
+    element_name: bridRiskAssessmentAttribute
+    citygml_prefix: brid
+    citygml_base: AbstractBridge
+    citygml_namespace: http://www.opengis.net/citygml/bridge/2.0
+
+  - class: ConstructionStructureAttribute
+    element_name: bridStructureAttribute
+    citygml_prefix: brid
+    citygml_base: AbstractBridge
+    citygml_namespace: http://www.opengis.net/citygml/bridge/2.0
+
+  # ============================================================================
+  # Tunnel Module Extensions (tun:_GenericApplicationPropertyOfAbstractTunnel)
+  # Total: 11 elements
+  # ============================================================================
+  - class: ConstructionBaseAttribute
+    element_name: tunBaseAttribute
+    citygml_prefix: tun
+    citygml_base: AbstractTunnel
+    citygml_namespace: http://www.opengis.net/citygml/tunnel/2.0
+
+  - class: DataQualityAttribute
+    element_name: tunDataQualityAttribute
+    citygml_prefix: tun
+    citygml_base: AbstractTunnel
+    citygml_namespace: http://www.opengis.net/citygml/tunnel/2.0
+
+  - class: DisasterRiskAttribute
+    element_name: tunDisasterRiskAttribute
+    citygml_prefix: tun
+    citygml_base: AbstractTunnel
+    citygml_namespace: http://www.opengis.net/citygml/tunnel/2.0
+
+  - class: DmAttribute
+    element_name: tunDmAttribute
+    citygml_prefix: tun
+    citygml_base: AbstractTunnel
+    citygml_namespace: http://www.opengis.net/citygml/tunnel/2.0
+
+  - class: FacilityAttribute
+    element_name: tunFacilityAttribute
+    citygml_prefix: tun
+    citygml_base: AbstractTunnel
+    citygml_namespace: http://www.opengis.net/citygml/tunnel/2.0
+
+  - class: FacilityIdAttribute
+    element_name: tunFacilityIdAttribute
+    citygml_prefix: tun
+    citygml_base: AbstractTunnel
+    citygml_namespace: http://www.opengis.net/citygml/tunnel/2.0
+
+  - class: FacilityTypeAttribute
+    element_name: tunFacilityTypeAttribute
+    citygml_prefix: tun
+    citygml_base: AbstractTunnel
+    citygml_namespace: http://www.opengis.net/citygml/tunnel/2.0
+
+  - class: ConstructionFunctionalAttribute
+    element_name: tunFunctionalAttribute
+    citygml_prefix: tun
+    citygml_base: AbstractTunnel
+    citygml_namespace: http://www.opengis.net/citygml/tunnel/2.0
+
+  - class: KeyValuePairAttribute
+    element_name: tunKeyValuePairAttribute
+    citygml_prefix: tun
+    citygml_base: AbstractTunnel
+    citygml_namespace: http://www.opengis.net/citygml/tunnel/2.0
+
+  - class: ConstructionRiskAssessmentAttribute
+    element_name: tunRiskAssessmentAttribute
+    citygml_prefix: tun
+    citygml_base: AbstractTunnel
+    citygml_namespace: http://www.opengis.net/citygml/tunnel/2.0
+
+  - class: ConstructionStructureAttribute
+    element_name: tunStructureAttribute
+    citygml_prefix: tun
+    citygml_base: AbstractTunnel
+    citygml_namespace: http://www.opengis.net/citygml/tunnel/2.0
+
+  # ============================================================================
+  # Land Use Module Extensions (luse:_GenericApplicationPropertyOfLandUse)
+  # Total: 8 elements
+  # ============================================================================
+  - class: IfcAttribute
+    element_name: ifcLandUseAttribute
+    citygml_prefix: luse
+    citygml_base: LandUse
+    citygml_namespace: http://www.opengis.net/citygml/landuse/2.0
+
+  - class: LandUseDetailAttribute
+    element_name: landUseDetailAttribute
+    citygml_prefix: luse
+    citygml_base: LandUse
+    citygml_namespace: http://www.opengis.net/citygml/landuse/2.0
+
+  - class: DataQualityAttribute
+    element_name: luseDataQualityAttribute
+    citygml_prefix: luse
+    citygml_base: LandUse
+    citygml_namespace: http://www.opengis.net/citygml/landuse/2.0
+
+  - class: DmAttribute
+    element_name: luseDmAttribute
+    citygml_prefix: luse
+    citygml_base: LandUse
+    citygml_namespace: http://www.opengis.net/citygml/landuse/2.0
+
+  - class: FacilityAttribute
+    element_name: luseFacilityAttribute
+    citygml_prefix: luse
+    citygml_base: LandUse
+    citygml_namespace: http://www.opengis.net/citygml/landuse/2.0
+
+  - class: FacilityIdAttribute
+    element_name: luseFacilityIdAttribute
+    citygml_prefix: luse
+    citygml_base: LandUse
+    citygml_namespace: http://www.opengis.net/citygml/landuse/2.0
+
+  - class: FacilityTypeAttribute
+    element_name: luseFacilityTypeAttribute
+    citygml_prefix: luse
+    citygml_base: LandUse
+    citygml_namespace: http://www.opengis.net/citygml/landuse/2.0
+
+  - class: KeyValuePairAttribute
+    element_name: luseKeyValuePairAttribute
+    citygml_prefix: luse
+    citygml_base: LandUse
+    citygml_namespace: http://www.opengis.net/citygml/landuse/2.0
+
+  # ============================================================================
+  # Water Body Module Extensions (wtr:_GenericApplicationPropertyOfWaterBody)
+  # Total: 8 elements
+  # ============================================================================
+  - class: FloodingRiskAttribute
+    element_name: floodingRiskAttribute
+    citygml_prefix: wtr
+    citygml_base: WaterBody
+    citygml_namespace: http://www.opengis.net/citygml/waterbody/2.0
+
+  - class: WaterBodyDetailAttribute
+    element_name: waterBodyDetailAttribute
+    citygml_prefix: wtr
+    citygml_base: WaterBody
+    citygml_namespace: http://www.opengis.net/citygml/waterbody/2.0
+
+  - class: DataQualityAttribute
+    element_name: wtrDataQualityAttribute
+    citygml_prefix: wtr
+    citygml_base: WaterBody
+    citygml_namespace: http://www.opengis.net/citygml/waterbody/2.0
+
+  - class: DmAttribute
+    element_name: wtrDmAttribute
+    citygml_prefix: wtr
+    citygml_base: WaterBody
+    citygml_namespace: http://www.opengis.net/citygml/waterbody/2.0
+
+  - class: FacilityAttribute
+    element_name: wtrFacilityAttribute
+    citygml_prefix: wtr
+    citygml_base: WaterBody
+    citygml_namespace: http://www.opengis.net/citygml/waterbody/2.0
+
+  - class: FacilityIdAttribute
+    element_name: wtrFacilityIdAttribute
+    citygml_prefix: wtr
+    citygml_base: WaterBody
+    citygml_namespace: http://www.opengis.net/citygml/waterbody/2.0
+
+  - class: FacilityTypeAttribute
+    element_name: wtrFacilityTypeAttribute
+    citygml_prefix: wtr
+    citygml_base: WaterBody
+    citygml_namespace: http://www.opengis.net/citygml/waterbody/2.0
+
+  - class: KeyValuePairAttribute
+    element_name: wtrKeyValuePairAttribute
+    citygml_prefix: wtr
+    citygml_base: WaterBody
+    citygml_namespace: http://www.opengis.net/citygml/waterbody/2.0
+
+  # ============================================================================
+  # City Furniture Module Extensions (frn:_GenericApplicationPropertyOfCityFurniture)
+  # Total: 7 elements
+  # ============================================================================
+  - class: CityFurnitureDetailAttribute
+    element_name: cityFurnitureDetailAttribute
+    citygml_prefix: frn
+    citygml_base: CityFurniture
+    citygml_namespace: http://www.opengis.net/citygml/cityfurniture/2.0
+
+  - class: DataQualityAttribute
+    element_name: frnDataQualityAttribute
+    citygml_prefix: frn
+    citygml_base: CityFurniture
+    citygml_namespace: http://www.opengis.net/citygml/cityfurniture/2.0
+
+  - class: DmAttribute
+    element_name: frnDmAttribute
+    citygml_prefix: frn
+    citygml_base: CityFurniture
+    citygml_namespace: http://www.opengis.net/citygml/cityfurniture/2.0
+
+  - class: FacilityAttribute
+    element_name: frnFacilityAttribute
+    citygml_prefix: frn
+    citygml_base: CityFurniture
+    citygml_namespace: http://www.opengis.net/citygml/cityfurniture/2.0
+
+  - class: FacilityIdAttribute
+    element_name: frnFacilityIdAttribute
+    citygml_prefix: frn
+    citygml_base: CityFurniture
+    citygml_namespace: http://www.opengis.net/citygml/cityfurniture/2.0
+
+  - class: FacilityTypeAttribute
+    element_name: frnFacilityTypeAttribute
+    citygml_prefix: frn
+    citygml_base: CityFurniture
+    citygml_namespace: http://www.opengis.net/citygml/cityfurniture/2.0
+
+  - class: KeyValuePairAttribute
+    element_name: frnKeyValuePairAttribute
+    citygml_prefix: frn
+    citygml_base: CityFurniture
+    citygml_namespace: http://www.opengis.net/citygml/cityfurniture/2.0
+
+  # ============================================================================
+  # Transportation Module Extensions (tran:_GenericApplicationPropertyOfTransportationComplex)
+  # Total: 7 elements
+  # ============================================================================
+  - class: DataQualityAttribute
+    element_name: tranDataQualityAttribute
+    citygml_prefix: tran
+    citygml_base: TransportationComplex
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  - class: DmAttribute
+    element_name: tranDmAttribute
+    citygml_prefix: tran
+    citygml_base: TransportationComplex
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  - class: FacilityAttribute
+    element_name: tranFacilityAttribute
+    citygml_prefix: tran
+    citygml_base: TransportationComplex
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  - class: FacilityIdAttribute
+    element_name: tranFacilityIdAttribute
+    citygml_prefix: tran
+    citygml_base: TransportationComplex
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  - class: FacilityTypeAttribute
+    element_name: tranFacilityTypeAttribute
+    citygml_prefix: tran
+    citygml_base: TransportationComplex
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  - class: KeyValuePairAttribute
+    element_name: tranKeyValuePairAttribute
+    citygml_prefix: tran
+    citygml_base: TransportationComplex
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  - class: UsecaseAttribute
+    element_name: tranUsecaseAttribute
+    citygml_prefix: tran
+    citygml_base: TransportationComplex
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  # ============================================================================
+  # Vegetation Module Extensions (veg:_GenericApplicationPropertyOfVegetationObject)
+  # Total: 6 elements
+  # ============================================================================
+  - class: DataQualityAttribute
+    element_name: vegDataQualityAttribute
+    citygml_prefix: veg
+    citygml_base: VegetationObject
+    citygml_namespace: http://www.opengis.net/citygml/vegetation/2.0
+
+  - class: DmAttribute
+    element_name: vegDmAttribute
+    citygml_prefix: veg
+    citygml_base: VegetationObject
+    citygml_namespace: http://www.opengis.net/citygml/vegetation/2.0
+
+  - class: FacilityAttribute
+    element_name: vegFacilityAttribute
+    citygml_prefix: veg
+    citygml_base: VegetationObject
+    citygml_namespace: http://www.opengis.net/citygml/vegetation/2.0
+
+  - class: FacilityIdAttribute
+    element_name: vegFacilityIdAttribute
+    citygml_prefix: veg
+    citygml_base: VegetationObject
+    citygml_namespace: http://www.opengis.net/citygml/vegetation/2.0
+
+  - class: FacilityTypeAttribute
+    element_name: vegFacilityTypeAttribute
+    citygml_prefix: veg
+    citygml_base: VegetationObject
+    citygml_namespace: http://www.opengis.net/citygml/vegetation/2.0
+
+  - class: KeyValuePairAttribute
+    element_name: vegKeyValuePairAttribute
+    citygml_prefix: veg
+    citygml_base: VegetationObject
+    citygml_namespace: http://www.opengis.net/citygml/vegetation/2.0
+
+  # ============================================================================
+  # City Object Group Module Extensions (grp:_GenericApplicationPropertyOfCityObjectGroup)
+  # Total: 4 elements
+  # ============================================================================
+  - class: FiscalYearOfPublication
+    element_name: fiscalYearOfPublication
+    type_override: xs:gYear
+    citygml_prefix: grp
+    citygml_base: CityObjectGroup
+    citygml_namespace: http://www.opengis.net/citygml/cityobjectgroup/2.0
+
+  - class: IfcAttribute
+    element_name: ifcBuildingStoreyAttribute
+    citygml_prefix: grp
+    citygml_base: CityObjectGroup
+    citygml_namespace: http://www.opengis.net/citygml/cityobjectgroup/2.0
+
+  - class: IndoorAttribute
+    element_name: indoorStoreyAttribute
+    citygml_prefix: grp
+    citygml_base: CityObjectGroup
+    citygml_namespace: http://www.opengis.net/citygml/cityobjectgroup/2.0
+
+  - class: Language
+    element_name: language
+    type_override: gml:CodeType
+    citygml_prefix: grp
+    citygml_base: CityObjectGroup
+    citygml_namespace: http://www.opengis.net/citygml/cityobjectgroup/2.0
+
+  # ============================================================================
+  # Road Module Extensions (tran:_GenericApplicationPropertyOfRoad)
+  # Total: 3 elements
+  # ============================================================================
+  - class: RoadType
+    element_name: roadStatus
+    citygml_prefix: tran
+    citygml_base: Road
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  - class: RoadStructureAttribute
+    element_name: roadStructureAttribute
+    citygml_prefix: tran
+    citygml_base: Road
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  - class: TrafficVolumeAttribute
+    element_name: trafficVolumeAttribute
+    citygml_prefix: tran
+    citygml_base: Road
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  # ============================================================================
+  # Building Element-Specific Extensions (Various)
+  # Total: 11 elements
+  # ============================================================================
+  - class: IfcAttribute
+    element_name: ifcBoundarySurfaceAttribute
+    citygml_prefix: bldg
+    citygml_base: BoundarySurface
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: IndoorAttribute
+    element_name: indoorBoundarySurfaceAttribute
+    citygml_prefix: bldg
+    citygml_base: BoundarySurface
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: IfcAttribute
+    element_name: ifcBuildingFurnitureAttribute
+    citygml_prefix: bldg
+    citygml_base: BuildingFurniture
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: IndoorAttribute
+    element_name: indoorFurnitureAttribute
+    citygml_prefix: bldg
+    citygml_base: BuildingFurniture
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: IfcAttribute
+    element_name: ifcIntBuildingInstallationAttribute
+    citygml_prefix: bldg
+    citygml_base: IntBuildingInstallation
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: IndoorAttribute
+    element_name: indoorIntInstallationAttribute
+    citygml_prefix: bldg
+    citygml_base: IntBuildingInstallation
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: IfcAttribute
+    element_name: ifcBuildingInstallationAttribute
+    citygml_prefix: bldg
+    citygml_base: BuildingInstallation
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: IfcAttribute
+    element_name: ifcOpeningAttribute
+    citygml_prefix: bldg
+    citygml_base: Opening
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: IndoorAttribute
+    element_name: indoorOpeningAttribute
+    citygml_prefix: bldg
+    citygml_base: Opening
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: IfcAttribute
+    element_name: ifcRoomAttribute
+    citygml_prefix: bldg
+    citygml_base: Room
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  - class: IndoorAttribute
+    element_name: indoorRoomAttribute
+    citygml_prefix: bldg
+    citygml_base: Room
+    citygml_namespace: http://www.opengis.net/citygml/building/2.0
+
+  # ============================================================================
+  # Relief/DEM Module Extensions (Various)
+  # Total: 3 elements
+  # ============================================================================
+  - class: DataQualityAttribute
+    element_name: demDataQualityAttribute
+    citygml_prefix: dem
+    citygml_base: ReliefFeature
+    citygml_namespace: http://www.opengis.net/citygml/relief/2.0
+
+  - class: KeyValuePairAttribute
+    element_name: demKeyValuePairAttribute
+    citygml_prefix: dem
+    citygml_base: ReliefFeature
+    citygml_namespace: http://www.opengis.net/citygml/relief/2.0
+
+  - class: DmAttribute
+    element_name: demDmAttribute
+    citygml_prefix: dem
+    citygml_base: ReliefComponent
+    citygml_namespace: http://www.opengis.net/citygml/relief/2.0
+
+  # ============================================================================
+  # Transportation Element-Specific Extensions (Various)
+  # Total: 5 elements
+  # ============================================================================
+  - class: RailwayRouteAttribute
+    element_name: railwayRouteAttribute
+    citygml_prefix: tran
+    citygml_base: Railway
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  - class: RailwayTrackAttribute
+    element_name: railwayTrackAttribute
+    citygml_prefix: tran
+    citygml_base: TrafficArea
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  - class: TrafficAreaStructureAttribute
+    element_name: trafficAreaStructureAttribute
+    citygml_prefix: tran
+    citygml_base: TrafficArea
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  - class: TrackAttribute
+    element_name: trackAttribute
+    citygml_prefix: tran
+    citygml_base: Track
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  - class: SquareUrbanPlanAttribute
+    element_name: squareUrbanPlanAttribute
+    citygml_prefix: tran
+    citygml_base: Square
+    citygml_namespace: http://www.opengis.net/citygml/transportation/2.0
+
+  # ============================================================================
+  # Core Module Extensions (core:_GenericApplicationPropertyOfCityObject)
+  # Total: 1 element
+  # ============================================================================
+  - class: PointCloud
+    element_name: pointCloud
+    citygml_prefix: core
+    citygml_base: CityObject
+    citygml_namespace: http://www.opengis.net/citygml/2.0
+
+# Total: 99 ADE hook elements (verified count matches VBA analysis)

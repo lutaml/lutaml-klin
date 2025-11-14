@@ -1,0 +1,25 @@
+# Sample type overrides for integration testing
+# Format: UML Type => XSD Type
+
+type_overrides:
+  # Basic type overrides
+  CharacterString: xs:string
+  Integer: xs:integer
+  Real: xs:double
+  Boolean: xs:boolean
+  Date: xs:date
+  DateTime: xs:dateTime
+
+  # Custom type mappings
+  GM_Point: gml:PointPropertyType
+  GM_Curve: gml:CurvePropertyType
+  GM_Surface: gml:SurfacePropertyType
+
+  # PLATEAU-specific overrides
+  Code: gml:CodeType
+  Measure: gml:MeasureType
+  URI: xs:anyURI
+
+  # Complex type overrides for testing
+  OldLegacyType: modern:NewType
+  DeprecatedClass: current:UpdatedClass

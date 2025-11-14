@@ -1,0 +1,142 @@
+<ShapeChangeConfiguration xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://www.interactive-instruments.de/ShapeChange/Configuration/1.1" xmlns:sc="http://www.interactive-instruments.de/ShapeChange/Configuration/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.interactive-instruments.de/ShapeChange/Configuration/1.1 http://shapechange.net/resources/schema/ShapeChangeConfiguration.xsd">
+	<input>
+		<parameter name="inputModelType" value="EA7"/>
+		<!-- インプットファイルを変更ください -->
+		<parameter name="inputFile" value="202503_current_plateau_v5.0.qea"/>
+		<parameter name="appSchemaName" value="urf"/>
+		<parameter name="publicOnly" value="true"/>
+		<parameter name="checkingConstraints" value="disabled"/>
+		<parameter name="sortedSchemaOutput" value="true"/>
+		<xi:include href="http://shapechange.net/resources/config/StandardAliases.xml"/>
+		<packages>
+ 			<PackageInfo packageName=" urf" ns=" https://www.geospatial.jp/iur/urf/3.2"  nsabr=" urf" xsdDocument=" urbanFunction.xsd" version=" 3.2.1"/>
+ 			<PackageInfo packageName=" uro" ns=" https://www.geospatial.jp/iur/uro/3.2"  nsabr=" uro" xsdDocument=" urbanObject.xsd" version=" 3.2.1"/>
+ 			<PackageInfo packageName=" luse" ns=" http://www.opengis.net/citygml/landuse/2.0"  nsabr=" luse" xsdDocument=" landUse.xsd" version=" 2.0.0"/>
+ 			<PackageInfo packageName=" bldg" ns=" http://www.opengis.net/citygml/building/2.0"  nsabr=" bldg" xsdDocument=" building.xsd" version=" 2.0.0"/>
+ 			<PackageInfo packageName=" brid" ns=" http://www.opengis.net/citygml/bridge/2.0"  nsabr=" brid" xsdDocument=" bridge.xsd" version=" 2.0.0"/>
+ 			<PackageInfo packageName=" tran" ns=" http://www.opengis.net/citygml/transportation/2.0"  nsabr=" tran" xsdDocument=" transportation.xsd" version=" 2.0.0"/>
+ 			<PackageInfo packageName=" tun" ns=" http://www.opengis.net/citygml/tunnel/2.0"  nsabr=" tun" xsdDocument=" tunnel.xsd" version=" 2.0.0"/>
+ 			<PackageInfo packageName=" grp" ns=" http://www.opengis.net/citygml/cityobjectgroup/2.0"  nsabr=" grp" xsdDocument=" cityObjectGroup.xsd" version=" 2.0.0"/>
+ 			<PackageInfo packageName=" frn" ns=" http://www.opengis.net/citygml/cityfurniture/2.0"  nsabr=" frn" xsdDocument=" cityFurniture.xsd" version=" 2.0.0"/>
+ 			<PackageInfo packageName=" veg" ns=" http://www.opengis.net/citygml/vegetation/2.0"  nsabr=" veg" xsdDocument=" vegetation.xsd" version=" 2.0.0"/>
+ 			<PackageInfo packageName=" wtr" ns=" http://www.opengis.net/citygml/waterbody/2.0"  nsabr=" wtr" xsdDocument=" waterBody.xsd" version=" 2.0.0"/>
+ 			<PackageInfo packageName=" dem" ns=" http://www.opengis.net/citygml/relief/2.0"  nsabr=" dem" xsdDocument=" relief.xsd"  version=" 2.0.0"/>
+		</packages>
+	</input>
+	<log>
+		<parameter name="reportLevel" value="INFO"/>
+		<parameter name="logFile" value="test/ea/log.xml"/>
+	</log>
+	<targets>
+		<TargetXmlSchema class="de.interactive_instruments.ShapeChange.Target.XmlSchema.XmlSchema" mode="enabled">
+			<targetParameter name="outputDirectory" value="test/ea"/>
+ 			<targetParameter name="sortedOutput" value="true"/>
+ 			<targetParameter name="defaultEncodingRule" value="X-plateau"/>
+ 			<rules>
+ 				<EncodingRule name="citygml" extends="iso19136_2007">
+					<!-- Support the GML 3.3 association class encoding rule extension for TextureAssociation. -->
+					<rule name="rule-xsd-rel-association-classes"/>
+					<!-- Basic types may be restricted with facets. For example, the length of a subtype of CharacterString -->
+					<!--   may be restricted through the use of the "length" tagged value, or the allowed range of numeric  -->
+					<!--   values may be limited through the use of the tagged values "rangeMinimum" & "rangeMaximum".  -->
+					<rule name="rule-xsd-cls-basictype"/>
+					<!-- A basic type that matches this conversion rule and has a single property with maximum multiplicity  -->
+					<!--   greater than 1 will be converted as a list-based simple type. The list item type is the XSD type  -->
+					<!--   of the UML property value type. If the minimum multiplicity of the UML property is 0 and the      -->
+					<!--   maximum multiplicity is unbounded ('*'), then the length of the resulting list is not restricted. -->
+					<!--   Otherwise, length restrictions are defined according to the multiplicity of the property.         -->
+					<rule name="rule-xsd-cls-basictype-list"/>
+					<!-- If a <<Union>> class has a tagged value "gmlAsGroup" with a value of "true", then the class is    -->
+					<!--   encoded as a global group which is referenced wherever a property is defined that has the union -->
+					<!--   class as its value. (Note that this is only valid if it is clear from the context how to map    -->
+					<!--   the individual values to the conceptual model.)                                                 -->
+					<rule name="rule-xsd-cls-union-asGroup"/>
+					<!-- If an attribute has an initial value, it is converted to a default value in XML Schema.   -->
+					<!--   If the attribute carries the constraint "{frozen}", too, the initial value is converted -->
+					<!--   to a fixed element value in XML Schema.                                                 -->
+					<rule name="rule-xsd-prop-initialValue"/>
+					<!-- Generate constraining facets based on tagged values length, maxLength, -->
+					<!--    size, pattern, rangeMaximum, and rangeMinimum of a property.        -->
+					<rule name="rule-xsd-prop-constrainingFacets"/>
+					<!-- Set default behavior to not generate inline annotation elements. -->
+					<rule name="rule-xsd-all-no-documentation"/>
+					<!-- Enables the OCL 2.2 parser and Schematron code-generator. -->
+					<rule name="rule-xsd-pkg-schematron"/>
+ 				</EncodingRule>
+ 				<!-- Custom PLATEAU rule with ADE hooks -->
+ 				<EncodingRule name="X-plateau" extends="citygml">
+					<rule name="rule-xsd-cls-plateau-ade-hooks"/>
+ 				</EncodingRule>
+ 			</rules>
+ 			<xi:include href="http://shapechange.net/resources/config/StandardRules.xml"/>
+ 			<xi:include href="http://shapechange.net/resources/config/StandardNamespaces.xml"/>
+ 			<xi:include href="http://shapechange.net/resources/config/StandardMapEntries.xml"/>
+			<xsdMapEntries>
+				<XsdMapEntry type="xs::anyURI" xsdEncodingRules="citygml" xmlPropertyType="xs:anyURI" xmlType="xs:anyURI" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::boolean" xsdEncodingRules="citygml" xmlPropertyType="xs:boolean" xmlType="xs:boolean" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::date" xsdEncodingRules="citygml" xmlPropertyType="xs:date" xmlType="xs:date" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::double" xsdEncodingRules="citygml" xmlPropertyType="xs:double" xmlType="xs:double" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::gYear" xsdEncodingRules="citygml" xmlPropertyType="xs:gYear" xmlType="xs:gYear" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::gYearMonth" xsdEncodingRules="citygml" xmlPropertyType="xs:gYearMonth" xmlType="xs:gYearMonth" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::integer" xsdEncodingRules="citygml" xmlPropertyType="xs:integer" xmlType="xs:integer" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::nonNegativeInteger" xsdEncodingRules="citygml" xmlPropertyType="xs:nonNegativeInteger" xmlType="xs:nonNegativeInteger" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::string" xsdEncodingRules="citygml" xmlPropertyType="xs:string" xmlType="xs:string" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gml::CodeType" xsdEncodingRules="citygml" xmlPropertyType="gml:CodeType" xmlType="gml:CodeType" xmlTypeType="complex" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gml::doubleList" xsdEncodingRules="citygml" xmlPropertyType="gml:doubleList" xmlType="gml:doubleList" xmlTypeType="complex" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gml::LengthType" xsdEncodingRules="citygml" xmlPropertyType="gml:LengthType" xmlType="gml:LengthType" xmlTypeType="complex" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gml::MeasureType" xsdEncodingRules="citygml" xmlPropertyType="gml:MeasureType" xmlType="gml:MeasureType" xmlTypeType="complex" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gml:StringOrRefType" xsdEncodingRules="citygml" xmlPropertyType="gml:StringOrRefType" xmlType="gml:StringOrRefType" xmlTypeType="complex" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gml::DirectPosition" xsdEncodingRules="citygml" xmlPropertyType="gml:DirectPositionType" xmlType="gml:DirectPositionType" xmlTypeType="complex" xmlTypeContent="simple"/>
+				<XsdMapEntry type="MultiSurface" xsdEncodingRules="citygml" xmlPropertyType="gml:MultiSurfacePropertyType" xmlType="gml:MultiSurfaceType" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="MultiCurve" xsdEncodingRules="citygml" xmlPropertyType="gml:MultiCurvePropertyType" xmlType="gml:MultiCurveType" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="MultiPoint" xsdEncodingRules="citygml" xmlPropertyType="gml:MultiPointPropertyType" xmlType="gml:MultiPointType" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="GeometricComplex" xsdEncodingRules="citygml" xmlPropertyType="gml:GeometricComplexPropertyType" xmlType="gml:GeometricComplexType" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="Point" xsdEncodingRules="citygml" xmlPropertyType="gml:PointPropertyType" xmlType="gml:PointType" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="_Geometry" xsdEncodingRules="citygml" xmlPropertyType="gml:GeometryPropertyType" xmlType="gml:GeometryType" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="anyURI" xsdEncodingRules="citygml" xmlPropertyType="xs:anyURI" xmlType="xs:anyURI" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="boolean" xsdEncodingRules="citygml" xmlPropertyType="xs:boolean" xmlType="xs:boolean" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="date" xsdEncodingRules="citygml" xmlPropertyType="xs:date" xmlType="xs:date" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="double" xsdEncodingRules="citygml" xmlPropertyType="xs:double" xmlType="xs:double" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gYear" xsdEncodingRules="citygml" xmlPropertyType="xs:gYear" xmlType="xs:gYear" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gYearMonth" xsdEncodingRules="citygml" xmlPropertyType="xs:gYearMonth" xmlType="xs:gYearMonth" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="integer" xsdEncodingRules="citygml" xmlPropertyType="xs:integer" xmlType="xs:integer" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="nonNegativeInteger" xsdEncodingRules="citygml" xmlPropertyType="xs:nonNegativeInteger" xmlType="xs:nonNegativeInteger" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="string" xsdEncodingRules="citygml" xmlPropertyType="xs:string" xmlType="xs:string" xmlTypeType="simple" xmlTypeContent="simple"/>
+			</xsdMapEntries>
+			<xi:include href="StandardNamespaces-v31.xml" />
+			<xmlNamespaces>
+				<XmlNamespace nsabr="gml" ns="http://www.opengis.net/gml" location="http://schemas.opengis.net/gml/3.1.1/base/gml.xsd"/>
+				<XmlNamespace nsabr="uro" ns="https://www.geospatial.jp/iur/uro/3.2" location="https://www.geospatial.jp/iur/schemas/uro/3.2/urbanObject.xsd"/>
+				<XmlNamespace nsabr="urf" ns="https://www.geospatial.jp/iur/urf/3.2" location="https://www.geospatial.jp/iur/schemas/urf/3.2/urbanFunction.xsd"/>
+				<XmlNamespace nsabr="core" ns="http://www.opengis.net/citygml/2.0" location="http://schemas.opengis.net/citygml/2.0/cityGMLBase.xsd" />
+				<XmlNamespace nsabr="app" ns="http://www.opengis.net/citygml/appearance/2.0" location="http://schemas.opengis.net/citygml/appearance/2.0/appearance.xsd" />
+				<XmlNamespace nsabr="brid" ns="http://www.opengis.net/citygml/bridge/2.0" location="http://schemas.opengis.net/citygml/bridge/2.0/bridge.xsd" />
+				<XmlNamespace nsabr="bldg" ns="http://www.opengis.net/citygml/building/2.0" location="http://schemas.opengis.net/citygml/building/2.0/building.xsd" />
+				<XmlNamespace nsabr="frn" ns="http://www.opengis.net/citygml/cityfurniture/2.0" location="http://schemas.opengis.net/citygml/cityfurniture/2.0/cityFurniture.xsd" />
+				<XmlNamespace nsabr="grp" ns="http://www.opengis.net/citygml/cityobjectgroup/2.0" location="http://schemas.opengis.net/citygml/cityobjectgroup/2.0/cityObjectGroup.xsd" />
+				<XmlNamespace nsabr="gen" ns="http://www.opengis.net/citygml/generics/2.0" location="http://schemas.opengis.net/citygml/generics/2.0/generics.xsd" />
+				<XmlNamespace nsabr="luse" ns="http://www.opengis.net/citygml/landuse/2.0" location="http://schemas.opengis.net/citygml/landuse/2.0/landUse.xsd" />
+				<XmlNamespace nsabr="dem" ns="http://www.opengis.net/citygml/relief/2.0" location="http://schemas.opengis.net/citygml/relief/2.0/relief.xsd" />
+				<XmlNamespace nsabr="tran" ns="http://www.opengis.net/citygml/transportation/2.0" location="http://schemas.opengis.net/citygml/transportation/2.0/transportation.xsd" />
+				<XmlNamespace nsabr="tun" ns="http://www.opengis.net/citygml/tunnel/2.0" location="http://schemas.opengis.net/citygml/tunnel/2.0/tunnel.xsd" />
+				<XmlNamespace nsabr="veg" ns="http://www.opengis.net/citygml/vegetation/2.0" location="http://schemas.opengis.net/citygml/vegetation/2.0/vegetation.xsd" />
+				<XmlNamespace nsabr="wtr" ns="http://www.opengis.net/citygml/waterbody/2.0" location="http://schemas.opengis.net/citygml/waterbody/2.0/waterBody.xsd" />
+				<XmlNamespace nsabr="brid" ns="http://www.opengis.net/citygml/bridge/2.0" location="http://schemas.opengis.net/citygml/bridge/2.0/bridge.xsd" />
+			</xmlNamespaces>
+		</TargetXmlSchema>
+		<Target class="de.interactive_instruments.ShapeChange.Target.FeatureCatalogue.FeatureCatalogue" mode="enabled">
+			<targetParameter name="outputDirectory" value="test/ea"/>
+			<targetParameter name="outputFilename" value="test"/>
+			<targetParameter name="sortedOutput" value="true"/>
+			<targetParameter name="inheritedProperties" value="false"/>
+			<targetParameter name="outputFormat" value="HTML"/>
+			<targetParameter name="name" value="'Test application schema'"/>
+			<targetParameter name="scope" value="This feature catalogue ..."/>
+			<targetParameter name="versionNumber" value="n/a"/>
+			<targetParameter name="versionDate" value="n/a"/>
+			<targetParameter name="producer" value="n/a"/>
+			<targetParameter name="xsltPfad" value="http://shapechange.net/resources/xslt"/>
+			<targetParameter name="xslhtmlFile" value="html.xsl"/>
+		</Target>
+	</targets>
+</ShapeChangeConfiguration>

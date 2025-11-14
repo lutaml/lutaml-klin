@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ShapeChangeConfiguration
+    xmlns="http://www.interactive-instruments.de/ShapeChange/Configuration/1.1"
+    xmlns:xi="http://www.w3.org/2001/XInclude">
+  <input>
+    <packages>
+      <PackageInfo packageName="urf"
+                   ns="https://www.geospatial.jp/iur/urf/3.2"
+                   nsabr="urf"
+                   xsdDocument="urbanFunction.xsd"
+                   version="3.2.1"/>
+    </packages>
+  </input>
+  <targets>
+    <TargetXmlSchema>
+      <xmlNamespaces>
+        <XmlNamespace nsabr="gml"
+                      ns="http://www.opengis.net/gml"
+                      location="http://schemas.opengis.net/gml/3.1.1/base/gml.xsd"/>
+      </xmlNamespaces>
+      <xsdMapEntries>
+        <XsdMapEntry type="xs::string"
+                     xsdEncodingRules="citygml"
+                     xmlPropertyType="xs:string"
+                     xmlType="xs:string"
+                     xmlTypeType="simple"
+                     xmlTypeContent="simple"/>
+      </xsdMapEntries>
+    </TargetXmlSchema>
+  </targets>
+</ShapeChangeConfiguration>
