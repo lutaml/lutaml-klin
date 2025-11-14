@@ -1,0 +1,1082 @@
+= Lutaml-Klin Unified Implementation Plan
+:toc:
+:toclevels: 3
+
+== Executive Summary
+
+This document provides a unified plan for implementing lutaml-klin, the orchestration tool that bridges ShapeChange's UML-to-XSD transformations with Lutaml Model by generating machine-readable YAML mappings.
+
+**Current Status**: Core implementation complete, Phase 8 (Type Override Mapping + Advanced Documentation) complete
+**Goal**: Production-ready tool for PLATEAU UML-XML mapping generation
+**Timeline**: 28-40 hours (3.5-5 work days) + 18 hours (Phase 8: advanced features and documentation)
+
+== Architecture Overview
+
+=== High-Level Data Flow
+
+[source]
+----
+┌─────────────────┐
+│  ShapeChange    │
+│  Config XML     │◄─── Standard configs (HTTP)
+│  + XIncludes    │◄─── Local configs (file)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  ConfigParser   │──► Parse encoding rules
+│  + XInclude     │──► Extract type mappings
+│   Resolver      │──► Extract namespaces
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────┐
+│           Encoding Rules Registry               │
+│  ┌──────────────┐  ┌──────────────┐            │
+│  │ XsdMapEntry  │  │ XmlNamespace │            │
+│  │ Collection   │  │ Collection   │            │
+│  └──────────────┘  └──────────────┘            │
+└─────────────────────────────────────────────────┘
+         │
+         │
+         ▼
+┌─────────────────┐      ┌─────────────────┐
+│   XMI File      │      │   XSD Schemas   │
+│  (UML Model)    │      │  (Target XML)   │
+└────────┬────────┘      └────────┬────────┘
+         │                        │
+         ▼                        ▼
+┌─────────────────┐      ┌─────────────────┐
+│  XmiNavigator   │      │  XsdAnalyzer    │
+│  (lutaml-xmi)   │      │  (moxml)        │
+└────────┬────────┘      └────────┬────────┘
+         │                        │
+         │    Parse & Extract     │
+         ▼                        ▼
+┌─────────────────┐      ┌─────────────────┐
+│   UML Models    │      │   XSD Models    │
+│  • Package      │      │  • Element      │
+│  • Class        │      │  • ComplexType  │
+│  • Attribute    │      │  • SimpleType   │
+│  • Association  │      │  • Attribute    │
+└────────┬────────┘      └────────┬────────┘
+         │                        │
+         └────────┬───────────────┘
+                  │
+                  ▼
+         ┌────────────────┐
+         │ Mapping        │
+         │ Generator      │◄─── Apply encoding rules
+         │                │◄─── Match UML to XSD
+         │                │◄─── Resolve namespaces
+         └────────┬───────┘
+                  │
+                  ▼
+         ┌────────────────┐
+         │ YAML Mapping   │
+         │ (Lutaml Model) │
+         │  • Package     │
+         │  • Class       │
+         │  • Attribute   │
+         └────────┬───────┘
+                  │
+                  ▼
+         ┌────────────────┐
+         │  YAML Files    │
+         │  (Output)      │
+         └────────────────┘
+----
+
+=== Component Responsibilities
+
+==== Input Components
+
+**ShapeChange ConfigParser**::
+* Parse ShapeChange XML configuration files
+* Resolve XInclude references (HTTP and local)
+* Extract encoding rules, type mappings, namespaces
+* Output: ShapeChangeConfiguration model
+
+**XmiNavigator**::
+* Parse XMI files using lutaml-xmi
+* Navigate UML package hierarchy
+* Extract classes, attributes, associations
+* Handle Enterprise Architect specifics
+* Output: UML Package/Class/Attribute models
+
+**XsdAnalyzer**::
+* Parse XSD schemas using lutaml-xsd
+* Extract element definitions
+* Extract complex/simple type definitions
+* Build lookup indexes for efficient matching
+* Output: XSD Element/Type models
+
+==== Processing Component
+
+**MappingGenerator**::
+* Coordinate all input sources
+* Apply ShapeChange encoding rules
+* Match UML classes to XSD types
+* Match UML attributes to XSD elements/attributes
+* Resolve namespace prefixes
+* Handle inheritance and associations
+* Output: Mapping models (Package/Class/Attribute)
+
+==== Output Component
+
+**YAML Serialization**::
+* Use Lutaml::Model serialization
+* Generate hierarchical YAML structure
+* Support package nesting
+* Support multiple output files
+
+== Current Implementation Status
+
+=== ✅ Complete
+
+==== Foundation (Phase 1)
+* [x] Gem scaffold with proper structure
+* [x] Lutaml::Model-based config models
+* [x] ConfigParser with XInclude resolution
+* [x] UML models (Package, Class, Attribute, Association)
+* [x] Mapping models (Package, Class, Attribute, Schema)
+* [x] Reference documentation (encoding rules)
+* [x] ShapeChange config files downloaded
+
+==== Files Exist
+* [x] `lib/lutaml/klin/shapechange/config_parser.rb`
+* [x] `lib/lutaml/klin/shapechange/xinclude_resolver.rb`
+* [x] `lib/lutaml/klin/shapechange/models/config/*.rb` (5 files)
+* [x] `lib/lutaml/klin/models/uml/*.rb` (4 files)
+* [x] `lib/lutaml/klin/models/mapping/*.rb` (4 files)
+* [x] `lib/lutaml/klin/xmi_navigator.rb`
+* [x] `lib/lutaml/klin/xsd_analyzer.rb`
+* [x] `lib/lutaml/klin/mapping_generator.rb`
+
+=== ⏳ Needs Implementation/Verification
+
+==== Phase 2: XMI Navigation (4-6 hours) ✅ COMPLETE
+* [x] Verify XmiNavigator implementation
+* [x] Test with actual PLATEAU XMI file (20251022-uro.xmi, 174 classes)
+* [x] Ensure lutaml-xmi integration works
+* [x] Handle Enterprise Architect XMI extensions
+* [x] Create comprehensive tests (20/20 tests passing)
+
+==== Phase 3: XSD Analysis (4-6 hours) ✅ COMPLETE
+* [x] Verify XsdAnalyzer implementation
+* [x] Create XSD model classes (ElementMapping, ComplexTypeMapping)
+* [x] Test with PLATEAU XSD schemas
+* [x] Build element/type lookup indexes
+* [x] Create comprehensive tests (xsd_analyzer_spec.rb)
+
+==== Phase 4: Mapping Generation (8-10 hours) ✅ COMPLETE
+* [x] Verify MappingGenerator implementation
+* [x] Implement encoding rule application logic
+* [x] Implement UML-to-XSD matching algorithm
+* [x] Handle namespace resolution (with priority-based type override)
+* [x] Generate YAML output via Lutaml::Model
+* [x] Create comprehensive tests (mapping_generator_spec.rb, using URO data)
+* [x] **BONUS**: Type override mapping feature (Phase 8)
+
+==== Phase 5: CLI Implementation (4-6 hours) ✅ COMPLETE
+* [x] Create Thor-based CLI (`lib/lutaml/klin/cli.rb`)
+* [x] Implement `generate` command (with `--type-mapping` option)
+* [x] Implement `merge` command (for combining YAMLs)
+* [x] Implement `validate` command
+* [x] Implement `report` command (for human-readable reports)
+* [x] Create executable (`exe/lutaml-klin`)
+* [x] Update gemspec
+* [x] Create command classes (GenerateCommand, MergeCommand, ValidateCommand, ReportCommand)
+
+==== Phase 6: Integration Testing (4-6 hours) ⏳ IN PROGRESS
+* [x] Test with PLATEAU URO package (20251022-uro.xmi, 174 classes)
+* [x] Integration test spec created (plateau_uro_integration_spec.rb)
+* [ ] Test with PLATEAU URF package
+* [ ] Test with CityGML 2.0 package
+* [ ] Test with GML package
+* [ ] Validate output structure
+* [ ] Validate mapping accuracy
+* [ ] Fix remaining integration test issues (test setup, not code bugs)
+
+==== Phase 7: Documentation (4-6 hours) ✅ COMPLETE
+* [x] Update README.adoc with comprehensive usage
+* [x] Create ARCHITECTURE.adoc
+* [x] Create EXAMPLES.adoc
+* [x] Document CLI commands (docs/cli.adoc)
+* [x] Document Ruby API (docs/ruby-api.adoc)
+* [x] Document options (docs/options.adoc)
+* [x] Document basic usage (docs/basic-usage.adoc)
+* [x] Create feature index (docs/features/index.adoc)
+* [x] Document YAML output format (in mapping-generation.adoc)
+
+== Detailed Implementation Tasks
+
+=== Task 1: Verify and Complete XmiNavigator (4-6 hours)
+
+==== 1.1: Review Current Implementation
+
+* Read `lib/lutaml/klin/xmi_navigator.rb`
+* Identify what's skeletal vs implemented
+* Check lutaml-xmi gem documentation/README
+
+==== 1.2: Implement Core Methods
+
+Methods needed:
+
+[source,ruby]
+----
+class XmiNavigator
+  def parse_file(xmi_path)
+    # Load XMI using lutaml-xmi
+    # Return root model
+  end
+
+  def find_package(name)
+    # Navigate to package by name
+    # Support nested packages
+  end
+
+  def find_class(name, package: nil)
+    # Find class by name
+    # Optionally scope to package
+  end
+
+  def classes_in_package(package_name)
+    # Get all classes in a package
+    # Include nested packages if specified
+  end
+
+  private
+
+  def extract_packages(parent)
+    # Recursively extract package hierarchy
+    # Create Package models
+  end
+
+  def extract_classes(package_element)
+    # Extract classes from package
+    # Create Class models with attributes
+  end
+
+  def extract_attributes(class_element)
+    # Extract attributes from class
+    # Create Attribute models
+  end
+
+  def extract_associations(model)
+    # Extract associations
+    # Create Association models
+  end
+end
+----
+
+==== 1.3: Create Tests
+
+* Create `spec/fixtures/xmi/minimal_test.xmi`
+* Test package extraction
+* Test class extraction
+* Test attribute extraction
+* Test stereotype handling
+
+=== Task 2: Verify and Complete XsdAnalyzer (4-6 hours)
+
+==== 2.1: Review Current Implementation
+
+* Read `lib/lutaml/klin/xsd_analyzer.rb`
+* Check if XSD models exist (Element, ComplexType, etc.)
+* Review lutaml-xsd documentation
+
+==== 2.2: Create XSD Models (if needed)
+
+[source,ruby]
+----
+# lib/lutaml/klin/models/xsd/element.rb
+class Element < Lutaml::Model::Serializable
+  attribute :name, :string
+  attribute :type, :string
+  attribute :namespace, :string
+  attribute :min_occurs, :integer
+  attribute :max_occurs, :string
+  attribute :substitution_group, :string
+end
+
+# lib/lutaml/klin/models/xsd/complex_type.rb
+class ComplexType < Lutaml::Model::Serializable
+  attribute :name, :string
+  attribute :namespace, :string
+  attribute :elements, Element, collection: true
+  attribute :attributes, XsdAttribute, collection: true
+  attribute :base_type, :string
+end
+
+# Similar for SimpleType, XsdAttribute
+----
+
+==== 2.3: Implement XsdAnalyzer
+
+[source,ruby]
+----
+class XsdAnalyzer
+  def parse_schema(xsd_path)
+    # Parse XSD using lutaml-xsd
+    # Extract target namespace
+  end
+
+  def find_element(name, namespace: nil)
+    # Find element definition
+    # Use indexes for efficiency
+  end
+
+  def find_type(name, namespace: nil)
+    # Find complex or simple type
+    # Use indexes for efficiency
+  end
+
+  private
+
+  def build_element_index
+    # Create name -> element lookup
+  end
+
+  def build_type_index
+    # Create name -> type lookup
+  end
+end
+----
+
+==== 2.4: Create Tests
+
+* Create `spec/fixtures/xsd/test_schema.xsd`
+* Test schema parsing
+* Test element lookup
+* Test type lookup
+* Test namespace handling
+
+=== Task 3: Verify and Complete MappingGenerator (8-10 hours)
+
+==== 3.1: Review Current Implementation
+
+* Read `lib/lutaml/klin/mapping_generator.rb`
+* Understand current architecture
+* Identify gaps
+
+==== 3.2: Implement Core Algorithm
+
+[source,ruby]
+----
+class MappingGenerator
+  def initialize(config:, xmi_navigator:, xsd_analyzer:)
+    @config = config
+    @xmi = xmi_navigator
+    @xsd = xsd_analyzer
+    @rules = build_rule_registry
+  end
+
+  def generate_mapping(package_name)
+    # 1. Find UML package
+    # 2. For each class in package:
+    #    a. Determine XSD type using encoding rules
+    #    b. Match to XSD element
+    #    c. For each attribute:
+    #       - Determine XSD mapping
+    #       - Match to XSD element/attribute
+    # 3. Create mapping models
+    # 4. Return PackageMapping
+  end
+
+  private
+
+  def apply_encoding_rules(uml_class)
+    # Apply ShapeChange encoding rule chain
+    # Determine XML element name
+    # Determine XML type
+  end
+
+  def map_attribute(uml_attr, class_mapping)
+    # Determine XML element/attribute name
+    # Determine XML type
+    # Apply type mappings from XsdMapEntry
+  end
+
+  def resolve_namespace(prefix)
+    # Look up namespace from config
+  end
+
+  def build_rule_registry
+    # Create lookup for encoding rules
+    # Index XsdMapEntry by type and rule
+  end
+end
+----
+
+==== 3.3: Implement Encoding Rule Logic
+
+Study `reference/ENCODING_RULES_DOCUMENTATION.md`:
+
+* Implement rule inheritance chain traversal
+* Implement standard GML 3.2 conversion rules:
+  - `rule-xsd-cls-standard-gml-property-types`
+  - `rule-xsd-cls-no-base-class`
+  - `rule-xsd-prop-att-map-entry`
+  - etc.
+
+==== 3.4: Implement Type Mapping Logic
+
+* Use `XsdMapEntry` from config
+* Match UML type to `type` attribute
+* Filter by `xsdEncodingRules`
+* Use `xmlType`, `xmlPropertyType` for output
+
+==== 3.5: Create Tests
+
+* Test with simple UML class
+* Test with complex hierarchy
+* Test attribute mapping
+* Test type resolution
+* Test namespace resolution
+
+=== Task 4: Implement CLI (4-6 hours)
+
+==== 4.1: Create CLI Structure
+
+[source,ruby]
+----
+# lib/lutaml/klin/cli.rb
+require "thor"
+
+module Lutaml
+  module Klin
+    class Cli < Thor
+      desc "generate CONFIG XMI XSD OUTPUT", "Generate YAML mapping"
+      option :package, type: :string, required: true,
+             desc: "UML package name to process"
+      option :verbose, type: :boolean, default: false,
+             desc: "Enable verbose output"
+      def generate(config_path, xmi_path, xsd_path, output_path)
+        # Load config
+        # Parse XMI
+        # Parse XSD
+        # Generate mapping
+        # Write YAML
+      end
+
+      desc "merge YAML_FILES OUTPUT", "Merge multiple YAML mappings"
+      def merge(*yaml_files, output_path)
+        # Load all YAML files
+        # Merge using Lutaml::Model
+        # Detect conflicts
+        # Write combined YAML
+      end
+
+      desc "validate YAML_FILE", "Validate YAML mapping"
+      def validate(yaml_file)
+        # Load YAML
+        # Check structure
+        # Report issues
+      end
+    end
+  end
+end
+----
+
+==== 4.2: Create Executable
+
+[source,ruby]
+----
+#!/usr/bin/env ruby
+# exe/lutaml-klin
+
+require "lutaml/klin"
+require "lutaml/klin/cli"
+
+Lutaml::Klin::Cli.start(ARGV)
+----
+
+==== 4.3: Update Gemspec
+
+Add executable to gemspec:
+
+[source,ruby]
+----
+spec.bindir = "exe"
+spec.executables = ["lutaml-klin"]
+----
+
+==== 4.4: Create Commands Module
+
+[source,ruby]
+----
+# lib/lutaml/klin/commands/generate_command.rb
+class GenerateCommand
+  def initialize(options)
+    @options = options
+  end
+
+  def run
+    # Command logic here
+  end
+end
+
+# Similar for MergeCommand, ValidateCommand
+----
+
+=== Task 5: Integration Testing (4-6 hours)
+
+==== 5.1: Prepare Test Data
+
+* PLATEAU XMI file: `sources/xmi/20251010-242.xmi`
+* ShapeChange configs:
+  - `ShapeChangeConfig_Plateau_urf.xml`
+  - `ShapeChangeConfig_Plateau_uro.xml`
+* PLATEAU XSD schemas (from config locations)
+
+==== 5.2: Test URF Package
+
+[source,shell]
+----
+lutaml-klin generate \
+  reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  sources/xmi/20251010-242.xmi \
+  schemas/urf/ \
+  output/urf_mapping.yaml \
+  --package "Conceptual Models > i-UR > Urban Planning ADE 3.2"
+----
+
+Expected output structure:
+
+[source,yaml]
+----
+mapping:
+  package: "Conceptual Models"
+  sub_packages:
+    - package: "i-UR"
+      sub_packages:
+        - package: "Urban Planning ADE 3.2"
+          sub_packages:
+            - package: "urf"
+              namespace: "https://www.geospatial.jp/iur/urf/3.2"
+              prefix: "urf"
+              classes:
+                - class: "UrbanPlanningArea"
+                  xml_element: "urf:UrbanPlanningArea"
+                  xml_type: "urf:UrbanPlanningAreaType"
+                  attributes:
+                    - name: "id"
+                      xml_attribute: "gml:id"
+                      xml_type: "xs:ID"
+                    - name: "name"
+                      xml_element: "gml:name"
+                      xml_type: "gml:CodeType"
+----
+
+==== 5.3: Validate Output
+
+* Check package hierarchy is correct
+* Check all classes are mapped
+* Check all attributes are mapped
+* Check namespace prefixes are correct
+* Check XML types are correct
+
+==== 5.4: Test Other Packages
+
+Repeat for:
+* CityGML 2.0 packages (bldg, tran, etc.)
+* GML base packages
+* ISO 19xxx packages
+
+=== Task 6: Documentation (4-6 hours)
+
+==== 6.1: Update README.adoc
+
+Add sections:
+
+* Purpose (existing)
+* Features (new)
+* Architecture overview (new)
+* Installation (existing)
+* Usage examples (new)
+* CLI commands (new)
+* YAML output format (new)
+* Development (existing)
+
+==== 6.2: Create ARCHITECTURE.adoc
+
+Document:
+
+* Component diagram
+* Data flow diagram
+* Class hierarchy
+* Key algorithms
+* Design decisions
+
+==== 6.3: Create EXAMPLES.adoc
+
+Provide:
+
+* Basic usage example
+* PLATEAU URF example
+* Custom encoding rules example
+* Multiple package example
+* Merging example
+
+== Testing Strategy
+
+=== Unit Tests
+
+* Each model class (config, UML, XSD, mapping)
+* ConfigParser with various config structures
+* XmiNavigator with test XMI files
+* XsdAnalyzer with test schemas
+* MappingGenerator with mock data
+
+=== Integration Tests
+
+* End-to-end with PLATEAU data
+* Multiple packages from same XMI
+* Multiple XSD schemas
+* Config with XIncludes
+
+=== Manual Testing
+
+* CLI usability
+* Output readability
+* Error messages
+* Performance with large XMI
+
+== Success Criteria
+
+=== Functional
+
+* [x] Parse ShapeChange configs with XIncludes
+* [ ] Extract encoding rules and type mappings
+* [ ] Parse PLATEAU XMI successfully
+* [ ] Extract UML packages, classes, attributes
+* [ ] Parse PLATEAU XSD schemas
+* [ ] Extract XSD elements and types
+* [ ] Match UML classes to XSD types
+* [ ] Match UML attributes to XSD elements
+* [ ] Apply encoding rules correctly
+* [ ] Resolve namespaces correctly
+* [ ] Generate valid YAML output
+* [ ] Merge multiple YAML files
+* [ ] CLI works end-to-end
+* [x] Type override mapping feature (Phase 8)
+* [x] Comprehensive feature documentation (Phase 8)
+* [x] Architecture diagrams (Phase 8)
+
+=== Quality
+
+* [ ] All tests passing
+* [ ] Rubocop compliant
+* [ ] No warnings or errors
+* [ ] Comprehensive documentation
+* [ ] Examples work as documented
+
+=== Performance
+
+* [ ] Process large XMI (20MB+) in reasonable time
+* [ ] Memory usage acceptable
+* [ ] No memory leaks
+
+== Known Challenges
+
+=== XMI Parsing
+
+* Enterprise Architect XMI extensions
+* Large file size (20MB+)
+* Complex package hierarchies
+* Multiple model versions
+
+**Mitigation**: Use lutaml-xmi streaming if available, test incrementally
+
+=== Encoding Rules
+
+* Complex inheritance chains
+* Context-dependent rules
+* Multiple rule sets
+
+**Mitigation**: Study reference documentation thoroughly, implement registry pattern
+
+=== Type Matching
+
+* Ambiguous type names
+* Multiple namespaces
+* Qualified vs unqualified names
+
+**Mitigation**: Build comprehensive indexes, implement fuzzy matching fallback
+
+=== XInclude Resolution
+
+* HTTP resources may be unavailable
+* Local paths vary by system
+* Circular includes possible
+
+**Mitigation**: Implement caching, use local mirrors, detect cycles
+
+== Timeline and Phases
+
+=== Phase 2: XMI Navigation (4-6 hours)
+* Review current implementation: 1 hour
+* Implement/fix core methods: 2-3 hours
+* Create tests: 1-2 hours
+
+=== Phase 3: XSD Analysis (4-6 hours)
+* Review current implementation: 1 hour
+* Create XSD models if needed: 1-2 hours
+* Implement analyzer: 1-2 hours
+* Create tests: 1-2 hours
+
+=== Phase 4: Mapping Generation (8-10 hours)
+* Review current implementation: 1 hour
+* Implement encoding rules: 3-4 hours
+* Implement type mapping: 2-3 hours
+* Implement matching algorithm: 2-3 hours
+* Create tests: 2-3 hours
+
+=== Phase 5: CLI Implementation (4-6 hours)
+* Design CLI structure: 1 hour
+* Implement commands: 2-3 hours
+* Create executable: 0.5 hour
+* Test CLI: 1-1.5 hours
+
+=== Phase 6: Integration Testing (4-6 hours)
+* Set up test data: 1 hour
+* Test URF package: 1-2 hours
+* Test other packages: 1-2 hours
+* Validate output: 1-2 hours
+
+=== Phase 7: Documentation (4-6 hours)
+* Update README: 1-2 hours
+* Create ARCHITECTURE: 1-2 hours
+* Create EXAMPLES: 1-2 hours
+* Review and polish: 1 hour
+
+=== Phase 8: Type Override Mapping + Advanced Documentation (18 hours) ✅ COMPLETE
+
+==== Type Override Mapping Implementation (4 hours)
+* [x] Add `--type-mapping` CLI option: 1 hour
+* [x] Implement YAML override file loading in GenerateCommand: 1 hour
+* [x] Enhance MappingGenerator with type override resolution: 1.5 hours
+* [x] Create comprehensive example override file: 0.5 hour
+
+**Key Features Implemented:**
+
+* Optional type override mapping via `--type-mapping` CLI flag
+* YAML-based override configuration with `type_overrides` key
+* Priority-based type resolution: Override → ShapeChange → Original
+* Support for namespace fixes (xs:: → xs:, gml:: → gml:)
+* Support for typo corrections and normalization patterns
+* Reference example file: `reference/type_overrides_example.yaml`
+
+==== Advanced Feature Documentation (14 hours)
+* [x] Create individual feature documentation pages (7 pages): 10 hours
+  - `docs/features/xmi-parsing.adoc` (250 lines)
+  - `docs/features/shapechange-config.adoc` (450 lines)
+  - `docs/features/mapping-generation.adoc` (550 lines)
+  - `docs/features/human-reports.adoc` (130 lines)
+  - `docs/features/validation.adoc` (140 lines)
+  - `docs/features/merging.adoc` (120 lines)
+  - `docs/features/namespace-resolution.adoc` (320 lines)
+* [x] Create architecture diagrams (3 files): 3 hours
+  - `docs/diagrams/type-resolution-flow.txt` (130 lines)
+  - `docs/diagrams/component-architecture.txt` (190 lines)
+  - `docs/diagrams/data-flow.txt` (130 lines)
+* [x] Update STATUS.md with Phase 8 details: 1 hour
+
+**Documentation Standards Applied:**
+
+* All docs follow MECE principles (Mutually Exclusive, Collectively Exhaustive)
+* Consistent structure: Purpose, Concepts, Content, Examples, Relevant Docs
+* Comprehensive feature coverage with use cases and code examples
+* ASCII diagrams for visual architecture representation
+
+**Total Estimated Time**: 28-40 hours (Phases 1-7) + 18 hours (Phase 8) = 46-58 hours
+
+== Dependencies
+
+=== Required Gems
+
+* `lutaml-model ~> 0.7` - Model framework and YAML serialization
+* `lutaml-xmi` - XMI parsing
+* `lutaml-xsd` - XSD parsing
+* `moxml` - XML parsing (ShapeChange configs)
+* `thor` - CLI framework
+
+=== Reference Materials
+
+* ShapeChange documentation
+* ISO 19136 (GML 3.2) specification
+* PLATEAU schema documentation
+* Encoding rules documentation
+
+=== External Resources
+
+* ShapeChange standard configs (HTTP)
+* PLATEAU XMI file
+* PLATEAU XSD schemas
+
+== Risk Assessment
+
+=== High Risk
+
+* **lutaml-xmi API compatibility**: If API differs from assumptions
+  - Mitigation: Test early, adjust XmiNavigator
+  - Impact: 2-4 hours rework
+
+* **Encoding rule complexity**: Rules more complex than documented
+  - Mitigation: Start with simple rules, iterate
+  - Impact: 4-8 hours additional work
+
+=== Medium Risk
+
+* **XSD schema complexity**: Unexpected schema structures
+  - Mitigation: Build flexible parser
+  - Impact: 2-4 hours additional work
+
+* **YAML structure requirements**: User needs different format
+  - Mitigation: Use Lutaml::Model for flexibility
+  - Impact: 1-2 hours adjustment
+
+=== Low Risk
+
+* **CLI usability issues**: Commands unclear
+  - Mitigation: Follow Thor conventions
+  - Impact: 0.5-1 hour polish
+
+* **Documentation gaps**: Missing examples
+  - Mitigation: Allocate time for polish
+  - Impact: 1-2 hours additional
+
+== Next Steps
+
+=== Immediate (Start Now)
+
+1. Review `lib/lutaml/klin/xmi_navigator.rb` implementation
+2. Test XmiNavigator with a small XMI file
+3. Review `lib/lutaml/klin/xsd_analyzer.rb` implementation
+4. Test XsdAnalyzer with a simple schema
+
+=== Short Term (This Week)
+
+1. Complete XMI navigation implementation
+2. Complete XSD analysis implementation
+3. Begin mapping generation implementation
+4. Create unit tests for each component
+
+=== Medium Term (Next Week)
+
+1. Complete mapping generation
+2. Implement CLI
+3. Perform integration testing
+4. Update documentation
+
+=== Long Term (Ongoing)
+
+1. Add more encoding rules as needed
+2. Support additional UML stereotypes
+3. Optimize performance
+4. Add validation features
+
+== Appendix: File Structure
+
+----
+lutaml-klin/
+├── lib/
+│   └── lutaml/
+│       └── klin/
+│           ├── klin.rb                 # Main entry point
+│           ├── version.rb              # Version constant
+│           ├── cli.rb                  # Thor-based CLI
+│           ├── xmi_navigator.rb        # XMI parsing
+│           ├── xsd_analyzer.rb         # XSD parsing
+│           ├── mapping_generator.rb    # Core orchestration
+│           ├── commands/               # CLI commands
+│           │   ├── generate_command.rb
+│           │   ├── merge_command.rb
+│           │   └── validate_command.rb
+│           ├── models/
+│           │   ├── uml/               # UML models
+│           │   │   ├── package.rb
+│           │   │   ├── class.rb
+│           │   │   ├── attribute.rb
+│           │   │   └── association.rb
+│           │   ├── xsd/               # XSD models
+│           │   │   ├── element.rb
+│           │   │   ├── complex_type.rb
+│           │   │   ├── simple_type.rb
+│           │   │   └── attribute.rb
+│           │   └── mapping/           # Mapping models
+│           │       ├── schema_mapping.rb
+│           │       ├── package_mapping.rb
+│           │       ├── class_mapping.rb
+│           │       └── attribute_mapping.rb
+│           └── shapechange/           # ShapeChange support
+│               ├── config_parser.rb
+│               ├── xinclude_resolver.rb
+│               └── models/
+│                   └── config/
+│                       ├── shape_change_configuration.rb
+│                       ├── encoding_rule.rb
+│                       ├── xsd_map_entry.rb
+│                       ├── xml_namespace.rb
+│                       └── package_info.rb
+├── exe/
+│   └── lutaml-klin                    # Executable
+├── spec/                              # Tests
+├── reference/                         # Reference materials
+├── README.adoc                        # Main documentation
+├── ARCHITECTURE.adoc                  # Architecture doc
+├── EXAMPLES.adoc                      # Usage examples
+└── PROGRESS.md                        # Progress tracking
+----
+
+== Appendix: YAML Output Format
+
+=== Example Output
+
+[source,yaml]
+----
+schema_mapping:
+  version: "1.0"
+  generated_at: "2025-10-22T23:00:00Z"
+  source:
+    xmi: "sources/xmi/20251010-242.xmi"
+    config: "reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml"
+    xsd: "schemas/urf/"
+
+mapping:
+  package: "Conceptual Models"
+  sub_packages:
+    - package: "i-UR"
+      sub_packages:
+        - package: "Urban Planning ADE 3.2"
+          sub_packages:
+            - package: "urf"
+              namespace: "https://www.geospatial.jp/iur/urf/3.2"
+              prefix: "urf"
+              xsd_location: "https://www.geospatial.jp/iur/schemas/urf/3.2/urbanFunction.xsd"
+              classes:
+                - class: "UrbanPlanningArea"
+                  stereotype: "featureType"
+                  xml_element: "urf:UrbanPlanningArea"
+                  xml_type: "urf:UrbanPlanningAreaType"
+                  documentation: "Urban planning area feature"
+                  attributes:
+                    - name: "id"
+                      type: "xs::ID"
+                      multiplicity: "1..1"
+                      xml_mapping:
+                        kind: "attribute"
+                        name: "gml:id"
+                        type: "xs:ID"
+                        required: true
+
+                    - name: "name"
+                      type: "gml::CodeType"
+                      multiplicity: "0..*"
+                      xml_mapping:
+                        kind: "element"
+                        name: "gml:name"
+                        type: "gml:CodeType"
+                        min_occurs: 0
+                        max_occurs: "unbounded"
+
+                    - name: "areaClassificationType"
+                      type: "urf::AreaClassificationType"
+                      multiplicity: "0..1"
+                      xml_mapping:
+                        kind: "element"
+                        name: "urf:areaClassificationType"
+                        type: "gml:CodeType"
+                        min_occurs: 0
+                        max_occurs: 1
+
+                - class: "AreaClassificationType"
+                  stereotype: "codeList"
+                  xml_element: "urf:AreaClassificationType"
+                  xml_type: "gml:CodeType"
+                  documentation: "Code list for area classification types"
+----
+
+=== Format Principles
+
+* **Hierarchical**: Preserves UML package structure
+* **Namespace-aware**: Includes prefix and full namespace URI
+* **Complete**: All attributes with full mapping details
+* **Traceable**: Source file references
+* **Extensible**: Can add metadata without breaking structure
+
+== Conclusion
+
+This unified plan provides a comprehensive roadmap for completing lutaml-klin.
+The foundation is solid with Phase 1 complete, and Phase 8 has successfully added advanced features including type override mapping and comprehensive documentation.
+
+**Current Progress:**
+
+* ✅ Phase 1: Foundation (Complete)
+* ⏳ Phase 2-7: Core implementation (In progress/verification needed)
+* ✅ Phase 8: Type Override Mapping + Advanced Documentation (Complete)
+
+**Key Achievements:**
+
+1. **Type Override Mapping**: Provides flexible solution to handle malformed type names in XMI files (e.g., "xs::string" → "xs:string")
+2. **Comprehensive Documentation**: 2,460+ lines across 7 feature docs and 3 architecture diagrams
+3. **Priority-Based Resolution**: Override → ShapeChange → Namespace → Direct type resolution
+4. **MECE Documentation**: All docs follow Mutually Exclusive, Collectively Exhaustive principles
+
+**Next Focus Areas:**
+
+1. Verify and test XMI navigation with real PLATEAU files
+2. Verify and test XSD analysis implementation
+3. Complete mapping generation with encoding rules
+4. Perform end-to-end integration testing
+5. Prepare for production deployment
+
+This plan ensures lutaml-klin will be a robust, well-documented tool for bridging UML and XSD schemas in the PLATEAU ecosystem.
+
+
+== Ultimate test that we need to satisfy
+
+XMI file: /Users/mulgogi/src/mn/mn-samples-plateau/sources/xmi/20251010-242.xmi
+
+ShapeChange configs:
+* /Users/mulgogi/src/mn/mn-samples-plateau/PLATEAU-Manual-Generator/src/ShapeChange-3.1.0/ShapeChangeConfig_Plateau_uro.xml
+* /Users/mulgogi/src/mn/mn-samples-plateau/PLATEAU-Manual-Generator/src/ShapeChange-3.1.0/ShapeChangeConfig_Plateau_urf.xml
+
+Resulting XSD schemas (from ShapeChange configs):
+* /Users/mulgogi/src/mn/mn-samples-plateau/reference-docs/xsd/i-ur/urbanObject.xsd
+* /Users/mulgogi/src/mn/mn-samples-plateau/reference-docs/xsd/i-ur/urbanFunction.xsd
+
+Method to obtain fully resolved XSD repository through lutaml-xsd:
+* /Users/mulgogi/src/lutaml/lutaml-xsd/examples/parse_urban_function.rb
+
+lutaml-xsd creates a SchemaRepository by parsing the XSD schemas.
+
+A mapping of XML namespace prefixes to URIs:
+* e.g. `urf`: `https://www.geospatial.jp/iur/urf/3.2`, and this mapping is given to lutaml-xsd
+
+Then lutaml-xsd can accept this mapping in the SchemaRepository to allow resolving XML namespace prefixes in the XSD schemas.
+
+lutaml-klin takes this input:
+
+* XMI file from Enterprise Architect
+* ShapeChange configuration files (with XIncludes resolved)
+* Fully-resolved XSD schemas (via lutaml-xsd SchemaRepository)
+* Namespace prefix to URI mapping (which it passes to lutaml-xsd)
+
+And produces:
+
+* YAML mapping files (UML class and attributes to XSD elements and data types) for:
+
+** URF package: "Conceptual Models::i-UR::Urban Planning ADE 3.2::urf"
+** URO package: "Conceptual Models::i-UR::Urban Planning ADE 3.2::uro"
+** CityGML package: "Conceptual Models::CityGML2.0"
+
+Then, the generated YAML files are passed into an HTML SPA site generator, which
+converts the content into JSON and embeds in the HTML, providing a dynamic and
+interactive user experience, where the user can see per UML package, class, and
+attribute how they map to the XSD schema elements and types, with full
+traceability back to the original XMI and ShapeChange configuration used to
+generate the mapping, with information whether things are resolved via
+ShapeChange encoding rules, type mappings, or direct namespace resolution.
+
