@@ -4,8 +4,8 @@ require "spec_helper"
 require "nokogiri"
 
 RSpec.describe "XSD Generation ShapeChange Parity", type: :integration do
-  let(:lur_path) { "packages/plateau_all.lur" }
-  let(:lxr_path) { "packages/plateau_schemas.lxr" }
+  let(:lur_path) { "spec/fixtures/packages/plateau_all.lur" }
+  let(:lxr_path) { "spec/fixtures/packages/plateau_schemas.lxr" }
   let(:config_path) { "./reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml" }
   let(:output_dir) { "tmp/test_shapechange_parity" }
 

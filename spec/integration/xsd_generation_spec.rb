@@ -3,9 +3,13 @@
 require "spec_helper"
 require "nokogiri"
 require "fileutils"
+require "lutaml/klin/repositories/uml_repository_adapter"
+require "lutaml/klin/repositories/schema_repository_adapter"
+require "lutaml/klin/shapechange/config_parser"
+require "lutaml/klin/shapechange/xsd_generator"
 
 RSpec.describe "XSD Generation Integration", type: :integration do
-  let(:lur_path) { "packages/plateau_all.lur" }
+  let(:lur_path) { "spec/fixtures/packages/plateau_all.lur" }
   let(:config_path) { "./reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml" }
   let(:output_dir) { "tmp/test_xsd_generation" }
 

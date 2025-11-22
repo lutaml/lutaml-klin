@@ -175,16 +175,16 @@ module Lutaml
           # @param context [ResolutionContext] The resolution context
           # @return [String, nil] The XSD namespace URI
           def determine_namespace(uml_class, context)
-            # Get package name for the class
-            package_name = if uml_class.respond_to?(:package)
-              uml_class.package
-            elsif uml_class.respond_to?(:owner)
-              uml_class.owner&.name
-            end
+            # Try to get package name from qualified_name
+            package_path = if uml_class.respond_to?(:qualified_name)
+                            uml_class.qualified_name
+                          elsif uml_class.respond_to?(:full_name)
+                            uml_class.full_name
+                          end
 
-            return nil unless package_name
+            return nil unless package_path
 
-            context.shapechange_config.namespace_for_package(package_name)
+            context.shapechange_config.namespace_for_package(package_path)
           rescue StandardError
             nil
           end

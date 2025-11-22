@@ -160,11 +160,9 @@ module Lutaml
           # @example
           #   determine_namespace(building) # => "http://www.opengis.net/..."
           def determine_namespace(uml_class)
-            # Try to get qualified name or package name
+            # Try to get package path from qualified name
             package_path = if uml_class.respond_to?(:qualified_name)
                             uml_class.qualified_name
-                          elsif uml_class.respond_to?(:package)
-                            uml_class.package
                           else
                             nil
                           end

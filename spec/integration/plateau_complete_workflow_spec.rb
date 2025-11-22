@@ -3,9 +3,10 @@
 require "spec_helper"
 require "fileutils"
 require "yaml"
+require "benchmark"
 
 RSpec.describe "PLATEAU Complete Workflow", :integration do
-  let(:lur_package) { "packages/plateau_all.lur" }
+  let(:lur_package) { "spec/fixtures/packages/plateau_all.lur" }
   let(:shapechange_uro) { "reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml" }
   let(:shapechange_urf) { "reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml" }
   let(:output_dir) { "tmp/plateau_integration_test" }

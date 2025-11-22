@@ -2,11 +2,11 @@ source "https://rubygems.org"
 
 gemspec
 
-# gem "lutaml-model", path: "../lutaml-model"
-# gem "lutaml", path: "../lutaml"
-# gem "lutaml-xsd", path: "../lutaml-xsd"
-# gem "moxml", path: "../moxml"
-# gem "canon", path: "../canon"
+gem "lutaml-model", path: "../lutaml-model"
+gem "lutaml", path: "../lutaml"
+gem "lutaml-xsd", path: "../lutaml-xsd"
+gem "moxml", path: "../moxml"
+gem "canon", path: "../canon"
 gem "nokogiri"
 gem "rake"
 gem "rspec"
