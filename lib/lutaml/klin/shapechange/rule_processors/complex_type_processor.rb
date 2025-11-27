@@ -19,11 +19,12 @@ module Lutaml
             return if uml_class.is_a?(Lutaml::Uml::Enum)
 
             xsd_doc = context[:xsd_document]
+            attrs = additional_attributes(uml_class)
 
             # Create complexType element
             complex_type = xsd_doc.add_complex_type(
               name: type_name(uml_class, xsd_doc),
-              **additional_attributes(uml_class)
+              **attrs
             )
 
             # Determine if we need complexContent/extension
@@ -42,6 +43,9 @@ module Lutaml
 
             # Store reference for SequenceProcessor to add sequence/choice
             context[:current_complex_type] = complex_type
+
+            # Record mapping if collector present
+            record_type_mapping(uml_class, base_type, attrs, context) if context[:mapping_collector]
           end
 
           private
@@ -110,6 +114,30 @@ module Lutaml
 
             # DATATYPE/UNION without base don't need extension
             false
+          end
+
+          def record_type_mapping(uml_class, base_type, attrs, context)
+            collector = context[:mapping_collector]
+            return unless collector
+
+            # This updates the existing class mapping created by ObjectElementProcessor
+            current_mapping = collector.current_class_mapping
+            return unless current_mapping
+
+            # Add type information to the mapping
+            current_mapping.xsd_type_name = type_name(uml_class, context[:xsd_document])
+            
+            # Update transformation_info with type-level details
+            if current_mapping.transformation_info
+              current_mapping.transformation_info.add_rule(RULE_ID)
+              
+              # Store base type information
+              if base_type
+                metadata = current_mapping.transformation_info.get_metadata
+                metadata[:base_type] = base_type
+                current_mapping.transformation_info.set_metadata(metadata)
+              end
+            end
           end
         end
       end

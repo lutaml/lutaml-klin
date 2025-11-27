@@ -17,6 +17,7 @@ require_relative "rule_processors/code_list_processor"
 require_relative "rule_processors/class_rules/basic_type_processor"
 require_relative "rule_processors/plateau_ade_hooks_processor"
 require_relative "class_selector"
+require_relative "mapping_collector"
 
 module Lutaml
   module Klin
@@ -26,10 +27,14 @@ module Lutaml
       # Single Responsibility: Orchestrate XSD generation workflow
       class XsdGenerator
         attr_reader :uml_repository, :config, :rule_registry
+        attr_reader :lur_path, :config_path, :generate_mapping
 
-        def initialize(uml_repository, config)
+        def initialize(uml_repository, config, lur_path: nil, config_path: nil, generate_mapping: true)
           @uml_repository = uml_repository
           @config = config
+          @lur_path = lur_path
+          @config_path = config_path
+          @generate_mapping = generate_mapping
           @rule_registry = build_rule_registry
         end
 
@@ -133,6 +138,18 @@ module Lutaml
             version: package_info.version || "1.0"
           )
 
+          # Initialize MappingCollector if mapping generation enabled
+          mapping_collector = if @generate_mapping
+                                MappingCollector.new(
+                                  package_name: pkg_name,
+                                  package_namespace: package_info.ns.strip,
+                                  package_prefix: package_info.nsabr.strip,
+                                  config: config,
+                                  lur_path: @lur_path,
+                                  config_path: @config_path
+                                )
+                              end
+
           # Get encoding rule for this package
           encoding_rule = determine_encoding_rule(package)
           rule_checker = RuleChecker.new(rule_registry, encoding_rule)
@@ -158,12 +175,14 @@ module Lutaml
 
           # Process all classes
           classes.each do |uml_class|
-            process_class(uml_class, xsd_doc, rule_checker, pkg_name)
+            process_class(uml_class, xsd_doc, rule_checker, pkg_name,
+                         mapping_collector: mapping_collector)
           end
 
           # Process all enums
           enums.each do |uml_enum|
-            process_class(uml_enum, xsd_doc, rule_checker, pkg_name)
+            process_class(uml_enum, xsd_doc, rule_checker, pkg_name,
+                         mapping_collector: mapping_collector)
           end
 
           # Generate filename with stripped spaces
@@ -176,9 +195,18 @@ module Lutaml
 
           File.write(filepath, xsd_doc.to_xml)
 
+          # Write YAML mapping file if collector present
+          mapping_filepath = nil
+          if mapping_collector
+            mapping_filename = filename.sub('.xsd', '_mapping.yaml')
+            mapping_filepath = File.join(package_output_dir, mapping_filename)
+            File.write(mapping_filepath, mapping_collector.to_yaml)
+          end
+
           {
             package: pkg_name,
             file: filepath,
+            mapping_file: mapping_filepath,
             namespace: package_info.ns.strip,
             classes_processed: classes.size,
             enums_processed: enums.size
@@ -267,7 +295,7 @@ module Lutaml
           class_package_name == package_name
         end
 
-        def process_class(uml_class, xsd_doc, rule_checker, package_name)
+        def process_class(uml_class, xsd_doc, rule_checker, package_name, mapping_collector: nil)
           context = {
             xsd_document: xsd_doc,
             uml_class: uml_class,
@@ -276,7 +304,8 @@ module Lutaml
             uml_repository: uml_repository,
             package_name: package_name,
             gml_namespace: determine_gml_namespace(config),
-            model: uml_repository
+            model: uml_repository,
+            mapping_collector: mapping_collector
           }
 
           # Create processors in order of execution

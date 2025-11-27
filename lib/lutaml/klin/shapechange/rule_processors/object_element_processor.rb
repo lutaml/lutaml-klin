@@ -18,13 +18,17 @@ module Lutaml
             return if uml_class.is_a?(Lutaml::Uml::Enum)
 
             xsd_doc = context[:xsd_document]
+            attrs = additional_attributes(uml_class, context)
 
             # Add element: <xs:element name="Building" type="uro:BuildingType"/>
             xsd_doc.add_element(
               name: uml_class.name,
               type: "#{xsd_doc.prefix}:#{uml_class.name}Type",
-              **additional_attributes(uml_class, context)
+              **attrs
             )
+
+            # Record mapping if collector present
+            record_element_mapping(uml_class, attrs, context) if context[:mapping_collector]
           end
 
           private
@@ -71,6 +75,24 @@ module Lutaml
             elsif stereotypes.include?("ObjectType") || stereotypes.include?("objecttype")
               "gml:AbstractGML"
             end
+          end
+
+          def record_element_mapping(uml_class, attrs, context)
+            collector = context[:mapping_collector]
+            return unless collector
+
+            collector.record_class_mapping(
+              uml_class: uml_class,
+              xsd_element_name: uml_class.name,
+              xsd_element_substitution_group: attrs[:substitutionGroup],
+              rules_applied: [RULE_ID],
+              context: {
+                encoding_rule: context[:config]&.target_config&.dig(:default_encoding_rule),
+                is_abstract: attrs[:abstract] == "true",
+                is_substitutable: attrs[:substitutionGroup].present?,
+                substitution_group: attrs[:substitutionGroup]
+              }
+            )
           end
         end
       end

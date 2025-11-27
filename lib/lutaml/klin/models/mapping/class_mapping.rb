@@ -2,6 +2,7 @@
 
 require "lutaml/model"
 require_relative "attribute_mapping"
+require_relative "transformation_info"
 
 module Lutaml
   module Klin
@@ -33,6 +34,9 @@ module Lutaml
         # Attribute mappings
         attribute :attribute_mappings, AttributeMapping, collection: true
 
+        # Transformation tracking (XSD generation metadata)
+        attribute :transformation_info, TransformationInfo
+
         yaml do
           map "uml_name", to: :uml_name
           map "uml_package", to: :uml_package
@@ -50,6 +54,7 @@ module Lutaml
           map "resolution_method", to: :resolution_method
           map "resolution_confidence", to: :resolution_confidence
           map "attribute_mappings", to: :attribute_mappings
+          map "transformation_info", to: :transformation_info
         end
 
         # Check if the class mapping and all its attributes are fully resolved

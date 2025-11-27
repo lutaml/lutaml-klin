@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "transformation_info"
 
 module Lutaml
   module Klin
@@ -33,6 +34,9 @@ module Lutaml
         attribute :resolution_method, :string
         attribute :resolution_error, :string
 
+        # Transformation tracking (XSD generation metadata)
+        attribute :transformation_info, TransformationInfo
+
         yaml do
           map "uml_name", to: :uml_name
           map "uml_type", to: :uml_type
@@ -51,6 +55,7 @@ module Lutaml
           map "resolution_status", to: :resolution_status
           map "resolution_method", to: :resolution_method
           map "resolution_error", to: :resolution_error
+          map "transformation_info", to: :transformation_info
         end
 
         # Check if the attribute mapping is fully resolved
