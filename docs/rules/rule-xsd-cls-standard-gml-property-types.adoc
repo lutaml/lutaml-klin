@@ -1,0 +1,335 @@
+= rule-xsd-cls-standard-gml-property-types
+
+== Purpose
+
+Generates standard GML property types following ISO 19136 conventions, including anonymous property types when needed for special encoding requirements.
+
+== Background
+
+GML 3.2 (ISO 19136) defines a standard pattern for property types that support both inline and by-reference encoding. This rule ensures properties follow GML conventions including:
+
+* Standard PropertyType wrappers
+* Association attribute groups (xlink:href, etc.)
+* Ownership attributes (GML 3.2+)
+* Anonymous types for special cases
+
+== When It Applies
+
+This rule applies to:
+
+* Properties of feature types or object types
+* Properties requiring association semantics
+* Properties with special encoding requirements (nilReason, metadata, qualifiers)
+
+== Implementation
+
+Based on `XsdDocument.java:mapPropertyType()` and `addAnonymousPropertyType()` methods.
+
+=== Three Property Type Patterns
+
+==== Pattern A: By-Reference Encoding
+
+Used when `inlineOrByReference="byreference"` or for code lists encoded as dictionaries.
+
+.Anonymous type with gml:ReferenceType
+[source,xml]
+----
+<element name="relatedBuilding">
+  <complexType>
+    <complexContent>
+      <extension base="gml:ReferenceType"> <!--1-->
+        <attribute name="nilReason" type="gml:NilReasonType"/> <!--2-->
+      </extension>
+    </complexContent>
+  </complexType>
+</element>
+----
+<1> Extends gml:ReferenceType for by-reference semantics
+<2> Optional nilReason attribute if property allows it
+
+==== Pattern B: Inline Encoding
+
+Used when `inlineOrByReference="inline"` for embedded content only.
+
+.Anonymous type with direct element reference
+[source,xml]
+----
+<element name="component">
+  <complexType>
+    <sequence minOccurs="0"> <!--1-->
+      <element ref="uro:Building"/> <!--2-->
+    </sequence>
+  </complexType>
+</element>
+----
+<1> Optional sequence (minOccurs="0")
+<2> Direct reference to target element
+
+==== Pattern C: Standard InlineOrByReference
+
+Default pattern supporting both inline and by-reference via xlink:href.
+
+.Named PropertyType
+[source,xml]
+----
+<complexType name="BuildingPropertyType"> <!--1-->
+  <sequence minOccurs="0">
+    <element ref="uro:Building"/>
+  </sequence>
+  <attributeGroup ref="gml:AssociationAttributeGroup"/> <!--2-->
+  <attributeGroup ref="gml:OwnershipAttributeGroup"/> <!--3-->
+</complexType>
+----
+<1> Named type following GML convention
+<2> Standard association attributes (xlink:href, xlink:title, etc.)
+<3> Ownership attributes (owned, nilReason) for GML 3.2+
+
+.Anonymous type with special attributes
+[source,xml]
+----
+<element name="building">
+  <complexType>
+    <sequence minOccurs="0">
+      <element ref="uro:Building"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+    <attribute name="nilReason" type="gml:NilReasonType"/> <!--1-->
+    <attribute name="metadata" type="gml:reference"/> <!--2-->
+  </complexType>
+</element>
+----
+<1> Extra nilReason attribute for voidable properties
+<2> Metadata attribute if property has metadata
+
+== When Anonymous Types Are Generated
+
+Anonymous property types are created instead of using standard PropertyType when:
+
+1. **By-Reference Encoding**: `inlineOrByReference="byreference"`
+2. **Code List Dictionary**: Code list with `asDictionary` flag
+3. **NilReason Required**: Property has `nilReasonAllowed` or is `voidable`
+4. **Metadata Attribute**: Property has metadata
+5. **Qualifiers**: Property has qualifiers
+6. **Array Properties**: GML array property pattern
+7. **No Standard Type**: Value type has no PropertyType generated
+
+== Examples
+
+=== Example 1: Standard PropertyType
+
+.UML Model
+[example]
+====
+[source]
+----
+«featureType» City
+  └─ property mainBuilding: Building [1]
+----
+====
+
+.Generated XSD
+[example]
+====
+[source,xml]
+----
+<element name="mainBuilding" type="uro:BuildingPropertyType"/>
+
+<complexType name="BuildingPropertyType">
+  <sequence minOccurs="0">
+    <element ref="uro:Building"/>
+  </sequence>
+  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+  <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+</complexType>
+----
+====
+
+=== Example 2: By-Reference with NilReason
+
+.UML Model
+[example]
+====
+[source]
+----
+«featureType» Building
+  └─ property owner: Person [0..1] {inlineOrByReference = "byreference", voidable}
+----
+====
+
+.Generated XSD
+[example]
+====
+[source,xml]
+----
+<element name="owner" minOccurs="0">
+  <complexType>
+    <complexContent>
+      <extension base="gml:ReferenceType">
+        <attribute name="nilReason" type="gml:NilReasonType"/>
+      </extension>
+    </complexContent>
+  </complexType>
+</element>
+----
+====
+
+=== Example 3: Inline Encoding
+
+.UML Model
+[example]
+====
+[source]
+----
+«featureType» Building
+  └─ property address: Address [1] {inlineOrByReference = "inline"}
+----
+====
+
+.Generated XSD
+[example]
+====
+[source,xml]
+----
+<element name="address">
+  <complexType>
+    <sequence minOccurs="0">
+      <element ref="uro:Address"/>
+    </sequence>
+  </complexType>
+</element>
+----
+====
+
+=== Example 4: With Metadata Attribute
+
+.UML Model
+[example]
+====
+[source]
+----
+«featureType» Building
+  └─ property height: Measure [1] {metadata}
+----
+====
+
+.Generated XSD
+[example]
+====
+[source,xml]
+----
+<element name="height">
+  <complexType>
+    <sequence minOccurs="0">
+      <element ref="gml:Measure"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+    <attribute name="metadata" type="gml:reference"/>
+  </complexType>
+</element>
+----
+====
+
+== Implementation Details
+
+File:: link:../../lib/lutaml/klin/shapechange/rule_processors/property_element_processor.rb[PropertyElementProcessor]
+Lines:: Enhanced for anonymous type generation
+Spec:: link:../../spec/lutaml/klin/shapechange/rule_processors/property_element_processor_spec.rb[property_element_processor_spec.rb]
+
+=== Key Methods
+
+`generate_property_type(property, context)`::
+Determines if standard or anonymous type needed
+
+`generate_anonymous_property_type(property, encoding_mode, context)`::
+Creates anonymous type with appropriate pattern
+
+`add_association_attributes(complex_type, context)`::
+Adds gml:AssociationAttributeGroup
+
+`add_ownership_attributes(complex_type, context)`::
+Adds gml:OwnershipAttributeGroup for GML 3.2+
+
+`add_nil_reason_attribute(complex_type, context)`::
+Adds nilReason attribute support
+
+`add_metadata_attribute(complex_type, context)`::
+Adds metadata attribute support
+
+`determine_encoding_mode(property)`::
+Determines which of 3 patterns to use
+
+== Related Rules
+
+* link:rule-xsd-prop-inlineOrByReference.adoc[rule-xsd-prop-inlineOrByReference] - Controls encoding mode
+* link:rule-xsd-prop-nilReasonAllowed.adoc[rule-xsd-prop-nilReasonAllowed] - Adds nilReason support
+* link:rule-xsd-prop-metadata.adoc[rule-xsd-prop-metadata] - Adds metadata attribute
+* link:rule-xsd-cls-property-type.adoc[rule-xsd-cls-property-type] - Generates standard PropertyType
+* link:rule-xsd-cls-noPropertyType.adoc[rule-xsd-cls-noPropertyType] - Skips PropertyType generation
+
+== Configuration
+
+=== ShapeChange Config
+
+[source,xml]
+----
+<EncodingRule name="iso19136_2007">
+  <rule name="rule-xsd-cls-standard-gml-property-types"/>
+</EncodingRule>
+----
+
+=== GML Namespace Configuration
+
+The rule requires GML namespace configuration:
+
+[source,xml]
+----
+<namespace prefix="gml" 
+           uri="http://www.opengis.net/gml/3.2"/>
+----
+
+== Decision Logic
+
+The implementation follows this decision tree:
+
+[source]
+----
+IF inlineOrByReference = "byreference" THEN
+  → Pattern A (by-reference with gml:ReferenceType)
+ELSE IF inlineOrByReference = "inline" THEN
+  → Pattern B (inline-only sequence)
+ELSE IF needs_special_attributes? THEN  // nilReason, metadata, qualifiers
+  → Pattern C anonymous (full associations + special attrs)
+ELSE IF should_use_property_type? THEN
+  → Pattern C named (standard PropertyType)
+ELSE
+  → Direct type reference
+END IF
+----
+
+== Notes
+
+* Standard PropertyType names follow GML convention: `{ClassName}PropertyType`
+* Association attributes enable by-reference encoding via xlink:href
+* Ownership attributes are GML 3.2+ specific
+* Anonymous types are generated inline within element declarations
+* Pattern selection depends on multiple factors including encoding requirements
+* NilReason attributes are separate from nillable (different purposes)
+
+== ShapeChange Reference
+
+* Java implementation: `XsdDocument.java` lines 3026-3156 (mapPropertyType)
+* Java implementation: `XsdDocument.java` lines 3989-4252 (addAnonymousPropertyType)
+* Encoding rule: Part of `iso19136_2007` (GML 3.2) base rules
+* GML specification: ISO 19136:2007 clause 7.2 (Property types)
+
+== Status
+
+✅ **Implemented** - Complete implementation with all three patterns
+
+* Implementation: link:../../lib/lutaml/klin/shapechange/rule_processors/property_element_processor.rb[PropertyElementProcessor.rb]
+* Three patterns: by-reference, inline, standard (all working)
+* Helper methods: 10+ methods for attributes and encoding
+* Tests: Passing
+* PLATEAU URO/URF: Verified working

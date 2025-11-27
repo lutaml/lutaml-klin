@@ -1,0 +1,230 @@
+= rule-xsd-cls-basictype-list
+
+== Purpose
+
+Encodes basic types with a single property having maxOccurs > 1 as list-based simpleTypes with length restrictions.
+
+== Background
+
+Basic types that contain a single property with multiplicity [n..*] should be encoded as XSD list types rather than as complex types with sequences. This provides a more compact and natural representation for homogeneous value lists.
+
+== When It Applies
+
+This rule applies when all of the following are true:
+
+* Class has `«basicType»` stereotype
+* Class has exactly one property
+* Property has upper multiplicity > 1 (`maxOccurs > 1`)
+* Property has `{sequence}` constraint (ordered)
+
+== Implementation
+
+Based on `XsdDocument.java:pAnonymousBasicType()` lines 1395-1468.
+
+=== Algorithm
+
+When processing a basic type class:
+
+1. Check if class has exactly one property
+2. Check if property multiplicity allows multiple values (`maxOccurs > 1`)
+3. Check if property is ordered (has `{sequence}` constraint)
+4. Determine the item type from property's value type
+5. Map the item type to XSD simple type
+6. Create `<xs:simpleType>` with nested `<xs:list>`
+7. Add length restrictions based on multiplicity:
+   * If multiplicity is `[n..n]` → use `<xs:length value="n"/>`
+   * If multiplicity is `[min..*]` → use `<xs:minLength value="min"/>`
+   * If multiplicity is `[min..max]` → use both `<xs:minLength>` and `<xs:maxLength>`
+
+=== Syntax Definition
+
+[source,xml]
+----
+<xs:simpleType name="{TypeName}"> <!--1-->
+  <xs:restriction>
+    <xs:simpleType>
+      <xs:list itemType="{itemType}"/> <!--2-->
+    </xs:simpleType>
+    <xs:length value="{n}"/> <!--3-->
+    <!-- or -->
+    <xs:minLength value="{min}"/> <!--4-->
+    <xs:maxLength value="{max}"/> <!--5-->
+  </xs:restriction>
+</xs:simpleType>
+----
+<1> Named type for the basic type class
+<2> List with item type mapped from property type
+<3> Exact length for [n..n] multiplicity
+<4> Minimum length for [min..*] or [min..max]
+<5> Maximum length for [min..max]
+
+Where,
+
+`{TypeName}`:: Name of the basic type class with "Type" suffix
+`{itemType}`:: XSD simple type mapped from property's value type
+`{n}`:: Exact cardinality for fixed-length lists
+`{min}`:: Minimum cardinality
+`{max}`:: Maximum cardinality
+
+== Examples
+
+=== Example 1: Fixed-Length List
+
+.UML Model
+[example]
+====
+[source]
+----
+«basicType» TransformationMatrix2x2
+  └─ property list: Real [4] {sequence}
+----
+====
+
+.Generated XSD
+[example]
+====
+[source,xml]
+----
+<xs:simpleType name="TransformationMatrix2x2Type">
+  <xs:restriction>
+    <xs:simpleType>
+      <list itemType="double"/>
+    </xs:simpleType>
+    <length value="4"/>
+  </xs:restriction>
+</xs:simpleType>
+----
+====
+
+=== Example 2: Variable-Length List with Minimum
+
+.UML Model
+[example]
+====
+[source]
+----
+«basicType» CoordinateList
+  └─ property points: Double [2..*] {sequence}
+----
+====
+
+.Generated XSD
+[example]
+====
+[source,xml]
+----
+<xs:simpleType name="CoordinateListType">
+  <xs:restriction>
+    <xs:simpleType>
+      <list itemType="double"/>
+    </xs:simpleType>
+    <minLength value="2"/>
+  </xs:restriction>
+</xs:simpleType>
+----
+====
+
+=== Example 3: Bounded-Length List
+
+.UML Model
+[example]
+====
+[source]
+----
+«basicType» SmallNumberList
+  └─ property values: Integer [2..5] {sequence}
+----
+====
+
+.Generated XSD
+[example]
+====
+[source,xml]
+----
+<xs:simpleType name="SmallNumberListType">
+  <xs:restriction>
+    <xs:simpleType>
+      <list itemType="integer"/>
+    </xs:simpleType>
+    <minLength value="2"/>
+    <maxLength value="5"/>
+  </xs:restriction>
+</xs:simpleType>
+----
+====
+
+=== Example 4: Usage in XML Instance
+
+.XML instance using fixed-length list
+[example]
+====
+[source,xml]
+----
+<transformationMatrix>1.0 0.0 0.0 1.0</transformationMatrix>
+----
+
+Values are space-separated as per XSD list specification.
+====
+
+== Implementation Details
+
+File:: link:../../lib/lutaml/klin/shapechange/rule_processors/class_rules/basic_type_processor.rb[BasicTypeProcessor]
+Lines:: 52-114
+Spec:: link:../../spec/lutaml/klin/shapechange/rule_processors/class_rules/basic_type_processor_spec.rb[basic_type_processor_spec.rb]
+
+=== Key Methods
+
+`applies_to?(uml_class)`::
+Checks if class is a basic type with single list property
+
+`process(uml_class, xsd_document, context)`::
+Generates list-based simpleType with restrictions
+
+`determine_item_type(property)`::
+Maps property value type to XSD simple type
+
+`add_length_restrictions(restriction_element, multiplicity)`::
+Adds appropriate length constraints
+
+== Related Rules
+
+* link:rule-xsd-cls-basictype.adoc[rule-xsd-cls-basictype] - Base rule for basic types
+* link:rule-xsd-cls-type.adoc[rule-xsd-cls-type] - General type generation
+* `rule-xsd-prop-facets` - Additional facet restrictions
+
+== Configuration
+
+=== ShapeChange Config
+
+[source,xml]
+----
+<EncodingRule name="citygml" extends="iso19136_2007">
+  <rule name="rule-xsd-cls-basictype-list"/>
+</EncodingRule>
+----
+
+=== No Additional Parameters
+
+This rule operates automatically based on class structure and does not require additional configuration parameters.
+
+== Notes
+
+* Property must have `{sequence}` constraint to be eligible
+* Item type is determined from property's value type map entry
+* Length restrictions preserve UML multiplicity semantics
+* Whitespace handling follows XSD list type specification
+* This encoding is more compact than complex type with sequence
+
+== ShapeChange Reference
+
+* Java implementation: `XsdDocument.java` lines 1395-1468
+* Method: `pAnonymousBasicType()`
+* Encoding rule: Part of `iso19136_2007` (GML 3.2) and `citygml` rules
+
+== Status
+
+✅ **Implemented** - Complete implementation with full test coverage
+
+* Implementation: link:../../lib/lutaml/klin/shapechange/rule_processors/class_rules/basic_type_processor.rb[BasicTypeProcessor.rb] (lines 52-114)
+* Tests: Passing
+* PLATEAU URO/URF: Verified working

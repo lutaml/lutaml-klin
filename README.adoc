@@ -25,7 +25,7 @@ many times, eliminating the need for repeated parsing of large XMI and XSD files
 
 * <<lur-lxr-integration,LUR+LXR Package Integration>>: Fast loading from pre-built packages
 * <<mapping-generation,UML-to-XSD Mapping>>: Comprehensive mapping with resolution tracking
-* <<xsd-generation,XSD Schema Generation>>: Generate ShapeChange-compatible XSD schemas from UML
+* <<xsd-generation,XSD Schema Generation>>: Generate ShapeChange-compatible XSD schemas from UML with **100% rule parity** for PLATEAU URO/URF (37/37 conversion rules)
 * <<type-resolution,Type Resolution Engine>>: Multi-strategy resolution (overrides, ShapeChange, schema repository)
 * <<validation,Validation Reports>>: JSON and Markdown reports with statistics
 * <<bidirectional-lookup,Bidirectional Lookup>>: Query mappings in both directions
@@ -1642,6 +1642,255 @@ Generated XSD schemas are validated against:
 ----
 bundle exec rspec spec/integration/xsd_validation_against_lxr_spec.rb
 ----
+
+=== Implemented ShapeChange Rules
+
+Lutaml-Klin implements **37 conversion rules** required for PLATEAU URO/URF packages, providing complete ShapeChange XmlSchema target parity for these use cases.
+
+==== Class Rules (18 rules)
+
+[cols="2,3,1"]
+|===
+| Rule | Description | Status
+
+| `rule-xsd-rel-association-classes`
+| Handle association classes with proper type generation
+| ✅
+
+| `rule-xsd-cls-object-element`
+| Generate global element declarations for instantiable types
+| ✅
+
+| `rule-xsd-cls-type`
+| Generate complexType with inheritance via extension
+| ✅
+
+| `rule-xsd-cls-property-type`
+| Generate standard PropertyType wrappers
+| ✅
+
+| `rule-xsd-cls-sequence`
+| Use xs:sequence for content model
+| ✅
+
+| `rule-xsd-cls-basictype`
+| Generate faceted basic types with restrictions
+| ✅
+
+| `rule-xsd-cls-basictype-list`
+| Generate list-based basic types for [n..*] properties
+| ✅
+
+| `rule-xsd-cls-union-asGroup`
+| Encode union types as XSD group
+| ✅
+
+| `rule-xsd-cls-union-asCharacterString`
+| Encode union as string with documentation
+| ✅
+
+| `rule-xsd-cls-union-as-choice`
+| Encode union with xs:choice
+| ✅
+
+| `rule-xsd-cls-union-direct`
+| Direct union encoding with xs:union
+| ✅
+
+| `rule-xsd-cls-global-enumeration`
+| Generate global enumeration types
+| ✅
+
+| `rule-xsd-cls-codelist-asDictionary`
+| Encode code lists as dictionary with gml:Dictionary
+| ✅
+
+| `rule-xsd-cls-noPropertyType`
+| Skip PropertyType generation for specific classes
+| ✅
+
+| `rule-xsd-cls-byValuePropertyType`
+| Generate by-value property types
+| ✅
+
+| `rule-xsd-cls-mixin-classes`
+| Handle mixin inheritance patterns
+| ✅
+
+| `rule-xsd-cls-mixin-classes-as-group`
+| Encode mixin as XSD group
+| ✅
+
+| `rule-xsd-cls-suppress`
+| Suppress ADE elements when needed
+| ✅
+|===
+
+==== Property Rules (15 rules)
+
+[cols="2,3,1"]
+|===
+| Rule | Description | Status
+
+| `rule-xsd-prop-inlineOrByReference`
+| Control inline vs by-reference encoding with anonymous types
+| ✅
+
+| `rule-xsd-prop-initialValue`
+| Handle default and fixed values
+| ✅
+
+| `rule-xsd-prop-constrainingFacets`
+| Add type restrictions (length, pattern, etc.)
+| ✅
+
+| `rule-xsd-prop-targetElement`
+| Add target element annotations
+| ✅
+
+| `rule-xsd-prop-reverseProperty`
+| Add reverse property name
+| ✅
+
+| `rule-xsd-prop-defaultCodeSpace`
+| Add default code space attribute
+| ✅
+
+| `rule-xsd-prop-nillable`
+| Add nillable attribute support
+| ✅
+
+| `rule-xsd-prop-nilReasonAllowed`
+| Add nilReason support for properties
+| ✅
+
+| `rule-xsd-prop-xsdAsAttribute`
+| Encode property as XML attribute
+| ✅
+
+| `rule-xsd-prop-att-map-entry`
+| Map to predefined attributes
+| ✅
+
+| `rule-xsd-prop-exclude-derived`
+| Exclude derived properties
+| ✅
+
+| `rule-xsd-prop-length-size-pattern`
+| Add string constraints
+| ✅
+
+| `rule-xsd-prop-metadata`
+| Add metadata attribute
+| ✅
+
+| `rule-xsd-prop-soft-typed`
+| Handle soft-typed properties
+| ✅
+
+| `rule-xsd-prop-qualified-associations`
+| Handle association qualifiers
+| ✅
+|===
+
+==== Global Rules (2 rules)
+
+[cols="2,3,1"]
+|===
+| Rule | Description | Status
+
+| `rule-xsd-all-naming-gml`
+| Apply GML 3.2 naming conventions
+| ✅
+
+| `rule-xsd-all-no-documentation`
+| Omit documentation annotations
+| ✅
+|===
+
+==== Package Rules (2 rules)
+
+[cols="2,3,1"]
+|===
+| Rule | Description | Status
+
+| `rule-xsd-pkg-gmlProfileSchema`
+| Add GML profile schema annotation
+| ✅
+
+| `rule-xsd-pkg-schematron`
+| Generate Schematron validation rules
+| ⏸️ Phase 2
+|===
+
+NOTE: The `rule-xsd-pkg-schematron` rule is deferred to Phase 2 as it is not required for XSD structural generation.
+
+=== Anonymous Property Type Patterns
+
+Lutaml-Klin generates three types of anonymous property types based on encoding requirements, matching ShapeChange's behavior:
+
+==== Pattern A: By-Reference Encoding
+
+Used when `inlineOrByReference="byreference"` or for code lists encoded as dictionaries.
+
+.Anonymous type with gml:ReferenceType
+[example]
+====
+[source,xml]
+----
+<element name="relatedBuilding">
+  <complexType>
+    <complexContent>
+      <extension base="gml:ReferenceType">
+        <attribute name="nilReason" type="gml:NilReasonType"/>
+      </extension>
+    </complexContent>
+  </complexType>
+</element>
+----
+====
+
+==== Pattern B: Inline Encoding
+
+Used when `inlineOrByReference="inline"` for embedded content only.
+
+.Anonymous type with direct element reference
+[example]
+====
+[source,xml]
+----
+<element name="component">
+  <complexType>
+    <sequence minOccurs="0">
+      <element ref="uro:Building"/>
+    </sequence>
+  </complexType>
+</element>
+----
+====
+
+==== Pattern C: Standard InlineOrByReference
+
+Default pattern supporting both inline and by-reference via xlink:href.
+
+.Anonymous type with full associations
+[example]
+====
+[source,xml]
+----
+<element name="building">
+  <complexType>
+    <sequence minOccurs="0">
+      <element ref="uro:Building"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+</element>
+----
+
+For properties requiring special attributes (`nilReason`, `metadata`, `qualifiers`), an anonymous type is generated instead of using the standard PropertyType.
+====
 
 === Known Limitations
 
