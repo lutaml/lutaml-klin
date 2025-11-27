@@ -45,6 +45,15 @@ module Lutaml
             xsd_doc = context[:xsd_document]
             sequence = context[:sequence_or_choice]
 
+            # Skip cross-package properties (properties whose type is in a different package)
+            if is_cross_package_property?(attribute, context)
+              if ENV["VERBOSE"]
+                type_package = find_type_package(attribute.type, context)
+                puts "    - SKIPPED cross-package attribute: #{attribute.name} (type from #{type_package})"
+              end
+              return
+            end
+
             # Determine property name first
             prop_name = determine_property_name(attribute, context)
 
@@ -428,6 +437,20 @@ module Lutaml
             attribute["name"] = "metadata"
             attribute["type"] = "anyURI"
             parent.add_child(attribute)
+          end
+
+          # Check if a property references a type from a different package
+          # Cross-package properties should be excluded from XSD generation
+          def is_cross_package_property?(attribute, context)
+            type_name = attribute.type
+            return false unless type_name
+
+            # Get the package where the type is defined
+            type_package = find_type_package(type_name, context)
+            current_package = context[:package_name]
+
+            # Skip if type is from a different package
+            type_package && current_package && type_package != current_package
           end
         end
       end
