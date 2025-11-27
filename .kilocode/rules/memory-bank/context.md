@@ -189,10 +189,13 @@ Content validation: ✅ 100% match
    - Estimate: 150-200 hours
    - Priority: Low (XSD generation works perfectly without it)
 
-3. **Documentation Polish** (1-2 hours)
-   - Update README with rule completion
-   - Add examples of anonymous types
-   - Document the three patterns
+3. ✅ **Documentation Complete** (2025-01-27 evening)
+   - ✅ Updated README with all 37 rules documented
+   - ✅ Added three anonymous property type patterns with examples
+   - ✅ Created rule-xsd-cls-basictype-list.adoc
+   - ✅ Created rule-xsd-cls-standard-gml-property-types.adoc
+   - ✅ Archived 28 old planning documents to old-docs/
+   - ✅ Git commit with semantic message
 
 ---
 
