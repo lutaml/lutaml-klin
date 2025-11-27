@@ -1,0 +1,232 @@
+= Rule: rule-xsd-prop-constrainingFacets
+
+== Overview
+
+Generate constraining facets based on tagged values [`length`], [`maxLength`], [`size`], [`pattern`], [`rangeMaximum`], and [`rangeMinimum`] of a property. This is a more comprehensive version of [`rule-xsd-prop-length-size-pattern`].
+
+== Priority
+
+Must-have (PLATEAU uses for property constraints)
+
+== ShapeChange Documentation
+
+Source:: `/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/Non_Standard_Conversion_Rules.adoc` (lines 754-770)
+
+Description::
+Generate constraining facets based on tagged values of a property. The value of tag length, maxLength, or size (in descending order of priority) is used to populate facets totalDigits and maxLength. Facet pattern is read from the according tagged value. Facet maxInclusive is read from tagged value rangeMaximum. Facet minInclusive is read from tagged value rangeMinimum.
+
+NOTE: A facet is only created if the (base) type of the property supports it.
+
+== Java Implementation
+
+Source:: [`XsdDocument.java:addProperty`](lines 2300-2426)
+
+=== Algorithm
+
+The Java implementation follows this process:
+
+. Check if property matches [`rule-xsd-prop-constrainingFacets`]
+. Check if property category is not CODELIST or ENUMERATION
+. Get tagged values: length/maxLength/size, pattern, rangeMinimum, rangeMaximum
+. Only proceed if at least one tagged value is present
+. Determine base type from map entries or value type
+. Determine if base type supports the facets (simple/simple or complex/simple)
+. Create anonymous type with restriction
+. Add supported facets:
+  * totalDigits: if baseType supports it and length/maxLength/size is present
+  * maxLength: if baseType supports it and length/maxLength/size is present
+  * pattern: if baseType supports it and pattern is present
+  * minInclusive: if baseType supports it and rangeMinimum is present
+  * maxInclusive: if baseType supports it and rangeMaximum is present
+
+=== Facet Support by Base Type
+
+The implementation checks if a facet is supported by the base type:
+
+* `totalDigits`: integer types, decimal
+* `maxLength`: string types, binary types
+* `pattern`: all types (universal)
+* `minInclusive`, `maxInclusive`: integer types, decimal, float, double, date/time types
+
+== Our Implementation
+
+Type:: Processor Class
+File:: [`lib/lutaml/klin/shapechange/rule_processors/property_rules/constraining_facets_processor.rb`]
+Spec:: [`spec/lutaml/klin/shapechange/rule_processors/property_rules/constraining_facets_processor_spec.rb`]
+
+=== Design Principles
+
+. Comprehensive facet support for all XSD basic types
+. Type-aware facet generation (only add supported facets)
+. Priority handling for length-related tags (length > maxLength > size)
+. Configuration-driven base type mapping
+
+=== Implementation Details
+
+The [`ConstrainingFacetsProcessor`] class extends [`BaseRuleProcessor`] and:
+
+. Checks property category (excludes CODELIST and ENUMERATION)
+. Extracts all relevant tagged values
+. Determines base type from property type information
+. Checks facet support for the base type
+. Creates anonymous restriction type with appropriate facets
+. Handles both simple/simple and complex/simple content
+
+== Test Cases
+
+=== Test Case 1: String property with length constraint
+
+Input UML::
+[source]
+----
+class Address
+  property postalCode: String [1] {length=10}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="postalCode">
+  <simpleType>
+    <restriction base="string">
+      <maxLength value="10"/>
+    </restriction>
+  </simpleType>
+</element>
+----
+
+=== Test Case 2: Integer property with range constraints
+
+Input UML::
+[source]
+----
+class Building
+  property floors: Integer [1] {rangeMinimum=1, rangeMaximum=200}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="floors">
+  <simpleType>
+    <restriction base="integer">
+      <minInclusive value="1"/>
+      <maxInclusive value="200"/>
+    </restriction>
+  </simpleType>
+</element>
+----
+
+=== Test Case 3: String with pattern constraint
+
+Input UML::
+[source]
+----
+class Contact
+  property email: String [1] {pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="email">
+  <simpleType>
+    <restriction base="string">
+      <pattern value="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"/>
+    </restriction>
+  </simpleType>
+</element>
+----
+
+=== Test Case 4: Decimal with totalDigits
+
+Input UML::
+[source]
+----
+class Measurement
+  property value: Decimal [1] {length=8}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="value">
+  <simpleType>
+    <restriction base="decimal">
+      <totalDigits value="8"/>
+    </restriction>
+  </simpleType>
+</element>
+----
+
+=== Test Case 5: Multiple facets combined
+
+Input UML::
+[source]
+----
+class Product
+  property price: Decimal [1] {length=10, rangeMinimum=0.01, rangeMaximum=999999.99}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="price">
+  <simpleType>
+    <restriction base="decimal">
+      <totalDigits value="10"/>
+      <minInclusive value="0.01"/>
+      <maxInclusive value="999999.99"/>
+    </restriction>
+  </simpleType>
+</element>
+----
+
+=== Test Case 6: CodeList property (should not process)
+
+Input UML::
+[source]
+----
+class Feature
+  property category: CategoryCodeList [1] {length=50}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="category" type="CategoryCodeListType"/>
+<!-- No restrictions added for codelist -->
+----
+
+== Implementation Status
+
+* [x] Documentation read
+* [x] Java code analyzed
+* [ ] Processor implemented
+* [ ] Spec written
+* [ ] Integrated
+* [ ] Committed
+
+== Dependencies
+
+Depends on::
+* Property element generation
+* Property type mapping
+* Facet support checking
+
+Related to::
+* [`rule-xsd-prop-length-size-pattern`]: Simpler predecessor
+
+== Notes
+
+* Only processes properties if value type is NOT CODELIST or ENUMERATION
+* Length/maxLength/size priority: length > maxLength > size
+* Facets are only added if the base type supports them
+* Supports both simple/simple and complex/simple content types
+* For complex/simple content, uses simpleContent/restriction instead of simpleType/restriction
+
+== References
+
+* ShapeChange documentation: Non-Standard Conversion Rules
+* XML Schema Part 2: Datatypes - Constraining facets
+* ISO 19103: Property constraints

@@ -1,0 +1,228 @@
+= rule-xsd-cls-noPropertyType
+
+== Purpose
+
+Suppresses generation of PropertyType definitions unless explicitly required via `includePropertyType` tagged value.
+
+== Background
+
+In XML Schema generation, property types (e.g., `BuildingPropertyType`) are typically generated for classes that have identity. However, there are cases where property type generation should be suppressed:
+
+* When inline encoding is always used (no by-reference needed)
+* When custom property types are defined externally
+* When reducing schema complexity for simple applications
+* When the class is never referenced via properties
+
+This rule provides control over property type generation on a per-class basis.
+
+== Implementation
+
+Based on `XsdDocument.java:pPropertyTypes()` and `pPropertyTypeWithSubtypes()` lines 1207-1208, 1234-1237.
+
+=== Algorithm
+
+When generating property types for a class:
+
+1. Check if `rule-xsd-cls-noPropertyType` is active for the class
+2. Check class's `includePropertyType` tagged value
+3. If rule is active AND `includePropertyType` is NOT true:
+   - Skip property type generation entirely
+   - Skip property type with subtypes generation
+4. Otherwise, generate property types as normal
+
+=== Syntax Definition
+
+[source,ruby]
+----
+# Check if property type should be generated
+def should_generate_property_type?(uml_class)
+  return true unless uml_class.matches?("rule-xsd-cls-noPropertyType") <1>
+
+  # Rule is active, check includePropertyType
+  include_property_type = uml_class.include_property_type? <2>
+
+  if include_property_type
+    true <3>
+  else
+    false <4>
+  end
+end
+
+# Generate property type only if allowed
+def generate_property_type(uml_class)
+  return unless should_generate_property_type?(uml_class) <5>
+
+  # Generate PropertyType
+  create_property_type_definition(uml_class)
+end
+----
+<1> If rule not active, always generate
+<2> Check tagged value
+<3> Generate if explicitly included
+<4> Suppress if not explicitly included
+<5> Skip generation if suppressed
+
+Where,
+
+`matches?(rule)`:: Rule is active for this class
+`include_property_type?`:: Tagged value `includePropertyType="true"`
+`PropertyType`:: Standard GML property wrapper type
+
+== Examples
+
+=== Example 1: Suppress PropertyType
+
+.UML class with suppression
+[source,ruby]
+----
+class SimpleDataType < Lutaml::Model::Serializable
+  # Tagged value: includePropertyType = "false" or not set <1>
+  attribute :value, :string
+  attribute :unit, :string
+end
+----
+<1> PropertyType generation suppressed
+
+.Generated XML Schema (with rule active)
+[source,xml]
+----
+<!-- Element generated --> <!--1-->
+<element name="SimpleDataType" type="SimpleDataTypeType"/>
+
+<!-- ComplexType generated --> <!--2-->
+<complexType name="SimpleDataTypeType">
+  <sequence>
+    <element name="value" type="string"/>
+    <element name="unit" type="string"/>
+  </sequence>
+</complexType>
+
+<!-- PropertyType NOT generated --> <!--3-->
+<!-- SimpleDataTypePropertyType is omitted -->
+----
+<1> Object element still created
+<2> Type definition still created
+<3> PropertyType suppressed
+
+=== Example 2: Explicitly Include PropertyType
+
+.UML class with explicit inclusion
+[source,ruby]
+----
+class ImportantType < Lutaml::Model::Serializable
+  # Tagged value: includePropertyType = "true" <1>
+  attribute :critical_data, :string
+end
+----
+<1> PropertyType explicitly requested
+
+.Generated XML Schema (with rule active)
+[source,xml]
+----
+<element name="ImportantType" type="ImportantTypeType"/>
+
+<complexType name="ImportantTypeType">
+  <sequence>
+    <element name="critical_data" type="string"/>
+  </sequence>
+</complexType>
+
+<!-- PropertyType IS generated because explicitly included --> <!--1-->
+<complexType name="ImportantTypePropertyType">
+  <sequence minOccurs="0">
+    <element ref="ImportantType"/>
+  </sequence>
+  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+  <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+</complexType>
+----
+<1> PropertyType generated due to explicit inclusion
+
+=== Example 3: Without Rule Active
+
+.Generated XML Schema (rule inactive)
+[source,xml]
+----
+<element name="SimpleDataType" type="SimpleDataTypeType"/>
+
+<complexType name="SimpleDataTypeType">
+  <sequence>
+    <element name="value" type="string"/>
+    <element name="unit" type="string"/>
+  </sequence>
+</complexType>
+
+<!-- PropertyType always generated when rule is not active --> <!--1-->
+<complexType name="SimpleDataTypePropertyType">
+  <sequence minOccurs="0">
+    <element ref="SimpleDataType"/>
+  </sequence>
+  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+  <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+</complexType>
+----
+<1> Default behavior generates PropertyType
+
+== Configuration
+
+=== When This Rule Applies
+
+* Rule is active in encoding rules
+* Class has identity (features, objects, datatypes with identity)
+* Class does NOT have `includePropertyType="true"` tagged value
+
+=== Tagged Value: includePropertyType
+
+Controls property type generation:
+
+.includePropertyType values
+[cols="1,3"]
+|===
+|Value |Effect
+
+|`"true"`
+|Generate PropertyType even with rule active
+
+|`"false"` or not set
+|Suppress PropertyType when rule active
+
+|Not applicable
+|Generate PropertyType (rule not active)
+|===
+
+=== Use Cases
+
+**Suppress PropertyType when:**
+
+* Class is always encoded inline
+* Custom property types defined elsewhere
+* Reducing schema size/complexity
+* Application-specific encoding requirements
+
+**Include PropertyType when:**
+
+* By-reference encoding needed
+* XLink support required
+* Standard GML patterns expected
+* Interoperability with other systems
+
+=== PropertyType Generation
+
+Standard property type includes:
+
+* Optional element reference (minOccurs="0")
+* Association attributes (xlink:href, etc.)
+* Ownership attributes (GML 3.2+)
+* Support for inline or by-reference encoding
+
+=== Related Rules
+
+* `rule-xsd-cls-standard-gml-property-types`: Standard GML property type pattern
+* `rule-xsd-cls-byValuePropertyType`: By-value property types
+* `rule-xsd-prop-inlineOrByReference`: Inline/reference encoding control
+
+== References
+
+* ShapeChange: `XsdDocument.java` lines 1207-1208, 1234-1237 (`pPropertyTypes`, `pPropertyTypeWithSubtypes`)
+* GML 3.2: Section 7.2.3.3 (Property types)
+* ISO 19136:2007: Section 21.2.3 (GML property types)

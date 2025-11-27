@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ShapeChangeConfiguration xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://www.interactive-instruments.de/ShapeChange/Configuration/1.1" xmlns:sc="http://www.interactive-instruments.de/ShapeChange/Configuration/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.interactive-instruments.de/ShapeChange/Configuration/1.1 http://shapechange.net/resources/schema/ShapeChangeConfiguration.xsd">
+	<input>
+		<parameter name="inputModelType" value="EA7"/>
+		<parameter name="inputFile" value="reference/input/202503_current_plateau_v5.0.qea"/>
+		<parameter name="appSchemaName" value="uro"/>
+		<parameter name="publicOnly" value="true"/>
+		<parameter name="checkingConstraints" value="disabled"/>
+		<parameter name="sortedSchemaOutput" value="true"/>
+		<xi:include href="http://shapechange.net/resources/config/StandardAliases.xml"/>
+		<packages>
+ 			<PackageInfo packageName="uro" ns="https://www.geospatial.jp/iur/uro/3.2" nsabr="uro" xsdDocument="urbanObject.xsd" version="3.2.1"/>
+		</packages>
+	</input>
+	<log>
+		<parameter name="reportLevel" value="INFO"/>
+		<parameter name="logFile" value="reference/output/log.xml"/>
+	</log>
+	<targets>
+		<TargetXmlSchema class="de.interactive_instruments.ShapeChange.Target.XmlSchema.XmlSchema" mode="enabled">
+			<targetParameter name="outputDirectory" value="reference/output"/>
+ 			<targetParameter name="sortedOutput" value="true"/>
+ 			<targetParameter name="defaultEncodingRule" value="citygml"/>
+ 			<rules>
+ 				<EncodingRule name="citygml" extends="iso19136_2007">
+					<rule name="rule-xsd-rel-association-classes"/>
+					<rule name="rule-xsd-cls-basictype"/>
+					<rule name="rule-xsd-cls-basictype-list"/>
+					<rule name="rule-xsd-cls-union-asGroup"/>
+					<rule name="rule-xsd-prop-initialValue"/>
+					<rule name="rule-xsd-prop-constrainingFacets"/>
+					<rule name="rule-xsd-all-no-documentation"/>
+					<rule name="rule-xsd-pkg-schematron"/>
+ 				</EncodingRule>
+ 			</rules>
+ 			<xi:include href="http://shapechange.net/resources/config/StandardRules.xml"/>
+ 			<xi:include href="http://shapechange.net/resources/config/StandardNamespaces.xml"/>
+ 			<xi:include href="http://shapechange.net/resources/config/StandardMapEntries.xml"/>
+			<xsdMapEntries>
+				<XsdMapEntry type="xs::anyURI" xsdEncodingRules="citygml" xmlPropertyType="xs:anyURI" xmlType="xs:anyURI" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::boolean" xsdEncodingRules="citygml" xmlPropertyType="xs:boolean" xmlType="xs:boolean" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::date" xsdEncodingRules="citygml" xmlPropertyType="xs:date" xmlType="xs:date" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::double" xsdEncodingRules="citygml" xmlPropertyType="xs:double" xmlType="xs:double" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::gYear" xsdEncodingRules="citygml" xmlPropertyType="xs:gYear" xmlType="xs:gYear" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::gYearMonth" xsdEncodingRules="citygml" xmlPropertyType="xs:gYearMonth" xmlType="xs:gYearMonth" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::integer" xsdEncodingRules="citygml" xmlPropertyType="xs:integer" xmlType="xs:integer" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::nonNegativeInteger" xsdEncodingRules="citygml" xmlPropertyType="xs:nonNegativeInteger" xmlType="xs:nonNegativeInteger" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="xs::string" xsdEncodingRules="citygml" xmlPropertyType="xs:string" xmlType="xs:string" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gml::CodeType" xsdEncodingRules="citygml" xmlPropertyType="gml:CodeType" xmlType="gml:CodeType" xmlTypeType="complex" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gml::doubleList" xsdEncodingRules="citygml" xmlPropertyType="gml:doubleList" xmlType="gml:doubleList" xmlTypeType="complex" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gml::LengthType" xsdEncodingRules="citygml" xmlPropertyType="gml:LengthType" xmlType="gml:LengthType" xmlTypeType="complex" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gml::MeasureType" xsdEncodingRules="citygml" xmlPropertyType="gml:MeasureType" xmlType="gml:MeasureType" xmlTypeType="complex" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gml:StringOrRefType" xsdEncodingRules="citygml" xmlPropertyType="gml:StringOrRefType" xmlType="gml:StringOrRefType" xmlTypeType="complex" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gml::DirectPosition" xsdEncodingRules="citygml" xmlPropertyType="gml:DirectPositionType" xmlType="gml:DirectPositionType" xmlTypeType="complex" xmlTypeContent="simple"/>
+				<XsdMapEntry type="MultiSurface" xsdEncodingRules="citygml" xmlPropertyType="gml:MultiSurfacePropertyType" xmlType="gml:MultiSurfaceType" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="MultiCurve" xsdEncodingRules="citygml" xmlPropertyType="gml:MultiCurvePropertyType" xmlType="gml:MultiCurveType" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="MultiPoint" xsdEncodingRules="citygml" xmlPropertyType="gml:MultiPointPropertyType" xmlType="gml:MultiPointType" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="GeometricComplex" xsdEncodingRules="citygml" xmlPropertyType="gml:GeometricComplexPropertyType" xmlType="gml:GeometricComplexType" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="Point" xsdEncodingRules="citygml" xmlPropertyType="gml:PointPropertyType" xmlType="gml:PointType" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="_Geometry" xsdEncodingRules="citygml" xmlPropertyType="gml:GeometryPropertyType" xmlType="gml:GeometryType" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="anyURI" xsdEncodingRules="citygml" xmlPropertyType="xs:anyURI" xmlType="xs:anyURI" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="boolean" xsdEncodingRules="citygml" xmlPropertyType="xs:boolean" xmlType="xs:boolean" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="date" xsdEncodingRules="citygml" xmlPropertyType="xs:date" xmlType="xs:date" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="double" xsdEncodingRules="citygml" xmlPropertyType="xs:double" xmlType="xs:double" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gYear" xsdEncodingRules="citygml" xmlPropertyType="xs:gYear" xmlType="xs:gYear" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="gYearMonth" xsdEncodingRules="citygml" xmlPropertyType="xs:gYearMonth" xmlType="xs:gYearMonth" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="integer" xsdEncodingRules="citygml" xmlPropertyType="xs:integer" xmlType="xs:integer" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="nonNegativeInteger" xsdEncodingRules="citygml" xmlPropertyType="xs:nonNegativeInteger" xmlType="xs:nonNegativeInteger" xmlTypeType="simple" xmlTypeContent="simple"/>
+				<XsdMapEntry type="string" xsdEncodingRules="citygml" xmlPropertyType="xs:string" xmlType="xs:string" xmlTypeType="simple" xmlTypeContent="simple"/>
+			</xsdMapEntries>
+			<xmlNamespaces>
+				<XmlNamespace nsabr="gml" ns="http://www.opengis.net/gml" location="http://schemas.opengis.net/gml/3.1.1/base/gml.xsd"/>
+				<XmlNamespace nsabr="uro" ns="https://www.geospatial.jp/iur/uro/3.2" location="https://www.geospatial.jp/iur/schemas/uro/3.2/urbanObject.xsd"/>
+				<XmlNamespace nsabr="core" ns="http://www.opengis.net/citygml/2.0" location="http://schemas.opengis.net/citygml/2.0/cityGMLBase.xsd" />
+			</xmlNamespaces>
+		</TargetXmlSchema>
+	</targets>
+</ShapeChangeConfiguration>

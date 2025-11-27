@@ -1,0 +1,255 @@
+= rule-xsd-pkg-gmlProfileSchema
+:toc:
+:sectnums:
+
+== Purpose
+
+Add [`gml:gmlProfileSchema`](http://schemas.opengis.net/gml/3.2.1/gmlBase.xsd#gmlProfileSchema) annotation to schema for GML profile compliance metadata.
+
+This rule enables packages to declare which GML profile they conform to, supporting profile-based validation and tooling.
+
+== ShapeChange Analysis
+
+=== Java Implementation
+
+The rule is implemented in [`XsdDocument.java:addStandardAnnotation()`](../../reference/shapechange-sources/de/interactive_instruments/ShapeChange/Target/XmlSchema/XsdDocument.java:314-323):
+
+[source,java]
+----
+if (info.matches("rule-xsd-pkg-gmlProfileSchema")
+        && options.GML_NS.equals("http://www.opengis.net/gml/3.2")) {
+    String profile = pi.gmlProfileSchema();
+    if (profile != null && !profile.trim().isEmpty()) {
+        if (e2 == null)
+            e2 = document.createElementNS(Options.W3C_XML_SCHEMA, "appinfo");
+        Element e0 = document.createElementNS(options.GML_NS, "gmlProfileSchema");
+        e2.appendChild(e0);
+        e0.appendChild(document.createTextNode(profile));
+    }
+}
+----
+
+=== Algorithm
+
+When this rule is enabled:
+
+1. Check if package matches [`rule-xsd-pkg-gmlProfileSchema`](rule-xsd-pkg-gmlProfileSchema.adoc)
+2. Verify GML namespace is `http://www.opengis.net/gml/3.2`
+3. Get `gmlProfileSchema` value from package
+4. If profile value exists and is non-empty:
+   * Create `<appinfo>` element if needed
+   * Create [`gml:gmlProfileSchema`](http://schemas.opengis.net/gml/3.2.1/gmlBase.xsd#gmlProfileSchema) element
+   * Set element text content to profile value
+
+=== Key Characteristics
+
+* **Scope**: Package/Schema annotation
+* **Context**: GML 3.2 and later
+* **Element**: [`gml:gmlProfileSchema`](http://schemas.opengis.net/gml/3.2.1/gmlBase.xsd#gmlProfileSchema)
+* **Source**: Package tagged value or property
+
+== Implementation Requirements
+
+=== Input Detection
+
+Identify packages requiring GML profile annotation:
+
+* Package has `gmlProfileSchema` tagged value or property
+* Rule [`rule-xsd-pkg-gmlProfileSchema`](rule-xsd-pkg-gmlProfileSchema.adoc) is enabled
+* GML namespace is `http://www.opengis.net/gml/3.2`
+
+=== Processing Logic
+
+[source,ruby]
+----
+def process_gml_profile_schema(package, context)
+  # Get profile value from package
+  profile = package.tagged_value("gmlProfileSchema") ||
+            package.gml_profile_schema
+
+  return if profile.nil? || profile.strip.empty?
+
+  # Create appinfo element
+  appinfo = context[:annotation][:appinfo] ||= []
+
+  # Add gml:gmlProfileSchema element
+  appinfo << {
+    namespace: context.gml_namespace,
+    element: "gmlProfileSchema",
+    text: profile
+  }
+end
+----
+
+=== Output Generation
+
+Generate schema annotation with profile declaration:
+
+[source,xml]
+----
+<schema>
+  <annotation>
+    <appinfo>
+      <gml:gmlProfileSchema>http://www.opengis.net/gml/3.2</gml:gmlProfileSchema>
+    </appinfo>
+  </annotation>
+  <!-- schema content -->
+</schema>
+----
+
+== Configuration
+
+=== Rule Declaration
+
+[source,xml]
+----
+<EncodingRule name="gml33">
+  <rule name="rule-xsd-pkg-gmlProfileSchema"/>
+</EncodingRule>
+----
+
+=== Tagged Value
+
+Package must have `gmlProfileSchema` tagged value:
+
+[source]
+----
+Package: MyApplicationSchema
+  Tagged Values:
+    gmlProfileSchema: "http://www.opengis.net/gml/3.2"
+----
+
+== Examples
+
+=== Example 1: GML 3.2 Profile
+
+.Input Model
+[source]
+----
+Package: CityGML
+  targetNamespace: http://www.opengis.net/citygml/2.0
+  xmlns: citygml
+  version: 2.0.0
+  Tagged Values:
+    gmlProfileSchema: "http://www.opengis.net/gml/3.2"
+----
+
+.Output XSD
+[source,xml]
+----
+<schema targetNamespace="http://www.opengis.net/citygml/2.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:citygml="http://www.opengis.net/citygml/2.0"
+        xmlns:gml="http://www.opengis.net/gml/3.2"
+        elementFormDefault="qualified"
+        version="2.0.0">
+
+  <annotation>
+    <appinfo>
+      <gml:gmlProfileSchema>http://www.opengis.net/gml/3.2</gml:gmlProfileSchema>
+    </appinfo>
+  </annotation>
+
+  <!-- schema content -->
+</schema>
+----
+
+=== Example 2: Custom GML Profile
+
+.Input Model
+[source]
+----
+Package: TransportNetwork
+  Tagged Values:
+    gmlProfileSchema: "http://example.org/profiles/transport/1.0"
+----
+
+.Output XSD
+[source,xml]
+----
+<schema>
+  <annotation>
+    <appinfo>
+      <gml:gmlProfileSchema>http://example.org/profiles/transport/1.0</gml:gmlProfileSchema>
+    </appinfo>
+  </annotation>
+  <!-- schema content -->
+</schema>
+----
+
+=== Example 3: No Profile (Rule Disabled or No Value)
+
+.Input Model
+[source]
+----
+Package: BasicSchema
+  (no gmlProfileSchema tagged value)
+----
+
+.Output XSD
+[source,xml]
+----
+<schema>
+  <!-- No gml:gmlProfileSchema annotation -->
+  <!-- schema content -->
+</schema>
+----
+
+== Testing Strategy
+
+=== Test Coverage
+
+1. **Basic Profile Declaration**
+   * Package with `gmlProfileSchema` → annotation added
+   * Correct namespace and element
+
+2. **Empty or Missing Profile**
+   * No tagged value → no annotation
+   * Empty string → no annotation
+
+3. **GML Version Check**
+   * GML 3.2 → annotation added
+   * GML 3.1 or earlier → no annotation
+
+4. **Rule Disabled**
+   * Profile value present but rule disabled
+   * No annotation added
+
+5. **Multiple Appinfo Elements**
+   * Combines with other appinfo content
+   * Proper ordering maintained
+
+=== Expected Behaviors
+
+* Profile annotation in schema `<annotation>`
+* [`gml:gmlProfileSchema`](http://schemas.opengis.net/gml/3.2.1/gmlBase.xsd#gmlProfileSchema) element with text content
+* Only for GML 3.2 schemas
+* GML namespace imported
+
+== Notes
+
+=== GML Profile Compliance
+
+The [`gml:gmlProfileSchema`](http://schemas.opengis.net/gml/3.2.1/gmlBase.xsd#gmlProfileSchema) annotation:
+
+* Declares conformance to a specific GML profile
+* Enables profile-based validation
+* Supports tooling and documentation
+* Defined in GML 3.2 specification
+
+=== Common Profile Values
+
+* `http://www.opengis.net/gml/3.2` - Full GML 3.2
+* `http://www.opengis.net/def/profile/gml/2.0/gml-sf0` - Simple Features Level 0
+* `http://www.opengis.net/def/profile/gml/2.0/gml-sf1` - Simple Features Level 1
+* `http://www.opengis.net/def/profile/gml/2.0/gml-sf2` - Simple Features Level 2
+
+=== Relationship to Other Rules
+
+* Related to [`rule-xsd-pkg-dgiwgsp`](rule-xsd-pkg-dgiwgsp.adoc) for DGIWG profiles
+* Works with [`rule-xsd-pkg-gmlsf`](rule-xsd-pkg-gmlsf.adoc) for Simple Features
+* Part of schema metadata annotations
+
+=== Reference Implementation
+
+See [`GmlProfileSchemaProcessor`](../../lib/lutaml/klin/xsd_gen/rule_processors/package_rules/gml_profile_schema_processor.rb) for Ruby implementation.

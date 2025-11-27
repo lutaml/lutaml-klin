@@ -1,0 +1,507 @@
+= Mapping Generation
+:toc:
+:toclevels: 3
+
+== Purpose
+
+The mapping generation feature is the core capability of lutaml-klin. It orchestrates the transformation of UML models (from XMI files) into YAML mapping documents that describe how UML classes and attributes map to XML Schema elements and types, using ShapeChange configuration rules.
+
+This automated mapping generation eliminates manual effort, ensures consistency, and provides a foundation for downstream processes like schema generation and documentation.
+
+== Concepts
+
+=== Mapping Document Structure
+
+A generated mapping document contains hierarchical information:
+
+[source,yaml]
+----
+package: Urban Planning ADE 3.2
+namespace: https://www.geospatial.jp/iur/urf/3.2
+prefix: urf
+classes:
+  - name: Building
+    xml_element: urf:Building
+    xml_type: urf:BuildingType
+    stereotype: FeatureType
+    attributes:
+      - name: buildingID
+        xml_element: urf:buildingID
+        xml_type: xs:string
+        multiplicity: "1"
+      - name: class
+        xml_element: urf:class
+        xml_type: gml:CodeType
+        multiplicity: "0..1"
+----
+
+=== Three-Way Coordination
+
+Mapping generation coordinates three input sources:
+
+1. **XMI File** - UML model structure (packages, classes, attributes)
+2. **ShapeChange Config** - Transformation rules (type mappings, namespaces)
+3. **Encoding Rules** - Specific transformation behavior (iso19136_2007, citygml, etc.)
+
+The generator ensures these three sources work together cohesively.
+
+=== Type Resolution Strategy
+
+Type resolution follows this priority order:
+
+1. **Type Override Mapping** (optional) - Manual type corrections
+2. **ShapeChange Type Mappings** - Configured type transformations
+3. **Namespace Resolution** - Resolve prefixed types (gml:CodeType)
+4. **Direct Mapping** - Use UML type as-is (fallback)
+
+== Basic Mapping Generation
+
+=== Generate for Single Package
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load inputs
+navigator = Lutaml::Klin::XmiNavigator.new('model.xmi')
+config = Lutaml::Klin::Shapechange::ConfigParser.parse('config.xml')
+
+# Create generator
+generator = Lutaml::Klin::MappingGenerator.new(
+  xmi_navigator: navigator,
+  config: config,
+  encoding_rule: 'citygml'
+)
+
+# Generate mapping for package
+mapping = generator.generate_for_package('urf')
+
+# Save to YAML
+File.write('urf_mapping.yaml', mapping.to_yaml)
+----
+
+=== Generate for Multiple Packages
+
+[source,ruby]
+----
+# Generate mappings for all packages
+packages = ['urf', 'uro', 'core', 'bldg']
+
+mappings = packages.map do |pkg_name|
+  generator.generate_for_package(pkg_name)
+end
+
+# Save each mapping
+mappings.each do |mapping|
+  filename = "#{mapping.package_name}_mapping.yaml"
+  File.write(filename, mapping.to_yaml)
+end
+----
+
+== Type Override Mapping
+
+=== Purpose
+
+Type override mapping allows you to correct malformed or non-standard type names in XMI files before they're processed. This is useful when:
+
+* XMI uses incorrect separators (e.g., `xs::string` instead of `xs:string`)
+* Type names have typos or variations
+* You need to normalize type references
+
+=== Configuration Format
+
+Create a type override file (YAML or JSON):
+
+[source,yaml]
+----
+# type_overrides.yaml
+type_overrides:
+  "xs::string": "xs:string"
+  "xs::integer": "xs:integer"
+  "xs::boolean": "xs:boolean"
+  "gml::CodeType": "gml:CodeType"
+  "gml::MeasureType": "gml:MeasureType"
+  "CharString": "CharacterString"  # Fix typo
+----
+
+=== Using Type Overrides
+
+[source,ruby]
+----
+# Load type override mapping
+type_overrides = YAML.load_file('type_overrides.yaml')
+
+# Create generator with overrides
+generator = Lutaml::Klin::MappingGenerator.new(
+  xmi_navigator: navigator,
+  config: config,
+  encoding_rule: 'citygml',
+  type_overrides: type_overrides['type_overrides']
+)
+
+# Types are now normalized before resolution
+mapping = generator.generate_for_package('urf')
+----
+
+=== CLI Usage
+
+[source,bash]
+----
+# Use --type-mapping option
+lutaml-klin generate \
+  --xmi model.xmi \
+  --config config.xml \
+  --package urf \
+  --encoding-rule citygml \
+  --type-mapping type_overrides.yaml \
+  --output urf_mapping.yaml
+----
+
+=== Example: Fixing Double Colon Issues
+
+Some XMI files incorrectly use `::` instead of `:` for namespace separators:
+
+[source,yaml]
+----
+# type_overrides.yaml
+type_overrides:
+  # Fix xs namespace
+  "xs::string": "xs:string"
+  "xs::integer": "xs:integer"
+  "xs::double": "xs:double"
+  "xs::boolean": "xs:boolean"
+  "xs::date": "xs:date"
+  "xs::anyURI": "xs:anyURI"
+
+  # Fix gml namespace
+  "gml::CodeType": "gml:CodeType"
+  "gml::MeasureType": "gml:MeasureType"
+  "gml::LengthType": "gml:LengthType"
+  "gml::PointType": "gml:PointType"
+----
+
+Result:
+
+[source,ruby]
+----
+# Before type override:
+# attribute.type = "xs::string"
+# Result: unresolved type
+
+# After type override:
+# attribute.type = "xs:string"
+# Result: resolved to XML Schema string type
+----
+
+== Advanced Configuration
+
+=== Custom Encoding Rules
+
+[source,ruby]
+----
+# Create generator with specific encoding rule
+generator = Lutaml::Klin::MappingGenerator.new(
+  xmi_navigator: navigator,
+  config: config,
+  encoding_rule: 'iso19136_2007'  # GML 3.2
+)
+----
+
+=== Filtering Classes by Stereotype
+
+[source,ruby]
+----
+# Generate only for specific stereotypes
+generator = Lutaml::Klin::MappingGenerator.new(
+  xmi_navigator: navigator,
+  config: config,
+  encoding_rule: 'citygml',
+  stereotypes: ['FeatureType', 'DataType']  # Exclude CodeList, etc.
+)
+
+mapping = generator.generate_for_package('urf')
+----
+
+=== Custom Output Format
+
+[source,ruby]
+----
+# Generate mapping
+mapping = generator.generate_for_package('urf')
+
+# Convert to different formats
+yaml_output = mapping.to_yaml
+json_output = mapping.to_json
+hash_output = mapping.to_h
+
+# Save
+File.write('mapping.yaml', yaml_output)
+File.write('mapping.json', json_output)
+----
+
+== Mapping Resolution Details
+
+=== Attribute Type Resolution
+
+For each UML attribute, the generator resolves types through:
+
+[source,ruby]
+----
+# Example attribute from XMI
+attribute.name = "buildingID"
+attribute.type = "xs::string"  # From XMI
+
+# Step 1: Apply type override (if configured)
+overridden_type = type_overrides["xs::string"] || attribute.type
+# => "xs:string"
+
+# Step 2: Look up in ShapeChange config
+mapping = config.find_type_mapping(overridden_type, 'citygml')
+# => {xmlType: "xs:string", xmlPropertyType: "xs:string"}
+
+# Step 3: Resolve namespace
+if mapping.xml_type.include?(':')
+  prefix, local_name = mapping.xml_type.split(':')
+  namespace = config.find_namespace_by_prefix(prefix)
+  # => {ns: "http://www.w3.org/2001/XMLSchema", nsabr: "xs"}
+end
+
+# Result:
+# xml_type: "xs:string"
+# xml_namespace: "http://www.w3.org/2001/XMLSchema"
+----
+
+=== Association Resolution
+
+[source,ruby]
+----
+# Association from UML
+association.source = "Building"
+association.target = "Address"
+association.type = "composition"
+
+# Generated mapping
+{
+  source_class: "Building",
+  target_class: "Address",
+  xml_element: "urf:address",
+  xml_type: "urf:AddressType",
+  association_type: "composition",
+  multiplicity: "1"
+}
+----
+
+=== Multiplicity Handling
+
+[source,ruby]
+----
+# UML multiplicity formats
+"1"          => min: 1, max: 1    # Required, single
+"0..1"       => min: 0, max: 1    # Optional, single
+"1..*"       => min: 1, max: "*"  # Required, multiple
+"0..*"       => min: 0, max: "*"  # Optional, multiple
+"2..5"       => min: 2, max: 5    # Bounded range
+----
+
+== Performance Optimization
+
+=== Batch Processing
+
+[source,ruby]
+----
+# Process multiple packages efficiently
+generator = Lutaml::Klin::MappingGenerator.new(
+  xmi_navigator: navigator,
+  config: config,
+  encoding_rule: 'citygml'
+)
+
+# Generate all mappings
+package_names = ['urf', 'uro', 'core', 'bldg', 'tran']
+
+mappings = {}
+package_names.each do |pkg_name|
+  puts "Generating #{pkg_name}..."
+  mappings[pkg_name] = generator.generate_for_package(pkg_name)
+
+  # Save incrementally to avoid memory issues
+  File.write("#{pkg_name}_mapping.yaml", mappings[pkg_name].to_yaml)
+
+  # Allow garbage collection
+  GC.start
+end
+----
+
+=== Caching Strategies
+
+[source,ruby]
+----
+# Cache parsed config (parse once, use many times)
+config = Lutaml::Klin::Shapechange::ConfigParser.parse('config.xml')
+
+# Reuse for multiple generations
+packages.each do |pkg|
+  generator = Lutaml::Klin::MappingGenerator.new(
+    xmi_navigator: navigator,
+    config: config,  # Reuse cached config
+    encoding_rule: 'citygml'
+  )
+
+  mapping = generator.generate_for_package(pkg)
+end
+----
+
+== Error Handling
+
+=== Validation
+
+[source,ruby]
+----
+mapping = generator.generate_for_package('urf')
+
+# Validate generated mapping
+unless mapping.valid?
+  puts "Validation errors:"
+  mapping.errors.each do |error|
+    puts "  - #{error}"
+  end
+end
+----
+
+=== Missing Type Resolutions
+
+[source,ruby]
+----
+# Check for unresolved types
+unresolved = mapping.classes.flat_map do |cls|
+  cls.attributes.select { |attr| attr.xml_type.nil? }
+end
+
+if unresolved.any?
+  puts "WARNING: #{unresolved.count} attributes with unresolved types"
+  unresolved.each do |attr|
+    puts "  - #{attr.name}: #{attr.type}"
+  end
+end
+----
+
+=== Handling Generation Errors
+
+[source,ruby]
+----
+begin
+  mapping = generator.generate_for_package('urf')
+rescue Lutaml::Klin::PackageNotFoundError => e
+  puts "Package not found: #{e.message}"
+rescue Lutaml::Klin::TypeResolutionError => e
+  puts "Type resolution failed: #{e.message}"
+rescue => e
+  puts "Generation error: #{e.message}"
+  puts e.backtrace
+end
+----
+
+== Integration with CLI
+
+=== Command-Line Generation
+
+[source,bash]
+----
+# Basic generation
+lutaml-klin generate \
+  --xmi /path/to/model.xmi \
+  --config /path/to/config.xml \
+  --package urf \
+  --encoding-rule citygml \
+  --output urf_mapping.yaml
+
+# With type overrides
+lutaml-klin generate \
+  --xmi model.xmi \
+  --config config.xml \
+  --package urf \
+  --encoding-rule citygml \
+  --type-mapping type_overrides.yaml \
+  --output urf_mapping.yaml
+
+# Batch mode (all packages)
+lutaml-klin generate \
+  --xmi model.xmi \
+  --config config.xml \
+  --all-packages \
+  --encoding-rule citygml \
+  --output-dir mappings/
+----
+
+=== Using Environment Variables
+
+[source,bash]
+----
+# Set defaults via environment
+export LUTAML_KLIN_XMI=/path/to/model.xmi
+export LUTAML_KLIN_CONFIG=/path/to/config.xml
+export LUTAML_KLIN_ENCODING_RULE=citygml
+
+# Simplified command
+lutaml-klin generate --package urf --output urf_mapping.yaml
+----
+
+== Output Formats
+
+=== YAML Format (Default)
+
+[source,yaml]
+----
+package: Urban Planning ADE 3.2
+namespace: https://www.geospatial.jp/iur/urf/3.2
+prefix: urf
+encoding_rule: citygml
+classes:
+  - name: Building
+    xml_element: urf:Building
+    xml_type: urf:BuildingType
+    stereotype: FeatureType
+    attributes:
+      - name: buildingID
+        xml_element: urf:buildingID
+        xml_type: xs:string
+        multiplicity: "1"
+----
+
+=== JSON Format
+
+[source,json]
+----
+{
+  "package": "Urban Planning ADE 3.2",
+  "namespace": "https://www.geospatial.jp/iur/urf/3.2",
+  "prefix": "urf",
+  "encoding_rule": "citygml",
+  "classes": [
+    {
+      "name": "Building",
+      "xml_element": "urf:Building",
+      "xml_type": "urf:BuildingType",
+      "stereotype": "FeatureType",
+      "attributes": [
+        {
+          "name": "buildingID",
+          "xml_element": "urf:buildingID",
+          "xml_type": "xs:string",
+          "multiplicity": "1"
+        }
+      ]
+    }
+  ]
+}
+----
+
+== Relevant Documents
+
+* link:../architecture.adoc[Architecture Documentation] - Mapping generation flow
+* link:../ruby-api.adoc[Ruby API Reference] - MappingGenerator API
+* link:../cli.adoc[CLI Reference] - Generate command options
+* link:xmi-parsing.adoc[XMI Parsing] - UML model input
+* link:shapechange-config.adoc[ShapeChange Configuration] - Type mappings
+* link:namespace-resolution.adoc[Namespace Resolution] - Type resolution details
+* link:validation.adoc[Validation] - Mapping validation

@@ -1,0 +1,493 @@
+= Basic Usage
+
+== Purpose
+
+This guide introduces new users to Lutaml-Klin with practical examples for
+generating UML-to-XSD mappings from ShapeChange outputs.
+
+By following this guide, you will:
+
+* Install Lutaml-Klin in your Ruby environment
+* Generate your first YAML mapping from XMI and ShapeChange configuration
+* Understand the structure of mapping outputs
+* Learn common workflows for analyzing UML-to-XSD transformations
+
+== Concepts
+
+=== UML-to-XSD mapping
+
+UML (Unified Modeling Language) models define domain concepts and relationships
+in a platform-independent way. ShapeChange transforms these UML models into
+XSD (XML Schema Definition) for XML-based data exchange.
+
+Lutaml-Klin bridges this transformation by creating machine-readable mappings
+that show exactly how each UML class became an XSD element.
+
+=== ShapeChange transformation
+
+ShapeChange is a Java tool that reads UML models in XMI format and generates
+XSD schemas according to configurable encoding rules.
+
+The transformation process:
+
+[source]
+----
+UML Model (XMI)
+      │
+      ▼
+ShapeChange ──→ Configuration (encoding rules, type mappings)
+      │
+      ▼
+XSD Schemas
+----
+
+Lutaml-Klin analyzes both the input (XMI) and configuration to reconstruct
+the transformation logic.
+
+=== YAML mappings
+
+Lutaml-Klin outputs mappings in YAML format for easy programmatic access.
+
+Each mapping contains:
+
+* **Package mappings**: UML packages with their XML namespaces
+* **Class mappings**: UML classes mapped to XSD elements and complex types
+* **Attribute mappings**: UML attributes mapped to XSD elements with type conversions
+* **Encoding rules**: ShapeChange rules applied during transformation
+
+== Installation
+
+=== Using Bundler (recommended)
+
+Add to your `Gemfile`:
+
+[source,ruby]
+----
+gem "lutaml-klin"
+----
+
+Then execute:
+
+[source,shell]
+----
+bundle install
+----
+
+=== Direct installation
+
+Install the gem directly:
+
+[source,shell]
+----
+gem install lutaml-klin
+----
+
+=== Verify installation
+
+Check that the CLI is available:
+
+[source,shell]
+----
+lutaml-klin --version
+----
+
+Expected output:
+
+[source,text]
+----
+Lutaml-Klin version 0.1.0
+----
+
+== Your first mapping generation
+
+=== Prepare your inputs
+
+You need three files:
+
+1. **XMI file**: Your UML model exported from a modeling tool
+2. **ShapeChange configuration**: XML file with encoding rules and type mappings
+3. **Output path**: Where to save the generated YAML mapping
+
+Example file structure:
+
+[source]
+----
+my-project/
+├── models/
+│   └── urban-planning.xmi
+├── config/
+│   └── shapechange-config.xml
+└── output/
+    └── (mappings will be generated here)
+----
+
+=== Generate the mapping
+
+Run the `generate` command:
+
+[source,shell]
+----
+lutaml-klin generate \
+  --xmi models/urban-planning.xmi \
+  --config config/shapechange-config.xml \
+  --output output/urban-planning-mapping.yaml \
+  --verbose
+----
+
+Where:
+
+`--xmi`:: Path to your XMI file containing the UML model
+`--config`:: Path to ShapeChange XML configuration file
+`--output`:: Path where the YAML mapping will be saved
+`--verbose`:: (Optional) Enable detailed logging to see progress
+
+Example output:
+
+[source,text]
+----
+[INFO] Parsing XMI file: models/urban-planning.xmi
+[INFO] Found 1 packages
+[INFO] Found 15 classes
+[INFO] Parsing ShapeChange configuration: config/shapechange-config.xml
+[INFO] Found encoding rule: iso19136_2007_ShapeChange_1_0_0
+[INFO] Found 8 type mappings
+[INFO] Generating mappings...
+[INFO] Mapped 15 classes
+[INFO] Mapped 42 attributes
+[INFO] Writing YAML to: output/urban-planning-mapping.yaml
+[SUCCESS] Mapping generation complete!
+----
+
+=== Examine the output
+
+Open the generated YAML file:
+
+[source,shell]
+----
+cat output/urban-planning-mapping.yaml
+----
+
+Example output structure:
+
+[source,yaml]
+----
+---
+schema_mapping:
+  package_mappings:
+  - name: urbplan
+    namespace: http://example.org/urbplan/1.0
+    class_mappings:
+    - uml_class:
+        name: Building
+        stereotype: FeatureType
+        attributes:
+        - name: buildingID
+          type: CharacterString
+          multiplicity: 0..1
+      xsd_element:
+        name: Building
+        type: BuildingType
+        namespace: http://example.org/urbplan/1.0
+      xsd_complex_type:
+        name: BuildingType
+        base: gml:AbstractFeatureType
+        elements:
+        - name: buildingID
+          type: string
+          min_occurs: 0
+          max_occurs: '1'
+      attribute_mappings:
+      - uml_attribute:
+          name: buildingID
+          type: CharacterString
+        xsd_element:
+          name: buildingID
+          type: string
+  encoding_rules:
+  - name: iso19136_2007_ShapeChange_1_0_0
+    extends_encoding_rule: iso19136_2007
+----
+
+== Understanding the mapping structure
+
+=== Package mapping
+
+Each UML package becomes a `package_mapping`:
+
+[source,yaml]
+----
+- name: urbplan                              # <1>
+  namespace: http://example.org/urbplan/1.0 # <2>
+  class_mappings: [...]                      # <3>
+----
+<1> Package name from UML model
+<2> XML namespace from ShapeChange configuration
+<3> Array of class mappings within this package
+
+=== Class mapping
+
+Each UML class becomes a `class_mapping`:
+
+[source,yaml]
+----
+- uml_class:          # <1>
+    name: Building
+    stereotype: FeatureType
+    attributes: [...]
+  xsd_element:        # <2>
+    name: Building
+    type: BuildingType
+    namespace: http://example.org/urbplan/1.0
+  xsd_complex_type:   # <3>
+    name: BuildingType
+    base: gml:AbstractFeatureType
+    elements: [...]
+  attribute_mappings: [...]  # <4>
+----
+<1> UML class information from XMI
+<2> Corresponding XSD element (if generated)
+<3> Corresponding XSD complex type definition (if generated)
+<4> Individual attribute mappings
+
+=== Attribute mapping
+
+Each UML attribute maps to an XSD element:
+
+[source,yaml]
+----
+- uml_attribute:    # <1>
+    name: buildingID
+    type: CharacterString
+    multiplicity: 0..1
+  xsd_element:      # <2>
+    name: buildingID
+    type: string
+    namespace: http://www.w3.org/2001/XMLSchema
+    min_occurs: 0
+    max_occurs: '1'
+----
+<1> Original UML attribute definition
+<2> Transformed XSD element with type conversion
+
+Notice the type conversion: `CharacterString` → `string`
+
+=== Type mappings
+
+Type conversions are defined in ShapeChange configuration:
+
+.UML Type to XSD Type Conversions
+[source]
+----
+CharacterString → xs:string
+Integer         → xs:integer
+Real            → xs:double
+Boolean         → xs:boolean
+Date            → xs:date
+DateTime        → xs:dateTime
+Code            → gml:CodeType
+Measure         → gml:MeasureType
+----
+
+These mappings ensure UML types are correctly converted to XSD types.
+
+== Common workflows
+
+=== Workflow 1: Analyze a single package
+
+Generate mapping for one UML package:
+
+[source,shell]
+----
+lutaml-klin generate \
+  --xmi models/uro-package.xmi \
+  --config config/plateau-uro-config.xml \
+  --output mappings/uro.yaml
+----
+
+Then create a human-readable report:
+
+[source,shell]
+----
+lutaml-klin report \
+  --mapping mappings/uro.yaml \
+  --output reports/uro-investigation.txt
+----
+
+=== Workflow 2: Analyze multiple packages
+
+Generate mappings for each package separately:
+
+[source,shell]
+----
+lutaml-klin generate --xmi models/package1.xmi --config config/pkg1.xml --output mappings/pkg1.yaml
+lutaml-klin generate --xmi models/package2.xmi --config config/pkg2.xml --output mappings/pkg2.yaml
+lutaml-klin generate --xmi models/package3.xmi --config config/pkg3.xml --output mappings/pkg3.yaml
+----
+
+Merge into a single mapping:
+
+[source,shell]
+----
+lutaml-klin merge \
+  --inputs mappings/pkg1.yaml,mappings/pkg2.yaml,mappings/pkg3.yaml \
+  --output mappings/complete.yaml
+----
+
+=== Workflow 3: Validate against XSD schemas
+
+After generating a mapping, validate it against the actual XSD schemas:
+
+[source,shell]
+----
+lutaml-klin validate \
+  --mapping mappings/uro.yaml \
+  --xsd schemas/uro/ \
+  --verbose
+----
+
+This checks:
+
+* All UML classes have corresponding XSD elements
+* All attributes are correctly mapped
+* Type conversions match ShapeChange rules
+* Multiplicities are preserved
+
+== Programmatic usage
+
+=== Load a mapping in Ruby
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load the generated YAML mapping
+mapping = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(
+  File.read('mappings/uro.yaml')
+)
+
+puts "Loaded mapping for #{mapping.package_mappings.size} package(s)"
+----
+
+=== Query class mappings
+
+[source,ruby]
+----
+# Find a specific package
+uro_pkg = mapping.package_mappings.find { |pkg| pkg.name == 'uro' }
+
+# Find all FeatureType classes
+feature_types = uro_pkg.class_mappings.select do |cls|
+  cls.uml_class.stereotype == 'FeatureType'
+end
+
+puts "Found #{feature_types.size} FeatureType classes"
+
+# Display class names
+feature_types.each do |cls|
+  puts "  - #{cls.uml_class.name}"
+end
+----
+
+=== Analyze type conversions
+
+[source,ruby]
+----
+# Collect all type conversions
+conversions = {}
+
+mapping.package_mappings.each do |pkg|
+  pkg.class_mappings.each do |cls|
+    cls.attribute_mappings.each do |attr_map|
+      uml_type = attr_map.uml_attribute.type
+      xsd_type = attr_map.xsd_element.type
+
+      conversions[uml_type] ||= []
+      conversions[uml_type] << xsd_type unless conversions[uml_type].include?(xsd_type)
+    end
+  end
+end
+
+# Display results
+conversions.each do |uml_type, xsd_types|
+  puts "#{uml_type} → #{xsd_types.join(', ')}"
+end
+----
+
+== Troubleshooting
+
+=== XMI parsing errors
+
+**Error:** "Failed to parse XMI file"
+
+**Solution:** Ensure your XMI file is valid XML. Check for:
+
+* Proper XML encoding declaration
+* Balanced tags
+* Valid XMI namespace declarations
+
+Validate with:
+
+[source,shell]
+----
+xmllint --noout models/urban-planning.xmi
+----
+
+=== ShapeChange configuration errors
+
+**Error:** "Failed to parse ShapeChange configuration"
+
+**Solution:** Verify your configuration file includes:
+
+* `<input>` section with model reference
+* `<targets>` section with at least one target
+* Valid encoding rules
+* Proper XML namespace declarations
+
+=== Missing namespace mappings
+
+**Warning:** "Package 'xyz' has no namespace defined"
+
+**Solution:** Add namespace configuration to your ShapeChange config:
+
+[source,xml]
+----
+<PackageInfo packageName="xyz">
+  <ns>http://example.org/xyz/1.0</ns>
+  <version>1.0</version>
+</PackageInfo>
+----
+
+=== Empty output
+
+**Issue:** Generated YAML contains no class mappings
+
+**Solution:** Check that:
+
+* Your XMI file contains classes (not just packages)
+* Classes are in the expected packages
+* ShapeChange configuration targets the correct packages
+
+Enable verbose mode to see what's being parsed:
+
+[source,shell]
+----
+lutaml-klin generate --xmi model.xmi --config config.xml --output out.yaml --verbose
+----
+
+== Next steps
+
+Now that you understand basic usage:
+
+* Explore link:features/index.adoc[advanced features]
+* Learn the link:ruby-api.adoc[complete Ruby API]
+* Understand the link:architecture.adoc[system architecture]
+* Review link:cli.adoc[all CLI commands] in detail
+* Configure advanced link:options.adoc[options]
+
+== Relevant documents
+
+* link:../README.adoc[README.adoc] - Project overview and quick start
+* link:cli.adoc[Command Line Interface] - Complete CLI reference
+* link:ruby-api.adoc[Ruby API] - Programmatic usage guide
+* link:features/index.adoc[Features] - Detailed feature documentation
+* link:../EXAMPLES.adoc[EXAMPLES.adoc] - More comprehensive examples

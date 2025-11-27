@@ -1,0 +1,568 @@
+= Lutaml-Klin Architecture
+
+== Overview
+
+Lutaml-Klin follows a model-driven architecture with clear separation of
+concerns, designed to orchestrate the analysis and mapping of UML-to-XSD
+transformations performed by ShapeChange.
+
+== Design Principles
+
+=== Model-driven architecture
+
+All data structures are represented as first-class model objects using
+Lutaml::Model::Serializable for automatic serialization to YAML, JSON, and XML.
+
+This ensures:
+
+* Type safety and validation
+* Consistent serialization/deserialization
+* Clear API boundaries
+* Self-documenting code through model definitions
+
+=== Separation of concerns
+
+Each component has a single, well-defined responsibility:
+
+* **Parsers**: Extract data from input formats (XMI, XML, XSD)
+* **Models**: Represent domain concepts (UML, XSD, Mappings, Config)
+* **Generators**: Create output artifacts (YAML mappings, text reports)
+* **Commands**: Orchestrate operations and handle CLI interactions
+
+=== MECE principle
+
+All components are Mutually Exclusive and Collectively Exhaustive:
+
+* No overlapping responsibilities between classes
+* Complete coverage of required functionality
+* Clear boundaries between modules
+
+== Component Architecture
+
+=== Layer 1: Input Parsers
+
+==== XmiNavigator
+
+[source]
+----
+XmiNavigator
+├── Responsibility: Parse XMI files and extract UML model structure
+├── Dependencies: lutaml gem for XMI parsing
+├── Output: Array<Package> with nested classes, attributes, associations
+└── Location: lib/lutaml/klin/xmi_navigator.rb
+----
+
+Key methods:
+
+* `parse_file(path)`: Load and parse an XMI file
+* `packages`: Return all packages found in the XMI
+* `find_package(name)`: Locate a specific package by name
+
+Implementation details:
+
+* Uses Lutaml::Parser.parse to read XMI
+* Traverses Document → Packages → Classes → Attributes/Associations
+* Builds Package model objects with full hierarchy
+
+==== ShapeChange::ConfigParser
+
+[source]
+----
+ConfigParser
+├── Responsibility: Parse ShapeChange XML configuration files
+├── Dependencies: lutaml-model for XML parsing
+├── Output: ShapeChangeConfiguration model
+└── Location: lib/lutaml/klin/shapechange/config_parser.rb
+----
+
+Key methods:
+
+* `parse_file(path)`: Load and parse configuration XML
+* Resolves XInclude references via XIncludeResolver
+
+Configuration elements extracted:
+
+* Target configurations (encoding rules, output settings)
+* XSD map entries (type mappings: UML → XSD)
+* XML namespaces
+* Package-specific information
+
+==== XsdAnalyzer
+
+[source]
+----
+XsdAnalyzer
+├── Responsibility: Parse XSD schemas and extract element definitions
+├── Dependencies: lutaml-xsd gem
+├── Output: ElementMapping and ComplexTypeMapping models
+└── Location: lib/lutaml/klin/xsd_analyzer.rb
+----
+
+Key methods:
+
+* `analyze(xsd_content, location)`: Parse XSD and extract definitions
+* `find_element(name)`: Locate specific element definition
+* `find_complex_type(name)`: Locate complex type definition
+
+=== Layer 2: Domain Models
+
+==== UML Models
+
+Located in `lib/lutaml/klin/models/uml/`:
+
+[source]
+----
+UML Model Hierarchy
+├── Package
+│   ├── name: String
+│   ├── namespace: String (optional)
+│   ├── classes: Array<Class>
+│   └── packages: Array<Package> (nested)
+├── Class
+│   ├── name: String
+│   ├── id: String
+│   ├── stereotype: String
+│   ├── attributes: Array<Attribute>
+│   └── associations: Array<Association>
+├── Attribute
+│   ├── name: String
+│   ├── type: String
+│   ├── multiplicity: String
+│   └── visibility: String
+└── Association
+    ├── name: String
+    ├── target_class: String
+    ├── multiplicity: String
+    └── navigable: Boolean
+----
+
+All UML models inherit from `Lutaml::Model::Serializable`.
+
+==== XSD Models
+
+Located in `lib/lutaml/klin/models/xsd/`:
+
+[source]
+----
+XSD Model Hierarchy
+├── ElementMapping
+│   ├── name: String
+│   ├── type: String
+│   ├── namespace: String
+│   ├── min_occurs: Integer
+│   └── max_occurs: String (supports "unbounded")
+└── ComplexTypeMapping
+    ├── name: String
+    ├── base: String (inheritance)
+    ├── namespace: String
+    └── elements: Array<ElementMapping>
+----
+
+==== Mapping Models
+
+Located in `lib/lutaml/klin/models/mapping/`:
+
+[source]
+----
+Mapping Model Hierarchy
+SchemaMapping (root)
+├── package_mappings: Array<PackageMapping>
+│   ├── name: String
+│   ├── namespace: String
+│   └── class_mappings: Array<ClassMapping>
+│       ├── uml_class: UmlClass
+│       ├── xsd_element: ElementMapping (optional)
+│       ├── xsd_complex_type: ComplexTypeMapping (optional)
+│       └── attribute_mappings: Array<AttributeMapping>
+│           ├── uml_attribute: Attribute
+│           └── xsd_element: ElementMapping
+└── encoding_rules: Array<EncodingRule>
+    ├── name: String
+    └── extends_encoding_rule: String
+----
+
+The SchemaMapping model serves as the root container for all mappings and can
+be serialized to/from YAML for machine processing.
+
+==== Configuration Models
+
+Located in `lib/lutaml/klin/shapechange/models/config/`:
+
+[source]
+----
+Configuration Model Hierarchy
+ShapeChangeConfiguration
+├── input_id: String
+├── target_configurations: Array<TargetConfiguration>
+│   ├── class_name: String
+│   ├── mode: String
+│   ├── encoding_rules: Array<String>
+│   └── xsd_map_entries: Array<XsdMapEntry>
+│       ├── type: String (UML type)
+│       ├── xml_type: String (XSD type)
+│       └── xml_type_ns: String (namespace)
+├── xml_namespaces: Array<XmlNamespace>
+│   ├── ns: String
+│   └── location: String
+└── package_infos: Array<PackageInfo>
+    ├── package_name: String
+    ├── ns: String
+    └── version: String
+----
+
+=== Layer 3: Orchestration
+
+==== MappingGenerator
+
+[source]
+----
+MappingGenerator
+├── Responsibility: Orchestrate UML↔XSD mapping generation
+├── Inputs: XmiNavigator, ConfigParser, XsdAnalyzer (optional)
+├── Output: SchemaMapping model
+└── Location: lib/lutaml/klin/mapping_generator.rb
+----
+
+Core algorithm:
+
+[source]
+----
+1. Parse XMI file → Extract UML packages/classes
+2. Parse ShapeChange config → Extract encoding rules/type mappings
+3. For each UML package:
+   a. Create PackageMapping with namespace from config
+   b. For each UML class in package:
+      i. Create ClassMapping
+      ii. Set uml_class reference
+      iii. For each attribute:
+          - Find type mapping from config (UML type → XSD type)
+          - Create AttributeMapping
+      iv. If XSD provided:
+          - Find corresponding XSD element
+          - Find corresponding complex type
+          - Link to ClassMapping
+4. Return complete SchemaMapping
+----
+
+Key methods:
+
+* `generate(xmi_path, config_path, xsd_path = nil)`: Main entry point
+* `map_package(uml_package, config)`: Map a single package
+* `map_class(uml_class, config)`: Map a single class
+* `map_attribute(attr, type_mappings)`: Map a single attribute
+
+==== ReportCommand
+
+[source]
+----
+ReportCommand
+├── Responsibility: Generate human-readable transformation reports
+├── Input: SchemaMapping YAML file
+├── Output: Text report file
+└── Location: lib/lutaml/klin/commands/report_command.rb
+----
+
+Report structure:
+
+[source]
+----
+Report Header
+├── Title
+└── Timestamp
+
+For each package:
+  Package Header
+  For each class:
+    Class Section
+    ├── UML Information
+    │   ├── Name, Stereotype
+    │   ├── Attributes (with types and multiplicity)
+    │   └── Associations
+    ├── XSD Element (if mapped)
+    │   ├── Name, Type, Namespace
+    ├── XSD Complex Type (if mapped)
+    │   ├── Name, Base Type
+    │   └── Elements
+    └── Attribute Mappings
+        └── UML attribute → XSD element (with type conversion)
+----
+
+=== Layer 4: CLI Commands
+
+All CLI commands are located in `lib/lutaml/klin/commands/` and follow Thor
+conventions.
+
+==== GenerateCommand
+
+[source,ruby]
+----
+class GenerateCommand
+  def initialize(options = {})
+    @xmi_path = options[:xmi]
+    @config_path = options[:config]
+    @output_path = options[:output]
+    @verbose = options[:verbose]
+  end
+
+  def run
+    # 1. Validate inputs
+    # 2. Create MappingGenerator
+    # 3. Generate mapping
+    # 4. Serialize to YAML
+    # 5. Write to output file
+  end
+end
+----
+
+==== ReportCommand
+
+[source,ruby]
+----
+class ReportCommand
+  def initialize(options = {})
+    @mapping_path = options[:mapping]
+    @output_path = options[:output]
+    @verbose = options[:verbose]
+  end
+
+  def run
+    # 1. Load SchemaMapping from YAML
+    # 2. Generate text report
+    # 3. Write to output file
+  end
+end
+----
+
+==== MergeCommand
+
+[source,ruby]
+----
+class MergeCommand
+  def initialize(options = {})
+    @input_paths = options[:inputs].split(',')
+    @output_path = options[:output]
+    @verbose = options[:verbose]
+  end
+
+  def run
+    # 1. Load all mapping files
+    # 2. Merge package_mappings
+    # 3. Deduplicate encoding rules
+    # 4. Write merged YAML
+  end
+end
+----
+
+==== ValidateCommand
+
+[source,ruby]
+----
+class ValidateCommand
+  def initialize(options = {})
+    @mapping_path = options[:mapping]
+    @xsd_path = options[:xsd]
+    @verbose = options[:verbose]
+  end
+
+  def run
+    # 1. Load SchemaMapping
+    # 2. Parse XSD schemas
+    # 3. Validate all mappings
+    # 4. Report issues
+  end
+end
+----
+
+== Data Flow
+
+=== Generate Command Flow
+
+[source]
+----
+User Input
+  │
+  ├─ XMI file (UML model)
+  ├─ Config XML (ShapeChange settings)
+  └─ Output path
+  │
+  ▼
+GenerateCommand.run
+  │
+  ├─► XmiNavigator.parse_file(xmi_path)
+  │     └─► Returns: Array<Package>
+  │
+  ├─► ConfigParser.parse_file(config_path)
+  │     └─► Returns: ShapeChangeConfiguration
+  │
+  └─► MappingGenerator.generate(xmi, config)
+        │
+        ├─► For each package:
+        │     └─► map_package(pkg, config)
+        │           └─► For each class:
+        │                 └─► map_class(cls, config)
+        │                       └─► For each attribute:
+        │                             └─► map_attribute(attr, mappings)
+        │
+        └─► Returns: SchemaMapping
+              │
+              ├─► SchemaMapping.to_yaml
+              │
+              └─► File.write(output_path, yaml)
+                    │
+                    ▼
+                  YAML Output
+----
+
+=== Report Command Flow
+
+[source]
+----
+User Input
+  │
+  ├─ Mapping YAML file
+  └─ Output path
+  │
+  ▼
+ReportCommand.run
+  │
+  ├─► SchemaMapping.from_yaml(File.read(mapping_path))
+  │     └─► Returns: SchemaMapping
+  │
+  └─► Generate text report
+        │
+        ├─► For each package_mapping:
+        │     ├─► Write package header
+        │     └─► For each class_mapping:
+        │           ├─► generate_class_section(cls)
+        │           │     ├─► UML information
+        │           │     ├─► XSD element info
+        │           │     ├─► XSD complex type info
+        │           │     └─► Attribute mappings
+        │           └─► Write to report
+        │
+        └─► File.write(output_path, report_text)
+              │
+              ▼
+            Text Report Output
+----
+
+== Extension Points
+
+=== Adding New Input Formats
+
+To add support for a new UML input format:
+
+1. Create a new navigator class (e.g., `EcoreNavigator`)
+2. Implement the same interface as `XmiNavigator`:
+   * `parse_file(path)`
+   * `packages` method returning `Array<Package>`
+3. Update `MappingGenerator` to accept multiple navigator types
+4. Add CLI option to select navigator type
+
+=== Adding New Output Formats
+
+To add a new output format for mappings:
+
+1. Add serialization format to `SchemaMapping` model using Lutaml::Model
+2. Update `GenerateCommand` to support format selection
+3. Example: JSON output using Lutaml::Model's built-in JSON serialization
+
+=== Adding New Validation Rules
+
+To add custom validation rules:
+
+1. Extend `ValidateCommand` with new validation methods
+2. Add configuration options for enabling/disabling rules
+3. Report validation results in standardized format
+
+== Testing Strategy
+
+=== Unit Tests
+
+Each component has focused unit tests:
+
+* **Parsers**: Test with minimal fixtures
+* **Models**: Test serialization/deserialization
+* **Generators**: Test mapping logic with mocks
+* **Commands**: Test with temporary files
+
+=== Integration Tests
+
+Located in `spec/integration/`:
+
+* Use real-world data (PLATEAU URO package)
+* Test complete workflows end-to-end
+* Verify performance with large datasets (174 classes)
+* Validate output correctness
+
+=== Test Fixtures
+
+Organized by purpose:
+
+* `spec/fixtures/xmi/`: Sample XMI files
+* `spec/fixtures/configs/`: ShapeChange configurations
+* `spec/fixtures/xsd/`: XSD schema samples
+* `spec/fixtures/expected_mappings/`: Known-good YAML outputs
+
+== Performance Considerations
+
+=== Memory Management
+
+* Stream large XMI files instead of loading entire DOM
+* Use lazy evaluation for package/class traversal
+* Clear intermediate data structures after processing
+
+=== Optimization Targets
+
+* Parse 174 classes (PLATEAU URO) in < 10 seconds ✓
+* Generate YAML output in < 1 second
+* Report generation scales linearly with class count
+
+=== Caching Strategy
+
+* Cache parsed XMI documents for multiple operations
+* Cache ShapeChange config for repeated use
+* Memoize type mapping lookups
+
+== Security Considerations
+
+=== Input Validation
+
+* Validate all file paths before reading
+* Sanitize XMI/XML input to prevent XXE attacks
+* Limit file sizes to prevent memory exhaustion
+
+=== Output Safety
+
+* Use safe YAML serialization (no unsafe deserialization)
+* Validate output paths (no directory traversal)
+* Set appropriate file permissions on output files
+
+== Future Enhancements
+
+=== Planned Features
+
+1. **Interactive mode**: Web UI for exploring mappings
+2. **Diff tool**: Compare mappings across versions
+3. **Reverse mapping**: Generate UML from XSD
+4. **Plugin system**: User-defined transformation rules
+5. **Export formats**: HTML, Markdown, GraphML
+
+=== Architectural Improvements
+
+1. **Streaming parser**: For very large XMI files
+2. **Parallel processing**: Multi-threaded class mapping
+3. **Incremental updates**: Only re-map changed classes
+4. **Query interface**: SQL-like queries on mappings
+
+== Glossary
+
+ShapeChange:: Java tool for UML-to-XSD transformation
+XMI:: XML Metadata Interchange (UML serialization format)
+XSD:: XML Schema Definition
+Encoding Rule:: ShapeChange transformation pattern
+Type Mapping:: UML type to XSD type conversion rule
+PLATEAU:: Japanese urban planning data standard
+URO:: Urban Object package in PLATEAU
+Lutaml:: Ruby library for UML and data modeling
+Lutaml-Model:: Serialization framework using model definitions

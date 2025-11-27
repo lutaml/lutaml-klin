@@ -1,0 +1,111 @@
+= rule-xsd-prop-defaultCodeSpace
+
+== General
+
+The `rule-xsd-prop-defaultCodeSpace` adds `<gml:defaultCodeSpace>` annotations for code list properties in GML 3.2 schemas.
+
+This rule specifies the default URI for code list values, supporting validation and resolution of codes.
+
+== Purpose
+
+Default code space annotations enable:
+
+* Declaration of default code list URI
+* Validation of code list values
+* Resolution of codes to their definitions
+* Compliance with GML 3.2 code list patterns
+
+== ShapeChange Algorithm
+
+Based on [`XsdDocument.java`](../../reference/shapechange-sources/de/interactive_instruments/ShapeChange/Target/XmlSchema/XsdDocument.java) lines 434-440:
+
+.Key implementation points
+[source,java]
+----
+if (info.matches("rule-xsd-prop-defaultCodeSpace")
+        && !propi.defaultCodeSpace().isEmpty()
+        && options.GML_NS.equals("http://www.opengis.net/gml/3.2")) {
+    if (e2 == null)
+        e2 = document.createElementNS(Options.W3C_XML_SCHEMA, "appinfo");
+    Element e3 = document.createElementNS(options.GML_NS, "defaultCodeSpace");
+    e2.appendChild(e3);
+    e3.appendChild(document.createTextNode(propi.defaultCodeSpace()));
+}
+----
+
+== Algorithm Steps
+
+. Verify GML namespace is "http://www.opengis.net/gml/3.2"
+. Check property has defaultCodeSpace value defined
+. Verify defaultCodeSpace is not empty
+. Create `<gml:defaultCodeSpace>` element in appinfo
+. Add code space URI as text content
+
+== Implementation
+
+The Ruby implementation:
+
+[source,ruby]
+----
+def apply_rule(property, context)
+  return unless gml_32?(context)
+
+  code_space = get_default_code_space(property)
+  return if code_space.nil? || code_space.empty?
+
+  add_default_code_space_annotation(code_space, context)
+end
+
+def gml_32?(context)
+  context[:gml_namespace] == "http://www.opengis.net/gml/3.2"
+end
+
+def get_default_code_space(property)
+  return nil unless property.respond_to?(:default_code_space)
+
+  code_space = property.default_code_space
+  return nil if code_space.nil?
+
+  code_space.to_s.strip
+rescue
+  nil
+end
+
+def add_default_code_space_annotation(code_space, context)
+  appinfo = ensure_appinfo_element(context)
+
+  # Create gml:defaultCodeSpace
+  code_space_elem = create_gml_element("defaultCodeSpace", context)
+  code_space_elem.content = code_space
+  appinfo.add_child(code_space_elem)
+end
+----
+
+== Usage Example
+
+.Code list property with default code space
+====
+Given a property with `defaultCodeSpace = "http://example.org/codelists/colors.xml"`:
+
+[source,xml]
+----
+<xs:element name="color" type="gml:CodeType">
+  <xs:annotation>
+    <xs:appinfo>
+      <gml:defaultCodeSpace>http://example.org/codelists/colors.xml</gml:defaultCodeSpace> <!--1-->
+    </xs:appinfo>
+  </xs:annotation>
+</xs:element>
+----
+<1> Default code space annotation specifying code list URI
+====
+
+== Test Cases
+
+The implementation includes tests for:
+
+. Property with defaultCodeSpace value
+. Property without defaultCodeSpace (no annotation)
+. Empty defaultCodeSpace (no annotation)
+. Non-GML 3.2 namespace (no annotation)
+. Integration with code list encoding

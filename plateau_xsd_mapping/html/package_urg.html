@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>urg - PLATEAU Mapping</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px 20px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+    }
+    .breadcrumb {
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+    .breadcrumb a {
+      color: white;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    h1 { font-size: 2em; }
+    .class-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .class-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #667eea;
+    }
+    .class-name {
+      font-size: 1.4em;
+      font-weight: bold;
+      color: #667eea;
+    }
+    .stereotype-badge {
+      background: #e3f2fd;
+      color: #1976d2;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.9em;
+    }
+    .attributes-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .attributes-table th {
+      text-align: left;
+      padding: 10px;
+      background: #f5f5f5;
+      font-weight: 600;
+      border-bottom: 2px solid #ddd;
+    }
+    .attributes-table td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .resolved {
+      background: #e8f5e9;
+    }
+    .unresolved {
+      background: #fff3e0;
+    }
+    .status-badge {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .badge-resolved {
+      background: #4caf50;
+      color: white;
+    }
+    .badge-unresolved {
+      background: #ff9800;
+      color: white;
+    }
+    .type-info {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      color: #666;
+    }
+    .resolution-path {
+      font-size: 0.85em;
+      color: #4caf50;
+      font-style: italic;
+      margin-top: 5px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="breadcrumb">
+        <a href="index.html">← Back to All Packages</a>
+      </div>
+      <h1>📦 urg</h1>
+      <p>26 classes</p>
+    </header>
+
+    <div id="classes">
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_StatisticalGrid</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>class</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>value</strong></td>
+  <td class="type-info">xs:anyType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urbanPlanType</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>areaClassificationType</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>prefecture</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>city</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>surveyYear</strong></td>
+  <td class="type-info">xs:gYear</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>referenceDate</strong></td>
+  <td class="type-info">xs:date</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urg::lod-2MultiSurface</strong></td>
+  <td class="type-info">MultiSurface</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod-1MultiSurface</strong></td>
+  <td class="type-info">MultiSurface</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">AreaClassificationGrid</div>
+    
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urg::class</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">AreaClassificationGrid</div>
+    <div class='stereotype-badge'>«Feature»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">AreaOfAnnualDiversionsType</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>year</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>area</strong></td>
+  <td class="type-info">xs:double</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">CityObjectGroup</div>
+    <div class='stereotype-badge'>«ADEElement»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urg::fiscalYearOfPublication</strong></td>
+  <td class="type-info">xs:gYear</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urg::language</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">ClassificationItemValue</div>
+    <div class='stereotype-badge'>«CodeList»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">GenericGridCell</div>
+    <div class='stereotype-badge'>«Feature»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urg::value</strong></td>
+  <td class="type-info">KeyValuePair</td>
+  <td>1..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Households</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>numberOfOrdinaryHouseholds</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numberOfHouseholdsByOwnership</strong></td>
+  <td class="type-info">NumberOfHouseholdsType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numberOfMainHouseholds</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numberOfHouseholdsByStruture</strong></td>
+  <td class="type-info">NumberOfHouseholdsType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">KeyValuePair</div>
+    <div class='stereotype-badge'>«dataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urg::key</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urg::codeValue</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urg::stringValue</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urg::intValue</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urg::doubleValue</strong></td>
+  <td class="type-info">xs:double</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urg::measuredValue</strong></td>
+  <td class="type-info">gml:MeasureType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urg::dateValue</strong></td>
+  <td class="type-info">xs:date</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urg::uriValue</strong></td>
+  <td class="type-info">xs:anyURI</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">LandPrice</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>landPrice</strong></td>
+  <td class="type-info">LandPricePerLandUseType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>currencyUnit</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">LandPricePerLandUseType</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>landUse</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>landPrice</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">LandslideDisaster</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>dateOfOccurence</strong></td>
+  <td class="type-info">xs:date</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>landSlideType</strong></td>
+  <td class="type-info">LandSlideTypeValue</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>maximumRainfallPerDay</strong></td>
+  <td class="type-info">gml:LengthType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>maximumRainfallPerHour</strong></td>
+  <td class="type-info">gml:LengthType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>slope</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>sedimentDischarge</strong></td>
+  <td class="type-info">xs:double</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>length</strong></td>
+  <td class="type-info">gml:LengthType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">LandUseDiversion</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>areaOfAnnualDiversion</strong></td>
+  <td class="type-info">NumberOfAnnualDiversionsType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numberOfAnnualDiversion</strong></td>
+  <td class="type-info">AreaOfAnnualDiversionsType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">NumberOfAnnualDiversionsType</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>year</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>count</strong></td>
+  <td class="type-info">xs:nonNegativeInteger</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">NumberOfHouseholdsType</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>class</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>number</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">NumberOfOfficesAndEmployees</div>
+    
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urg::numberOfOffices</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urg::numberOfEmployees</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">OfficesAndEmployees</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>numberOfOffices</strong></td>
+  <td class="type-info">xs:nonNegativeInteger</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numberOfEmployees</strong></td>
+  <td class="type-info">xs:nonNegativeInteger</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>salesAmount</strong></td>
+  <td class="type-info">xs:nonNegativeInteger</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Population</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>total</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>daytimePopulation</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>daytimePopulationDensity</strong></td>
+  <td class="type-info">xs:double</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>daytimeOfficeCommuter</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>daytimeSchoolCommuter</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>daytimeUnder15</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>daytimeOver15</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>agriculturalWorker</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>nonCommuter</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>natuarlIncrease</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>births</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>deaths</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>socialIncrease</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>moveFrom</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>moveTo</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>increasement</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>malePopulation</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>femalePopulation</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>populationByAgeAndSex</strong></td>
+  <td class="type-info">PopulationByAgeAndSexType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">PopulationByAgeAndSexType</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>ageAndSex</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>number</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">PublicTransitAccessibility</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>availability</strong></td>
+  <td class="type-info">xs:boolean</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">RailwayServeceArea</div>
+    
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urg::serviceArea</strong></td>
+  <td class="type-info">xs:boolean</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">StatisticalDistribution</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urg::class</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urg::surveyYear</strong></td>
+  <td class="type-info">xs:gYear</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>values</strong></td>
+  <td class="type-info">StatisticalValues</td>
+  <td>1..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">StatisticalUnit</div>
+    
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urg::geometry</strong></td>
+  <td class="type-info">Surface</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>object</strong></td>
+  <td class="type-info">_CityObject</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">StatisticalValue</div>
+    <div class='stereotype-badge'>«dataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>type</strong></td>
+  <td class="type-info">ClassificationItemValue</td>
+  <td>1..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>value</strong></td>
+  <td class="type-info">xs:anyType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">StatisticalValues</div>
+    <div class='stereotype-badge'>«dataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urg::value</strong></td>
+  <td class="type-info">StatisticalValue</td>
+  <td>1..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>unit</strong></td>
+  <td class="type-info">StatisticalUnit</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">StatusOfSightSeeing</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>numOfHotels</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numOfRyokan</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numOfPublicInn</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numOfInn</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numOfCotage</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numOfTempleHotel</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numOfRentaVilla</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numOfYouthHostel</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numOfCapsuleHotel</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>numOfTrainingCenter</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>totalAccomodations</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>totalCapacity</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>totalRooms</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+    </div>
+
+    <footer>
+      <p><a href="index.html">← Back to All Packages</a></p>
+    </footer>
+  </div>
+</body>
+</html>

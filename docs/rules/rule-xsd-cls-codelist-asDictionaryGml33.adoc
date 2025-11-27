@@ -1,0 +1,170 @@
+= rule-xsd-cls-codelist-asDictionaryGml33
+
+== Purpose
+
+Encodes code lists represented as GML dictionaries using `gml:ReferenceType` for GML 3.3 encodings.
+
+== Background
+
+GML 3.3 introduced an alternative encoding for code lists as dictionaries using `gml:ReferenceType` instead of `gml:CodeType`. This provides:
+
+* `@xlink:href` attribute containing the URI to the dictionary item
+* Support for remote dictionary lookup
+* Alignment with GML 3.3 reference patterns
+
+== Implementation
+
+Based on `XsdDocument.java:mapPropertyType()` lines 3192-3210.
+
+=== Algorithm
+
+When processing a property with a code list value type:
+
+1. Check if the property's class matches this rule
+2. Check if the value type is a code list (`category == Options.CODELIST`)
+3. Check if code list has `asDictionary()` or `asDictionaryGml33()` flag set
+4. Check if the encoding rule for the property's class is GML 3.3
+
+If all conditions are met:
+
+* Generate property type using `gml:ReferenceType` as base
+* If property has metadata, add metadata attribute support
+* Add import for `gml` namespace
+* Add `xlink` namespace import for `@xlink:href`
+
+=== Syntax Definition
+
+[source,ruby]
+----
+# Property type generation for code list as dictionary (GML 3.3)
+if code_list.as_dictionary? && <1>
+   property.in_class.matches?("rule-xsd-cls-codelist-asDictionaryGml33") <2>
+
+  # Use gml:ReferenceType as property type
+  property_type = "gml:ReferenceType" <3>
+
+  # Add metadata support if needed
+  if property.property_metadata? <4>
+    # Create complex type with extension
+    create_complex_type_with_extension(property_type) do |extension|
+      add_metadata_attribute(extension) <5>
+    end
+  end
+end
+----
+<1> Code list is marked as dictionary
+<2> Property's class uses GML 3.3 dictionary encoding
+<3> Base type is `gml:ReferenceType`
+<4> Check if metadata support needed
+<5> Add metadata attribute to extension
+
+Where,
+
+`as_dictionary?`:: Returns true if code list is represented as dictionary
+`matches?(rule)`:: Checks if encoding rule applies to the class
+`gml:ReferenceType`:: GML 3.3 type with `@xlink:href` for references
+`property_metadata?`:: Property supports metadata attributes
+
+== Examples
+
+=== Example 1: Simple Code List Property
+
+.Code list marked as dictionary for GML 3.3
+[source,ruby]
+----
+class LandUseCode < Lutaml::Model::Serializable
+  attribute :category, :string
+  attribute :as_dictionary_gml33, :boolean, default: -> { true }
+end
+
+class LandUse < Lutaml::Model::Serializable
+  attribute :code, LandUseCode
+end
+----
+
+.Generated XML Schema (GML 3.3 encoding)
+[source,xml]
+----
+<element name="code" type="gml:ReferenceType" minOccurs="1"/> <!--1-->
+----
+<1> Uses `gml:ReferenceType` for GML 3.3
+
+=== Example 2: With Metadata Support
+
+.Code list property with metadata
+[source,ruby]
+----
+class Building < Lutaml::Model::Serializable
+  attribute :usage, UsageCode, property_metadata: true
+end
+----
+
+.Generated XML Schema
+[source,xml]
+----
+<element name="usage">
+  <complexType>
+    <complexContent>
+      <extension base="gml:ReferenceType"> <!--1-->
+        <attribute name="metadata" type="anyURI"/> <!--2-->
+      </extension>
+    </complexContent>
+  </complexType>
+</element>
+----
+<1> Extends `gml:ReferenceType`
+<2> Adds metadata attribute support
+
+=== Example 3: Instance Usage
+
+.XML instance using code list as dictionary (GML 3.3)
+[source,xml]
+----
+<LandUse>
+  <code xlink:href="http://example.org/codelists/landuse#residential"/> <!--1-->
+</LandUse>
+----
+<1> Full URI to dictionary item in `@xlink:href`
+
+== Configuration
+
+=== When This Rule Applies
+
+* Code list has `asDictionary` or `asDictionaryGml33` flag set
+* Property's containing class matches `rule-xsd-cls-codelist-asDictionaryGml33`
+* Encoding is GML 3.3
+
+=== Differences from GML 3.2 Encoding
+
+[cols="1,1,1"]
+|===
+|Aspect |GML 3.2 (Rule 29) |GML 3.3 (Rule 30)
+
+|Base Type
+|`gml:CodeType`
+|`gml:ReferenceType`
+
+|Code Value
+|Element text content
+|`@xlink:href` attribute
+
+|Code Space
+|Optional `@codeSpace`
+|Included in URI fragment
+
+|NilReason
+|Supported
+|Not typically used
+|===
+
+=== Related Rules
+
+* `rule-xsd-cls-codelist-asDictionary`: GML 3.2 variant (uses `gml:CodeType`)
+* `rule-xsd-cls-codelist-gmlsf`: GMLSF variant (fixed codeSpace)
+* `rule-xsd-prop-metadata`: Adds metadata support
+
+== References
+
+* ShapeChange: `XsdDocument.java` lines 3192-3210 (`mapPropertyType()`)
+* GML 3.3: OGC 10-129r1
+* Code list representation patterns

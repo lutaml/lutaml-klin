@@ -1,0 +1,307 @@
+= Rule: rule-xsd-cls-no-abstract-classes
+
+== Overview
+
+Do not convert abstract classes to object elements and do not process their properties; create a property type with references to subtypes with object elements instead.
+
+== Priority
+
+Should-have (used for abstract type handling)
+
+== ShapeChange Documentation
+
+Source:: `/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/Non_Standard_Conversion_Rules.adoc` (lines 527-532)
+
+Description::
+Abstract classes are not encoded as concrete types in XSD. Instead, properties that reference abstract classes are encoded with a choice of concrete subtype elements.
+
+== Java Implementation
+
+Source:: [`XsdDocument.java:pComplexType`](lines 1159-1174) and [`XsdDocument.java:mapPropertyType`](lines 3159-3162)
+
+=== Algorithm
+
+The Java implementation follows this process:
+
+==== For Class Processing (pComplexType):
+
+. Check if class is abstract
+. Check if class matches [`rule-xsd-cls-no-abstract-classes`]
+. If both conditions met: Treat like MIXIN class
+. Do not create object element for the abstract class
+. Do not create regular complex type
+
+==== For Property Processing (mapPropertyType):
+
+. Check if property value type is abstract
+. Check if value type matches [`rule-xsd-cls-no-abstract-classes`]
+. Create anonymous property type with choice of subtypes
+. Find all concrete subtypes using [`subtypes()`] method
+. Add element references for each concrete subtype
+
+==== For Subtype Discovery (subtypes):
+
+. Recursively walk down subtype tree
+. For each subtype:
+  * If it's a MIXIN: Continue recursion
+  * If it's abstract and matches this rule: Continue recursion
+  * Otherwise: Add to result set (it's instantiable)
+
+=== Implementation Logic
+
+[source,java]
+----
+// In pComplexType - treat abstract classes like mixins
+private HashSet<ClassInfo> subtypes(ClassInfo ci) {
+    HashSet<ClassInfo> res = new HashSet<ClassInfo>();
+    if (ci.subtypes() != null) {
+        for (String subtypeId : ci.subtypes()) {
+            ClassInfo cix = model.classById(subtypeId);
+            if (cix != null && (cix.category() == Options.MIXIN ||
+                (cix.matches("rule-xsd-cls-no-abstract-classes") &&
+                 cix.isAbstract()))) {
+                res.addAll(subtypes(cix));
+            } else {
+                res.add(cix);
+            }
+        }
+    }
+    return res;
+}
+
+// In mapPropertyType - create choice for abstract types
+} else if ((ci.matches("rule-xsd-cls-mixin-classes") &&
+            ci.category() == Options.MIXIN) ||
+           (ci.matches("rule-xsd-cls-no-abstract-classes") &&
+            ci.isAbstract())) {
+
+    multiplicityAlreadySet = addAnonymousPropertyType(
+        e, propi, null, null, subtypes(ci), false);
+}
+----
+
+== Our Implementation
+
+Type:: Processor Class
+File:: [`lib/lutaml/klin/shapechange/rule_processors/class_rules/no_abstract_classes_processor.rb`]
+Spec:: [`spec/lutaml/klin/shapechange/rule_processors/class_rules/no_abstract_classes_processor_spec.rb`]
+
+=== Design Principles
+
+. Abstract classes are not instantiable in XSD
+. Properties reference concrete subtypes via choice
+. Recursive subtype discovery handles nested abstractions
+. Treats abstract classes similar to mixins
+
+=== Implementation Details
+
+The [`NoAbstractClassesProcessor`] class extends [`BaseRuleProcessor`] and:
+
+. Detects abstract classes that match the rule
+. Prevents object element creation for abstract classes
+. Creates choice-based property types for properties with abstract value types
+. Recursively finds all concrete (instantiable) subtypes
+. Generates element references for each concrete subtype
+
+== Test Cases
+
+=== Test Case 1: Abstract class with concrete subtypes
+
+Input UML::
+[source]
+----
+abstract class AbstractFeature
+  property id: String [1]
+
+class Building extends AbstractFeature
+  property floors: Integer [1]
+
+class Road extends AbstractFeature
+  property lanes: Integer [1]
+
+class City
+  property features: AbstractFeature [0..*]
+----
+
+Expected XSD::
+[source,xml]
+----
+<!-- No element or type for AbstractFeature itself -->
+
+<complexType name="BuildingType">
+  <complexContent>
+    <extension base="...">
+      ...
+    </extension>
+  </complexContent>
+</complexType>
+
+<element name="Building" type="BuildingType"/>
+
+<complexType name="RoadType">
+  <complexContent>
+    <extension base="...">
+      ...
+    </extension>
+  </complexContent>
+</complexType>
+
+<element name="Road" type="RoadType"/>
+
+<!-- Property with abstract type uses choice -->
+<element name="features" minOccurs="0" maxOccurs="unbounded">
+  <complexType>
+    <choice>
+      <element ref="Building"/>
+      <element ref="Road"/>
+    </choice>
+  </complexType>
+</element>
+----
+
+=== Test Case 2: Nested abstract classes
+
+Input UML::
+[source]
+----
+abstract class AbstractGeometry
+
+abstract class AbstractSurface extends AbstractGeometry
+
+class Polygon extends AbstractSurface
+
+class MultiPolygon extends AbstractSurface
+
+class Feature
+  property geometry: AbstractGeometry [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<!-- No elements for AbstractGeometry or AbstractSurface -->
+
+<element name="geometry">
+  <complexType>
+    <choice>
+      <element ref="Polygon"/>
+      <element ref="MultiPolygon"/>
+    </choice>
+  </complexType>
+</element>
+----
+
+=== Test Case 3: Abstract class with mixin subtype
+
+Input UML::
+[source]
+----
+abstract class AbstractBase
+
+«mixin» MixinType extends AbstractBase
+
+class ConcreteType1 extends MixinType
+
+class ConcreteType2 extends MixinType
+
+class Container
+  property item: AbstractBase [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<!-- No elements for AbstractBase or MixinType -->
+
+<element name="item">
+  <complexType>
+    <choice>
+      <element ref="ConcreteType1"/>
+      <element ref="ConcreteType2"/>
+    </choice>
+  </complexType>
+</element>
+----
+
+=== Test Case 4: Concrete class (should not process)
+
+Input UML::
+[source]
+----
+class ConcreteFeature
+  property name: String [1]
+
+class Container
+  property item: ConcreteFeature [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<complexType name="ConcreteFeatureType">
+  ...
+</complexType>
+
+<element name="ConcreteFeature" type="ConcreteFeatureType"/>
+
+<element name="item" type="ConcreteFeaturePropertyType"/>
+<!-- Uses standard property type, not choice -->
+----
+
+=== Test Case 5: Abstract class with no subtypes
+
+Input UML::
+[source]
+----
+abstract class Orphan
+  property value: String [1]
+
+class Container
+  property orphan: Orphan [0..1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="orphan" minOccurs="0">
+  <complexType>
+    <choice>
+      <!-- Empty choice - no concrete subtypes -->
+    </choice>
+  </complexType>
+</element>
+----
+
+== Implementation Status
+
+* [x] Documentation read
+* [x] Java code analyzed
+* [ ] Processor implemented
+* [ ] Spec written
+* [ ] Integrated
+* [ ] Committed
+
+== Dependencies
+
+Depends on::
+* Subtype discovery infrastructure
+* Property type generation
+* Element reference generation
+
+Related rules::
+* [`rule-xsd-cls-mixin-classes`]: Similar treatment for mixins
+* [`rule-xsd-cls-type`]: Standard type generation
+
+== Notes
+
+* Abstract classes are not instantiable in XML
+* Properties use choice compositor for subtype selection
+* Recursive subtype discovery handles multi-level hierarchies
+* Mixins and abstract classes are treated similarly under this rule
+* The rule prevents creation of object elements for abstract classes
+
+== References
+
+* ShapeChange documentation: Non-Standard Conversion Rules
+* XML Schema Part 1: Structures - Abstract types
+* UML specification: Abstract classes

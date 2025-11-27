@@ -1,0 +1,260 @@
+= XMI Parsing
+:toc:
+:toclevels: 3
+
+== Purpose
+
+The XMI parsing feature enables lutaml-klin to extract UML model information from XMI 2.1 files. This is the foundational capability that allows the tool to understand the structure of UML models created in tools like Enterprise Architect, enabling automated mapping generation to XML Schema.
+
+== Concepts
+
+=== XMI (XML Metadata Interchange)
+
+XMI is an OMG standard for exchanging metadata information via XML. In the context of UML-to-XSD mapping, XMI files contain the complete UML model structure including:
+
+* Package hierarchies
+* Class definitions with stereotypes
+* Attributes with types and multiplicities
+* Associations between classes
+* Tagged values and constraints
+
+=== Package Hierarchy Navigation
+
+UML models are organized in nested packages. The XMI parser provides efficient navigation through this hierarchy, allowing selective extraction of specific packages without loading the entire model into memory.
+
+=== Lazy Loading Strategy
+
+For large XMI files (like PLATEAU's 242.xmi with 22 packages and 2223 attributes), lutaml-klin uses a lazy loading approach:
+
+* Parse XMI structure on demand
+* Extract only requested packages
+* Minimize memory footprint
+* Improve performance for targeted mapping generation
+
+== XMI File Structure
+
+A typical XMI file contains:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.1"
+         xmlns:xmi="http://schema.omg.org/spec/XMI/2.1">
+  <uml:Model xmi:type="uml:Model" xmi:id="_1" name="Model">
+    <packagedElement xmi:type="uml:Package" xmi:id="_2" name="Package1">
+      <packagedElement xmi:type="uml:Class" xmi:id="_3" name="Building">
+        <ownedAttribute xmi:id="_4" name="id" type="_5">
+          <type xmi:idref="xs::ID"/>
+        </ownedAttribute>
+      </packagedElement>
+    </packagedElement>
+  </uml:Model>
+</xmi:XMI>
+----
+
+== Loading XMI Files
+
+=== Basic Loading
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load XMI file
+navigator = Lutaml::Klin::XmiNavigator.new('/path/to/model.xmi')
+
+# Parse the XMI
+navigator.parse
+----
+
+=== Accessing Package Information
+
+[source,ruby]
+----
+# List all top-level packages
+packages = navigator.packages
+packages.each do |pkg|
+  puts "Package: #{pkg.name}"
+end
+
+# Access nested packages
+nested = navigator.find_package_by_path('Conceptual Models/i-UR/Urban Planning ADE 3.2/urf')
+----
+
+== Extracting UML Classes
+
+=== Get All Classes in a Package
+
+[source,ruby]
+----
+# Extract classes from specific package
+classes = navigator.classes_in_package('urf')
+
+classes.each do |uml_class|
+  puts "Class: #{uml_class.name}"
+  puts "Stereotype: #{uml_class.stereotype}"
+
+  # Access attributes
+  uml_class.attributes.each do |attr|
+    puts "  - #{attr.name}: #{attr.type}"
+  end
+end
+----
+
+=== Filtering by Stereotype
+
+[source,ruby]
+----
+# Find feature types (classes with <<FeatureType>> stereotype)
+feature_types = navigator.classes_in_package('urf').select do |cls|
+  cls.stereotype == 'FeatureType'
+end
+----
+
+== Working with UML Attributes
+
+=== Attribute Properties
+
+Each UML attribute provides:
+
+[source,ruby]
+----
+attribute = uml_class.attributes.first
+
+# Basic properties
+attribute.name           # => "buildingID"
+attribute.type           # => "xs::string"
+attribute.multiplicity   # => "1"
+attribute.is_derived     # => false
+
+# Tagged values (metadata)
+attribute.tagged_values  # => {"sequenceNumber" => "1"}
+----
+
+=== Type Resolution
+
+UML attributes reference types which may be:
+
+* Primitive types: `xs::string`, `xs::integer`
+* Complex types: `gml::CodeType`, `gml::MeasureType`
+* Other UML classes: `Building`, `Address`
+
+[source,ruby]
+----
+# Check if type is a primitive
+if attribute.type.start_with?('xs::')
+  puts "Primitive type: #{attribute.type}"
+else
+  puts "Complex type: #{attribute.type}"
+end
+----
+
+== Handling Associations
+
+=== Association Types
+
+UML associations represent relationships between classes:
+
+[source,ruby]
+----
+# Get associations for a class
+associations = navigator.associations_for_class(uml_class.id)
+
+associations.each do |assoc|
+  puts "Association: #{assoc.name}"
+  puts "  From: #{assoc.source_class}"
+  puts "  To: #{assoc.target_class}"
+  puts "  Type: #{assoc.association_type}"  # composition, aggregation, etc.
+end
+----
+
+== Performance Considerations
+
+=== Large XMI Files
+
+For files like PLATEAU's 242.xmi:
+
+[source,ruby]
+----
+# Don't load all classes at once
+# BAD:
+all_classes = navigator.all_classes  # Loads entire model
+
+# GOOD:
+package_classes = navigator.classes_in_package('urf')  # Loads only needed package
+----
+
+=== Memory Management
+
+[source,ruby]
+----
+# Process packages iteratively
+package_names = navigator.package_names
+
+package_names.each do |pkg_name|
+  classes = navigator.classes_in_package(pkg_name)
+
+  # Process classes
+  process_classes(classes)
+
+  # Allow garbage collection between packages
+  GC.start
+end
+----
+
+== Error Handling
+
+=== Common Issues
+
+[source,ruby]
+----
+begin
+  navigator = Lutaml::Klin::XmiNavigator.new('model.xmi')
+  navigator.parse
+rescue Lutaml::Klin::XmiParseError => e
+  puts "Failed to parse XMI: #{e.message}"
+  # Handle malformed XMI
+rescue Lutaml::Klin::PackageNotFoundError => e
+  puts "Package not found: #{e.message}"
+  # Handle missing package
+end
+----
+
+=== Validation
+
+[source,ruby]
+----
+# Validate XMI structure
+unless navigator.valid?
+  errors = navigator.validation_errors
+  errors.each { |err| puts "ERROR: #{err}" }
+end
+----
+
+== Integration with Mapping Generation
+
+The XMI parser integrates seamlessly with the mapping generator:
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load inputs
+navigator = Lutaml::Klin::XmiNavigator.new('model.xmi')
+config = Lutaml::Klin::Shapechange::ConfigParser.parse('config.xml')
+
+# Generate mappings for specific package
+generator = Lutaml::Klin::MappingGenerator.new(
+  xmi_navigator: navigator,
+  config: config
+)
+
+mapping = generator.generate_for_package('urf')
+----
+
+== Relevant Documents
+
+* link:../architecture.adoc[Architecture Documentation] - Overall system design
+* link:../ruby-api.adoc[Ruby API Reference] - Complete API documentation
+* link:shapechange-config.adoc[ShapeChange Configuration] - Config file integration
+* link:mapping-generation.adoc[Mapping Generation] - How XMI data is used in mapping

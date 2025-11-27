@@ -1,0 +1,28 @@
+{
+  "index": [
+    {
+      "id": "class_building",
+      "type": "class",
+      "title": "Building",
+      "qualified_name": "ModelRoot::i-UR::uro::Building",
+      "keywords": [
+        "building",
+        "feature",
+        "urban"
+      ],
+      "resolution_status": "resolved"
+    },
+    {
+      "id": "attr_building_type",
+      "type": "attribute",
+      "title": "buildingType",
+      "qualified_name": "Building::buildingType",
+      "keywords": [
+        "building",
+        "type",
+        "code"
+      ],
+      "resolution_status": "resolved"
+    }
+  ]
+}

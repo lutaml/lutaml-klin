@@ -1,0 +1,238 @@
+= rule-xsd-all-notEncoded
+
+== Purpose
+
+Excludes properties from XML Schema generation when their encoding rule is set to "notencoded".
+
+== Background
+
+In UML models, some properties may be conceptually important for the model but should not appear in certain encoding formats. The `encodingRule` mechanism allows properties to be marked as "notencoded" for specific targets:
+
+* Profile-specific exclusions (properties not in certain profiles)
+* Implementation-specific omissions (internal-only properties)
+* Encoding format constraints (properties incompatible with XML)
+* Conditional property inclusion based on encoding rules
+
+This rule provides fine-grained control over which properties appear in the generated XML Schema.
+
+== Implementation
+
+Based on `XsdDocument.java:includeProperty()` line 1902.
+
+=== Algorithm
+
+When determining if a property should be included:
+
+1. Check if `rule-xsd-all-notEncoded` is active for the property
+2. Get the property's encoding rule value for "xsd" target
+3. If encoding rule equals "notencoded" (case-insensitive):
+   - Exclude the property from XML Schema
+   - Property will not appear in generated XSD
+4. Otherwise, include the property normally
+
+=== Syntax Definition
+
+[source,ruby]
+----
+# Check if property should be included in XML Schema
+def include_property?(property)
+  return true unless property.matches?("rule-xsd-all-notEncoded") <1>
+
+  # Rule is active, check encoding rule
+  encoding_rule = property.encoding_rule("xsd") <2>
+
+  if encoding_rule&.casecmp("notencoded")&.zero? <3>
+    false <4>
+  else
+    true <5>
+  end
+end
+
+# Process properties for class
+def process_properties(uml_class)
+  uml_class.properties.each do |property|
+    next unless include_property?(property) <6>
+
+    # Generate XML element for property
+    generate_property_element(property)
+  end
+end
+----
+<1> If rule not active, always include
+<2> Get encoding rule value for "xsd"
+<3> Check if equals "notencoded" (case-insensitive)
+<4> Exclude from XML Schema
+<5> Include in XML Schema
+<6> Skip excluded properties
+
+Where,
+
+`matches?(rule)`:: Rule is active for this property
+`encoding_rule(target)`:: Returns encoding rule value for target
+`"notencoded"`:: Special value indicating exclusion
+`casecmp`:: Case-insensitive string comparison
+
+== Examples
+
+=== Example 1: Exclude Internal Property
+
+.UML class with notencoded property
+[source,ruby]
+----
+class Building < Lutaml::Model::Serializable
+  attribute :name, :string <1>
+  attribute :height, :decimal <2>
+  # encodingRule("xsd") = "notencoded" <3>
+  attribute :internal_id, :string
+end
+----
+<1> Public property (included)
+<2> Public property (included)
+<3> Internal property (excluded)
+
+.Generated XML Schema (with rule active)
+[source,xml]
+----
+<complexType name="BuildingType">
+  <sequence>
+    <!-- Public properties included --> <!--1-->
+    <element name="name" type="string"/>
+    <element name="height" type="decimal"/>
+    <!-- internal_id NOT generated --> <!--2-->
+  </sequence>
+</complexType>
+----
+<1> Normal properties appear
+<2> Notencoded property excluded
+
+=== Example 2: Profile-Specific Exclusion
+
+.Properties with different encoding rules
+[source,ruby]
+----
+class Feature < Lutaml::Model::Serializable
+  # encodingRule("xsd") = "iso19136_2007" <1>
+  attribute :core_property, :string
+
+  # encodingRule("xsd") = "notencoded" <2>
+  attribute :extension_property, :string
+end
+----
+<1> Standard encoding (included)
+<2> Profile extension (excluded from base schema)
+
+.Generated XML Schema
+[source,xml]
+----
+<complexType name="FeatureType">
+  <sequence>
+    <element name="core_property" type="string"/> <!--1-->
+    <!-- extension_property omitted --> <!--2-->
+  </sequence>
+</complexType>
+----
+<1> Core property included
+<2> Extension property excluded
+
+=== Example 3: Without Rule Active
+
+.Generated XML Schema (rule inactive)
+[source,xml]
+----
+<complexType name="BuildingType">
+  <sequence>
+    <element name="name" type="string"/>
+    <element name="height" type="decimal"/>
+    <!-- internal_id IS generated because rule not active --> <!--1-->
+    <element name="internal_id" type="string"/>
+  </sequence>
+</complexType>
+----
+<1> All properties included when rule inactive
+
+=== Example 4: Case-Insensitive Matching
+
+The encoding rule value is case-insensitive:
+
+* `"notencoded"` ✓
+* `"NOTENCODED"` ✓
+* `"NotEncoded"` ✓
+* `"NoTEnCodEd"` ✓
+
+All variants result in property exclusion.
+
+== Configuration
+
+=== When This Rule Applies
+
+* Rule is active in encoding rules
+* Property has `encodingRule("xsd")` set
+* Encoding rule value is "notencoded" (case-insensitive)
+
+=== Encoding Rule Mechanism
+
+The `encodingRule` tagged value controls property inclusion:
+
+.Common encoding rule values
+[cols="1,3"]
+|===
+|Value |Meaning
+
+|`"iso19136_2007"`
+|Include in GML 3.2 encoding
+
+|`"iso19139_2007"`
+|Include in ISO 19139 encoding
+
+|`"notencoded"`
+|Exclude from encoding
+
+|(not set)
+|Use default behavior
+|===
+
+=== Property Filtering
+
+Properties are excluded if:
+
+1. Property is navigable AND
+2. Property is not a restriction AND
+3. **Rule is active AND encoding rule is "notencoded"** (this rule) AND
+4. Property is not derived (or `rule-xsd-prop-exclude-derived` not active) AND
+5. No property map entry overrides the exclusion
+
+=== Use Cases
+
+**Exclude properties when:**
+
+* Profile-specific extensions not in base standard
+* Implementation details (internal IDs, cached values)
+* Derived/computed properties not serialized
+* Platform-specific attributes
+* Properties incompatible with XML encoding
+
+**Keep notencoded separate from:**
+
+* `isDerived`: Controlled by `rule-xsd-prop-exclude-derived`
+* `isRestriction`: Controlled separately
+* Property map entries: Can override exclusion
+
+=== Integration with Other Rules
+
+Works with:
+
+* `rule-xsd-prop-exclude-derived`: Handles derived properties
+* `rule-xsd-prop-inlineOrByReference`: Only affects included properties
+* Property map entries: Can override notencoded exclusion
+
+=== Related Rules
+
+* `rule-xsd-prop-exclude-derived`: Exclude derived properties
+* `rule-xsd-cls-noPropertyType`: Control PropertyType generation
+* Multiple encoding rule support for multi-target schemas
+
+== References
+
+* ShapeChange: `XsdDocument.java` line 1902 (`includeProperty()`)
+* ISO 19136:2007: Clause 21 (Encoding rules)
+* GML 3.2: Annex E (Application schemas)

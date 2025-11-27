@@ -1,0 +1,221 @@
+= rule-xsd-cls-enum-subtypes
+
+== Purpose
+
+Includes enumeration values from subtypes when generating enumeration type definitions in XML Schema.
+
+== Background
+
+This rule is the reverse of `rule-xsd-cls-enum-supertypes`. While supertypes traverse up the inheritance hierarchy, this rule traverses down to collect values from specialized enumerations. When this rule is active:
+
+* All enumeration values from subtype enumerations are included
+* Values are collected recursively down the inheritance chain
+* Subtypes are added after the current class
+* Results in a flattened enumeration with all values from the entire subtype tree
+
+== Implementation
+
+Based on `XsdDocument.java:pAnonymousEnumeration()` lines 1806-1825.
+
+=== Algorithm
+
+When generating an enumeration type:
+
+1. Start with a list containing the current enumeration class
+2. If rule is active, traverse subtype chain
+3. For each subtype that is an enumeration or code list:
+   - Add to list (at end to maintain order)
+   - Continue traversing its subtypes recursively
+4. Process all classes in order, extracting enumeration values
+5. Generate xs:enumeration facets for all values
+
+=== Syntax Definition
+
+[source,ruby]
+----
+# Enumeration value collection with subtypes
+def collect_enumeration_values_with_subtypes(enumeration_class)
+  classes = [enumeration_class] <1>
+
+  if enumeration_class.matches?("rule-xsd-cls-enum-subtypes") <2>
+    # Traverse subtypes
+    tasks = [enumeration_class]
+    while tasks.any?
+      current = tasks.shift
+
+      current.subtypes&.each do |subtype_id| <3>
+        subtype = model.class_by_id(subtype_id)
+
+        if subtype && is_enum_or_codelist?(subtype) <4>
+          tasks << subtype
+          classes << subtype <5>
+        end
+      end
+    end
+  end
+
+  # Collect all enumeration values
+  values = []
+  classes.each do |cls| <6>
+    cls.properties.each do |property|
+      values << property.name <7>
+    end
+  end
+
+  values
+end
+----
+<1> Start with current class
+<2> Check if rule is active
+<3> Iterate through subtypes
+<4> Only process enumeration/codelist subtypes
+<5> Add subtypes at end (specialization order)
+<6> Process all classes in order
+<7> Collect enumeration values
+
+Where,
+
+`matches?(rule)`:: Rule is active for this class
+`subtypes`:: Set of subtype IDs
+`is_enum_or_codelist?`:: Category is enumeration or code list
+`<<`:: Adds to end of list
+`properties`:: Enumeration literals (represented as properties)
+
+== Examples
+
+=== Example 1: Enumeration with Subtypes
+
+.Enumeration hierarchy
+[source,ruby]
+----
+class BaseStatus < Lutaml::Model::Serializable
+  attribute :pending, :string
+  attribute :active, :string
+end
+
+class ExtendedStatus < BaseStatus <1>
+  attribute :completed, :string
+  attribute :archived, :string
+end
+----
+<1> Specialized version of BaseStatus
+
+.Generated XML Schema for BaseStatus (with rule active)
+[source,xml]
+----
+<simpleType name="BaseStatusType">
+  <restriction base="string">
+    <!-- Values from current class first --> <!--1-->
+    <enumeration value="pending"/>
+    <enumeration value="active"/>
+    <!-- Then values from subtypes --> <!--2-->
+    <enumeration value="completed"/>
+    <enumeration value="archived"/>
+  </restriction>
+</simpleType>
+----
+<1> Current class values come first
+<2> Subtype values follow
+
+=== Example 2: Multiple Subtype Levels
+
+.Deep subtype hierarchy
+[source,ruby]
+----
+class BasicState < Lutaml::Model::Serializable
+  attribute :new, :string
+  attribute :active, :string
+end
+
+class IntermediateState < BasicState
+  attribute :processing, :string
+  attribute :waiting, :string
+end
+
+class DetailedState < IntermediateState <1>
+  attribute :validated, :string
+  attribute :finalized, :string
+end
+----
+<1> Inherits from IntermediateState ← BasicState
+
+.Generated XML Schema for BasicState
+[source,xml]
+----
+<simpleType name="BasicStateType">
+  <restriction base="string">
+    <!-- From BasicState (current) --> <!--1-->
+    <enumeration value="new"/>
+    <enumeration value="active"/>
+    <!-- From IntermediateState (direct subtype) --> <!--2-->
+    <enumeration value="processing"/>
+    <enumeration value="waiting"/>
+    <!-- From DetailedState (indirect subtype) --> <!--3-->
+    <enumeration value="validated"/>
+    <enumeration value="finalized"/>
+  </restriction>
+</simpleType>
+----
+<1> Current class values
+<2> Direct subtype values
+<3> Indirect subtype values
+
+=== Example 3: Without Rule
+
+.Generated XML Schema (rule inactive)
+[source,xml]
+----
+<simpleType name="BaseStatusType">
+  <restriction base="string">
+    <!-- Only current class values --> <!--1-->
+    <enumeration value="pending"/>
+    <enumeration value="active"/>
+  </restriction>
+</simpleType>
+----
+<1> Subtype values NOT included
+
+== Configuration
+
+=== When This Rule Applies
+
+* Rule is active in encoding rules
+* Class is an enumeration or code list
+* Class has subtypes that are also enumerations or code lists
+
+=== Processing Order
+
+1. **Start with current**: Current class first
+2. **Collect subtypes**: Traverse subtype tree recursively
+3. **Order classes**: Current first, then subtypes (breadth-first)
+4. **Extract values**: From each class in order
+5. **Generate facets**: Create xs:enumeration for each value
+
+=== Subtype Filtering
+
+Only subtypes with these categories are processed:
+
+* `Options.ENUMERATION`
+* `Options.CODELIST`
+
+Other subtype categories are ignored.
+
+=== Use Cases
+
+This rule is less common than `rule-xsd-cls-enum-supertypes` but useful when:
+
+* Base enumeration should include all specialized values
+* Creating comprehensive enumeration for validation
+* Flattening enumeration hierarchies for interoperability
+
+=== Related Rules
+
+* `rule-xsd-cls-enum-supertypes`: Include values from supertypes (more common)
+* `rule-xsd-cls-local-enumeration`: Generate local enumeration types
+* `rule-xsd-cls-codelist-asDictionary`: Code list as dictionary
+
+== References
+
+* ShapeChange: `XsdDocument.java` lines 1806-1825 (`pAnonymousEnumeration()`)
+* UML 2.5: Section 10.4 (Enumerations)
+* XML Schema Part 2: Section 4.3.5 (enumeration facet)

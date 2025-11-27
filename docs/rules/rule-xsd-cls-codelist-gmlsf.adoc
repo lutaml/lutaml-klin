@@ -1,0 +1,177 @@
+= rule-xsd-cls-codelist-gmlsf
+
+== Purpose
+
+Encodes code list properties for GMLSF (GML Simple Features) profiles with a fixed `codeSpace` attribute.
+
+== Background
+
+GML Simple Features Profile (GMLSF) requires code lists to be encoded with `gml:CodeType` that has a fixed `codeSpace` attribute pointing to the code list URI. This ensures:
+
+* Consistent code list references in GMLSF Level 0, 1, and 2
+* Fixed codeSpace prevents invalid references
+* Compliance with GMLSF encoding rules
+
+== Implementation
+
+Based on `XsdDocument.java:addProperty()` lines 2179-2213.
+
+=== Algorithm
+
+When processing a property with a code list value type in GMLSF context:
+
+1. Check if the value type is a code list (`category == Options.CODELIST`)
+2. Check if the property's class matches `rule-xsd-cls-codelist-gmlsf`
+3. Extract code list URI from `codeList` or `vocabulary` tagged value
+
+If all conditions are met:
+
+* Create complexType with simpleContent
+* Use `gml:CodeType` as restriction base
+* Add fixed `codeSpace` attribute with code list URI
+* Set attribute type to `anyURI`
+
+=== Syntax Definition
+
+[source,ruby]
+----
+# Property type generation for GMLSF code list
+if value_type.category == "codelist" && <1>
+   property.in_class.matches?("rule-xsd-cls-codelist-gmlsf") <2>
+
+  # Create anonymous complex type
+  create_complex_type do |complex_type|
+    create_simple_content do |simple_content| <3>
+      create_restriction("gml:CodeType") do |restriction| <4>
+
+        # Add fixed codeSpace attribute
+        if code_list_uri.present? <5>
+          create_attribute("codeSpace") do |attr|
+            attr.type = "anyURI" <6>
+            attr.fixed = code_list_uri <7>
+          end
+        end
+      end
+    end
+  end
+end
+----
+<1> Value type is a code list
+<2> Property's class uses GMLSF encoding
+<3> Code list uses simpleContent for text value
+<4> Restriction on `gml:CodeType`
+<5> Code list URI is available
+<6> Attribute type is URI
+<7> Fixed value prevents changes
+
+Where,
+
+`category`:: Type category (codelist, enumeration, etc.)
+`matches?(rule)`:: Checks if encoding rule applies
+`gml:CodeType`:: GML type with text content and codeSpace
+`code_list_uri`:: URI from `codeList` or `vocabulary` tagged value
+`fixed`:: Makes attribute value immutable
+
+== Examples
+
+=== Example 1: GMLSF Code List Property
+
+.Code list with codeList tagged value
+[source,ruby]
+----
+class LandUseCode < Lutaml::Model::Serializable
+  attribute :category, :string
+  attribute :code_list, :string, default: -> { "http://example.org/codelists/landuse" }
+end
+
+class LandUse < Lutaml::Model::Serializable
+  attribute :code, LandUseCode
+end
+----
+
+.Generated XML Schema (GMLSF encoding)
+[source,xml]
+----
+<element name="code"> <!--1-->
+  <complexType>
+    <simpleContent> <!--2-->
+      <restriction base="gml:CodeType"> <!--3-->
+        <attribute name="codeSpace" type="anyURI"
+                   fixed="http://example.org/codelists/landuse"/> <!--4-->
+      </restriction>
+    </simpleContent>
+  </complexType>
+</element>
+----
+<1> Property element
+<2> Simple content for code value
+<3> Restricts `gml:CodeType`
+<4> Fixed codeSpace attribute
+
+=== Example 2: Using vocabulary Tagged Value
+
+.Code list with vocabulary instead of codeList
+[source,ruby]
+----
+class BuildingType < Lutaml::Model::Serializable
+  attribute :code, :string
+  attribute :vocabulary, :string, default: -> { "http://example.org/vocab/building" }
+end
+----
+
+.Generated XML Schema
+[source,xml]
+----
+<element name="buildingType">
+  <complexType>
+    <simpleContent>
+      <restriction base="gml:CodeType">
+        <attribute name="codeSpace" type="anyURI"
+                   fixed="http://example.org/vocab/building"/> <!--1-->
+      </restriction>
+    </simpleContent>
+  </complexType>
+</element>
+----
+<1> Uses vocabulary as codeSpace
+
+=== Example 3: Instance Usage
+
+.XML instance in GMLSF encoding
+[source,xml]
+----
+<LandUse>
+  <code codeSpace="http://example.org/codelists/landuse">residential</code> <!--1-->
+</LandUse>
+----
+<1> codeSpace is fixed and cannot be changed
+
+== Configuration
+
+=== When This Rule Applies
+
+* Value type is a code list (`category == codelist`)
+* Property's containing class matches `rule-xsd-cls-codelist-gmlsf`
+* Code list has `codeList` or `vocabulary` tagged value
+
+=== GMLSF Compliance Levels
+
+This rule supports all GMLSF compliance levels:
+
+* **Level 0**: Simple features with basic geometry
+* **Level 1**: Simple features with temporal properties
+* **Level 2**: Simple features with coverage properties
+
+The fixed codeSpace ensures consistent code list references across all levels.
+
+=== Related Rules
+
+* `rule-xsd-cls-codelist-asDictionary`: GML 3.2 dictionary encoding
+* `rule-xsd-cls-codelist-asDictionaryGml33`: GML 3.3 dictionary encoding
+* `rule-xsd-prop-featureType-gmlsf-byReference`: GMLSF feature references
+
+== References
+
+* ShapeChange: `XsdDocument.java` lines 2179-2213 (`addProperty()`)
+* GMLSF: OGC 10-100r3 (GML Simple Features Profile)
+* GML 3.2: ISO 19136:2007

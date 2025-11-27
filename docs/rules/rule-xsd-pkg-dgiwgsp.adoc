@@ -1,0 +1,296 @@
+= rule-xsd-pkg-dgiwgsp
+:toc:
+:sectnums:
+
+== Purpose
+
+Add DGIWG compliance level and GML profile schema annotations for DGIWG Spatial Profile compliance.
+
+This rule enables packages to declare conformance to the Defence Geospatial Information Working Group (DGIWG) Spatial Profile, supporting profile-based validation and tooling.
+
+== ShapeChange Analysis
+
+=== Java Implementation
+
+The rule is implemented in [`XsdDocument.java:addStandardAnnotation()`](../../reference/shapechange-sources/de/interactive_instruments/ShapeChange/Target/XmlSchema/XsdDocument.java:326-343):
+
+[source,java]
+----
+if (info.matches("rule-xsd-pkg-dgiwgsp")) {
+
+    String dgiwgComplianceLevel = pi.taggedValue("dgiwgComplianceLevel");
+    String dgiwgGMLProfileSchema = pi.taggedValue("dgiwgGMLProfileSchema");
+
+    if (StringUtils.isNotBlank(dgiwgComplianceLevel) &&
+        StringUtils.isNotBlank(dgiwgGMLProfileSchema)) {
+        e2 = document.createElementNS(Options.W3C_XML_SCHEMA, "appinfo");
+        addAttribute(e2, "source", options.schemaLocationOfNamespace(DGIWGSP_NS));
+        Element e0 = document.createElementNS(DGIWGSP_NS, "ComplianceLevel");
+        e2.appendChild(e0);
+        e0.appendChild(document.createTextNode(dgiwgComplianceLevel));
+        e0 = document.createElementNS(DGIWGSP_NS, "GMLProfileSchema");
+        e2.appendChild(e0);
+        e0.appendChild(document.createTextNode(dgiwgGMLProfileSchema));
+
+        addImport(DGIWGSP_NSABR, DGIWGSP_NS);
+    }
+}
+----
+
+=== Algorithm
+
+When this rule is enabled:
+
+1. Check if package matches [`rule-xsd-pkg-dgiwgsp`](rule-xsd-pkg-dgiwgsp.adoc)
+2. Get `dgiwgComplianceLevel` tagged value from package
+3. Get `dgiwgGMLProfileSchema` tagged value from package
+4. If both values exist and are non-empty:
+   * Create `<appinfo>` element with DGIWG namespace source
+   * Create `ComplianceLevel` element with compliance level value
+   * Create `GMLProfileSchema` element with GML profile URL
+   * Add import for DGIWG namespace
+
+=== Key Characteristics
+
+* **Scope**: Package/Schema annotation
+* **Context**: DGIWG Spatial Profile schemas
+* **Elements**: `ComplianceLevel`, `GMLProfileSchema`
+* **Namespace**: `http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/`
+
+== Implementation Requirements
+
+=== Input Detection
+
+Identify packages requiring DGIWG annotations:
+
+* Package has both `dgiwgComplianceLevel` and `dgiwgGMLProfileSchema` tagged values
+* Rule [`rule-xsd-pkg-dgiwgsp`](rule-xsd-pkg-dgiwgsp.adoc) is enabled in configuration
+* Both values are non-blank
+
+=== Processing Logic
+
+[source,ruby]
+----
+def process_dgiwg_profile(package, context)
+  # Get DGIWG tagged values
+  compliance_level = package.tagged_value("dgiwgComplianceLevel")
+  gml_profile = package.tagged_value("dgiwgGMLProfileSchema")
+
+  # Both must be present
+  return if compliance_level.nil? || gml_profile.nil?
+  return if compliance_level.strip.empty? || gml_profile.strip.empty?
+
+  # Create appinfo with source
+  appinfo = {
+    source: dgiwg_schema_location,
+    elements: [
+      {
+        namespace: DGIWG_NAMESPACE,
+        element: "ComplianceLevel",
+        text: compliance_level
+      },
+      {
+        namespace: DGIWG_NAMESPACE,
+        element: "GMLProfileSchema",
+        text: gml_profile
+      }
+    ]
+  }
+
+  # Add import
+  context[:imports] << {
+    prefix: "gmldgiwgsp",
+    namespace: DGIWG_NAMESPACE
+  }
+end
+----
+
+=== Output Generation
+
+Generate schema annotation with DGIWG profile declarations:
+
+[source,xml]
+----
+<schema xmlns:gmldgiwgsp="http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/">
+  <annotation>
+    <appinfo source="http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/profile.xsd">
+      <gmldgiwgsp:ComplianceLevel>1</gmldgiwgsp:ComplianceLevel>
+      <gmldgiwgsp:GMLProfileSchema>
+        http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/profile.xsd
+      </gmldgiwgsp:GMLProfileSchema>
+    </appinfo>
+  </annotation>
+  <!-- schema content -->
+</schema>
+----
+
+== Configuration
+
+=== Rule Declaration
+
+[source,xml]
+----
+<EncodingRule name="dgiwg">
+  <rule name="rule-xsd-pkg-dgiwgsp"/>
+</EncodingRule>
+----
+
+=== Tagged Values
+
+Package must have both tagged values:
+
+[source]
+----
+Package: MilitaryFeatures
+  Tagged Values:
+    dgiwgComplianceLevel: "1"
+    dgiwgGMLProfileSchema: "http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/profile.xsd"
+----
+
+== Examples
+
+=== Example 1: DGIWG Level 1 Compliance
+
+.Input Model
+[source]
+----
+Package: DefenseData
+  targetNamespace: http://example.mil/defense/1.0
+  xmlns: def
+  version: 1.0.0
+  Tagged Values:
+    dgiwgComplianceLevel: "1"
+    dgiwgGMLProfileSchema: "http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/profile.xsd"
+----
+
+.Output XSD
+[source,xml]
+----
+<schema targetNamespace="http://example.mil/defense/1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:def="http://example.mil/defense/1.0"
+        xmlns:gmldgiwgsp="http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/"
+        elementFormDefault="qualified"
+        version="1.0.0">
+
+  <annotation>
+    <appinfo source="http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/profile.xsd">
+      <gmldgiwgsp:ComplianceLevel>1</gmldgiwgsp:ComplianceLevel>
+      <gmldgiwgsp:GMLProfileSchema>
+        http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/profile.xsd
+      </gmldgiwgsp:GMLProfileSchema>
+    </appinfo>
+  </annotation>
+
+  <import namespace="http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/"
+          schemaLocation="http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/profile.xsd"/>
+
+  <!-- schema content -->
+</schema>
+----
+
+=== Example 2: Only One Tagged Value
+
+.Input Model
+[source]
+----
+Package: PartialDGIWG
+  Tagged Values:
+    dgiwgComplianceLevel: "1"
+    (no dgiwgGMLProfileSchema)
+----
+
+.Output XSD
+[source,xml]
+----
+<schema>
+  <!-- No DGIWG annotations - both values required -->
+  <!-- schema content -->
+</schema>
+----
+
+=== Example 3: DGIWG Level 2 Compliance
+
+.Input Model
+[source]
+----
+Package: AdvancedDefense
+  Tagged Values:
+    dgiwgComplianceLevel: "2"
+    dgiwgGMLProfileSchema: "http://www.dgiwg.org/gml/3.2/profiles/spatial/2.0/profile.xsd"
+----
+
+.Output XSD
+[source,xml]
+----
+<schema xmlns:gmldgiwgsp="http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/">
+  <annotation>
+    <appinfo source="http://www.dgiwg.org/gml/3.2/profiles/spatial/1.0/profile.xsd">
+      <gmldgiwgsp:ComplianceLevel>2</gmldgiwgsp:ComplianceLevel>
+      <gmldgiwgsp:GMLProfileSchema>
+        http://www.dgiwg.org/gml/3.2/profiles/spatial/2.0/profile.xsd
+      </gmldgiwgsp:GMLProfileSchema>
+    </appinfo>
+  </annotation>
+  <!-- schema content -->
+</schema>
+----
+
+== Testing Strategy
+
+=== Test Coverage
+
+1. **Both Tagged Values Present**
+   * Compliance level and profile → annotations added
+   * Correct namespace and elements
+
+2. **Missing Tagged Values**
+   * Only compliance level → no annotations
+   * Only profile schema → no annotations
+   * Neither present → no annotations
+
+3. **Empty Tagged Values**
+   * Blank compliance level → no annotations
+   * Blank profile schema → no annotations
+
+4. **Rule Disabled**
+   * Both values present but rule disabled
+   * No annotations added
+
+5. **Namespace Import**
+   * DGIWG namespace imported
+   * Schema location correct
+
+=== Expected Behaviors
+
+* Both `ComplianceLevel` and `GMLProfileSchema` elements
+* DGIWG namespace with prefix `gmldgiwgsp`
+* Appinfo with `source` attribute
+* Namespace imported with schema location
+
+== Notes
+
+=== DGIWG Spatial Profile
+
+The DGIWG Spatial Profile:
+
+* Defines compliance levels for military/defense GML data
+* Based on GML 3.2 with specific constraints
+* Supports interoperability across defense organizations
+* Requires both compliance level and profile schema declaration
+
+=== Compliance Levels
+
+* **Level 0**: Simple Features equivalent
+* **Level 1**: Basic DGIWG requirements
+* **Level 2**: Advanced DGIWG requirements with topology
+
+=== Relationship to Other Rules
+
+* Similar to [`rule-xsd-pkg-gmlProfileSchema`](rule-xsd-pkg-gmlProfileSchema.adoc) but DGIWG-specific
+* Works with DGIWG-specific encoding rules
+* May combine with GMLSF rules
+
+=== Reference Implementation
+
+See [`DgiwgspProcessor`](../../lib/lutaml/klin/xsd_gen/rule_processors/package_rules/dgiwgsp_processor.rb) for Ruby implementation.

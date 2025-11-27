@@ -1,0 +1,981 @@
+= Command Line Interface
+
+== Purpose
+
+This document provides a complete reference for the `lutaml-klin` command-line
+interface.
+
+Use this guide to:
+
+* Learn all available CLI commands and their options
+* Understand command-line workflows
+* Integrate Lutaml-Klin into shell scripts and automation
+* Troubleshoot CLI-related issues
+
+== Concepts
+
+=== Thor-based CLI
+
+Lutaml-Klin uses the Thor gem for command-line interface implementation,
+providing:
+
+* **Subcommands**: Each operation is a separate command (generate, report, etc.)
+* **Options**: Flags to customize behavior (--verbose, --output, etc.)
+* **Help system**: Built-in help for all commands
+* **Error handling**: Clear error messages with context
+
+=== Command structure
+
+All commands follow this pattern:
+
+[source,shell]
+----
+lutaml-klin <command> [options]
+----
+
+Where:
+
+* `<command>` is one of: generate, report, merge, validate
+* `[options]` are command-specific flags
+
+=== Exit codes
+
+Commands use standard exit codes:
+
+* `0`: Success
+* `1`: Error (invalid input, parse failure, etc.)
+* `2`: Usage error (missing required options)
+
+== Installation and setup
+
+=== Installing the gem
+
+[source,shell]
+----
+gem install lutaml-klin
+----
+
+Or with Bundler:
+
+[source,shell]
+----
+bundle add lutaml-klin
+----
+
+=== Verifying installation
+
+Check that the CLI is available:
+
+[source,shell]
+----
+lutaml-klin --version
+----
+
+Expected output:
+
+[source,text]
+----
+Lutaml-Klin version 0.1.0
+----
+
+=== Getting help
+
+Display available commands:
+
+[source,shell]
+----
+lutaml-klin help
+----
+
+Get help for a specific command:
+
+[source,shell]
+----
+lutaml-klin help generate
+lutaml-klin help report
+lutaml-klin help merge
+lutaml-klin help validate
+----
+
+== The generate command
+
+=== Purpose
+
+Generate YAML mappings from UML XMI files and ShapeChange configuration.
+
+=== Syntax
+
+[source,shell]
+----
+lutaml-klin generate --xmi PATH --config PATH --output PATH [options]
+----
+
+=== Required options
+
+`--xmi PATH`::
+Path to the UML model in XMI format. The file must be valid XML and conform
+to the XMI 2.x specification.
+
+`--config PATH`::
+Path to the ShapeChange XML configuration file. This file defines encoding
+rules and type mappings.
+
+`--output PATH`::
+Path where the generated YAML mapping file will be written. Parent directories
+will be created automatically if they don't exist.
+
+=== Optional options
+
+`--xsd PATH`::
+Path to XSD schema directory for type resolution (experimental). When provided,
+Lutaml-Klin will attempt to resolve namespaced types by loading XSD schemas.
+
+`--verbose`::
+Enable detailed logging. Shows progress information, file counts, and
+processing steps. Useful for debugging and monitoring long-running operations.
+
+`--help`::
+Display help for the generate command.
+
+=== Examples
+
+==== Basic usage
+
+[source,shell]
+----
+lutaml-klin generate \
+  --xmi models/urban-planning.xmi \
+  --config config/shapechange-config.xml \
+  --output mappings/urban-planning.yaml
+----
+
+==== With verbose output
+
+[source,shell]
+----
+lutaml-klin generate \
+  --xmi models/urban-planning.xmi \
+  --config config/shapechange-config.xml \
+  --output mappings/urban-planning.yaml \
+  --verbose
+----
+
+Output:
+
+[source,text]
+----
+[INFO] Parsing XMI file: models/urban-planning.xmi
+[INFO] Found 1 package(s)
+[INFO] Found 15 class(es)
+[INFO] Parsing ShapeChange configuration: config/shapechange-config.xml
+[INFO] Found encoding rule: iso19136_2007_ShapeChange_1_0_0
+[INFO] Found 8 type mapping(s)
+[INFO] Generating mappings...
+[INFO] Mapped 15 classes
+[INFO] Mapped 42 attributes
+[INFO] Writing YAML to: mappings/urban-planning.yaml
+[SUCCESS] Mapping generation complete!
+----
+
+==== With XSD type resolution
+
+[source,shell]
+----
+lutaml-klin generate \
+  --xmi models/plateau-uro.xmi \
+  --config config/plateau-config.xml \
+  --output mappings/uro.yaml \
+  --xsd schemas/ \
+  --verbose
+----
+
+==== Processing PLATEAU URO package
+
+[source,shell]
+----
+lutaml-klin generate \
+  --xmi /Users/mulgogi/src/mn/mn-samples-plateau/sources/xmi/20251022-uro.xmi \
+  --config reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml \
+  --output plateau_mappings/uro.yaml \
+  --verbose
+----
+
+=== Output format
+
+The generated YAML file contains:
+
+[source,yaml]
+----
+---
+schema_mapping:
+  package_mappings:
+  - name: <package_name>
+    namespace: <xml_namespace>
+    class_mappings:
+    - uml_class: {...}
+      xsd_element: {...}
+      xsd_complex_type: {...}
+      attribute_mappings: [...]
+  encoding_rules:
+  - name: <rule_name>
+    extends_encoding_rule: <parent_rule>
+----
+
+=== Error handling
+
+**Error: "XMI file not found"**
+
+[source,text]
+----
+Error: XMI file not found: models/missing.xmi
+----
+
+Solution: Verify the file path is correct and the file exists.
+
+**Error: "Failed to parse XMI"**
+
+[source,text]
+----
+Error: Failed to parse XMI file: Invalid XML syntax at line 42
+----
+
+Solution: Validate your XMI file with `xmllint`:
+
+[source,shell]
+----
+xmllint --noout models/urban-planning.xmi
+----
+
+**Error: "ShapeChange configuration not found"**
+
+[source,text]
+----
+Error: ShapeChange configuration not found: config/missing.xml
+----
+
+Solution: Verify the configuration file path.
+
+== The report command
+
+=== Purpose
+
+Generate human-readable transformation reports from YAML mappings.
+
+=== Syntax
+
+[source,shell]
+----
+lutaml-klin report --mapping PATH --output PATH [options]
+----
+
+=== Required options
+
+`--mapping PATH`::
+Path to a YAML mapping file (generated by the `generate` command). The file
+must be valid YAML and conform to the SchemaMapping structure.
+
+`--output PATH`::
+Path where the text report will be written. The report is formatted for human
+readability with sections for each class.
+
+=== Optional options
+
+`--verbose`::
+Enable detailed logging.
+
+`--help`::
+Display help for the report command.
+
+=== Examples
+
+==== Basic usage
+
+[source,shell]
+----
+lutaml-klin report \
+  --mapping mappings/urban-planning.yaml \
+  --output reports/urban-planning-report.txt
+----
+
+==== With verbose output
+
+[source,shell]
+----
+lutaml-klin report \
+  --mapping mappings/uro.yaml \
+  --output reports/uro-investigation.txt \
+  --verbose
+----
+
+Output:
+
+[source,text]
+----
+[INFO] Loading mapping: mappings/uro.yaml
+[INFO] Found 1 package(s)
+[INFO] Found 174 class(es)
+[INFO] Generating report...
+[INFO] Writing report to: reports/uro-investigation.txt
+[SUCCESS] Report generation complete!
+----
+
+=== Report structure
+
+The generated report includes:
+
+[source,text]
+----
+==================================================
+UML to XSD Transformation Investigation Report
+==================================================
+Generated: 2025-10-23 09:00:00 +0800
+
+Package: <package_name>
+Namespace: <xml_namespace>
+==================================================
+
+Class: <class_name>
+--------------------------------------------------
+
+UML Information:
+  Name: <class_name>
+  ID: <class_id>
+  Stereotype: <stereotype>
+  Attributes:
+    - <attr_name>: <attr_type> [<multiplicity>]
+    ...
+  Associations:
+    - <assoc_name>: <target_class> [<multiplicity>]
+    ...
+
+XSD Element:
+  Name: <element_name>
+  Type: <element_type>
+  Namespace: <namespace>
+
+XSD Complex Type:
+  Name: <type_name>
+  Base: <base_type>
+  Elements:
+    - <elem_name>: <elem_type> [<min>..<max>]
+    ...
+
+Attribute Mappings:
+  <uml_attr> (<uml_type>) → <xsd_elem> (<xsd_type>)
+  ...
+
+==================================================
+(Repeat for each class)
+==================================================
+
+Summary
+==================================================
+Total Classes Mapped: <count>
+Total Attributes Mapped: <count>
+Encoding Rules Applied: <rules>
+==================================================
+----
+
+=== Error handling
+
+**Error: "Mapping file not found"**
+
+[source,text]
+----
+Error: Mapping file not found: mappings/missing.yaml
+----
+
+Solution: Verify the mapping file path is correct.
+
+**Error: "Invalid YAML format"**
+
+[source,text]
+----
+Error: Failed to parse mapping: Invalid YAML syntax
+----
+
+Solution: Validate your YAML file structure matches SchemaMapping format.
+
+== The merge command
+
+=== Purpose
+
+Merge multiple YAML mapping files into a single combined mapping.
+
+=== Syntax
+
+[source,shell]
+----
+lutaml-klin merge --inputs PATH1,PATH2,... --output PATH [options]
+----
+
+=== Required options
+
+`--inputs PATH1,PATH2,...`::
+Comma-separated list of YAML mapping files to merge. All files must be valid
+SchemaMapping YAML files. The order of inputs determines precedence in case
+of conflicts.
+
+`--output PATH`::
+Path where the merged YAML file will be written.
+
+=== Optional options
+
+`--verbose`::
+Enable detailed logging.
+
+`--help`::
+Display help for the merge command.
+
+=== Examples
+
+==== Merging two packages
+
+[source,shell]
+----
+lutaml-klin merge \
+  --inputs mappings/package1.yaml,mappings/package2.yaml \
+  --output mappings/combined.yaml
+----
+
+==== Merging multiple PLATEAU packages
+
+[source,shell]
+----
+lutaml-klin merge \
+  --inputs mappings/uro.yaml,mappings/bldg.yaml,mappings/tran.yaml,mappings/luse.yaml \
+  --output mappings/complete-plateau.yaml \
+  --verbose
+----
+
+Output:
+
+[source,text]
+----
+[INFO] Loading mapping files...
+[INFO] Loaded: mappings/uro.yaml (1 package, 174 classes)
+[INFO] Loaded: mappings/bldg.yaml (1 package, 45 classes)
+[INFO] Loaded: mappings/tran.yaml (1 package, 32 classes)
+[INFO] Loaded: mappings/luse.yaml (1 package, 18 classes)
+[INFO] Merging package mappings...
+[INFO] Merged 4 packages with 269 total classes
+[INFO] Deduplicating encoding rules...
+[INFO] Writing merged mapping to: mappings/complete-plateau.yaml
+[SUCCESS] Merge complete!
+----
+
+=== Merge behavior
+
+* **Package mappings**: All packages from all inputs are included
+* **Encoding rules**: Duplicates are removed, keeping first occurrence
+* **Namespace conflicts**: If multiple packages have the same name, they are
+  kept as separate entries (no automatic merging)
+
+=== Output structure
+
+[source,yaml]
+----
+---
+schema_mapping:
+  package_mappings:
+  - name: package1
+    namespace: http://example.org/package1
+    class_mappings: [...]
+  - name: package2
+    namespace: http://example.org/package2
+    class_mappings: [...]
+  - name: package3
+    namespace: http://example.org/package3
+    class_mappings: [...]
+  encoding_rules:
+  - name: iso19136_2007
+    extends_encoding_rule: ''
+  - name: iso19136_2007_ShapeChange_1_0_0
+    extends_encoding_rule: iso19136_2007
+----
+
+=== Error handling
+
+**Error: "No input files specified"**
+
+[source,text]
+----
+Error: At least one input file must be specified
+----
+
+Solution: Provide at least one input file with --inputs.
+
+**Error: "Invalid input file"**
+
+[source,text]
+----
+Error: Failed to load input file: mappings/invalid.yaml
+----
+
+Solution: Verify all input files are valid SchemaMapping YAML files.
+
+== The validate command
+
+=== Purpose
+
+Validate mapping files for completeness and consistency against XSD schemas.
+
+=== Syntax
+
+[source,shell]
+----
+lutaml-klin validate --mapping PATH --xsd PATH [options]
+----
+
+=== Required options
+
+`--mapping PATH`::
+Path to a YAML mapping file to validate. The file must be a valid SchemaMapping
+YAML file generated by the `generate` command.
+
+`--xsd PATH`::
+Path to the XSD schema directory. The directory should contain all referenced
+XSD schema files (.xsd extension).
+
+=== Optional options
+
+`--verbose`::
+Enable detailed logging showing validation progress for each class and
+attribute.
+
+`--help`::
+Display help for the validate command.
+
+=== Examples
+
+==== Basic validation
+
+[source,shell]
+----
+lutaml-klin validate \
+  --mapping mappings/uro.yaml \
+  --xsd schemas/uro/
+----
+
+==== With verbose output
+
+[source,shell]
+----
+lutaml-klin validate \
+  --mapping mappings/uro.yaml \
+  --xsd schemas/uro/ \
+  --verbose
+----
+
+Output:
+
+[source,text]
+----
+[INFO] Loading mapping: mappings/uro.yaml
+[INFO] Loading XSD schemas from: schemas/uro/
+[INFO] Found 15 XSD schema files
+[INFO] Validating package: uro (174 classes)
+[INFO]   ✓ Building: All 4 attributes mapped correctly
+[INFO]   ✓ BuildingInstallation: All 2 attributes mapped correctly
+[INFO]   ✓ BuildingPart: All 3 attributes mapped correctly
+...
+[INFO] Type conversion validation...
+[INFO]   ✓ CharacterString → string (42 instances)
+[INFO]   ✓ Code → gml:CodeType (89 instances)
+[INFO] Multiplicity validation...
+[INFO]   ✓ All multiplicities preserved correctly
+[INFO] Namespace validation...
+[INFO]   ✓ Package namespace matches XSD targetNamespace
+[SUCCESS] Validation complete: PASSED
+----
+
+=== Validation checks
+
+The validate command performs these checks:
+
+1. **Mapping completeness**:
+   * All UML classes have corresponding XSD elements
+   * All attributes are mapped
+
+2. **Type conversions**:
+   * Type mappings follow ShapeChange rules
+   * Namespaces are correctly assigned
+
+3. **Multiplicity preservation**:
+   * UML multiplicities match XSD min/max occurs
+   * Unbounded multiplicities are correctly mapped
+
+4. **Namespace consistency**:
+   * Package namespaces match XSD targetNamespace
+   * Element references use correct namespaces
+
+=== Validation output
+
+Successful validation:
+
+[source,text]
+----
+==================================================
+Validation Summary
+==================================================
+Total classes validated: 174
+Total attributes validated: 523
+Errors: 0
+Warnings: 3
+Status: PASSED
+
+Warnings:
+  ⚠ BuildingInstallation.function: Unbounded multiplicity (acceptable)
+  ⚠ RoadSection.lanes: Unbounded multiplicity (acceptable)
+  ⚠ TrafficArea.surfaceMaterial: Unbounded multiplicity (acceptable)
+==================================================
+----
+
+Failed validation:
+
+[source,text]
+----
+==================================================
+Validation Summary
+==================================================
+Total classes validated: 174
+Total attributes validated: 523
+Errors: 5
+Warnings: 3
+Status: FAILED
+
+Errors:
+  ✗ Building.buildingID: Type mismatch (expected: string, found: integer)
+  ✗ Road.width: Missing XSD element
+  ...
+
+Warnings:
+  ⚠ BuildingInstallation.function: Unbounded multiplicity
+  ...
+==================================================
+----
+
+=== Error handling
+
+**Error: "Mapping file not found"**
+
+[source,text]
+----
+Error: Mapping file not found: mappings/missing.yaml
+----
+
+Solution: Verify the mapping file path.
+
+**Error: "XSD directory not found"**
+
+[source,text]
+----
+Error: XSD directory not found: schemas/missing/
+----
+
+Solution: Verify the XSD directory path.
+
+**Error: "No XSD files found"**
+
+[source,text]
+----
+Error: No XSD files found in directory: schemas/empty/
+----
+
+Solution: Ensure the directory contains .xsd files.
+
+== Global options
+
+These options work with all commands:
+
+=== --version
+
+Display the Lutaml-Klin version:
+
+[source,shell]
+----
+lutaml-klin --version
+----
+
+Output:
+
+[source,text]
+----
+Lutaml-Klin version 0.1.0
+----
+
+=== --help
+
+Display general help or command-specific help:
+
+[source,shell]
+----
+# General help
+lutaml-klin --help
+lutaml-klin help
+
+# Command-specific help
+lutaml-klin help generate
+lutaml-klin generate --help
+----
+
+== Command chaining workflows
+
+=== Generate and report
+
+Generate mapping then create report:
+
+[source,shell]
+----
+# Generate mapping
+lutaml-klin generate \
+  --xmi models/uro.xmi \
+  --config config/plateau-config.xml \
+  --output mappings/uro.yaml
+
+# Generate report
+lutaml-klin report \
+  --mapping mappings/uro.yaml \
+  --output reports/uro-investigation.txt
+----
+
+Or chain with shell operators:
+
+[source,shell]
+----
+lutaml-klin generate \
+  --xmi models/uro.xmi \
+  --config config/plateau-config.xml \
+  --output mappings/uro.yaml \
+&& lutaml-klin report \
+  --mapping mappings/uro.yaml \
+  --output reports/uro-investigation.txt
+----
+
+=== Generate, merge, and validate
+
+Process multiple packages:
+
+[source,shell]
+----
+# Generate individual mappings
+lutaml-klin generate --xmi pkg1.xmi --config cfg1.xml --output map1.yaml
+lutaml-klin generate --xmi pkg2.xmi --config cfg2.xml --output map2.yaml
+lutaml-klin generate --xmi pkg3.xmi --config cfg3.xml --output map3.yaml
+
+# Merge mappings
+lutaml-klin merge \
+  --inputs map1.yaml,map2.yaml,map3.yaml \
+  --output complete.yaml
+
+# Validate merged mapping
+lutaml-klin validate \
+  --mapping complete.yaml \
+  --xsd schemas/
+----
+
+=== Batch processing script
+
+Create a shell script for batch processing:
+
+[source,shell]
+----
+#!/bin/bash
+# process-plateau-packages.sh
+
+set -e  # Exit on error
+
+PACKAGES="uro bldg tran luse"
+XMI_DIR="/path/to/xmi"
+CONFIG_DIR="/path/to/configs"
+OUTPUT_DIR="mappings"
+
+mkdir -p "$OUTPUT_DIR"
+
+# Generate mappings for each package
+for pkg in $PACKAGES; do
+  echo "Processing package: $pkg"
+  lutaml-klin generate \
+    --xmi "$XMI_DIR/${pkg}.xmi" \
+    --config "$CONFIG_DIR/${pkg}-config.xml" \
+    --output "$OUTPUT_DIR/${pkg}.yaml" \
+    --verbose
+done
+
+# Merge all mappings
+echo "Merging all packages..."
+INPUT_FILES=$(echo $PACKAGES | sed 's/ /,/g' | sed "s/\([^,]*\)/$OUTPUT_DIR\/\1.yaml/g")
+lutaml-klin merge \
+  --inputs "$INPUT_FILES" \
+  --output "$OUTPUT_DIR/complete.yaml" \
+  --verbose
+
+echo "Processing complete!"
+----
+
+Run the script:
+
+[source,shell]
+----
+chmod +x process-plateau-packages.sh
+./process-plateau-packages.sh
+----
+
+== Environment variables
+
+=== LUTAML_KLIN_VERBOSE
+
+Enable verbose output for all commands:
+
+[source,shell]
+----
+export LUTAML_KLIN_VERBOSE=1
+lutaml-klin generate --xmi model.xmi --config config.xml --output map.yaml
+----
+
+=== LUTAML_KLIN_LOG_LEVEL
+
+Set log level (debug, info, warn, error):
+
+[source,shell]
+----
+export LUTAML_KLIN_LOG_LEVEL=debug
+lutaml-klin generate --xmi model.xmi --config config.xml --output map.yaml
+----
+
+== Tips and best practices
+
+=== Use absolute paths
+
+For clarity and robustness, use absolute paths:
+
+[source,shell]
+----
+lutaml-klin generate \
+  --xmi "$(pwd)/models/urban-planning.xmi" \
+  --config "$(pwd)/config/shapechange-config.xml" \
+  --output "$(pwd)/mappings/urban-planning.yaml"
+----
+
+=== Organize output files
+
+Use a consistent directory structure:
+
+[source]
+----
+project/
+├── models/          # XMI files
+├── config/          # ShapeChange configs
+├── schemas/         # XSD schemas
+├── mappings/        # Generated YAML mappings
+└── reports/         # Generated text reports
+----
+
+=== Check exit codes
+
+In scripts, check exit codes to handle errors:
+
+[source,shell]
+----
+if lutaml-klin generate --xmi model.xmi --config config.xml --output map.yaml; then
+  echo "✓ Generation successful"
+else
+  echo "✗ Generation failed"
+  exit 1
+fi
+----
+
+=== Use verbose mode for debugging
+
+When troubleshooting, always use --verbose:
+
+[source,shell]
+----
+lutaml-klin generate \
+  --xmi model.xmi \
+  --config config.xml \
+  --output map.yaml \
+  --verbose 2>&1 | tee generation.log
+----
+
+This saves output to a log file for later inspection.
+
+== Troubleshooting
+
+=== Command not found
+
+**Error:** `lutaml-klin: command not found`
+
+**Solutions:**
+
+1. Verify installation:
+   [source,shell]
+   ----
+   gem list lutaml-klin
+   ----
+
+2. Check PATH includes gem bin directory:
+   [source,shell]
+   ----
+   echo $PATH | grep "$(gem environment gemdir)/bin"
+   ----
+
+3. Reinstall the gem:
+   [source,shell]
+   ----
+   gem uninstall lutaml-klin
+   gem install lutaml-klin
+   ----
+
+=== Permission denied
+
+**Error:** `Permission denied: /path/to/output.yaml`
+
+**Solutions:**
+
+1. Check write permissions:
+   [source,shell]
+   ----
+   ls -la /path/to/
+   ----
+
+2. Create output directory:
+   [source,shell]
+   ----
+   mkdir -p /path/to/
+   ----
+
+3. Use a writable location:
+   [source,shell]
+   ----
+   lutaml-klin generate ... --output ~/mappings/output.yaml
+   ----
+
+=== Out of memory
+
+**Error:** `Cannot allocate memory`
+
+**Solutions:**
+
+1. Increase Ruby heap size:
+   [source,shell]
+   ----
+   RUBY_GC_HEAP_INIT_SLOTS=1000000 lutaml-klin generate ...
+   ----
+
+2. Process packages separately then merge:
+   [source,shell]
+   ----
+   # Instead of processing all at once
+   lutaml-klin generate --xmi package1.xmi ... --output map1.yaml
+   lutaml-klin generate --xmi package2.xmi ... --output map2.yaml
+   lutaml-klin merge --inputs map1.yaml,map2.yaml --output complete.yaml
+   ----
+
+== Relevant documents
+
+* link:../README.adoc[README.adoc] - Project overview
+* link:basic-usage.adoc[Basic Usage] - Getting started
+* link:options.adoc[Options] - Detailed options reference
+* link:ruby-api.adoc[Ruby API] - Programmatic usage
+* link:features/index.adoc[Features] - Feature documentation

@@ -1,0 +1,207 @@
+= rule-xsd-all-naming-19139
+
+== Purpose
+
+Applies ISO 19139:2007 naming conventions for types, elements, and property types in XML Schema.
+
+This ensures consistency with ISO 19139 metadata encoding standards.
+
+== Applies To
+
+* All classes (Object, DataType, Feature, CodeList, etc.)
+* Type names, element names, property type names
+
+== Algorithm
+
+When this rule is enabled:
+
+1. **Element names**:
+   - Abstract classes: Prefix with "Abstract"
+   - Concrete classes: Use class name as-is
+   ```
+   Class: Metadata (abstract) → Element: <prefix:AbstractMetadata>
+   Class: Metadata (concrete) → Element: <prefix:Metadata>
+   ```
+
+2. **Type names**:
+   - Abstract classes: `Abstract{name}_Type`
+   - Concrete classes: `{name}_Type`
+   - CodeLists: `gco:CodeListValue_Type`
+   ```
+   Class: Metadata (abstract) → Type: AbstractMetadata_Type
+   Class: Metadata (concrete) → Type: Metadata_Type
+   Class: RoleCode (codelist) → Type: gco:CodeListValue_Type
+   ```
+
+3. **Property type names**:
+   - Abstract classes: `Abstract{name}_PropertyType`
+   - Concrete classes: `{name}_PropertyType`
+   ```
+   Class: Metadata (abstract) → PropertyType: AbstractMetadata_PropertyType
+   Class: Metadata (concrete) → PropertyType: Metadata_PropertyType
+   ```
+
+4. **Substitution groups**: Use `gco:CharacterString` for codelists/enums, `gco:AbstractObject` for others
+
+5. **Base types**: Use `gco:AbstractObject_Type`
+
+== Configuration
+
+No additional parameters required beyond enabling the rule.
+
+== Example Output
+
+For an abstract metadata class:
+[source,xml]
+----
+<xs:element name="AbstractMetadata" type="gmd:AbstractMetadata_Type"
+            abstract="true" substitutionGroup="gco:AbstractObject"/>
+
+<xs:complexType name="AbstractMetadata_Type" abstract="true">
+  <xs:complexContent>
+    <xs:extension base="gco:AbstractObject_Type">
+      <xs:sequence>
+        <!-- properties -->
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="AbstractMetadata_PropertyType">
+  <xs:sequence minOccurs="0">
+    <xs:element ref="gmd:AbstractMetadata"/>
+  </xs:sequence>
+  <xs:attributeGroup ref="gco:ObjectReference"/>
+  <xs:attribute ref="gco:nilReason"/>
+</xs:complexType>
+----
+
+For a concrete metadata class:
+[source,xml]
+----
+<xs:element name="ResponsibleParty" type="gmd:ResponsibleParty_Type"
+            substitutionGroup="gco:AbstractObject"/>
+
+<xs:complexType name="ResponsibleParty_Type">
+  <xs:complexContent>
+    <xs:extension base="gco:AbstractObject_Type">
+      <xs:sequence>
+        <!-- properties -->
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="ResponsibleParty_PropertyType">
+  <xs:sequence minOccurs="0">
+    <xs:element ref="gmd:ResponsibleParty"/>
+  </xs:sequence>
+  <xs:attributeGroup ref="gco:ObjectReference"/>
+  <xs:attribute ref="gco:nilReason"/>
+</xs:complexType>
+----
+
+For a codelist:
+[source,xml]
+----
+<xs:element name="RoleCode" type="gco:CodeListValue_Type"
+            substitutionGroup="gco:CharacterString"/>
+----
+
+== Java Implementation Reference
+
+See `XsdDocument.java`:
+- Lines 627-631, 649-657: Element and type naming with "Abstract" prefix
+- Lines 676-680: Property type naming with "Abstract" prefix
+- Lines 738-743: Substitution groups (`gco:CharacterString` or `gco:AbstractObject`)
+- Lines 775-778: Base type `gco:AbstractObject_Type`
+
+== Naming Patterns
+
+[cols="1,1,2,2",options="header"]
+|===
+|Item |Abstract |Concrete |CodeList
+
+|Element
+|`Abstract{name}`
+|`{name}`
+|`{name}`
+
+|Type
+|`Abstract{name}_Type`
+|`{name}_Type`
+|`gco:CodeListValue_Type`
+
+|Property Type
+|`Abstract{name}_PropertyType`
+|`{name}_PropertyType`
+|`{name}_PropertyType`
+
+|Substitution Group
+|`gco:AbstractObject`
+|`gco:AbstractObject`
+|`gco:CharacterString`
+
+|Base Type
+|`gco:AbstractObject_Type`
+|`gco:AbstractObject_Type`
+|N/A
+|===
+
+== Use Cases
+
+* **ISO 19115 metadata**: Geographic metadata schemas
+* **ISO 19119 services**: Service metadata
+* **ISO 19110 catalogs**: Feature catalogs
+* **Metadata profiles**: Custom metadata extensions
+
+== Comparison with Other Naming Rules
+
+[cols="1,2,2,2",options="header"]
+|===
+|Rule |Element (abstract) |Type (abstract) |Property Type (abstract)
+
+|GML
+|`{name}`
+|`{name}Type`
+|`{name}PropertyType`
+
+|SWE
+|`{name}`
+|`{name}Type`
+|`{name}PropertyType`
+
+|ISO 19139
+|`Abstract{name}`
+|`Abstract{name}_Type`
+|`Abstract{name}_PropertyType`
+|===
+
+== Special Handling
+
+=== CodeLists
+
+CodeLists use special encoding:
+- Type: `gco:CodeListValue_Type` (not custom type)
+- Element: Standard naming
+- Substitution group: `gco:CharacterString`
+
+=== Unions
+
+Union types (category UNION) don't get substitution groups or base types in ISO 19139.
+
+== Related Rules
+
+* `rule-xsd-all-naming-gml` - GML naming conventions (different)
+* `rule-xsd-all-naming-swe` - SWE naming conventions (different)
+* `rule-xsd-cls-standard-19139-property-types` - ISO 19139 property type generation
+* `rule-xsd-cls-standard-19139-isoType` - ISO type annotations
+
+== Notes
+
+- "Abstract" prefix distinguishes abstract types
+- Underscore before "Type" suffix (unlike GML/SWE)
+- CodeLists reuse `gco:CodeListValue_Type`
+- Part of ISO 19139:2007 metadata encoding standard
+- Requires `gco` namespace for base types and attributes
+- Property types include `gco:ObjectReference` and `gco:nilReason`

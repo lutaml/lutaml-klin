@@ -1,0 +1,5 @@
+# Ignore all cached LXR packages
+*.lxr
+
+# Optionally keep the directory structure in git
+!.gitignore

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UML-XSD Mapping Browser</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- Embedded Data - No CORS issues with file:// protocol -->
+  <script id="embedded-data">
+    // Data will be injected here by SPA generator
+    window.MAPPING_DATA = {"version":"1.0","generated_at":"2025-10-25T23:00:55Z","metadata":{"lur_package":"plateau_uro.lur","lxr_package":"plateau_schemas.lxr","config_file":"ShapeChangeConfig_Plateau_uro.xml"},"packages":[{"id":"pkg_uro","name":"ModelRoot::Conceptual Models::i-UR::Urban Planning ADE 3.2::uro","namespace":"https://www.geospatial.jp/iur/uro/3.2","qualified_name":"ModelRoot::i-UR::uro","classes":[{"id":"class_building","uml_name":"Building","uml_qualified_name":"ModelRoot::i-UR::uro::Building","uml_stereotype":"featureType","uml_documentation":"Represents a building feature in urban planning areas","xsd_element_name":"uro:Building","xsd_type_name":"uro:BuildingType","xsd_namespace":"https://www.geospatial.jp/iur/uro/3.2","xsd_documentation":"Complex type for building features","resolved":true,"resolution_status":"resolved","resolution_method":"schema_repository","resolution_confidence":0.95,"attributes":[{"id":"attr_building_type","uml_name":"buildingType","uml_type":"gml::CodeType","uml_multiplicity":"0..1","uml_documentation":"Classification of building type","xsd_element_name":"uro:buildingType","xsd_type":"gml:CodeType","xsd_namespace":"http://www.opengis.net/gml/3.2","xsd_min_occurs":"0","xsd_max_occurs":"1","xsd_documentation":"gml:CodeType for coded values","resolved":true,"resolution_status":"resolved","resolution_method":"schema_repository"},{"id":"attr_height","uml_name":"measuredHeight","uml_type":"Measure","uml_multiplicity":"0..1","uml_documentation":"Measured height in meters","xsd_element_name":"uro:measuredHeight","xsd_type":"gml:MeasureType","xsd_namespace":"http://www.opengis.net/gml/3.2","xsd_min_occurs":"0","xsd_max_occurs":"1","resolved":true,"resolution_status":"resolved","resolution_method":"shapechange"},{"id":"attr_custom","uml_name":"customProperty","uml_type":"CustomType","uml_multiplicity":"0..1","uml_documentation":"Custom extended property","resolved":false,"resolution_status":"unresolved","resolution_error":"Type 'CustomType' not found in XSD repository"}]}]}]};
+    window.SEARCH_INDEX = {"index":[{"id":"class_building","type":"class","title":"Building","qualified_name":"ModelRoot::i-UR::uro::Building","keywords":["building","feature","urban"],"resolution_status":"resolved"},{"id":"attr_building_type","type":"attribute","title":"buildingType","qualified_name":"Building::buildingType","keywords":["building","type","code"],"resolution_status":"resolved"}]};
+    window.STATISTICS = {"summary":{"total_packages":1,"total_classes":1,"total_attributes":3,"resolved_classes":1,"resolved_attributes":2,"resolution_rate":66.67}};
+  </script>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>📋 UML-XSD Mapping Browser</h1>
+      <div class="search-container">
+        <input type="text" id="search" placeholder="Search packages, classes, attributes..." autocomplete="off" aria-label="Search">
+        <div id="search-results" class="search-results hidden" role="listbox" aria-label="Search results"></div>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar">
+        <section>
+          <h2>📦 Packages</h2>
+          <div id="package-tree" role="tree"></div>
+        </section>
+
+        <section>
+          <h2>🔍 Filters</h2>
+          <div class="filters">
+            <label>
+              <input type="checkbox" id="filter-resolved" checked aria-label="Show resolved items">
+              <span class="badge-resolved">✓</span> Resolved
+            </label>
+            <label>
+              <input type="checkbox" id="filter-partial" checked aria-label="Show partially resolved items">
+              <span class="badge-partial">⚠</span> Partial
+            </label>
+            <label>
+              <input type="checkbox" id="filter-unresolved" checked aria-label="Show unresolved items">
+              <span class="badge-unresolved">✗</span> Unresolved
+            </label>
+          </div>
+        </section>
+
+        <section>
+          <h2>📊 Statistics</h2>
+          <div id="statistics"></div>
+        </section>
+      </aside>
+
+      <main class="content">
+        <nav id="breadcrumb" aria-label="Breadcrumb"></nav>
+        <div id="details">
+          <div class="welcome">
+            <h2>Welcome to UML-XSD Mapping Browser</h2>
+            <p>Select a package or class from the tree on the left to view mapping details.</p>
+            <p>Use the search bar above to quickly find specific elements.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

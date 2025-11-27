@@ -1,0 +1,85 @@
+= rule-xsd-all-descriptorAnnotation
+
+== Purpose
+
+Generates `sc:descriptor` annotation elements for configured descriptors (alias, definition, description, etc.) in XML Schema.
+
+== Applies To
+
+* Classes
+* Properties
+* Packages
+
+== Algorithm
+
+When this rule is enabled and descriptors are configured to be represented:
+
+1. Check if the model element has descriptors
+2. For each configured descriptor to represent:
+   - Skip if the element doesn't have this descriptor
+   - Get all values for the descriptor
+   - Sort values alphabetically for consistent output
+3. For each descriptor value:
+   - Skip if value is empty
+   - Create `xs:annotation/xs:appinfo` if not present
+   - Add `sc:descriptor` element with:
+     * `@name` attribute with descriptor name
+     * `@lang` attribute if language is specified
+     * Text content with the descriptor value
+4. Import `sc` namespace (ShapeChange Application Info)
+
+== Configuration
+
+The rule requires configuration parameter `representDescriptors` specifying which descriptors to include:
+
+[source,xml]
+----
+<parameter name="representDescriptors" value="alias,definition,description"/>
+----
+
+Valid descriptor names include:
+- alias
+- definition
+- description
+- documentation
+- example
+- legalBasis
+- dataCaptureStatement
+- globalIdentifier
+- primaryCode
+
+== Example Output
+
+[source,xml]
+----
+<xs:element name="Building" type="bldg:BuildingType">
+  <xs:annotation>
+    <xs:documentation>A building structure</xs:documentation>
+    <xs:appinfo>
+      <sc:descriptor name="alias">Bâtiment</sc:descriptor>
+      <sc:descriptor name="alias" lang="de">Gebäude</sc:descriptor>
+      <sc:descriptor name="definition">A permanent structure with roof and walls</sc:descriptor>
+    </xs:appinfo>
+  </xs:annotation>
+</xs:element>
+----
+
+== Java Implementation Reference
+
+See `XsdDocument.java` lines 479-518:
+- Checks `info.matches("rule-xsd-all-descriptorAnnotation")`
+- Iterates configured `descriptorsToRepresent`
+- Creates sorted descriptor values
+- Adds `sc:descriptor` elements with name, optional lang, and value
+
+== Dependencies
+
+* Requires ShapeChange Application Info namespace import
+* Works with any model element type (Class, Property, Package)
+* Complements standard documentation elements
+
+== Related Rules
+
+* `rule-xsd-all-tagged-values` - Similar pattern for tagged values
+* `rule-xsd-all-globalIdentifierAnnotation` - Another annotation rule
+* `rule-xsd-all-no-documentation` - Suppresses documentation generation

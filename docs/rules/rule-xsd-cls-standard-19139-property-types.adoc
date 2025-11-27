@@ -1,0 +1,117 @@
+= rule-xsd-cls-standard-19139-property-types
+
+== Purpose
+
+Generates ISO 19139-style property types with `gco:ObjectReference` attribute group for metadata encoding.
+
+This enables encoding of geographic metadata according to ISO 19139:2007 standards.
+
+== Applies To
+
+* Classes (Feature, Object, DataType, Union, etc.)
+* Properties with class types
+
+== Algorithm
+
+When this rule is enabled for a class:
+
+1. **For property types**: Generate ISO 19139-style property type
+   - Add `<xs:sequence minOccurs="0">` with element reference
+   - For non-codelist/enumeration/union types: Add `gco:ObjectReference` attribute group
+   - Add `gco:nilReason` attribute
+   - Import `gco` namespace
+
+2. **Type structure**:
+   ```xml
+   <xs:complexType name="{ClassName}_PropertyType">
+     <xs:sequence minOccurs="0">
+       <xs:element ref="prefix:ClassName"/>
+     </xs:sequence>
+     <xs:attributeGroup ref="gco:ObjectReference"/>
+     <xs:attribute ref="gco:nilReason"/>
+   </xs:complexType>
+   ```
+
+3. **For codelists/enumerations**: Omit `gco:ObjectReference`, only include `gco:nilReason`
+
+== Configuration
+
+No additional parameters required beyond enabling the rule.
+
+== Example Output
+
+For a feature/object type:
+[source,xml]
+----
+<xs:complexType name="Building_PropertyType">
+  <xs:sequence minOccurs="0">
+    <xs:element ref="bldg:Building"/>
+  </xs:sequence>
+  <xs:attributeGroup ref="gco:ObjectReference"/>
+  <xs:attribute ref="gco:nilReason"/>
+</xs:complexType>
+----
+
+For a codelist type:
+[source,xml]
+----
+<xs:complexType name="BuildingTypeCode_PropertyType">
+  <xs:sequence minOccurs="0">
+    <xs:element ref="bldg:BuildingTypeCode"/>
+  </xs:sequence>
+  <xs:attribute ref="gco:nilReason"/>
+</xs:complexType>
+----
+
+== Java Implementation Reference
+
+See `XsdDocument.java`:
+- Lines 1241-1242: Check for `rule-xsd-cls-standard-19139-property-types`
+- Lines 3004-3024: Generate property type with ISO 19139 structure
+- Lines 1288-1296: Add `gco:ObjectReference` for non-codelist types
+- Lines 1297-1299: Add `gco:nilReason` attribute
+
+== ISO 19139 Namespace
+
+The `gco` namespace is:
+- URI: `http://www.isotc211.org/2005/gco`
+- Provides: `ObjectReference` attribute group, `nilReason` attribute
+- Related namespaces: `gmd` (metadata), `gmx` (extended metadata)
+
+== Use Cases
+
+* **ISO 19115 metadata**: Geographic metadata encoding
+* **Metadata profiles**: Custom metadata schemas
+* **Data catalogs**: Catalog service implementations
+* **Metadata registries**: Registry implementations
+
+== Attribute Groups
+
+=== gco:ObjectReference
+
+Provides attributes for referencing metadata objects:
+- `uuidref`: UUID reference to object
+- `xlink:href`: URL reference to object
+
+=== gco:nilReason
+
+Allows indication of missing/inapplicable values:
+- `missing`: Value is missing
+- `inapplicable`: Value not applicable
+- `unknown`: Value is unknown
+- `withheld`: Value withheld
+
+== Related Rules
+
+* `rule-xsd-cls-standard-gml-property-types` - GML 3.2 encoding (alternative)
+* `rule-xsd-cls-standard-swe-property-types` - SWE Common encoding (alternative)
+* `rule-xsd-cls-no-gml-types` - Non-GML encoding (opposite)
+* `rule-xsd-all-naming-19139` - ISO 19139 naming conventions
+
+== Notes
+
+- Property types always have `minOccurs="0"` on sequence
+- CodeList and Enumeration types omit `gco:ObjectReference`
+- Union types may also omit `gco:ObjectReference`
+- Requires ISO 19139 namespace imports
+- Part of ISO 19139:2007 metadata encoding standard

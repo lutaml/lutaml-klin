@@ -1,0 +1,209 @@
+= rule-xsd-cls-standard-19139-isoType
+
+== Purpose
+
+Add a `@gco:isoType` attribute to classes that extend ISO 19139 metadata types. This attribute indicates the base type from the ISO 19139 standard being specialized.
+
+== ShapeChange Reference
+
+=== Java Implementation
+
+[source,java]
+----
+// XsdDocument.java lines 956-1022
+if (ci.baseClass() != null && ci.matches("rule-xsd-cls-standard-19139-isoType")) {
+
+    ClassInfo baseType = ci.baseClass();
+
+    /*
+     * Check if the base type is mapped to one of the ISO 19139 namespaces. If so,
+     * identify the element name to which the base type is mapped, and add
+     * a @gco:isoType to the content.
+     */
+    MapEntry me = options.elementMapEntry(baseType.name(), baseType.encodingRule("xsd"));
+
+    if (me != null) {
+
+        String xmlElement = me.p1;
+
+        // determine the namespace
+        String s = xmlElement.trim();
+        if (!s.isEmpty()) {
+
+            int idx = s.indexOf(":");
+            if (idx > 0) {
+                String nsabr = s.substring(0, idx);
+                String ns = options.fullNamespace(nsabr);
+
+                if (ns != null && (ns.equals("http://www.isotc211.org/2005/gco")
+                        || ns.equals("http://www.isotc211.org/2005/gmd")
+                        || ns.equals("http://www.isotc211.org/2005/gmx")
+                        || ns.equals("http://www.isotc211.org/2005/gsr")
+                        || ns.equals("http://www.isotc211.org/2005/gss")
+                        || ns.equals("http://www.isotc211.org/2005/gts"))) {
+
+                    String metadataBaseTypeElementName = s.substring(idx + 1);
+
+                    if (metadataBaseTypeElementName != null) {
+
+                        addImport("gco", options.fullNamespace("gco"));
+
+                        Element e4 = document.createElementNS(Options.W3C_XML_SCHEMA, "attribute");
+                        e3.appendChild(e4);
+
+                        addAttribute(e4, "ref", "gco:isoType");
+                        addAttribute(e4, "use", "required");
+                        addAttribute(e4, "fixed", metadataBaseTypeElementName);
+                    }
+                }
+            }
+        }
+    }
+}
+----
+
+== Algorithm
+
+When processing a complex type with a base class:
+
+. Check if class has a base class and matches `rule-xsd-cls-standard-19139-isoType`
+. Get the base type from the class
+. Look up element map entry for the base type name
+. If map entry exists:
+  - Extract the XML element QName (e.g., `gmd:CI_Citation`)
+  - Determine the namespace from the prefix
+  - Check if namespace is one of the ISO 19139 namespaces:
+    * `http://www.isotc211.org/2005/gco`
+    * `http://www.isotc211.org/2005/gmd`
+    * `http://www.isotc211.org/2005/gmx`
+    * `http://www.isotc211.org/2005/gsr`
+    * `http://www.isotc211.org/2005/gss`
+    * `http://www.isotc211.org/2005/gts`
+  - If namespace matches:
+    * Extract element local name (after colon)
+    * Add `@gco:isoType` attribute with:
+      ** `ref="gco:isoType"`
+      ** `use="required"`
+      ** `fixed="{elementLocalName}"`
+    * Import `gco` namespace
+
+== Configuration
+
+This rule requires:
+
+* `rule-xsd-cls-standard-19139-isoType` - Enable the rule
+* Element map entries for ISO 19139 base types
+* Namespace mappings for ISO 19139 namespaces
+
+== Input Model Requirements
+
+* Class must have a base class
+* Base class must be mapped to an ISO 19139 namespace via element map entry
+* Base class mapping must specify the element name
+
+== Output
+
+=== ComplexType with gco:isoType Attribute
+
+[source,xml]
+----
+<xs:complexType name="MyCitation_Type">
+  <xs:complexContent>
+    <xs:extension base="gmd:CI_Citation_Type">
+      <xs:sequence>
+        <!-- Additional elements -->
+      </xs:sequence>
+      <xs:attribute ref="gco:isoType" use="required" fixed="CI_Citation"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+----
+
+== Example
+
+=== Input Model
+
+[source]
+----
+Class: MyCitation
+  BaseClass: CI_Citation (mapped to gmd:CI_Citation)
+  Category: DataType
+  EncodingRule: metadata-profile (includes rule-xsd-cls-standard-19139-isoType)
+----
+
+=== Configuration
+
+[source,xml]
+----
+<EncodingRule name="metadata-profile" extends="iso19139_2007">
+  <rule name="rule-xsd-cls-standard-19139-isoType"/>
+</EncodingRule>
+
+<TypeMapEntry type="CI_Citation">
+  <element>gmd:CI_Citation</element>
+  <base>gmd:CI_Citation_Type</base>
+</TypeMapEntry>
+
+<Namespace nsabr="gmd" ns="http://www.isotc211.org/2005/gmd"/>
+<Namespace nsabr="gco" ns="http://www.isotc211.org/2005/gco"/>
+----
+
+=== Output XSD
+
+[source,xml]
+----
+<xs:complexType name="MyCitation_Type">
+  <xs:complexContent>
+    <xs:extension base="gmd:CI_Citation_Type">
+      <xs:sequence>
+        <!-- Properties of MyCitation -->
+      </xs:sequence>
+
+      <!-- ISO type metadata added by rule -->
+      <xs:attribute ref="gco:isoType" use="required" fixed="CI_Citation"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<!-- Namespace imports -->
+<xs:import namespace="http://www.isotc211.org/2005/gmd"
+           schemaLocation="http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd"/>
+<xs:import namespace="http://www.isotc211.org/2005/gco"
+           schemaLocation="http://schemas.opengis.net/iso/19139/20070417/gco/gco.xsd"/>
+----
+
+== Use Cases
+
+=== ISO 19139 Metadata Profile
+
+When creating a metadata profile that specializes ISO 19139 types, the `@gco:isoType` attribute preserves information about the base type being specialized.
+
+=== Metadata Extension
+
+[source,xml]
+----
+<!-- Extended citation with additional fields -->
+<MyCitation gco:isoType="CI_Citation">
+  <!-- Standard CI_Citation elements -->
+  <gmd:title>...</gmd:title>
+  <gmd:date>...</gmd:date>
+
+  <!-- Extended elements from MyCitation -->
+  <customField>...</customField>
+</MyCitation>
+----
+
+== Related Rules
+
+* link:rule-xsd-all-naming-19139.adoc[rule-xsd-all-naming-19139] - ISO 19139 naming conventions
+* link:rule-xsd-cls-standard-19139-property-types.adoc[rule-xsd-cls-standard-19139-property-types] - ISO 19139 property types
+* link:rule-xsd-cls-suppress.adoc[rule-xsd-cls-suppress] - Class suppression for metadata profiles
+
+== Notes
+
+* This rule is specific to ISO 19139 metadata encoding
+* The `@gco:isoType` attribute is required by ISO 19139 for profile extensions
+* Only applies when base type is mapped to an ISO 19139 namespace
+* The attribute value is the local name (without namespace prefix)
+* Commonly used in metadata profile schemas that extend ISO 19115/19139
+* Helps metadata parsers identify the original ISO type being specialized

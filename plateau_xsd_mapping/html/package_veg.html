@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>veg - PLATEAU Mapping</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px 20px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+    }
+    .breadcrumb {
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+    .breadcrumb a {
+      color: white;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    h1 { font-size: 2em; }
+    .class-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .class-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #667eea;
+    }
+    .class-name {
+      font-size: 1.4em;
+      font-weight: bold;
+      color: #667eea;
+    }
+    .stereotype-badge {
+      background: #e3f2fd;
+      color: #1976d2;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.9em;
+    }
+    .attributes-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .attributes-table th {
+      text-align: left;
+      padding: 10px;
+      background: #f5f5f5;
+      font-weight: 600;
+      border-bottom: 2px solid #ddd;
+    }
+    .attributes-table td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .resolved {
+      background: #e8f5e9;
+    }
+    .unresolved {
+      background: #fff3e0;
+    }
+    .status-badge {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .badge-resolved {
+      background: #4caf50;
+      color: white;
+    }
+    .badge-unresolved {
+      background: #ff9800;
+      color: white;
+    }
+    .type-info {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      color: #666;
+    }
+    .resolution-path {
+      font-size: 0.85em;
+      color: #4caf50;
+      font-style: italic;
+      margin-top: 5px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="breadcrumb">
+        <a href="index.html">← Back to All Packages</a>
+      </div>
+      <h1>📦 veg</h1>
+      <p>3 classes</p>
+    </header>
+
+    <div id="classes">
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_VegetationObject</div>
+    <div class='stereotype-badge'>«featureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="resolved">
+  <td><strong>vegFacilityTypeAttribute</strong></td>
+  <td class="type-info">FacilityTypeAttribute</td>
+  <td>0..*</td>
+  <td>element: vegFacilityTypeAttribute<div class='resolution-path'>Matched element: urbanObject:element:vegFacilityTypeAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>vegFacilityIdAttribute</strong></td>
+  <td class="type-info">FacilityIdAttribute</td>
+  <td>0..1</td>
+  <td>element: vegFacilityIdAttribute<div class='resolution-path'>Matched element: urbanObject:element:vegFacilityIdAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>vegKeyValuePairAttribute</strong></td>
+  <td class="type-info">KeyValuePairAttribute</td>
+  <td>0..*</td>
+  <td>element: vegKeyValuePairAttribute<div class='resolution-path'>Matched element: urbanObject:element:vegKeyValuePairAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>vegDataQualityAttribute</strong></td>
+  <td class="type-info">DataQualityAttribute</td>
+  <td>1..1</td>
+  <td>element: vegDataQualityAttribute<div class='resolution-path'>Matched element: urbanObject:element:vegDataQualityAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>vegFacilityAttribute</strong></td>
+  <td class="type-info">FacilityAttribute</td>
+  <td>0..*</td>
+  <td>element: vegFacilityAttribute<div class='resolution-path'>Matched element: urbanObject:element:vegFacilityAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>vegDmAttribute</strong></td>
+  <td class="type-info">DmAttribute</td>
+  <td>0..*</td>
+  <td>element: vegDmAttribute<div class='resolution-path'>Matched element: urbanObject:element:vegDmAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">PlantCover</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>class</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>function</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>usage</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>averageHeight</strong></td>
+  <td class="type-info">gml:LengthType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod4MultiSolid</strong></td>
+  <td class="type-info">MultiSolid</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod4MultiSurface</strong></td>
+  <td class="type-info">MultiSurface</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod2MultiSolid</strong></td>
+  <td class="type-info">MultiSolid</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod3MultiSurface</strong></td>
+  <td class="type-info">MultiSurface</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod3MultiSolid</strong></td>
+  <td class="type-info">MultiSolid</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod2MultiSurface</strong></td>
+  <td class="type-info">MultiSurface</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod1MultiSolid</strong></td>
+  <td class="type-info">MultiSolid</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod1MultiSurface</strong></td>
+  <td class="type-info">MultiSurface</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">SolitaryVegetationObject</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>class</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>function</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>usage</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>species</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>height</strong></td>
+  <td class="type-info">gml:LengthType</td>
+  <td>0..1</td>
+  <td>element: Height<div class='resolution-path'>Matched element: urbanObject:element:Height</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>trunkDiameter</strong></td>
+  <td class="type-info">gml:LengthType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>crownDiameter</strong></td>
+  <td class="type-info">gml:LengthType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod1ImplicitRepresentation</strong></td>
+  <td class="type-info">ImplicitGeometry</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod4Geometry</strong></td>
+  <td class="type-info">_Geometry</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod2ImplicitRepresentation</strong></td>
+  <td class="type-info">ImplicitGeometry</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod3ImplicitRepresentation</strong></td>
+  <td class="type-info">ImplicitGeometry</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod4ImplicitRepresentation</strong></td>
+  <td class="type-info">ImplicitGeometry</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod3Geometry</strong></td>
+  <td class="type-info">_Geometry</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod2Geometry</strong></td>
+  <td class="type-info">_Geometry</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod1Geometry</strong></td>
+  <td class="type-info">_Geometry</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+    </div>
+
+    <footer>
+      <p><a href="index.html">← Back to All Packages</a></p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+= rule-xsd-all-no-documentation
+
+== Purpose
+
+Suppresses generation of `xs:documentation` elements in XML Schema annotations, creating schemas without human-readable documentation.
+
+== Applies To
+
+* Classes
+* Properties
+* Packages
+* All model elements
+
+== Algorithm
+
+When this rule is enabled:
+
+1. Check if rule `rule-xsd-all-no-documentation` matches
+2. If true, skip `xs:documentation` element generation entirely
+3. Other annotation content (appinfo, etc.) is still generated
+4. Documentation template processing is bypassed
+
+This creates minimal schemas focused on structure rather than documentation.
+
+== Configuration
+
+No additional parameters required beyond enabling the rule.
+
+== Example Output
+
+Without this rule (with documentation):
+[source,xml]
+----
+<xs:element name="Building" type="bldg:BuildingType">
+  <xs:annotation>
+    <xs:documentation>
+      A permanent structure with roof and walls designed for human occupancy.
+      NOTE: Buildings may be residential, commercial, or industrial.
+    </xs:documentation>
+    <xs:appinfo>
+      <sc:globalIdentifier>urn:x-shapechange:def:building</sc:globalIdentifier>
+    </xs:appinfo>
+  </xs:annotation>
+</xs:element>
+----
+
+With this rule (no documentation):
+[source,xml]
+----
+<xs:element name="Building" type="bldg:BuildingType">
+  <xs:annotation>
+    <xs:appinfo>
+      <sc:globalIdentifier>urn:x-shapechange:def:building</sc:globalIdentifier>
+    </xs:appinfo>
+  </xs:annotation>
+</xs:element>
+----
+
+== Java Implementation Reference
+
+See `XsdDocument.java` line 269:
+```java
+if (!info.matches("rule-xsd-all-no-documentation")) {
+    // Generate documentation
+}
+```
+
+The entire documentation block (lines 266-309) is skipped when this rule is enabled.
+
+== Use Cases
+
+* **Minimal schemas**: Reduce file size and complexity
+* **Machine-only processing**: Schemas not intended for human reading
+* **Performance**: Faster parsing and validation
+* **Confidentiality**: Remove potentially sensitive descriptions
+* **Code generation**: Cleaner schemas for automated processing
+
+== Impact
+
+When this rule is enabled:
+
+1. **No xs:documentation**: All documentation elements are omitted
+2. **Smaller files**: Significant reduction in schema file size
+3. **Faster processing**: Reduced parsing overhead
+4. **Loss of semantics**: Human understanding is reduced
+5. **Appinfo preserved**: Other annotations (tagged values, identifiers, etc.) remain
+
+== Related Rules
+
+* `rule-xsd-all-descriptorAnnotation` - Still generates descriptor annotations
+* `rule-xsd-all-tagged-values` - Still generates tagged value annotations
+* `rule-xsd-all-globalIdentifierAnnotation` - Still generates global identifiers
+
+== Notes
+
+- This rule only affects `xs:documentation` generation
+- All other annotation types (appinfo) are unaffected
+- Model documentation is still available in the source UML
+- Recommended for machine-oriented schemas only
+- Can be combined with other annotation rules

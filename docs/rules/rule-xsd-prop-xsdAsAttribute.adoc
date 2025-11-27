@@ -1,0 +1,283 @@
+= rule-xsd-prop-xsdAsAttribute
+
+== Purpose
+
+Generates XML attributes instead of elements for properties when tagged value `xsdAsAttribute="true"`.
+
+== Background
+
+XML Schema provides two mechanisms for encoding data:
+
+* **Elements**: Complex structures, repeatable, can be nil
+* **Attributes**: Simple values, single occurrence, more compact
+
+This rule allows UML properties to be encoded as XML attributes when appropriate:
+
+* Reduces XML verbosity for simple properties
+* Follows XML best practices (attributes for metadata)
+* Improves readability of XML instances
+* Supports legacy schema patterns
+
+However, attributes have limitations:
+
+* Cannot be nil (use of nillable not allowed)
+* Cannot repeat (maxOccurs must be 1)
+* Must have simple type
+* Cannot be used in association classes
+
+== Implementation
+
+Based on `XsdDocument.java:addProperty()` lines 2125-2151.
+
+=== Algorithm
+
+When generating a property:
+
+1. Check if `rule-xsd-prop-xsdAsAttribute` is active
+2. Get tagged value `xsdAsAttribute` (or `asXMLAttribute`)
+3. Check property constraints:
+   - Value must be "true" (case-insensitive)
+   - maxOccurs must be 1 (or property allows list encoding)
+   - Cannot be in association class
+4. If all conditions met:
+   - Generate `xs:attribute` instead of `xs:element`
+   - Set `use="required"` if minOccurs=1
+   - Use simple type only
+5. Otherwise, generate as element
+
+=== Syntax Definition
+
+[source,ruby]
+----
+# Check if property should be encoded as attribute
+def encode_as_attribute?(property, in_assoc_class)
+  return false unless property.matches?("rule-xsd-prop-xsdAsAttribute") <1>
+
+  xsd_as_attribute = property.tagged_value("xsdAsAttribute") <2>
+  return false unless xsd_as_attribute&.casecmp("true")&.zero? <3>
+
+  # Check constraints
+  multiplicity = property.cardinality
+  return false if multiplicity.max_occurs > 1 && !as_list?(property) <4>
+  return false if in_assoc_class <5>
+
+  true <6>
+end
+
+# Generate attribute or element
+def generate_property(property, in_assoc_class)
+  if encode_as_attribute?(property, in_assoc_class)
+    generate_xml_attribute(property) <7>
+  else
+    generate_xml_element(property) <8>
+  end
+end
+
+def generate_xml_attribute(property)
+  attribute = create_attribute_element <9>
+  set_name(attribute, property.name)
+  set_type(attribute, map_property_type(property))
+
+  if property.cardinality.min_occurs == 1 <10>
+    set_use(attribute, "required")
+  end
+
+  attribute
+end
+----
+<1> Check if rule is active
+<2> Get tagged value
+<3> Must be "true" (case-insensitive)
+<4> Cannot repeat (unless list)
+<5> Cannot be in association class
+<6> All conditions met
+<7> Generate xs:attribute
+<8> Generate xs:element
+<9> Create attribute element
+<10> Mark required if minOccurs=1
+
+Where,
+
+`xsdAsAttribute`:: Tagged value controlling encoding
+`asXMLAttribute`:: Alternative tagged value name
+`max_occurs`:: Maximum cardinality
+`as_list?`:: Property encoded as xs:list
+`in_assoc_class`:: Property in association class
+`use="required"`:: Attribute is mandatory
+
+== Examples
+
+=== Example 1: Simple Attribute
+
+.UML property as attribute
+[source,ruby]
+----
+class Measurement < Lutaml::Model::Serializable
+  # xsdAsAttribute = "true" <1>
+  attribute :unit, :string, cardinality: [1, 1] <2>
+  attribute :value, :decimal <3>
+end
+----
+<1> Tagged value set
+<2> Single occurrence, required
+<3> Normal element
+
+.Generated XML Schema
+[source,xml]
+----
+<complexType name="MeasurementType">
+  <sequence>
+    <element name="value" type="decimal"/> <!--1-->
+  </sequence>
+  <attribute name="unit" type="string" use="required"/> <!--2-->
+</complexType>
+----
+<1> value as element
+<2> unit as required attribute
+
+=== Example 2: Optional Attribute
+
+.UML property as optional attribute
+[source,ruby]
+----
+class Feature < Lutaml::Model::Serializable
+  attribute :name, :string
+  # xsdAsAttribute = "true", cardinality = [0, 1] <1>
+  attribute :code, :string, cardinality: [0, 1]
+end
+----
+<1> Optional attribute
+
+.Generated XML Schema
+[source,xml]
+----
+<complexType name="FeatureType">
+  <sequence>
+    <element name="name" type="string"/>
+  </sequence>
+  <attribute name="code" type="string"/> <!--1-->
+</complexType>
+----
+<1> Optional attribute (no use="required")
+
+=== Example 3: Invalid: Multi-valued Property
+
+.Cannot encode multi-valued as attribute
+[source,ruby]
+----
+class InvalidExample < Lutaml::Model::Serializable
+  # xsdAsAttribute = "true" BUT maxOccurs > 1 <1>
+  attribute :codes, :string, cardinality: [0, '*']
+end
+----
+<1> Violates constraint
+
+.Generated XML Schema
+[source,xml]
+----
+<complexType name="InvalidExampleType">
+  <sequence>
+    <!-- Falls back to element due to multiplicity --> <!--1-->
+    <element name="codes" type="string" maxOccurs="unbounded"/>
+  </sequence>
+</complexType>
+----
+<1> Encoded as element despite xsdAsAttribute
+
+=== Example 4: Usage in XML Instance
+
+.XML instance with attributes
+[source,xml]
+----
+<Measurement unit="meters"> <!--1-->
+  <value>12.5</value>
+</Measurement>
+----
+<1> unit encoded as compact attribute
+
+.Compared to element encoding
+[source,xml]
+----
+<Measurement>
+  <unit>meters</unit> <!--1-->
+  <value>12.5</value>
+</Measurement>
+----
+<1> More verbose element encoding
+
+== Configuration
+
+=== When This Rule Applies
+
+* Rule is active in encoding rules
+* Property has `xsdAsAttribute="true"` OR `asXMLAttribute="true"`
+* Property multiplicity: maxOccurs = 1 (or property is list-encoded)
+* Property NOT in association class
+* Property type is simple (or maps to simple type)
+
+=== Tagged Value Names
+
+The rule checks both tagged value variants:
+
+* `xsdAsAttribute`: Primary name
+* `asXMLAttribute`: Alternative name
+
+Both are case-sensitive for the name but case-insensitive for value.
+
+=== Constraints
+
+.XML attribute constraints
+[cols="1,3"]
+|===
+|Constraint |Reason
+
+|maxOccurs = 1
+|Attributes cannot repeat
+
+|Simple type
+|Attributes cannot have complex content
+
+|Not in assoc class
+|Association classes use different encoding
+
+|Not nillable
+|Attributes cannot be nillable in same way
+|===
+
+=== Type Handling
+
+When encoding as attribute:
+
+* Type must be simple (`simple/simple` in map entries)
+* Complex types cause error and fallback to element
+* Initial values become `default` or `fixed` attributes
+* No nilReason support for attributes
+
+=== Use Cases
+
+**Encode as attribute when:**
+
+* Short, simple values (codes, IDs, units)
+* Metadata properties
+* Single occurrence guaranteed
+* Compact XML desired
+
+**Keep as element when:**
+
+* Can be nil/voidable
+* May repeat (maxOccurs > 1)
+* Complex type
+* Standard GML property pattern needed
+
+=== Related Rules
+
+* `rule-xsd-prop-initialValue`: Handles default/fixed values
+* `rule-xsd-prop-nillable`: Only for elements
+* `rule-xsd-prop-inlineOrByReference`: Only for elements
+* `rule-xsd-rel-association-classes`: Attributes not allowed
+
+== References
+
+* ShapeChange: `XsdDocument.java` lines 2125-2151 (`addProperty()`)
+* XML Schema Part 1: Section 3.2 (Attribute declarations)
+* XML Best Practices: Attributes for simple metadata

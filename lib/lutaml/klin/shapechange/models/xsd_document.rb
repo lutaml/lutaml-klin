@@ -27,10 +27,10 @@ module Lutaml
           # Create Nokogiri XML document
           def create_document
             @xml_doc = Nokogiri::XML::Document.new
-            @root_element = @xml_doc.create_element("xs:schema")
+            @root_element = @xml_doc.create_element("schema")
 
-            # Add namespace definitions
-            @root_element.add_namespace_definition("xs", "http://www.w3.org/2001/XMLSchema")
+            # Add XML Schema as DEFAULT namespace (no prefix)
+            @root_element.add_namespace_definition(nil, "http://www.w3.org/2001/XMLSchema")
             @root_element.add_namespace_definition(@prefix, @namespace)
 
             # Set attributes
@@ -47,7 +47,7 @@ module Lutaml
 
             @imports << namespace
 
-            import_element = @xml_doc.create_element("xs:import")
+            import_element = @xml_doc.create_element("import")
             import_element["namespace"] = namespace
             import_element["schemaLocation"] = location if location
 
@@ -57,7 +57,7 @@ module Lutaml
 
           # Add a global element
           def add_element(name:, type:, **attributes)
-            element = @xml_doc.create_element("xs:element")
+            element = @xml_doc.create_element("element")
             element["name"] = name
             element["type"] = type
 
@@ -68,7 +68,7 @@ module Lutaml
 
           # Add a complex type
           def add_complex_type(name:, **attributes)
-            complex_type = @xml_doc.create_element("xs:complexType")
+            complex_type = @xml_doc.create_element("complexType")
             complex_type["name"] = name
 
             attributes.each { |k, v| complex_type[k.to_s] = v.to_s }
@@ -78,10 +78,10 @@ module Lutaml
 
           # Add complexContent/extension structure to a complexType
           def add_complex_content_extension(complex_type, base_type)
-            complex_content = @xml_doc.create_element("xs:complexContent")
+            complex_content = @xml_doc.create_element("complexContent")
             complex_type.add_child(complex_content)
 
-            extension = @xml_doc.create_element("xs:extension")
+            extension = @xml_doc.create_element("extension")
             extension["base"] = base_type
             complex_content.add_child(extension)
 
@@ -90,23 +90,22 @@ module Lutaml
 
           # Add a sequence element (for content model)
           def add_sequence(parent)
-            sequence = @xml_doc.create_element("xs:sequence")
+            sequence = @xml_doc.create_element("sequence")
             parent.add_child(sequence)
             sequence
           end
 
           # Add a choice element (for union types)
           def add_choice(parent)
-            choice = @xml_doc.create_element("xs:choice")
+            choice = @xml_doc.create_element("choice")
             parent.add_child(choice)
             choice
           end
 
           # Create an element without adding to document
           def create_element(name, **attributes)
-            # Prefix with xs: if not already prefixed
-            prefixed_name = name.include?(":") ? name : "xs:#{name}"
-            element = @xml_doc.create_element(prefixed_name)
+            # Use default namespace - no prefix needed
+            element = @xml_doc.create_element(name)
             attributes.each { |k, v| element[k.to_s] = v.to_s if v }
             element
           end
@@ -120,7 +119,7 @@ module Lutaml
 
           # Add a simple type
           def add_simple_type(name:, **attributes)
-            simple_type = @xml_doc.create_element("xs:simpleType")
+            simple_type = @xml_doc.create_element("simpleType")
             simple_type["name"] = name
 
             attributes.each { |k, v| simple_type[k.to_s] = v.to_s }
@@ -130,7 +129,7 @@ module Lutaml
 
           # Add restriction to a simple type
           def add_restriction(parent, base:)
-            restriction = @xml_doc.create_element("xs:restriction")
+            restriction = @xml_doc.create_element("restriction")
             restriction["base"] = base
             parent.add_child(restriction)
             restriction
@@ -138,7 +137,7 @@ module Lutaml
 
           # Add union to a simple type
           def add_union(parent, member_types:)
-            union = @xml_doc.create_element("xs:union")
+            union = @xml_doc.create_element("union")
             union["memberTypes"] = member_types
             parent.add_child(union)
             union
@@ -146,7 +145,7 @@ module Lutaml
 
           # Add enumeration value to a restriction
           def add_enumeration(parent, value:)
-            enumeration = @xml_doc.create_element("xs:enumeration")
+            enumeration = @xml_doc.create_element("enumeration")
             enumeration["value"] = value
             parent.add_child(enumeration)
             enumeration
@@ -154,7 +153,7 @@ module Lutaml
 
           # Add pattern to a restriction
           def add_pattern(parent, value:)
-            pattern = @xml_doc.create_element("xs:pattern")
+            pattern = @xml_doc.create_element("pattern")
             pattern["value"] = value
             parent.add_child(pattern)
             pattern

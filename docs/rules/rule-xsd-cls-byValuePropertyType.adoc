@@ -1,0 +1,60 @@
+= rule-xsd-cls-byValuePropertyType
+
+== Purpose
+
+Generates PropertyByValueType for classes with identity that support inline-only encoding.
+
+== Algorithm
+
+1. Check if class has identity (feature, object, mixin types)
+2. Verify `includeByValuePropertyType()` returns true
+3. Generate `{ClassName}PropertyByValueType` with:
+   - Sequence containing direct element reference
+   - No association attributes (xlink, ownership)
+   - Used for inline-only property encoding
+
+== Java Implementation Reference
+
+From `XsdDocument.java` (lines 1308-1324):
+
+[source,java]
+----
+if (ci.matches("rule-xsd-cls-byValuePropertyType")) {
+    if ((classHasIdentity(ci)) && ci.includeByValuePropertyType()) {
+        e1 = document.createElementNS(Options.W3C_XML_SCHEMA, "complexType");
+        document.getDocumentElement().appendChild(e1);
+        addAttribute(e1, "name", ci.name() + "PropertyByValueType");
+        e4 = document.createElementNS(Options.W3C_XML_SCHEMA, "sequence");
+        e1.appendChild(e4);
+        e3 = document.createElementNS(Options.W3C_XML_SCHEMA, "element");
+        e4.appendChild(e3);
+        if (ci.pkg() == null || ci.pkg().xmlns() == null) {
+            MessageContext mc = result.addError(null, 132, ci.name());
+            if (mc != null)
+                mc.addDetail(null, 400, "Class", ci.fullName());
+        } else
+            addAttribute(e3, "ref", ci.qname());
+    }
+}
+----
+
+## Conditions
+
+* Class must have identity (FEATURE, OBJECT, MIXIN categories)
+* Class must set `includeByValuePropertyType` flag
+* Used when inline-only encoding is required
+
+== Example
+
+For a Feature class `Building`, generates:
+
+[source,xml]
+----
+<complexType name="BuildingPropertyByValueType">
+  <sequence>
+    <element ref="Building"/>
+  </sequence>
+</complexType>
+----
+
+This type contains only the direct element reference, without association attributes like `xlink:href` or `gml:owns`.

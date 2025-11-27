@@ -1,0 +1,179 @@
+= Rule: rule-xsd-prop-nillable
+
+== Overview
+
+Adds `nillable="true"` attribute to property elements when the property is voidable, allowing the property to have no value (nil) in XML instances.
+
+== Priority
+
+Must-have (PLATEAU uses extensively for optional properties)
+
+== ShapeChange Documentation
+
+Source:: `/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/General_Conversion_Rules.adoc`
+
+Description::
+When a property is marked as voidable in the UML model, the corresponding XML Schema element should allow nil values through the `nillable` attribute.
+
+== Java Implementation
+
+Source:: [`XsdDocument.java:addProperty`](lines 2240-2243)
+
+=== Algorithm
+
+The Java implementation is straightforward:
+
+. Check if property has `voidable()` set to true
+. Check if property matches [`rule-xsd-prop-nillable`]
+. If both conditions are met, add `nillable="true"` attribute to the element
+. Alternative trigger: `nilReasonAllowed()` with [`rule-xsd-prop-nilReasonAllowed`]
+
+=== Implementation Logic
+
+[source,java]
+----
+if ((pi.nilReasonAllowed() && pi.matches("rule-xsd-prop-nilReasonAllowed"))
+        || (pi.voidable() && pi.matches("rule-xsd-prop-nillable"))) {
+    addAttribute(e1, "nillable", "true");
+}
+----
+
+== Our Implementation
+
+Type:: Processor Class
+File:: [`lib/lutaml/klin/shapechange/rule_processors/property_rules/nillable_processor.rb`]
+Spec:: [`spec/lutaml/klin/shapechange/rule_processors/property_rules/nillable_processor_spec.rb`]
+
+=== Design Principles
+
+. Simple attribute addition based on property metadata
+. Configuration over code (reads voidable from property)
+. No complex logic - direct mapping from UML to XSD
+. Clear semantic meaning (property can have no value)
+
+=== Implementation Details
+
+The [`NillableProcessor`] class extends [`BaseRuleProcessor`] and:
+
+. Checks if property is voidable
+. Adds `nillable="true"` to the property element
+. Handles both regular properties and attributes
+. Supports nilReasonAllowed as alternative trigger
+
+== Test Cases
+
+=== Test Case 1: Voidable Property
+
+Input UML::
+[source]
+----
+class Building
+  property height: Measure [1] {voidable}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="height" type="MeasureType" nillable="true"/>
+----
+
+=== Test Case 2: Non-Voidable Property
+
+Input UML::
+[source]
+----
+class Building
+  property name: String [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="name" type="string"/>
+<!-- No nillable attribute -->
+----
+
+=== Test Case 3: Voidable with nilReasonAllowed
+
+Input UML::
+[source]
+----
+class Feature
+  property description: String [0..1] {voidable, nilReasonAllowed}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="description" type="string" nillable="true" minOccurs="0"/>
+----
+
+=== Test Case 4: Optional Non-Voidable Property
+
+Input UML::
+[source]
+----
+class Feature
+  property code: String [0..1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="code" type="string" minOccurs="0"/>
+<!-- No nillable even though optional -->
+----
+
+=== Test Case 5: Multiple Voidable Properties
+
+Input UML::
+[source]
+----
+class Measurement
+  property value: Real [1] {voidable}
+  property accuracy: Real [0..1] {voidable}
+  property unit: String [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="value" type="double" nillable="true"/>
+<element name="accuracy" type="double" nillable="true" minOccurs="0"/>
+<element name="unit" type="string"/>
+----
+
+== Implementation Status
+
+* [ ] Documentation read
+* [ ] Java code analyzed
+* [ ] Processor implemented
+* [ ] Spec written
+* [ ] Integrated
+* [ ] Committed
+
+== Dependencies
+
+Depends on::
+* Property element generation
+* Property metadata (voidable flag)
+
+Used by::
+* All property encoding rules that need to handle nil values
+
+Related rules::
+* [`rule-xsd-prop-nilReasonAllowed`]: Alternative trigger for nillable
+* [`rule-xsd-prop-initialValue`]: Can coexist with nillable
+
+== Notes
+
+* `nillable="true"` allows `<element xsi:nil="true"/>` in XML instances
+* Different from `minOccurs="0"` which allows element to be omitted entirely
+* Voidable properties can have nil value even when required (`minOccurs="1"`)
+* The nillable attribute applies to elements, not attributes
+
+== References
+
+* ShapeChange documentation: General Conversion Rules
+* XML Schema Part 0: Primer - Nillable elements
+* ISO 19103: Voidable values in conceptual models

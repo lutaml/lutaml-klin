@@ -1,0 +1,208 @@
+= rule-xsd-prop-metadata-gmlsf-byReference
+:toc:
+:sectnums:
+
+== Purpose
+
+Use [`gml:ReferenceType`](http://schemas.opengis.net/gml/3.2.1/basicTypes.xsd#ReferenceType) for metadata properties in GML Simple Features (GMLSF) encoding.
+
+This rule ensures GMLSF compliance by encoding metadata properties using by-reference semantics only, rather than allowing inline content.
+
+== ShapeChange Analysis
+
+=== Java Implementation
+
+The rule is implemented in [`XsdDocument.java:addAnonymousPropertyType()`](../../reference/shapechange-sources/de/interactive_instruments/ShapeChange/Target/XmlSchema/XsdDocument.java:3983-3986):
+
+[source,java]
+----
+if ((propi.isMetadata() || valueIsMetadata) &&
+    propi.matches("rule-xsd-prop-metadata-gmlsf-byReference")) {
+    addAttribute(e, "type", "gml:ReferenceType");
+    addImport("gml", options.fullNamespace("gml"));
+    return false;
+}
+----
+
+=== Algorithm
+
+When this rule is enabled:
+
+1. Check if property is metadata or value is metadata
+2. If [`rule-xsd-prop-metadata-gmlsf-byReference`](rule-xsd-prop-metadata-gmlsf-byReference.adoc) applies:
+   * Set property type to [`gml:ReferenceType`](http://schemas.opengis.net/gml/3.2.1/basicTypes.xsd#ReferenceType)
+   * Add import for GML namespace
+   * Return without further processing
+
+=== Key Characteristics
+
+* **Scope**: Property encoding
+* **Context**: Metadata properties in GMLSF profiles
+* **Type Used**: [`gml:ReferenceType`](http://schemas.opengis.net/gml/3.2.1/basicTypes.xsd#ReferenceType)
+* **Profile**: GML Simple Features (GMLSF)
+
+== Implementation Requirements
+
+=== Input Detection
+
+Identify metadata properties that require GMLSF encoding:
+
+* Property has `is_metadata` flag set, OR
+* Property value is metadata type
+* Rule [`rule-xsd-prop-metadata-gmlsf-byReference`](rule-xsd-prop-metadata-gmlsf-byReference.adoc) is enabled in configuration
+
+=== Processing Logic
+
+[source,ruby]
+----
+def process_metadata_property(property, context)
+  # Check if property is metadata
+  return unless property_is_metadata?(property, context)
+
+  # Set type to gml:ReferenceType
+  context[:type] = "gml:ReferenceType"
+
+  # Add GML namespace import
+  context[:imports] << {
+    prefix: "gml",
+    namespace: gml_namespace_uri
+  }
+
+  # Mark as processed
+  context[:processed] = true
+end
+----
+
+=== Output Generation
+
+Generate property with [`gml:ReferenceType`](http://schemas.opengis.net/gml/3.2.1/basicTypes.xsd#ReferenceType):
+
+[source,xml]
+----
+<element name="metadata" type="gml:ReferenceType"/>
+----
+
+== Configuration
+
+=== Rule Declaration
+
+[source,xml]
+----
+<EncodingRule name="gmlsf" extends="gml33">
+  <rule name="rule-xsd-prop-metadata-gmlsf-byReference"/>
+</EncodingRule>
+----
+
+=== Dependencies
+
+* Requires GML 3.2 namespace support
+* Works with [`rule-xsd-prop-metadata`](rule-xsd-prop-metadata.adoc)
+* Alternative to inline metadata encoding
+
+== Examples
+
+=== Example 1: Metadata Property
+
+.Input Model
+[source]
+----
+Class: Feature
+  Property: metadata
+    Type: Metadata
+    isMetadata: true
+    Multiplicity: 0..1
+----
+
+.Output XSD (with rule enabled)
+[source,xml]
+----
+<element name="metadata" type="gml:ReferenceType" minOccurs="0"/>
+----
+
+.Output XSD (without rule - inline allowed)
+[source,xml]
+----
+<element name="metadata" minOccurs="0">
+  <complexType>
+    <complexContent>
+      <extension base="gml:AbstractMetadataPropertyType">
+        <sequence minOccurs="0">
+          <element ref="Metadata"/>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+</element>
+----
+
+=== Example 2: Multiple Metadata Properties
+
+.Input Model
+[source]
+----
+Class: Dataset
+  Property: quality
+    Type: DataQuality
+    isMetadata: true
+  Property: lineage
+    Type: Lineage
+    isMetadata: true
+----
+
+.Output XSD
+[source,xml]
+----
+<element name="quality" type="gml:ReferenceType"/>
+<element name="lineage" type="gml:ReferenceType"/>
+----
+
+== Testing Strategy
+
+=== Test Coverage
+
+1. **Basic Metadata Property**
+   * Metadata property → [`gml:ReferenceType`](http://schemas.opengis.net/gml/3.2.1/basicTypes.xsd#ReferenceType)
+   * Namespace import added
+
+2. **Value Metadata Type**
+   * Property with metadata value type
+   * Correct type assignment
+
+3. **Multiplicity Preservation**
+   * Optional metadata: `minOccurs="0"`
+   * Required metadata: no `minOccurs`
+
+4. **Rule Disabled**
+   * Standard metadata property type used
+   * Inline content allowed
+
+5. **Integration**
+   * Multiple metadata properties
+   * Mixed with regular properties
+
+=== Expected Behaviors
+
+* Metadata properties use [`gml:ReferenceType`](http://schemas.opengis.net/gml/3.2.1/basicTypes.xsd#ReferenceType)
+* GML namespace imported
+* Multiplicity correctly encoded
+* By-reference only (no inline)
+
+== Notes
+
+=== GMLSF Compliance
+
+This rule ensures compliance with GML Simple Features Level 0/1/2 by:
+
+* Restricting metadata to by-reference encoding
+* Using standard [`gml:ReferenceType`](http://schemas.opengis.net/gml/3.2.1/basicTypes.xsd#ReferenceType)
+* Simplifying property structure
+
+=== Relationship to Other Rules
+
+* Alternative to [`rule-xsd-prop-metadata`](rule-xsd-prop-metadata.adoc) for GMLSF
+* Works with GMLSF feature type rules
+* Simpler than GML 3.2 metadata property types
+
+=== Reference Implementation
+
+See [`MetadataGmlsfByReferenceProcessor`](../../lib/lutaml/klin/xsd_gen/rule_processors/property_rules/metadata_gmlsf_by_reference_processor.rb) for Ruby implementation.

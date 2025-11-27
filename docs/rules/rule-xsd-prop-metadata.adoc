@@ -1,0 +1,117 @@
+= rule-xsd-prop-metadata
+
+== General
+
+The `rule-xsd-prop-metadata` adds a metadata attribute to property type definitions when a property is marked with the propertyMetadata flag.
+
+This rule enables properties to carry metadata information through an anyURI-typed attribute, supporting advanced metadata capabilities in GML-based schemas.
+
+== Purpose
+
+Metadata attributes on properties allow:
+
+* Association of external metadata resources with property instances
+* Support for dynamic metadata linking
+* Enhanced semantic annotation capabilities
+* Compliance with metadata-aware encoding patterns
+
+== ShapeChange Algorithm
+
+Based on [`XsdDocument.java`](../../reference/shapechange-sources/de/interactive_instruments/ShapeChange/Target/XmlSchema/XsdDocument.java):
+
+.Key implementation points
+[source,java]
+----
+// Lines 2574-2578
+boolean addMetadata = false;
+if (propi.propertyMetadata() && propi.matches("rule-xsd-prop-metadata")) {
+    addMetadata = true;
+}
+
+// Lines 3976-3978, 4254-4259
+if (addMetadata) {
+    addMetadata(e3);  // or addMetadata(e1) or addMetadata(typeOrExtension)
+}
+
+// Lines 4254-4259
+private void addMetadata(Element e) {
+    Element m = document.createElementNS(Options.W3C_XML_SCHEMA, "attribute");
+    e.appendChild(m);
+    addAttribute(m, "name", "metadata");
+    addAttribute(m, "type", "anyURI");
+}
+----
+
+== Algorithm Steps
+
+. Check if property has `propertyMetadata()` flag set
+. Verify `rule-xsd-prop-metadata` applies to the property
+. Add metadata attribute to the property type:
+  * Create xs:attribute element
+  * Set name="metadata"
+  * Set type="anyURI"
+. Append to appropriate parent element (extension, complexType, etc.)
+
+== Implementation
+
+The Ruby implementation follows this algorithm:
+
+[source,ruby]
+----
+def apply_rule(property, context)
+  return unless property_has_metadata?(property)
+
+  # Find appropriate parent element for metadata attribute
+  parent_element = determine_parent_element(context)
+  return unless parent_element
+
+  add_metadata_attribute(parent_element, context)
+end
+
+def property_has_metadata?(property)
+  return false unless property.respond_to?(:property_metadata?)
+  property.property_metadata?
+end
+
+def add_metadata_attribute(parent, context)
+  xsd_doc = context[:xsd_document]
+
+  # Create xs:attribute element
+  metadata_attr = xsd_doc.create_element("attribute")
+  xsd_doc.add_attribute(metadata_attr, "name", "metadata")
+  xsd_doc.add_attribute(metadata_attr, "type", "anyURI")
+
+  parent.add_child(metadata_attr)
+end
+----
+
+== Usage Example
+
+.Property with metadata attribute
+====
+Given a UML property marked with `propertyMetadata = true`:
+
+[source,xml]
+----
+<xs:element name="relatedFeature">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="gml:ReferenceType">
+        <xs:attribute name="metadata" type="anyURI"/> <!--1-->
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+----
+<1> Metadata attribute added by this rule
+====
+
+== Test Cases
+
+The implementation includes tests for:
+
+. Property with propertyMetadata flag set
+. Property without metadata (no attribute added)
+. Metadata attribute in different contexts (extension, complexType)
+. Integration with other property rules
+. Error handling for missing context

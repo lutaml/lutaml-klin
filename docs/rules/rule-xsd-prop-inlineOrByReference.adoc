@@ -1,0 +1,253 @@
+= Rule: rule-xsd-prop-inlineOrByReference
+
+== Overview
+
+Determines whether a property uses inline encoding (value embedded) or by-reference encoding (value referenced via xlink:href), critical for association handling.
+
+== Priority
+
+Must-have (critical for associations and GML encoding patterns)
+
+== ShapeChange Documentation
+
+Source:: `/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/General_Conversion_Rules.adoc`
+
+Description::
+Properties can be encoded inline (with the full object structure) or by-reference (with just a reference/link to the object). This affects property type generation and attribute groups.
+
+== Java Implementation
+
+Source:: [`XsdDocument.java:mapPropertyType`](lines 3029-3156) and [`XsdDocument.java:addAnonymousPropertyType`](lines 3989-4097)
+
+=== Algorithm
+
+The Java implementation follows this complex decision tree:
+
+. Read `inlineOrByReference()` property metadata
+. For **by-reference** encoding:
+  * Never use standard property type
+  * Create anonymous property type with sequence
+  * Add `gml:AssociationAttributeGroup` or `xlink:simpleAttrs`
+  * Set `minOccurs="0"` on sequence
+  * If `rule-xsd-prop-targetElement` applies, preserve import
+. For **inline** encoding:
+  * Check multiple conditions to determine if embedding is needed:
+    ** GML 3.2+ with AbstractMemberType derivation
+    ** Property needs nilReason attribute
+    ** Property is array property
+    ** Value type has identity but no by-value property type
+    ** Property has qualifiers
+    ** Property has metadata
+  * If embedding not needed: Use standard property type
+  * If embedding needed: Create anonymous property type with choice/sequence
+. For **standard** (no explicit setting):
+  * Apply similar logic but with different defaults
+  * Classes with identity default to by-reference
+  * Classes without identity use inline
+
+=== Decision Matrix
+
+|===
+| Condition | inline | byreference | standard
+
+| Standard property type
+| Maybe
+| Never
+| Maybe
+
+| Anonymous property type
+| Maybe
+| Always
+| Maybe
+
+| Association attributes
+| Sometimes
+| Always
+| Maybe
+
+| Ownership attributes (GML 3.2)
+| Sometimes
+| Never
+| Maybe
+|===
+
+== Our Implementation
+
+Type:: Processor Class
+File:: [`lib/lutaml/klin/shapechange/rule_processors/property_rules/inline_or_by_reference_processor.rb`]
+Spec:: [`spec/lutaml/klin/shapechange/rule_processors/property_rules/inline_or_by_reference_processor_spec.rb`]
+
+=== Design Principles
+
+. Model-driven encoding decision
+. Support for both GML and non-GML schemas
+. Proper handling of association semantics
+. Clear separation between value and reference encodings
+
+=== Implementation Details
+
+The [`InlineOrByReferenceProcessor`] class extends [`BaseRuleProcessor`] and:
+
+. Reads `inlineOrByReference` property metadata
+. Determines encoding mode (inline/byreference/standard)
+. Creates appropriate property type structure
+. Adds required attribute groups
+. Handles special cases (metadata, qualifiers, arrays)
+
+== Test Cases
+
+=== Test Case 1: By-Reference Encoding
+
+Input UML::
+[source]
+----
+class City
+  property capital: Building [1] {inlineOrByReference = "byreference"}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="capital">
+  <complexType>
+    <sequence minOccurs="0"/>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </complexType>
+</element>
+----
+
+=== Test Case 2: Inline Encoding
+
+Input UML::
+[source]
+----
+class City
+  property location: Point [1] {inlineOrByReference = "inline"}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="location" type="PointType"/>
+----
+
+=== Test Case 3: Inline with Aggregation (GML 3.2)
+
+Input UML::
+[source]
+----
+class City
+  property buildings: Building [0..*] {inlineOrByReference = "inline", aggregation}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="buildings" minOccurs="0" maxOccurs="unbounded">
+  <complexType>
+    <complexContent>
+      <extension base="gml:AbstractFeatureMemberType">
+        <sequence>
+          <element ref="Building"/>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+</element>
+----
+
+=== Test Case 4: Standard Encoding (Class with Identity)
+
+Input UML::
+[source]
+----
+class Region
+  property admin: Organization [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="admin" type="OrganizationPropertyType"/>
+<!-- Uses standard property type with by-reference capability -->
+----
+
+=== Test Case 5: Standard Encoding (Class without Identity)
+
+Input UML::
+[source]
+----
+class Building
+  property address: Address [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="address" type="AddressType"/>
+<!-- Inline encoding, no property type needed -->
+----
+
+=== Test Case 6: By-Reference with targetElement
+
+Input UML::
+[source]
+----
+class Feature
+  property relatedFeature: AbstractFeature [0..1] {inlineOrByReference = "byreference"}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="relatedFeature" minOccurs="0">
+  <annotation>
+    <appinfo>
+      <gml:targetElement>AbstractFeature</gml:targetElement>
+    </appinfo>
+  </annotation>
+  <complexType>
+    <sequence minOccurs="0"/>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </complexType>
+</element>
+----
+
+== Implementation Status
+
+* [ ] Documentation read
+* [ ] Java code analyzed
+* [ ] Processor implemented
+* [ ] Spec written
+* [ ] Integrated
+* [ ] Committed
+
+== Dependencies
+
+Depends on::
+* Property type generation rules
+* Class identity determination
+* Association attribute groups
+
+Used by::
+* [`rule-xsd-cls-standard-gml-property-types`]: Uses inline/by-reference logic
+* [`rule-xsd-prop-gmlArrayProperty`]: Requires inline encoding
+
+Related rules::
+* [`rule-xsd-prop-targetElement`]: Works with by-reference
+* [`rule-xsd-cls-byValuePropertyType`]: Alternative to by-reference
+
+== Notes
+
+* `inline` embeds the full object structure
+* `byreference` uses XLink attributes for referencing
+* Default behavior depends on whether class has identity
+* GML 3.2 has specific handling for AbstractMemberType
+* Property type selection is complex and context-dependent
+* Association attributes differ between GML versions
+
+== References
+
+* ShapeChange documentation: General Conversion Rules
+* GML 3.2 specification: Property types and encoding patterns
+* XLink specification: Reference attributes

@@ -1,0 +1,38 @@
+= rule-xsd-rel-association-classes
+
+== Purpose
+
+Processes association class ends as additional properties in XML Schema generation.
+
+== Algorithm
+
+When a class is an association class:
+
+1. Check if the class has an associated `AssociationInfo`
+2. Verify the rule `rule-xsd-rel-association-classes` applies
+3. Process both association ends as additional properties:
+   - Add end1 as a property with empty multiplicity
+   - Add end2 as a property with empty multiplicity
+4. These properties are added alongside regular class properties
+
+== Java Implementation Reference
+
+From `XsdDocument.java` (lines 1951-1958):
+
+[source,java]
+----
+AssociationInfo ai = ci.isAssocClass();
+if (ai != null && ai.matches("rule-xsd-rel-association-classes")) {
+    Multiplicity m = new Multiplicity();
+    if (processLocalProperty(ci, ai.end1(), sequenceOrChoice, m, schDoc))
+        res++;
+    if (processLocalProperty(ci, ai.end2(), sequenceOrChoice, m, schDoc))
+        res++;
+}
+----
+
+== Notes
+
+* Association class ends are processed with empty multiplicity
+* Both ends are included as properties in the type definition
+* This allows association classes to carry additional properties beyond the association itself

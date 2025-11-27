@@ -1,0 +1,185 @@
+= rule-xsd-prop-featureType-gmlsf-byReference
+
+== Purpose
+
+Use `gml:ReferenceType` for feature type properties in GMLSF (GML Simple Features) profiles. This ensures compliance with the Simple Features profile by using by-reference encoding for feature properties.
+
+== ShapeChange Reference
+
+=== Java Implementation
+
+[source,java]
+----
+// XsdDocument.java lines 2215-2228
+} else if (pi.categoryOfValue() == Options.FEATURE
+    && pi.matches("rule-xsd-prop-featureType-gmlsf-byReference")) {
+
+    e1 = document.createElementNS(Options.W3C_XML_SCHEMA, "element");
+    addStandardAnnotation(e1, pi);
+    addAttribute(e1, "name", pi.name());
+
+    if (writeXmlEncodingInfos) {
+        encodingInfos.add(pi, pi.name(), this.targetNamespace, false);
+    }
+
+    addAttribute(e1, "type", "gml:ReferenceType");
+    addMinMaxOccurs(e1, m);
+    addImport("gml", options.fullNamespace("gml"));
+
+}
+----
+
+== Algorithm
+
+When processing a property with feature type value in GMLSF context:
+
+. Check if property value category is FEATURE
+. Check if rule `rule-xsd-prop-featureType-gmlsf-byReference` is enabled
+. Create element with property name
+. Add standard annotations
+. Set type to `gml:ReferenceType`
+. Apply multiplicity constraints
+. Import GML namespace
+
+== Configuration
+
+This rule requires:
+
+* `rule-xsd-prop-featureType-gmlsf-byReference` - Enable the rule
+* Property value type must be a feature type
+* GML Simple Features (GMLSF) encoding context
+
+== Input Model Requirements
+
+* Property value type must be categorized as FEATURE
+* GML namespace must be properly configured
+* Encoding rule should indicate GMLSF compliance
+
+== Output
+
+=== Feature Property with ReferenceType
+
+[source,xml]
+----
+<xs:element name="relatedFeature" type="gml:ReferenceType" minOccurs="0"/>
+----
+
+=== With Multiplicity
+
+[source,xml]
+----
+<xs:element name="relatedFeatures"
+            type="gml:ReferenceType"
+            minOccurs="0"
+            maxOccurs="unbounded"/>
+----
+
+== Example
+
+=== Input Model
+
+[source]
+----
+Class: Building (feature)
+  Properties:
+    - adjacentBuilding: Building [0..1]
+    - nearbyRoads: Road [0..*]
+
+Class: Road (feature)
+----
+
+=== Output XSD (GMLSF)
+
+[source,xml]
+----
+<xs:complexType name="BuildingType">
+  <xs:complexContent>
+    <xs:extension base="gml:AbstractFeatureType">
+      <xs:sequence>
+        <!-- Other properties -->
+
+        <!-- Feature reference using gml:ReferenceType -->
+        <xs:element name="adjacentBuilding"
+                    type="gml:ReferenceType"
+                    minOccurs="0"/>
+
+        <!-- Multiple feature references -->
+        <xs:element name="nearbyRoads"
+                    type="gml:ReferenceType"
+                    minOccurs="0"
+                    maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<!-- GML namespace import -->
+<xs:import namespace="http://www.opengis.net/gml/3.2"
+           schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+----
+
+=== Instance Example
+
+[source,xml]
+----
+<Building gml:id="B123">
+  <!-- Other properties -->
+
+  <!-- Reference to adjacent building -->
+  <adjacentBuilding xlink:href="#B124"/>
+
+  <!-- References to nearby roads -->
+  <nearbyRoads xlink:href="#R001"/>
+  <nearbyRoads xlink:href="#R002"/>
+</Building>
+----
+
+== Comparison with Standard Encoding
+
+=== Standard GML Encoding (Non-GMLSF)
+
+[source,xml]
+----
+<xs:element name="adjacentBuilding">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element ref="Building"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+</xs:element>
+----
+
+=== GMLSF Encoding
+
+[source,xml]
+----
+<xs:element name="adjacentBuilding" type="gml:ReferenceType" minOccurs="0"/>
+----
+
+== GMLSF Compliance
+
+The GML Simple Features profile (GMLSF) has specific restrictions:
+
+* Level 0 (SF-0): Only by-reference encoding allowed
+* Level 1 (SF-1): Limited inline encoding permitted
+* Level 2 (SF-2): More flexible encoding
+
+This rule enforces SF-0 compliance for feature associations by using only `gml:ReferenceType`.
+
+== Related Rules
+
+* link:rule-xsd-prop-inlineOrByReference.adoc[rule-xsd-prop-inlineOrByReference] - General inline/by-reference control
+* link:rule-xsd-cls-standard-gml-property-types.adoc[rule-xsd-cls-standard-gml-property-types] - Standard GML property types
+* link:rule-xsd-pkg-gmlsf.adoc[rule-xsd-pkg-gmlsf] - GMLSF package configuration
+
+== Notes
+
+* Enforces Simple Features profile compliance
+* Reduces schema complexity for simpler implementations
+* Always uses by-reference encoding for feature properties
+* Compatible with SF-0 (strictest GMLSF level)
+* `gml:ReferenceType` provides `xlink:href` and related XLink attributes
+* More restrictive than general GML encoding
+* Appropriate for web services and simple clients
+* May not be suitable for complex feature networks requiring inline encoding

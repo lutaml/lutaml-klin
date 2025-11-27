@@ -1,0 +1,395 @@
+= rule-xsd-all-tagged-values
+:toc:
+:sectnums:
+
+== Purpose
+
+Add [`sc:taggedValue`](http://www.interactive-instruments.de/ShapeChange/AppInfo#taggedValue) annotations for specified tagged values from model elements.
+
+This rule enables preservation of model metadata in XSD schemas, supporting documentation, tooling integration, and custom extensions.
+
+== ShapeChange Analysis
+
+=== Java Implementation
+
+The rule is implemented in [`XsdDocument.java:addStandardAnnotation()`](../../reference/shapechange-sources/de/interactive_instruments/ShapeChange/Target/XmlSchema/XsdDocument.java:444-477):
+
+[source,java]
+----
+if (info.matches("rule-xsd-all-tagged-values")) {
+
+    TaggedValues taggedValues = info.taggedValuesForTagList(options.parameter("representTaggedValues"));
+
+    if (!taggedValues.isEmpty()) {
+
+        // sort results alphabetically to support unit testing
+
+        // sort by tag name
+        TreeSet<String> tags = new TreeSet<String>(taggedValues.keySet());
+
+        for (String tag : tags) {
+
+            // sort values
+            String[] values = taggedValues.get(tag);
+            List<String> valueList = Arrays.asList(values);
+            Collections.sort(valueList);
+
+            // add appinfo elements
+            for (String v : values) {
+                if (v.trim().length() > 0) {
+                    if (e2 == null)
+                        e2 = document.createElementNS(Options.W3C_XML_SCHEMA, "appinfo");
+                    Element e3 = document.createElementNS(Options.SCAI_NS,
+                            Options.SCAI_NS_PREFIX + ":taggedValue");
+                    addAttribute(e3, "tag", tag);
+                    e3.appendChild(document.createTextNode(v));
+                    e2.appendChild(e3);
+                    addImport(Options.SCAI_NS_PREFIX, Options.SCAI_NS);
+                }
+            }
+        }
+    }
+}
+----
+
+=== Algorithm
+
+When this rule is enabled:
+
+1. Check if element matches [`rule-xsd-all-tagged-values`](rule-xsd-all-tagged-values.adoc)
+2. Get tagged values for tags specified in `representTaggedValues` configuration
+3. If tagged values exist:
+   * Sort tags alphabetically (for deterministic output)
+   * For each tag:
+     - Sort values alphabetically
+     - Create [`sc:taggedValue`](http://www.interactive-instruments.de/ShapeChange/AppInfo#taggedValue) element for each non-empty value
+     - Add `tag` attribute with tag name
+     - Set text content to value
+4. Add import for ShapeChange AppInfo namespace
+
+=== Key Characteristics
+
+* **Scope**: All model elements (classes, properties, packages)
+* **Context**: Schema element annotation
+* **Element**: [`sc:taggedValue`](http://www.interactive-instruments.de/ShapeChange/AppInfo#taggedValue)
+* **Namespace**: `http://www.interactive-instruments.de/ShapeChange/AppInfo`
+* **Configuration**: `representTaggedValues` parameter
+
+== Implementation Requirements
+
+=== Input Detection
+
+Identify elements requiring tagged value annotations:
+
+* Rule [`rule-xsd-all-tagged-values`](rule-xsd-all-tagged-values.adoc) is enabled
+* Configuration specifies which tagged values to represent
+* Element has one or more specified tagged values with non-empty values
+
+=== Processing Logic
+
+[source,ruby]
+----
+def process_tagged_values(element, context)
+  # Get list of tags to represent from configuration
+  represent_tags = context.config["representTaggedValues"] || []
+  return if represent_tags.empty?
+
+  # Get tagged values for specified tags
+  tagged_values = element.tagged_values_for_tags(represent_tags)
+  return if tagged_values.empty?
+
+  appinfo = []
+
+  # Sort tags alphabetically for deterministic output
+  sorted_tags = tagged_values.keys.sort
+
+  sorted_tags.each do |tag|
+    values = tagged_values[tag]
+
+    # Sort values alphabetically
+    sorted_values = values.sort
+
+    # Create element for each non-empty value
+    sorted_values.each do |value|
+      next if value.nil? || value.strip.empty?
+
+      appinfo << {
+        namespace: SCAI_NAMESPACE,
+        element: "taggedValue",
+        attributes: { tag: tag },
+        text: value
+      }
+    end
+  end
+
+  return {} if appinfo.empty?
+
+  {
+    appinfo: appinfo,
+    imports: [
+      {
+        prefix: "sc",
+        namespace: SCAI_NAMESPACE
+      }
+    ]
+  }
+end
+----
+
+=== Output Generation
+
+Generate annotations with tagged values:
+
+[source,xml]
+----
+<element name="Building">
+  <annotation>
+    <appinfo>
+      <sc:taggedValue tag="author">John Doe</sc:taggedValue>
+      <sc:taggedValue tag="version">1.0</sc:taggedValue>
+      <sc:taggedValue tag="status">approved</sc:taggedValue>
+    </appinfo>
+  </annotation>
+  <!-- element definition -->
+</element>
+----
+
+== Configuration
+
+=== Rule Declaration
+
+[source,xml]
+----
+<EncodingRule name="iso19136_2007">
+  <rule name="rule-xsd-all-tagged-values"/>
+</EncodingRule>
+----
+
+=== Configuration Parameter
+
+Specify which tagged values to represent:
+
+[source,xml]
+----
+<parameter name="representTaggedValues"
+           value="author,version,status,deprecated"/>
+----
+
+Or as comma-separated list:
+
+[source,xml]
+----
+<parameter name="representTaggedValues">
+  author,version,status,deprecated,example
+</parameter>
+----
+
+== Examples
+
+=== Example 1: Single Tagged Value
+
+.Input Model
+[source]
+----
+Class: Road
+  Tagged Values:
+    author: "Transport Team"
+----
+
+.Configuration
+[source,xml]
+----
+<parameter name="representTaggedValues" value="author"/>
+----
+
+.Output XSD
+[source,xml]
+----
+<complexType name="RoadType">
+  <annotation>
+    <appinfo>
+      <sc:taggedValue tag="author">Transport Team</sc:taggedValue>
+    </appinfo>
+  </annotation>
+  <!-- type definition -->
+</complexType>
+----
+
+=== Example 2: Multiple Tagged Values
+
+.Input Model
+[source]
+----
+Class: Building
+  Tagged Values:
+    author: "City Planning"
+    version: "2.0"
+    status: "approved"
+    lastModified: "2024-01-15"
+----
+
+.Configuration
+[source,xml]
+----
+<parameter name="representTaggedValues"
+           value="author,version,status"/>
+----
+
+.Output XSD
+[source,xml]
+----
+<complexType name="BuildingType">
+  <annotation>
+    <appinfo>
+      <sc:taggedValue tag="author">City Planning</sc:taggedValue>
+      <sc:taggedValue tag="status">approved</sc:taggedValue>
+      <sc:taggedValue tag="version">2.0</sc:taggedValue>
+    </appinfo>
+  </annotation>
+  <!-- type definition -->
+</complexType>
+----
+
+Note: Tags are sorted alphabetically (author, status, version).
+
+=== Example 3: Multi-valued Tagged Value
+
+.Input Model
+[source]
+----
+Property: geometry
+  Tagged Values:
+    example: "POINT(0 0)"
+    example: "LINESTRING(0 0, 1 1)"
+    example: "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))"
+----
+
+.Configuration
+[source,xml]
+----
+<parameter name="representTaggedValues" value="example"/>
+----
+
+.Output XSD
+[source,xml]
+----
+<element name="geometry" type="gml:GeometryPropertyType">
+  <annotation>
+    <appinfo>
+      <sc:taggedValue tag="example">LINESTRING(0 0, 1 1)</sc:taggedValue>
+      <sc:taggedValue tag="example">POINT(0 0)</sc:taggedValue>
+      <sc:taggedValue tag="example">POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))</sc:taggedValue>
+    </appinfo>
+  </annotation>
+</element>
+----
+
+Note: Values are sorted alphabetically.
+
+=== Example 4: Property with Tagged Values
+
+.Input Model
+[source]
+----
+Property: height
+  Type: Measure
+  Tagged Values:
+    unit: "meter"
+    accuracy: "0.1"
+    deprecated: "false"
+----
+
+.Configuration
+[source,xml]
+----
+<parameter name="representTaggedValues" value="unit,accuracy,deprecated"/>
+----
+
+.Output XSD
+[source,xml]
+----
+<element name="height" type="gml:MeasureType">
+  <annotation>
+    <appinfo>
+      <sc:taggedValue tag="accuracy">0.1</sc:taggedValue>
+      <sc:taggedValue tag="deprecated">false</sc:taggedValue>
+      <sc:taggedValue tag="unit">meter</sc:taggedValue>
+    </appinfo>
+  </annotation>
+</element>
+----
+
+== Testing Strategy
+
+=== Test Coverage
+
+1. **Single Tagged Value**
+   * One tag configured → annotation added
+   * Correct tag attribute and value
+
+2. **Multiple Tagged Values**
+   * Multiple tags configured → all present
+   * Alphabetically sorted by tag name
+
+3. **Multi-valued Tags**
+   * Tag with multiple values → multiple elements
+   * Values sorted alphabetically
+
+4. **Empty Values**
+   * Empty string value → skipped
+   * Only whitespace → skipped
+
+5. **No Configuration**
+   * `representTaggedValues` empty → no annotations
+   * Parameter missing → no annotations
+
+6. **Unconfigured Tags**
+   * Element has tags not in configuration
+   * Only configured tags represented
+
+7. **Rule Disabled**
+   * Tagged values present but rule disabled
+   * No annotations added
+
+=== Expected Behaviors
+
+* [`sc:taggedValue`](http://www.interactive-instruments.de/ShapeChange/AppInfo#taggedValue) elements in `<appinfo>`
+* `tag` attribute with tag name
+* Text content with value
+* Tags sorted alphabetically
+* Values sorted alphabetically
+* Empty values skipped
+* ShapeChange namespace with `sc` prefix
+
+== Notes
+
+=== Tagged Value Selection
+
+The `representTaggedValues` parameter allows selective inclusion of tagged values:
+
+* **Explicit Control**: Only specified tags are included
+* **Avoid Clutter**: Prevents unnecessary metadata in schemas
+* **Extensibility**: Easy to add new tags without code changes
+
+=== Common Tagged Values
+
+Typical tagged values to represent:
+
+* **author**: Creator or maintainer
+* **version**: Version information
+* **status**: Approval/deprecation status
+* **deprecated**: Deprecation flag
+* **example**: Example values
+* **unit**: Measurement unit
+* **accuracy**: Precision information
+
+=== Relationship to Other Rules
+
+* Works with all element types (classes, properties, packages)
+* Complementary to global identifier annotations
+* Part of ShapeChange AppInfo extensions
+* Supports documentation generation
+
+=== Reference Implementation
+
+See [`TaggedValuesProcessor`](../../lib/lutaml/klin/xsd_gen/rule_processors/tagged_values_processor.rb) for Ruby implementation.

@@ -1,0 +1,90 @@
+= rule-xsd-cls-union-asCharacterString
+
+== Purpose
+
+Encodes union types as simple `xs:string` type in XML Schema, providing a simplified representation for unions.
+
+== Applies To
+
+* Union classes
+
+== Algorithm
+
+When this rule is enabled and a union class is marked with `asCharacterString`:
+
+1. Check if the property's value type is a union
+2. Check if the union has `asCharacterString` set to true
+3. If both conditions are met, encode the property with `type="xs:string"`
+4. Skip normal union encoding (choice, etc.)
+
+This provides a simple string-based encoding for unions that don't require full structural representation.
+
+== Configuration
+
+No additional parameters required beyond enabling the rule.
+
+== Tagged Values
+
+The union class must have:
+- `asCharacterString` = "true"
+
+== Example Input (UML)
+
+[source]
+----
+<<union>> MeasureOrNilReason {
+  asCharacterString = "true"
+}
+  measure: Measure [0..1]
+  nilReason: NilReason [0..1]
+----
+
+== Example Output (XSD)
+
+Without this rule (complex union):
+[source,xml]
+----
+<xs:element name="value">
+  <xs:complexType>
+    <xs:choice>
+      <xs:element ref="gml:Measure"/>
+      <xs:element name="nilReason" type="gml:NilReasonType"/>
+    </xs:choice>
+  </xs:complexType>
+</xs:element>
+----
+
+With this rule (simple string):
+[source,xml]
+----
+<xs:element name="value" type="xs:string"/>
+----
+
+== Java Implementation Reference
+
+See `XsdDocument.java` lines 2254-2255:
+```java
+if (typeCi != null && typeCi.asCharacterString()
+    && typeCi.matches("rule-xsd-cls-union-asCharacterString"))
+    addAttribute(e1, "type", "string");
+```
+
+== Use Cases
+
+* Simplified encoding for unions where string representation is sufficient
+* Compatibility with systems that cannot handle complex union structures
+* Performance optimization by reducing XML complexity
+* Legacy system integration
+
+== Related Rules
+
+* `rule-xsd-cls-union-as-choice` - Full union encoding with choice
+* `rule-xsd-cls-union-asGroup` - Union encoded as group
+* `rule-xsd-cls-union-direct` - Direct union encoding without wrapper
+
+== Notes
+
+- This rule simplifies union encoding at the cost of losing type structure
+- Applications must parse the string value to determine the actual content type
+- Recommended only when string-based encoding is explicitly required
+- The `asCharacterString` flag must be set on the union class itself

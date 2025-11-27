@@ -1,0 +1,137 @@
+lutaml-klin Data Flow Diagram
+================================
+
+INPUTS                    PROCESSING                       OUTPUTS
+═══════                   ══════════                       ═══════
+
+┌──────────────┐
+│ XMI File     │──┐
+│ (UML Model)  │  │
+└──────────────┘  │
+                  │     ┌─────────────────────────┐
+┌──────────────┐  │     │                         │      ┌──────────────┐
+│ ShapeChange  │──┼────►│   MappingGenerator      │─────►│ YAML Mapping │
+│ Config (XML) │  │     │                         │      │ Document     │
+└──────────────┘  │     │  Orchestrates:          │      └──────────────┘
+                  │     │  1. Parse inputs        │
+┌──────────────┐  │     │  2. Navigate UML        │      ┌──────────────┐
+│ XSD Schemas  │──┘     │  3. Match types         │─────►│ HTML Report  │
+│ (Directory)  │        │  4. Resolve namespaces  │      │ (Optional)   │
+└──────────────┘        │  5. Build mappings      │      └──────────────┘
+                        └─────────────────────────┘
+┌──────────────┐                    │                    ┌──────────────┐
+│ Type         │                    │                    │ JSON Export  │
+│ Overrides    │────────────────────┘                    │ (Optional)   │
+│ (Optional)   │                                          └──────────────┘
+└──────────────┘
+
+
+Detailed Flow: Generate Command
+=================================
+
+1. INPUT LOADING
+   ─────────────
+   XMI File → lutaml-xmi → UML Model Objects
+   Config XML → moxml → ShapeChange Config Objects
+   XSD Files → moxml → XSD Schema Objects
+   Type Overrides (YAML) → YAML.load → Hash
+
+2. TYPE RESOLUTION
+   ───────────────
+   For each UML Attribute:
+     │
+     ├─► Get UML type name (e.g., "xs::string")
+     │
+     ├─► Apply type override if configured
+     │   "xs::string" → "xs:string"
+     │
+     ├─► Look up in ShapeChange type mappings
+     │   "CharacterString" → "xs:string"
+     │
+     ├─► Parse namespace prefix
+     │   "gml:CodeType" → prefix="gml", type="CodeType"
+     │
+     ├─► Resolve namespace URI
+     │   "gml" → "http://www.opengis.net/gml/3.2"
+     │
+     └─► Get schema location
+         "http://schemas.opengis.net/gml/3.2.1/gml.xsd"
+
+3. MAPPING GENERATION
+   ───────────────────
+   For each UML Package:
+     │
+     ├─► Extract UML Classes
+     │
+     ├─► For each UML Class:
+     │   │
+     │   ├─► Find matching XSD ComplexType
+     │   │
+     │   ├─► For each UML Attribute:
+     │   │   │
+     │   │   ├─► Apply type resolution (see step 2)
+     │   │   │
+     │   │   ├─► Find matching XSD Element
+     │   │   │
+     │   │   └─► Create AttributeMapping
+     │   │
+     │   └─► Create ClassMapping
+     │
+     └─► Create PackageMapping
+
+4. OUTPUT GENERATION
+   ─────────────────
+   SchemaMapping Object
+     │
+     ├─► to_yaml() → YAML file
+     ├─► to_json() → JSON file
+     └─► to_html() → HTML report
+
+
+Merge Command Flow
+==================
+
+Multiple YAML Files → MergeCommand → Combined YAML
+                         │
+                         ├─► Parse each file
+                         ├─► Validate structure
+                         ├─► Merge packages
+                         ├─► Deduplicate namespaces
+                         └─► Resolve conflicts
+
+
+Validate Command Flow
+=====================
+
+YAML File → ValidateCommand → Validation Report
+                  │
+                  ├─► Parse YAML
+                  ├─► Check structure
+                  ├─► Verify completeness
+                  ├─► Check consistency
+                  └─► Generate report
+
+
+Report Command Flow
+===================
+
+YAML Mapping → ReportCommand → Human-Readable Report
+                    │
+                    ├─► Parse mapping
+                    ├─► Extract statistics
+                    ├─► Format output
+                    └─► Write HTML/MD/TXT
+
+
+Error Flow
+==========
+
+Any Step
+   │
+   ├─► Error Detected
+   │
+   ├─► Log error message
+   │
+   ├─► (if --verbose) Show stack trace
+   │
+   └─► Exit with code 1

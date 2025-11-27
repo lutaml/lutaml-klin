@@ -1,0 +1,961 @@
+= Architecture
+
+== Purpose
+
+This document provides a comprehensive overview of Lutaml-Klin's architecture,
+design principles, and component interactions.
+
+It is intended for:
+
+* Developers contributing to Lutaml-Klin
+* Architects integrating Lutaml-Klin into larger systems
+* Advanced users who need to understand internal behavior
+* Anyone extending Lutaml-Klin with custom functionality
+
+== Concepts
+
+=== Model-driven architecture
+
+Lutaml-Klin follows a model-driven architecture (MDA) where all domain concepts
+are represented as first-class model objects.
+
+Every data structure inherits from `Lutaml::Model::Serializable`, providing:
+
+* **Type safety**: Strong typing prevents runtime errors
+* **Validation**: Automatic validation of required fields
+* **Serialization**: Built-in YAML/JSON/XML support
+* **Documentation**: Self-documenting through model definitions
+
+Example model definition:
+
+[source,ruby]
+----
+class ClassMapping < Lutaml::Model::Serializable
+  attribute :uml_class, UmlClass
+  attribute :xsd_element, ElementMapping
+  attribute :xsd_complex_type, ComplexTypeMapping
+  attribute :attribute_mappings, AttributeMapping, collection: true
+
+  xml do
+    root "classMapping"
+    map_element "umlClass", to: :uml_class
+    map_element "xsdElement", to: :xsd_element
+    map_element "xsdComplexType", to: :xsd_complex_type
+    map_element "attributeMapping", to: :attribute_mappings
+  end
+end
+----
+
+=== Separation of concerns
+
+Lutaml-Klin strictly separates responsibilities across components:
+
+* **Parsers** extract data from input formats (no business logic)
+* **Models** represent domain concepts (no I/O operations)
+* **Generators** create outputs (no parsing logic)
+* **Commands** orchestrate workflows (no implementation details)
+
+This separation ensures:
+
+* Each component can be tested in isolation
+* Components can be replaced without affecting others
+* Code remains maintainable as complexity grows
+
+=== Library boundaries
+
+Lutaml-Klin focuses on UML-to-XSD **mapping analysis**, not XSD processing:
+
+.Responsibility Boundaries
+[source]
+----
+┌─────────────────────────────────────────────────────────┐
+│ LUTAML-KLIN                                             │
+│                                                         │
+│ • Parse XMI → Extract UML models                        │
+│ • Parse ShapeChange config → Extract encoding rules     │
+│ • Generate mappings with type placeholders              │
+│ • Create human-readable reports                         │
+│ • Validate mapping completeness                         │
+└─────────────────────────────────────────────────────────┘
+                          │
+                          ▼ (delegates XSD work)
+┌─────────────────────────────────────────────────────────┐
+│ LUTAML-XSD (separate gem)                               │
+│                                                         │
+│ • Parse XSD schemas → Build schema repository           │
+│ • Resolve namespaced types (e.g., gml:CodeType)        │
+│ • Validate XSD structure and constraints                │
+│ • Provide schema introspection API                      │
+└─────────────────────────────────────────────────────────┘
+----
+
+This boundary ensures lutaml-klin remains focused and maintainable.
+
+=== MECE principle
+
+All components follow MECE (Mutually Exclusive, Collectively Exhaustive):
+
+* **Mutually Exclusive**: No overlapping responsibilities between classes
+* **Collectively Exhaustive**: All required functionality is covered
+
+Example: Type resolution is EXCLUSIVELY in lutaml-xsd, NEVER in lutaml-klin.
+
+== System architecture
+
+=== High-level overview
+
+[source]
+----
+                    ┌──────────────────┐
+                    │   User Input     │
+                    │  (CLI or Ruby)   │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │   CLI Layer      │
+                    │  (Thor commands) │
+                    └────────┬─────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+        ▼                    ▼                    ▼
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│ XMI Parser   │    │   Config     │    │     XSD      │
+│ (Navigator)  │    │   Parser     │    │   Analyzer   │
+└──────┬───────┘    └──────┬───────┘    └──────┬───────┘
+       │                   │                    │
+       │ UML Models        │ Encoding Rules     │ (optional)
+       │                   │                    │
+       └───────────────────┼────────────────────┘
+                           │
+                           ▼
+                  ┌────────────────┐
+                  │    Mapping     │
+                  │   Generator    │
+                  └────────┬───────┘
+                           │
+                           │ SchemaMapping
+                           │
+           ┌───────────────┼───────────────┐
+           │               │               │
+           ▼               ▼               ▼
+    ┌───────────┐   ┌───────────┐   ┌───────────┐
+    │   YAML    │   │  Report   │   │ Validator │
+    │ Exporter  │   │ Generator │   │           │
+    └───────────┘   └───────────┘   └───────────┘
+           │               │               │
+           ▼               ▼               ▼
+      Output Files   Text Reports   Validation Results
+----
+
+=== Component layers
+
+==== Layer 1: Input parsers
+
+**XmiNavigator**
+
+Parses XMI files and extracts UML model structure.
+
+[source,ruby]
+----
+navigator = Lutaml::Klin::XmiNavigator.new
+navigator.parse_file('plateau-uro.xmi')
+
+# Access parsed structure
+packages = navigator.packages           # Array<Package>
+pkg = navigator.find_package('uro')     # Package
+classes = navigator.classes_in_package('uro')  # Array<Class>
+----
+
+Implementation details:
+
+* Uses `Lutaml::Parser.parse` for XMI parsing
+* Traverses XMI Document → Packages → Classes → Attributes
+* Builds immutable model objects (Package, Class, Attribute, Association)
+* Handles nested package hierarchies
+
+**ShapeChange::ConfigParser**
+
+Parses ShapeChange XML configuration files.
+
+[source,ruby]
+----
+config = Lutaml::Klin::ShapeChange::ConfigParser.parse_file(
+  'ShapeChangeConfig_Plateau_uro.xml'
+)
+
+# Access configuration
+target = config.target_configurations.first
+encoding_rules = target.encoding_rules
+type_mappings = target.xsd_map_entries
+namespaces = config.xml_namespaces
+----
+
+Implementation details:
+
+* Uses `Lutaml::Model` XML deserialization
+* Resolves XInclude references via `XIncludeResolver`
+* Builds `ShapeChangeConfiguration` model with nested structures
+* Handles StandardNamespaces.xml, StandardMapEntries.xml imports
+
+**XsdAnalyzer**
+
+Analyzes XSD schemas (optional, for validation).
+
+[source,ruby]
+----
+analyzer = Lutaml::Klin::XsdAnalyzer.new
+analyzer.analyze(xsd_content, xsd_location)
+
+# Find definitions
+element = analyzer.find_element('Building')
+complex_type = analyzer.find_complex_type('BuildingType')
+----
+
+NOTE: XsdAnalyzer delegates to `lutaml-xsd` for actual schema parsing
+and type resolution.
+
+==== Layer 2: Domain models
+
+**UML Models** (`lib/lutaml/klin/models/uml/`)
+
+[source]
+----
+Package
+├── name: String
+├── id: String
+├── namespace: String (optional)
+├── classes: Array<Class>
+└── packages: Array<Package> (nested)
+
+Class
+├── name: String
+├── id: String
+├── stereotype: String (FeatureType, DataType, etc.)
+├── package_id: String (parent reference)
+├── attributes: Array<Attribute>
+└── associations: Array<Association>
+
+Attribute
+├── name: String
+├── type: String (may be namespaced, e.g., "gml:CodeType")
+├── multiplicity_min: Integer
+├── multiplicity_max: String (supports "unbounded")
+└── visibility: String (public, private, etc.)
+
+Association
+├── name: String
+├── target_class: String
+├── multiplicity: String
+└── navigable: Boolean
+----
+
+**Mapping Models** (`lib/lutaml/klin/models/mapping/`)
+
+[source]
+----
+SchemaMapping (root)
+├── package_mappings: Array<PackageMapping>
+│   ├── name: String
+│   ├── namespace: String
+│   └── class_mappings: Array<ClassMapping>
+│       ├── uml_class: UmlClass
+│       ├── xsd_element: ElementMapping (optional)
+│       ├── xsd_complex_type: ComplexTypeMapping (optional)
+│       └── attribute_mappings: Array<AttributeMapping>
+│           ├── uml_attribute: Attribute
+│           ├── xsd_element: ElementMapping
+│           └── resolution_status: Symbol (:resolved, :unresolved)
+└── encoding_rules: Array<EncodingRule>
+    ├── name: String
+    └── extends_encoding_rule: String
+----
+
+**Configuration Models** (`lib/lutaml/klin/shapechange/models/config/`)
+
+[source]
+----
+ShapeChangeConfiguration
+├── input_id: String
+├── target_configurations: Array<TargetConfiguration>
+│   ├── class_name: String
+│   ├── mode: String
+│   ├── encoding_rules: Array<String>
+│   └── xsd_map_entries: Array<XsdMapEntry>
+│       ├── type: String (UML type)
+│       ├── xml_type: String (XSD type)
+│       ├── xml_type_ns: String (namespace)
+│       └── xml_element_type: String (optional)
+├── xml_namespaces: Array<XmlNamespace>
+│   ├── nsabr: String (prefix, e.g., "gml")
+│   ├── ns: String (URI, e.g., "http://www.opengis.net/gml/3.2")
+│   └── location: String (schema URL or file path)
+└── package_infos: Array<PackageInfo>
+    ├── package_name: String
+    ├── ns: String (namespace URI)
+    └── version: String
+----
+
+==== Layer 3: Orchestration
+
+**MappingGenerator**
+
+Orchestrates the mapping generation process.
+
+Algorithm:
+
+[source]
+----
+INPUT: XMI file, ShapeChange config, XSD directory (optional)
+OUTPUT: SchemaMapping model
+
+1. Parse XMI file
+   └─→ Extract Package[] with Class[], Attribute[]
+
+2. Parse ShapeChange configuration
+   └─→ Extract EncodingRule[], XsdMapEntry[], XmlNamespace[]
+
+3. For each UML Package:
+   a. Create PackageMapping
+   b. Set namespace from config.package_infos
+   c. For each UML Class in package:
+      i. Create ClassMapping
+      ii. Set uml_class reference
+      iii. For each Attribute:
+          - Look up type mapping in config.xsd_map_entries
+          - Create AttributeMapping
+          - Mark as :unresolved if type is namespaced
+      iv. If XSD provided (optional):
+          - Delegate to lutaml-xsd for type resolution
+          - Update resolution_status to :resolved
+          - Link XSD element and complex type
+
+4. Collect unique encoding rules
+
+5. Return SchemaMapping with all mappings
+----
+
+Implementation:
+
+[source,ruby]
+----
+class MappingGenerator
+  def generate(xmi_path, config_path, xsd_path = nil)
+    # Parse inputs
+    navigator = XmiNavigator.new
+    navigator.parse_file(xmi_path)
+
+    config = ShapeChange::ConfigParser.parse_file(config_path)
+
+    # Generate mappings
+    schema_mapping = SchemaMapping.new
+    schema_mapping.package_mappings = navigator.packages.map do |pkg|
+      map_package(pkg, config)
+    end
+
+    # Optionally resolve types with lutaml-xsd
+    if xsd_path
+      resolve_types(schema_mapping, xsd_path, config.xml_namespaces)
+    end
+
+    schema_mapping
+  end
+
+  private
+
+  def map_package(uml_package, config)
+    package_mapping = PackageMapping.new
+    package_mapping.name = uml_package.name
+    package_mapping.namespace = find_namespace(uml_package.name, config)
+    package_mapping.class_mappings = uml_package.classes.map do |cls|
+      map_class(cls, config)
+    end
+    package_mapping
+  end
+
+  def map_class(uml_class, config)
+    class_mapping = ClassMapping.new
+    class_mapping.uml_class = uml_class
+    class_mapping.attribute_mappings = uml_class.attributes.map do |attr|
+      map_attribute(attr, config.target_configurations.first.xsd_map_entries)
+    end
+    class_mapping
+  end
+
+  def map_attribute(uml_attr, type_mappings)
+    attr_mapping = AttributeMapping.new
+    attr_mapping.uml_attribute = uml_attr
+
+    # Find type conversion
+    type_entry = type_mappings.find { |e| e.type == uml_attr.type }
+
+    if type_entry
+      # Simple type mapping from config
+      attr_mapping.xsd_element = ElementMapping.new(
+        name: uml_attr.name,
+        type: type_entry.xml_type,
+        namespace: type_entry.xml_type_ns
+      )
+      attr_mapping.resolution_status = :resolved
+    else
+      # Namespaced type - needs resolution via lutaml-xsd
+      attr_mapping.xsd_element = ElementMapping.new(
+        name: uml_attr.name,
+        type: uml_attr.type  # e.g., "gml:CodeType"
+      )
+      attr_mapping.resolution_status = :unresolved
+    end
+
+    attr_mapping
+  end
+
+  def resolve_types(schema_mapping, xsd_path, namespaces)
+    # Delegate to lutaml-xsd for type resolution
+    # (Implementation to be added when integrating with lutaml-xsd)
+  end
+end
+----
+
+==== Layer 4: CLI commands
+
+All commands are located in `lib/lutaml/klin/commands/` and inherit from
+`Thor`.
+
+**GenerateCommand**
+
+[source,ruby]
+----
+class GenerateCommand
+  def initialize(options = {})
+    @xmi_path = options[:xmi]
+    @config_path = options[:config]
+    @output_path = options[:output]
+    @xsd_path = options[:xsd]  # optional
+    @verbose = options[:verbose]
+  end
+
+  def run
+    log_info "Parsing XMI file: #{@xmi_path}"
+    log_info "Parsing ShapeChange config: #{@config_path}"
+
+    generator = MappingGenerator.new
+    mapping = generator.generate(@xmi_path, @config_path, @xsd_path)
+
+    log_info "Writing YAML to: #{@output_path}"
+    File.write(@output_path, mapping.to_yaml)
+
+    log_success "Mapping generation complete!"
+  end
+end
+----
+
+**ReportCommand**
+
+[source,ruby]
+----
+class ReportCommand
+  def initialize(options = {})
+    @mapping_path = options[:mapping]
+    @output_path = options[:output]
+    @verbose = options[:verbose]
+  end
+
+  def run
+    log_info "Loading mapping: #{@mapping_path}"
+    mapping = SchemaMapping.from_yaml(File.read(@mapping_path))
+
+    log_info "Generating report..."
+    report = generate_report(mapping)
+
+    log_info "Writing report to: #{@output_path}"
+    File.write(@output_path, report)
+
+    log_success "Report generation complete!"
+  end
+
+  private
+
+  def generate_report(mapping)
+    # Generate human-readable text report
+    # (See EXAMPLES.adoc for sample output)
+  end
+end
+----
+
+== Data flow
+
+=== Generate command flow
+
+[source]
+----
+User: lutaml-klin generate --xmi model.xmi --config config.xml --output map.yaml
+  │
+  ▼
+GenerateCommand.run
+  │
+  ├─► XmiNavigator.parse_file(model.xmi)
+  │     │
+  │     ├─► Lutaml::Parser.parse (XMI → XML DOM)
+  │     │
+  │     ├─► Traverse: Document → Model → Package → Class
+  │     │
+  │     └─► Return: Array<Package>
+  │           Each Package contains:
+  │           - Array<Class>
+  │           - Array<Attribute>
+  │           - Array<Association>
+  │
+  ├─► ConfigParser.parse_file(config.xml)
+  │     │
+  │     ├─► Lutaml::Model XML deserialization
+  │     │
+  │     ├─► XIncludeResolver.resolve (handle XInclude)
+  │     │
+  │     └─► Return: ShapeChangeConfiguration
+  │           Contains:
+  │           - EncodingRule[]
+  │           - XsdMapEntry[] (type mappings)
+  │           - XmlNamespace[] (namespace config)
+  │           - PackageInfo[] (package metadata)
+  │
+  └─► MappingGenerator.generate(packages, config)
+        │
+        ├─► For each Package:
+        │     ├─► map_package()
+        │     │     ├─► Find namespace in config.package_infos
+        │     │     └─► Create PackageMapping
+        │     │
+        │     └─► For each Class:
+        │           ├─► map_class()
+        │           │     ├─► Create ClassMapping
+        │           │     └─► Set uml_class reference
+        │           │
+        │           └─► For each Attribute:
+        │                 ├─► map_attribute()
+        │                 │     ├─► Look up in xsd_map_entries
+        │                 │     ├─► Create AttributeMapping
+        │                 │     └─► Set resolution_status
+        │                 │
+        │                 └─► Add to class_mapping.attribute_mappings
+        │
+        └─► Return: SchemaMapping
+              │
+              ▼
+        SchemaMapping.to_yaml
+              │
+              ▼
+        File.write(output_path, yaml)
+              │
+              ▼
+        YAML Output (map.yaml)
+----
+
+=== Namespace resolution flow (with lutaml-xsd integration)
+
+[source]
+----
+Unresolved Type: "gml:CodeType"
+  │
+  ▼
+Parse namespace prefix and local name
+  │
+  ├─► Prefix: "gml"
+  └─► Local name: "CodeType"
+  │
+  ▼
+Look up namespace URI in config.xml_namespaces
+  │
+  └─► Find: XmlNamespace(nsabr="gml", ns="http://www.opengis.net/gml/3.2", ...)
+  │
+  ▼
+Delegate to lutaml-xsd SchemaRepository
+  │
+  ├─► SchemaRepository.resolve_type(
+  │     namespace: "http://www.opengis.net/gml/3.2",
+  │     type_name: "CodeType"
+  │   )
+  │
+  └─► lutaml-xsd performs:
+        │
+        ├─► Load schema for namespace
+        │     (from location: http://schemas.opengis.net/gml/3.2.1/basicTypes.xsd)
+        │
+        ├─► Parse XSD and build type registry
+        │
+        ├─► Find <xs:complexType name="CodeType">
+        │
+        └─► Return: ComplexTypeDefinition
+              ├─► name: "CodeType"
+              ├─► namespace: "http://www.opengis.net/gml/3.2"
+              ├─► base: "gml:MeasureOrNilReasonListType"
+              └─► attributes: [...]
+  │
+  ▼
+Update AttributeMapping
+  │
+  ├─► xsd_element.type = "CodeType"
+  ├─► xsd_element.namespace = "http://www.opengis.net/gml/3.2"
+  ├─► xsd_element.definition = (full type definition)
+  └─► resolution_status = :resolved
+  │
+  ▼
+Resolved Type Mapping Complete
+----
+
+== Integration with lutaml-xsd
+
+=== Namespace configuration
+
+StandardNamespaces.xml defines namespace mappings:
+
+[source,xml]
+----
+<StandardNamespaces>
+  <XmlNamespace
+    nsabr="gml"
+    ns="http://www.opengis.net/gml/3.2"
+    location="http://schemas.opengis.net/gml/3.2.1/gml.xsd" />
+
+  <XmlNamespace
+    nsabr="xs"
+    ns="http://www.w3.org/2001/XMLSchema"
+    location="http://www.w3.org/2001/XMLSchema.xsd" />
+
+  <!-- More namespace definitions -->
+</StandardNamespaces>
+----
+
+Parsed into:
+
+[source,ruby]
+----
+XmlNamespace.new(
+  nsabr: "gml",
+  ns: "http://www.opengis.net/gml/3.2",
+  location: "http://schemas.opengis.net/gml/3.2.1/gml.xsd"
+)
+----
+
+=== SchemaRepository (in lutaml-xsd)
+
+The SchemaRepository manages XSD schemas and resolves types:
+
+[source,ruby]
+----
+# In lutaml-xsd gem
+module Lutaml
+  module Xsd
+    class SchemaRepository
+      def initialize
+        @schemas = {}
+        @type_registry = {}
+      end
+
+      def load_namespace_config(xml_namespaces)
+        xml_namespaces.each do |ns_config|
+          register_namespace(
+            ns_config.ns,
+            ns_config.location
+          )
+        end
+      end
+
+      def load_schema_directory(path)
+        Dir.glob(File.join(path, "**/*.xsd")).each do |schema_file|
+          load_schema(schema_file)
+        end
+      end
+
+      def resolve_type(namespace:, type_name:)
+        # Find schema for namespace
+        schema = @schemas[namespace]
+        return nil unless schema
+
+        # Find type definition in schema
+        schema.find_complex_type(type_name) ||
+          schema.find_simple_type(type_name)
+      end
+    end
+  end
+end
+----
+
+=== Resolution workflow
+
+Lutaml-Klin delegates to lutaml-xsd:
+
+[source,ruby]
+----
+# In lutaml-klin
+class MappingGenerator
+  def resolve_types(schema_mapping, xsd_path, namespaces)
+    # Create SchemaRepository (lutaml-xsd)
+    require 'lutaml/xsd'
+    repo = Lutaml::Xsd::SchemaRepository.new
+    repo.load_namespace_config(namespaces)
+    repo.load_schema_directory(xsd_path)
+
+    # Resolve unresolved types
+    schema_mapping.package_mappings.each do |pkg|
+      pkg.class_mappings.each do |cls|
+        cls.attribute_mappings.each do |attr|
+          next if attr.resolution_status == :resolved
+
+          # Parse namespaced type
+          if attr.uml_attribute.type =~ /^(\w+):(\w+)$/
+            prefix = $1
+            local_name = $2
+
+            # Find namespace for prefix
+            ns_config = namespaces.find { |n| n.nsabr == prefix }
+            next unless ns_config
+
+            # Resolve type
+            resolved = repo.resolve_type(
+              namespace: ns_config.ns,
+              type_name: local_name
+            )
+
+            if resolved
+              attr.xsd_element.type = local_name
+              attr.xsd_element.namespace = ns_config.ns
+              attr.xsd_element.definition = resolved
+              attr.resolution_status = :resolved
+            end
+          end
+        end
+      end
+    end
+  end
+end
+----
+
+== Extension points
+
+=== Adding new input formats
+
+To support a new UML format (e.g., Ecore, ArchiMate):
+
+1. Create a new navigator class:
+
+[source,ruby]
+----
+class EcoreNavigator
+  def parse_file(path)
+    # Parse Ecore file
+  end
+
+  def packages
+    # Return Array<Package>
+  end
+
+  def find_package(name)
+    # Return Package
+  end
+end
+----
+
+2. Update `MappingGenerator` to accept navigator type:
+
+[source,ruby]
+----
+def generate(input_path, config_path, navigator_type: :xmi)
+  navigator = case navigator_type
+              when :xmi then XmiNavigator.new
+              when :ecore then EcoreNavigator.new
+              else raise "Unknown navigator type"
+              end
+
+  navigator.parse_file(input_path)
+  # ... rest of generation
+end
+----
+
+3. Add CLI option for navigator selection
+
+=== Adding custom transformations
+
+To add custom transformation rules:
+
+[source,ruby]
+----
+class CustomMappingGenerator < MappingGenerator
+  def map_attribute(uml_attr, type_mappings)
+    # Custom transformation logic
+    if uml_attr.type == "CustomType"
+      # Special handling
+    else
+      super
+    end
+  end
+end
+----
+
+=== Adding new output formats
+
+Lutaml::Model provides built-in serialization:
+
+[source,ruby]
+----
+# JSON output
+mapping = SchemaMapping.from_yaml(...)
+json_output = mapping.to_json
+
+# XML output
+xml_output = mapping.to_xml
+
+# Custom format
+class CustomExporter
+  def export(schema_mapping)
+    # Custom export logic
+  end
+end
+----
+
+== Performance considerations
+
+=== Memory management
+
+For large models (1000+ classes):
+
+* Stream XMI parsing instead of loading entire DOM
+* Use lazy enumeration for package/class traversal
+* Clear intermediate data structures after processing
+
+[source,ruby]
+----
+def map_packages(packages, config)
+  packages.lazy.map { |pkg| map_package(pkg, config) }.to_a
+end
+----
+
+=== Caching strategy
+
+Cache parsed configurations:
+
+[source,ruby]
+----
+class MappingGenerator
+  def initialize
+    @config_cache = {}
+  end
+
+  def parse_config(path)
+    @config_cache[path] ||= ConfigParser.parse_file(path)
+  end
+end
+----
+
+=== Performance targets
+
+* Parse 174 classes (PLATEAU URO) in < 10 seconds ✓
+* Generate YAML output in < 1 second ✓
+* Report generation scales linearly with class count ✓
+
+== Security considerations
+
+=== Input validation
+
+* Validate file paths before reading
+* Sanitize XML/XMI input to prevent XXE attacks
+* Limit file sizes to prevent memory exhaustion
+
+[source,ruby]
+----
+def validate_path(path)
+  raise ArgumentError, "Invalid path" unless File.exist?(path)
+  raise ArgumentError, "File too large" if File.size(path) > 100.megabytes
+end
+----
+
+=== Output safety
+
+* Use safe YAML serialization (no unsafe tags)
+* Validate output paths (no directory traversal)
+* Set appropriate file permissions
+
+== Testing strategy
+
+=== Unit tests
+
+Each component has focused unit tests:
+
+[source,ruby]
+----
+RSpec.describe XmiNavigator do
+  describe "#parse_file" do
+    it "parses minimal XMI file" do
+      navigator = XmiNavigator.new
+      navigator.parse_file("spec/fixtures/xmi/minimal.xmi")
+      expect(navigator.packages).not_to be_empty
+    end
+  end
+end
+----
+
+=== Integration tests
+
+Full workflow tests with real data:
+
+[source,ruby]
+----
+RSpec.describe "PLATEAU URO Integration" do
+  it "generates complete mapping" do
+    mapping = MappingGenerator.new.generate(
+      "spec/fixtures/xmi/plateau-uro.xmi",
+      "spec/fixtures/configs/plateau-config.xml"
+    )
+
+    expect(mapping.package_mappings.size).to eq(1)
+    expect(mapping.package_mappings.first.class_mappings.size).to eq(174)
+  end
+end
+----
+
+=== Test fixtures
+
+Organized by purpose:
+
+[source]
+----
+spec/fixtures/
+├── xmi/
+│   ├── minimal_test.xmi
+│   └── plateau-uro.xmi
+├── configs/
+│   ├── simple_config.xml
+│   └── plateau_config.xml
+└── expected_mappings/
+    └── uro-expected.yaml
+----
+
+== Future enhancements
+
+=== Planned architectural improvements
+
+1. **Streaming XMI parser** for very large models
+2. **Parallel processing** for multi-package models
+3. **Incremental mapping** to only update changed classes
+4. **Plugin system** for custom transformation rules
+5. **Query DSL** for advanced mapping queries
+
+=== Integration improvements
+
+1. **Enhanced lutaml-xsd integration**:
+   * Bi-directional type resolution
+   * Constraint validation
+   * Schema versioning support
+
+2. **Multi-format support**:
+   * Direct Ecore file support
+   * UML Profile support
+   * Enterprise Architect repository access
+
+== Relevant documents
+
+* link:../README.adoc[README.adoc] - Project overview
+* link:basic-usage.adoc[Basic Usage] - Getting started guide
+* link:ruby-api.adoc[Ruby API] - API reference
+* link:features/namespace-resolution.adoc[Namespace Resolution] - Type resolution details
+* link:../ARCHITECTURE.adoc[ARCHITECTURE.adoc (root)] - Original architecture doc

@@ -1,0 +1,120 @@
+Type Resolution Flow in lutaml-klin
+=====================================
+
+Input: UML Attribute Type (from XMI)
+  │
+  │  Example: "xs::string" or "gml::CodeType"
+  │
+  ▼
+┌─────────────────────────────────────┐
+│ Step 1: Type Override Mapping      │
+│ (Optional - if configured)          │
+└─────────────────────────────────────┘
+  │
+  │  Check type_overrides hash
+  │  "xs::string" → "xs:string"
+  │  "gml::CodeType" → "gml:CodeType"
+  │
+  ▼
+┌─────────────────────────────────────┐
+│ Step 2: Parse Namespace Prefix     │
+└─────────────────────────────────────┘
+  │
+  │  Split on ':' separator
+  │  "xs:string" → prefix="xs", local="string"
+  │  "gml:CodeType" → prefix="gml", local="CodeType"
+  │
+  ▼
+┌─────────────────────────────────────┐
+│ Step 3: Namespace Resolution       │
+│ (via ShapeChange config)            │
+└─────────────────────────────────────┘
+  │
+  │  Look up namespace by prefix
+  │  xs → http://www.w3.org/2001/XMLSchema
+  │  gml → http://www.opengis.net/gml/3.2
+  │
+  ▼
+┌─────────────────────────────────────┐
+│ Step 4: ShapeChange Type Mapping   │
+└─────────────────────────────────────┘
+  │
+  │  Look up in XsdMapEntry cache
+  │  CharacterString → xs:string
+  │  Integer → xs:integer
+  │
+  ▼
+┌─────────────────────────────────────┐
+│ Step 5: Schema Location Resolution │
+│ (Delegate to lutaml-xsd)            │
+└─────────────────────────────────────┘
+  │
+  │  Get XSD schema location from namespace
+  │  Load and parse XSD schema
+  │
+  ▼
+┌─────────────────────────────────────┐
+│ Step 6: Type Definition Extraction  │
+└─────────────────────────────────────┘
+  │
+  │  Extract full type definition:
+  │  - Base type
+  │  - Restrictions/facets
+  │  - Documentation
+  │
+  ▼
+Output: Fully Resolved Type Information
+
+
+Resolution Priority
+===================
+1. Type Override Mapping (highest priority)
+   - Manual corrections
+   - Malformed type fixes
+
+2. ShapeChange Type Mappings
+   - Configured transformations
+   - Standard ISO/OGC mappings
+
+3. Namespace Resolution
+   - Prefix-to-URI mapping
+   - Schema location lookup
+
+4. Direct Mapping (lowest priority)
+   - Use type as-is
+   - May remain unresolved
+
+
+Example Resolution
+==================
+
+Input (from XMI):
+  type: "xs::string"
+
+Step 1 - Type Override:
+  "xs::string" → "xs:string"
+
+Step 2 - Parse:
+  prefix: "xs"
+  local: "string"
+
+Step 3 - Namespace:
+  xs → http://www.w3.org/2001/XMLSchema
+  location: http://www.w3.org/2001/XMLSchema.xsd
+
+Step 4 - Type Mapping:
+  (already xs:string, no mapping needed)
+
+Step 5 - Schema Resolution:
+  Load XML Schema XSD
+
+Step 6 - Extract:
+  name: "string"
+  namespace: "http://www.w3.org/2001/XMLSchema"
+  type: simple
+  base: anySimpleType
+
+Output:
+  xml_type: "xs:string"
+  xml_namespace: "http://www.w3.org/2001/XMLSchema"
+  resolved: true

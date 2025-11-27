@@ -1,0 +1,71 @@
+= rule-xsd-prop-gmlArrayProperty
+
+== Purpose
+
+Creates GML array property types for properties with the `gmlArrayProperty` tagged value.
+
+== Algorithm
+
+1. Check if property has tagged value `gmlArrayProperty="true"`
+2. Verify `inlineOrByReference` setting is "inline"
+3. Generate anonymous array property type with:
+   - Sequence element containing the target element reference
+   - minOccurs set on the sequence based on property cardinality
+   - Target element reference from element map entry
+
+== Java Implementation Reference
+
+From `XsdDocument.java` (lines 2432-2446):
+
+[source,java]
+----
+private boolean asArray(PropertyInfo propi) {
+    boolean asArray = false;
+    if (propi.matches("rule-xsd-prop-gmlArrayProperty")) {
+        String s = propi.taggedValue("gmlArrayProperty");
+        asArray = "true".equalsIgnoreCase(s);
+    }
+    if (asArray) {
+        if (!propi.matches("rule-xsd-prop-inlineOrByReference") ||
+            !propi.inlineOrByReference().equals("inline")) {
+            asArray = false;
+            // Error message
+        }
+    }
+    return asArray;
+}
+----
+
+From `XsdDocument.java` (lines 4183-4184, 2784-2794):
+
+[source,java]
+----
+multiplicityAlreadySet = addAnonymousPropertyType(e, propi, null,
+    asArrayTargetElement, null, false);
+
+// if 0..? also allow that the property element is missing
+multiplicityAlreadySet = true;
+if (propi.cardinality().minOccurs == 0)
+    addAttribute(e, "minOccurs", "0");
+----
+
+== Constraints
+
+* Property must have `inlineOrByReference="inline"`
+* Type must have an element mapping
+* Property cannot be in an association class context
+
+== Example
+
+Property with `gmlArrayProperty="true"` generates:
+
+[source,xml]
+----
+<element name="members">
+  <complexType>
+    <sequence>
+      <element ref="gml:AbstractFeature" minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+</element>
+----

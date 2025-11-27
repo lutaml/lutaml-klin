@@ -1,0 +1,30 @@
+{
+  "index": [
+    {
+      "id": "class_building",
+      "type": "class",
+      "title": "Building",
+      "package": "ModelRoot::i-UR::uro",
+      "xsd_type": "uro:BuildingType",
+      "keywords": [
+        "building",
+        "feature",
+        "urban"
+      ],
+      "url": "#/packages/pkg_uro/classes/class_building"
+    },
+    {
+      "id": "attr_building_type",
+      "type": "attribute",
+      "title": "buildingType",
+      "parent_class": "Building",
+      "xsd_type": "gml:CodeType",
+      "keywords": [
+        "building",
+        "type",
+        "code"
+      ],
+      "url": "#/packages/pkg_uro/classes/class_building/attributes/attr_building_type"
+    }
+  ]
+}

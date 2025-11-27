@@ -1,0 +1,99 @@
+= rule-xsd-cls-union-omitUnionsRepresentingFeatureTypeSets
+
+== Purpose
+
+Uses `gml:ReferenceType` for unions that represent sets of feature types, instead of generating union-specific property types.
+
+This simplifies schemas by reusing GML's reference type for feature type sets.
+
+== Applies To
+
+* Union classes with tagged value `representsFeatureTypeSet="true"`
+
+== Algorithm
+
+When this rule is enabled and a union has `representsFeatureTypeSet="true"`:
+
+1. **Property encoding**: Use `gml:ReferenceType` instead of custom property type
+   ```xml
+   <xs:element name="featureSet" type="gml:ReferenceType"/>
+   ```
+
+2. **Target elements**: Add `gml:targetElement` annotations for each feature in the set
+   ```xml
+   <xs:annotation>
+     <xs:appinfo>
+       <gml:targetElement>prefix:Feature1</gml:targetElement>
+       <gml:targetElement>prefix:Feature2</gml:targetElement>
+     </xs:appinfo>
+   </xs:annotation>
+   ```
+
+3. **Recursive handling**: Recursively find all features represented by nested unions
+
+== Configuration
+
+Requires:
+- Union class with `representsFeatureTypeSet="true"` tagged value
+- GML 3.2 encoding (`http://www.opengis.net/gml/3.2`)
+- `rule-xsd-prop-targetElement` for annotations
+
+== Example Output
+
+For a union representing multiple feature types:
+[source,xml]
+----
+<xs:element name="cityObject" type="gml:ReferenceType">
+  <xs:annotation>
+    <xs:appinfo>
+      <gml:targetElement>bldg:Building</gml:targetElement>
+      <gml:targetElement>tran:Road</gml:targetElement>
+      <gml:targetElement>veg:PlantCover</gml:targetElement>
+    </xs:appinfo>
+  </xs:annotation>
+</xs:element>
+----
+
+== Java Implementation Reference
+
+See `XsdDocument.java`:
+- Lines 2931-2987: Check union with `representsFeatureTypeSet` tag
+- Lines 2941-2945: Use `gml:ReferenceType` as property type
+- Lines 2948-2986: Add target element annotations
+- Lines 3368-3399: `findAllRepresentedFeatures()` - recursively find features
+
+== Tagged Value
+
+=== representsFeatureTypeSet
+
+* **Type**: Boolean string (`"true"` or `"false"`)
+* **Purpose**: Marks union as representing a feature type set
+* **Effect**: Changes property encoding to use reference type
+
+== Use Cases
+
+* **CityGML**: `_CityObject` union representing all feature types
+* **Feature collections**: Abstract feature type sets
+* **Polymorphic references**: Properties that can reference multiple feature types
+* **Registry schemas**: Feature type registries
+
+== Benefits
+
+* **Simplicity**: Reuses standard `gml:ReferenceType`
+* **Clarity**: Target elements document valid feature types
+* **Validation**: Schematron can validate against feature list
+* **Flexibility**: Easy to extend with new feature types
+
+== Related Rules
+
+* `rule-xsd-cls-union-as-choice` - Alternative union encoding
+* `rule-xsd-prop-targetElement` - Generates target element annotations
+* `rule-xsd-cls-union-as-group-property-type` - Group-based union encoding
+
+== Notes
+
+- Only for GML 3.2 and later
+- Requires `representsFeatureTypeSet="true"` tagged value
+- Target elements are sorted alphabetically
+- Handles nested unions recursively
+- Part of GML 3.2 feature type set pattern

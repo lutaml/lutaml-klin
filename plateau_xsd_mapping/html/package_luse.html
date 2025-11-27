@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>luse - PLATEAU Mapping</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px 20px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+    }
+    .breadcrumb {
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+    .breadcrumb a {
+      color: white;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    h1 { font-size: 2em; }
+    .class-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .class-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #667eea;
+    }
+    .class-name {
+      font-size: 1.4em;
+      font-weight: bold;
+      color: #667eea;
+    }
+    .stereotype-badge {
+      background: #e3f2fd;
+      color: #1976d2;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.9em;
+    }
+    .attributes-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .attributes-table th {
+      text-align: left;
+      padding: 10px;
+      background: #f5f5f5;
+      font-weight: 600;
+      border-bottom: 2px solid #ddd;
+    }
+    .attributes-table td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .resolved {
+      background: #e8f5e9;
+    }
+    .unresolved {
+      background: #fff3e0;
+    }
+    .status-badge {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .badge-resolved {
+      background: #4caf50;
+      color: white;
+    }
+    .badge-unresolved {
+      background: #ff9800;
+      color: white;
+    }
+    .type-info {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      color: #666;
+    }
+    .resolution-path {
+      font-size: 0.85em;
+      color: #4caf50;
+      font-style: italic;
+      margin-top: 5px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="breadcrumb">
+        <a href="index.html">← Back to All Packages</a>
+      </div>
+      <h1>📦 luse</h1>
+      <p>1 classes</p>
+    </header>
+
+    <div id="classes">
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">LandUse</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>class</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>function</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>usage</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>luseDataQualityAttribute</strong></td>
+  <td class="type-info">DataQualityAttribute</td>
+  <td>1..1</td>
+  <td>element: luseDataQualityAttribute<div class='resolution-path'>Matched element: urbanObject:element:luseDataQualityAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>luseFacilityIdAttribute</strong></td>
+  <td class="type-info">FacilityIdAttribute</td>
+  <td>0..1</td>
+  <td>element: luseFacilityIdAttribute<div class='resolution-path'>Matched element: urbanObject:element:luseFacilityIdAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>luseFacilityAttribute</strong></td>
+  <td class="type-info">FacilityAttribute</td>
+  <td>0..*</td>
+  <td>element: luseFacilityAttribute<div class='resolution-path'>Matched element: urbanObject:element:luseFacilityAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>luseDmAttribute</strong></td>
+  <td class="type-info">DmAttribute</td>
+  <td>0..*</td>
+  <td>element: luseDmAttribute<div class='resolution-path'>Matched element: urbanObject:element:luseDmAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>luseKeyValuePairAttribute</strong></td>
+  <td class="type-info">KeyValuePairAttribute</td>
+  <td>0..*</td>
+  <td>element: luseKeyValuePairAttribute<div class='resolution-path'>Matched element: urbanObject:element:luseKeyValuePairAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>lod1MultiSurface</strong></td>
+  <td class="type-info">MultiSurface</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>landUseDetailAttribute</strong></td>
+  <td class="type-info">LandUseDetailAttribute</td>
+  <td>0..1</td>
+  <td>element: landUseDetailAttribute<div class='resolution-path'>Matched element: urbanObject:element:landUseDetailAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>ifcLandUseAttribute</strong></td>
+  <td class="type-info">IfcAttribute</td>
+  <td>0..*</td>
+  <td>element: ifcLandUseAttribute<div class='resolution-path'>Matched element: urbanObject:element:ifcLandUseAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>luseFacilityTypeAttribute</strong></td>
+  <td class="type-info">FacilityTypeAttribute</td>
+  <td>0..*</td>
+  <td>element: luseFacilityTypeAttribute<div class='resolution-path'>Matched element: urbanObject:element:luseFacilityTypeAttribute</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+    </div>
+
+    <footer>
+      <p><a href="index.html">← Back to All Packages</a></p>
+    </footer>
+  </div>
+</body>
+</html>

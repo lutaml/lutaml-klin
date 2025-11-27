@@ -1,0 +1,118 @@
+= rule-xsd-prop-reverseProperty
+
+== General
+
+The `rule-xsd-prop-reverseProperty` adds `<gml:reversePropertyName>` annotations for bidirectional associations in GML 3.2 schemas.
+
+This rule documents the inverse relationship of navigable associations, enabling tools to understand bidirectional semantics.
+
+== Purpose
+
+Reverse property annotations enable:
+
+* Documentation of bidirectional associations
+* Navigation of relationships in both directions
+* Semantic understanding of association inverses
+* Compliance with GML 3.2 association patterns
+
+== ShapeChange Algorithm
+
+Based on [`XsdDocument.java`](../../reference/shapechange-sources/de/interactive_instruments/ShapeChange/Target/XmlSchema/XsdDocument.java) lines 426-432:
+
+.Key implementation points
+[source,java]
+----
+if (info.matches("rule-xsd-prop-reverseProperty")
+        && options.GML_NS.equals("http://www.opengis.net/gml/3.2")
+        && propi.reverseProperty() != null
+        && propi.reverseProperty().isNavigable()) {
+    if (e2 == null)
+        e2 = document.createElementNS(Options.W3C_XML_SCHEMA, "appinfo");
+    Element e3 = document.createElementNS(options.GML_NS, "reversePropertyName");
+    e2.appendChild(e3);
+    e3.appendChild(document.createTextNode(config.determineQName(propi.reverseProperty())));
+}
+----
+
+== Algorithm Steps
+
+. Verify GML namespace is "http://www.opengis.net/gml/3.2"
+. Check property has a reverse property defined
+. Verify reverse property is navigable
+. Determine qualified name of reverse property
+. Create `<gml:reversePropertyName>` element in appinfo
+. Add reverse property qname as text content
+
+== Implementation
+
+The Ruby implementation:
+
+[source,ruby]
+----
+def apply_rule(property, context)
+  return unless gml_32?(context)
+
+  reverse_prop = get_reverse_property(property)
+  return unless reverse_prop
+  return unless navigable?(reverse_prop)
+
+  reverse_qname = determine_qname(reverse_prop, context)
+  add_reverse_property_annotation(reverse_qname, context)
+end
+
+def gml_32?(context)
+  context[:gml_namespace] == "http://www.opengis.net/gml/3.2"
+end
+
+def get_reverse_property(property)
+  return nil unless property.respond_to?(:reverse_property)
+  property.reverse_property
+rescue
+  nil
+end
+
+def navigable?(property)
+  return false unless property
+  return true unless property.respond_to?(:navigable?)
+  property.navigable?
+end
+
+def add_reverse_property_annotation(qname, context)
+  appinfo = ensure_appinfo_element(context)
+
+  # Create gml:reversePropertyName
+  reverse_elem = create_gml_element("reversePropertyName", context)
+  reverse_elem.content = qname
+  appinfo.add_child(reverse_elem)
+end
+----
+
+== Usage Example
+
+.Bidirectional association with reverse property
+====
+Given a bidirectional association between Building and Address:
+
+[source,xml]
+----
+<!-- In Building schema -->
+<xs:element name="address" type="app:AddressPropertyType">
+  <xs:annotation>
+    <xs:appinfo>
+      <gml:reversePropertyName>app:building</gml:reversePropertyName> <!--1-->
+    </xs:appinfo>
+  </xs:annotation>
+</xs:element>
+----
+<1> Reverse property annotation referencing the inverse association
+====
+
+== Test Cases
+
+The implementation includes tests for:
+
+. Property with navigable reverse property
+. Property without reverse property (no annotation)
+. Unidirectional association (reverse not navigable)
+. Correct qname determination
+. Non-GML 3.2 namespace (no annotation)

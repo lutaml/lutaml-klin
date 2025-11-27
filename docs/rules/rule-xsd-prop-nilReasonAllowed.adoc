@@ -1,0 +1,205 @@
+= rule-xsd-prop-nilReasonAllowed
+
+== Purpose
+
+Adds a `nilReason` attribute to property types when the property allows nil values, supporting GML nilReason pattern for expressing why a value is absent.
+
+== Background
+
+In GML and ISO 19139 schemas, properties can be nil for various reasons (unknown, missing, inapplicable, withheld, etc.). The `nilReason` attribute provides a standardized way to express why a value is nil:
+
+* Supports GML 3.2 `NilReasonType` or GML 3.1 `NullType`
+* Used with properties that are voidable or explicitly allow nil
+* Enables semantic distinction between different types of missing data
+* Critical for data quality and interoperability
+
+== Implementation
+
+Based on `XsdDocument.java:addAnonymousPropertyType()` lines 3948-3955 and 4213-4222.
+
+=== Algorithm
+
+When creating anonymous property types:
+
+1. Check if property is `nilReasonAllowed` or (`voidable` AND `rule-xsd-prop-nillable` applies)
+2. If true, add `nilReason` attribute to the property type
+3. Use appropriate type based on GML version:
+   - GML 3.2: `gml:NilReasonType`
+   - GML 3.1/earlier: `gml:NullType`
+4. Attribute is optional (no `use="required"`)
+
+=== Syntax Definition
+
+[source,ruby]
+----
+# Add nilReason attribute to property type
+def add_nil_reason_attribute(property, property_type_element)
+  return unless property.nil_reason_allowed? <1>
+  return unless property.matches?("rule-xsd-prop-nilReasonAllowed") <2>
+
+  # Create attribute element
+  attribute = create_attribute_element <3>
+  set_attribute_name(attribute, "nilReason")
+
+  # Set type based on GML version
+  if gml_version == "3.2" <4>
+    set_attribute_type(attribute, "gml:NilReasonType")
+  elsif gml_version == "3.1"
+    set_attribute_type(attribute, "gml:NullType")
+  end
+
+  # Add to property type
+  property_type_element.append_child(attribute) <5>
+  add_import("gml", gml_namespace)
+end
+----
+<1> Check if property allows nil reason
+<2> Verify rule is active
+<3> Create xs:attribute element
+<4> Select type based on GML version
+<5> Add attribute to property type
+
+Where,
+
+`nil_reason_allowed?`:: Property explicitly allows nil reason
+`matches?(rule)`:: Rule is active for this property
+`gml_version`:: GML version ("3.2", "3.1", etc.)
+`NilReasonType`:: GML 3.2 nil reason type
+`NullType`:: GML 3.1 null type
+
+== Examples
+
+=== Example 1: Property with nilReason in GML 3.2
+
+.UML property configuration
+[source,ruby]
+----
+class Building < Lutaml::Model::Serializable
+  attribute :height, :decimal, voidable: true <1>
+  attribute :name, :string, nil_reason_allowed: true <2>
+end
+----
+<1> Voidable property (when rule-xsd-prop-nillable is active)
+<2> Explicitly allows nil reason
+
+.Generated XML Schema (GML 3.2)
+[source,xml]
+----
+<element name="height" nillable="true">
+  <complexType>
+    <simpleContent>
+      <extension base="decimal">
+        <attribute name="nilReason" type="gml:NilReasonType"/> <!--1-->
+      </extension>
+    </simpleContent>
+  </complexType>
+</element>
+
+<element name="name" nillable="true">
+  <complexType>
+    <simpleContent>
+      <extension base="string">
+        <attribute name="nilReason" type="gml:NilReasonType"/> <!--2-->
+      </extension>
+    </simpleContent>
+  </complexType>
+</element>
+----
+<1> nilReason added for voidable property
+<2> nilReason added for explicitly allowed property
+
+=== Example 2: GML 3.1 encoding
+
+.Generated XML Schema (GML 3.1)
+[source,xml]
+----
+<element name="height" nillable="true">
+  <complexType>
+    <simpleContent>
+      <extension base="decimal">
+        <attribute name="nilReason" type="gml:NullType"/> <!--1-->
+      </extension>
+    </simpleContent>
+  </complexType>
+</element>
+----
+<1> Uses GML 3.1 NullType instead of NilReasonType
+
+=== Example 3: Usage in XML instance
+
+.XML instance with nilReason values
+[source,xml]
+----
+<Building>
+  <height nilReason="unknown"/> <!--1-->
+  <name nilReason="withheld"/> <!--2-->
+  <address nilReason="inapplicable"/> <!--3-->
+</Building>
+----
+<1> Value is unknown
+<2> Value is withheld for privacy
+<3> Attribute does not apply
+
+=== Example 4: Standard nil reason values
+
+GML defines standard nil reason values:
+
+* `inapplicable`: Property does not apply
+* `missing`: Actual value is not available
+* `template`: Value will be available later
+* `unknown`: Proper value is not known
+* `withheld`: Value exists but is not divulged
+* URIs for other vocabulary values
+
+== Configuration
+
+=== When This Rule Applies
+
+* Rule is active in encoding rules
+* Property has `nilReasonAllowed` = true, OR
+* Property is `voidable` AND `rule-xsd-prop-nillable` is active
+* Property type supports nil values
+
+=== GML Version Handling
+
+.Nil reason type by GML version
+[cols="1,1,2"]
+|===
+|GML Version |Type |Notes
+
+|3.2
+|`gml:NilReasonType`
+|Union of enum and anyURI pattern
+
+|3.1 and earlier
+|`gml:NullType`
+|Enumeration of standard values
+
+|Non-GML
+|Not applicable
+|Rule typically not used
+|===
+
+=== Integration with Other Rules
+
+Works in combination with:
+
+* `rule-xsd-prop-nillable`: Sets `nillable="true"` on element
+* `rule-xsd-prop-inlineOrByReference`: For property type structure
+* `rule-xsd-prop-metadata`: Both can add attributes to property type
+
+=== Property Type Construction
+
+When nilReason is added:
+
+1. Property type becomes `complexType` (if not already)
+2. Uses `simpleContent` or `complexContent` as appropriate
+3. nilReason attribute added via `extension` element
+4. Other attributes (metadata, name, etc.) also added if applicable
+
+== References
+
+* ShapeChange: `XsdDocument.java` lines 3948-3955, 4213-4222 (`addAnonymousPropertyType()`)
+* GML 3.2: Section 7.2.3.12 (Nil values)
+* GML 3.1: Section 8.2.1 (Null values)
+* ISO 19136:2007: Annex E (GML application schemas)

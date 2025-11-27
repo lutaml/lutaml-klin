@@ -1,0 +1,177 @@
+= rule-xsd-cls-suppress
+
+== Purpose
+
+Generate ADE (Application Domain Extension) substitution elements for suppressed classes. This allows properties of suppressed classes to be extended via substitution groups in ADE schemas.
+
+== ShapeChange Reference
+
+=== Java Implementation
+
+[source,java]
+----
+// XsdDocument.java lines 2152-2177
+} else if (cibase.matches("rule-xsd-cls-suppress") && cibase.stereotype("adeelement")) {
+    e1 = document.createElementNS(Options.W3C_XML_SCHEMA, "element");
+    addStandardAnnotation(e1, pi);
+    addAttribute(e1, "name", pi.name());
+
+    if (writeXmlEncodingInfos) {
+        encodingInfos.add(pi, pi.name(), this.targetNamespace, false);
+    }
+
+    if (typeCi != null && typeCi.asCharacterString())
+        addAttribute(e1, "type", "string");
+    else
+        mapPropertyType(cibase, pi, e1, inAssocClass, schDoc);
+    ClassInfo cis = cibase.unsuppressedSupertype(true);
+    if (cis != null) {
+        String s = mapElement(cis);
+        if (s != null) {
+            addAttribute(e1, "substitutionGroup",
+                s.replace(":_", ":").replace(":", ":_GenericApplicationPropertyOf"));
+            addImport(cis.pkg().xmlns(), cis.pkg().targetNamespace());
+        }
+    } else {
+        MessageContext mc = result.addError(this, 145, cibase.name());
+        if (mc != null)
+            mc.addDetail(null, 400, "Class", cibase.fullName());
+    }
+}
+----
+
+== Algorithm
+
+When processing a property of a suppressed class with "adeelement" stereotype:
+
+. Create element with property name
+. Add standard annotations
+. Determine property type:
+  - If type has asCharacterString: use "string" type
+  - Otherwise: map property type normally
+. Find unsuppressed supertype of the class
+. Generate substitution group name:
+  - Map supertype element name
+  - Replace `:_` with `:`
+  - Replace `:` with `:_GenericApplicationPropertyOf`
+. Set substitutionGroup attribute
+. Import supertype namespace
+
+== Configuration
+
+This rule requires:
+
+* `rule-xsd-cls-suppress` - Enable the rule
+* Class must have `<<adeelement>>` stereotype
+* Class must have an unsuppressed supertype
+
+== Input Model Requirements
+
+* Suppressed class must have `<<adeelement>>` stereotype
+* Must have a valid unsuppressed supertype for substitution group
+* Supertype must be in a package with valid namespace
+
+== Output
+
+=== ADE Substitution Element
+
+[source,xml]
+----
+<xs:element name="propertyName"
+            type="PropertyType"
+            substitutionGroup="prefix:_GenericApplicationPropertyOfSuperType"/>
+----
+
+== Example
+
+=== Input Model
+
+[source]
+----
+Class: Building (suppressed)
+  Stereotype: <<adeelement>>
+  Supertype: AbstractBuilding (unsuppressed)
+  Properties:
+    - height: Measure
+    - floors: Integer
+
+Class: AbstractBuilding
+  Element: AbstractBuilding
+----
+
+=== Output XSD
+
+[source,xml]
+----
+<!-- ADE substitution element for height property -->
+<xs:element name="height"
+            type="gml:MeasureType"
+            substitutionGroup="bldg:_GenericApplicationPropertyOfAbstractBuilding"/>
+
+<!-- ADE substitution element for floors property -->
+<xs:element name="floors"
+            type="xs:integer"
+            substitutionGroup="bldg:_GenericApplicationPropertyOfAbstractBuilding"/>
+
+<!-- In base schema, AbstractBuilding would have: -->
+<xs:element name="AbstractBuilding" type="bldg:AbstractBuildingType"
+            substitutionGroup="gml:AbstractFeature" abstract="true"/>
+
+<xs:complexType name="AbstractBuildingType">
+  <xs:complexContent>
+    <xs:extension base="gml:AbstractFeatureType">
+      <xs:sequence>
+        <!-- Standard properties -->
+        <xs:element name="function" type="gml:CodeType" minOccurs="0"/>
+
+        <!-- ADE hook for extensions -->
+        <xs:element ref="bldg:_GenericApplicationPropertyOfAbstractBuilding"
+                    minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<!-- Abstract substitution group head -->
+<xs:element name="_GenericApplicationPropertyOfAbstractBuilding"
+            type="xs:anyType" abstract="true"/>
+----
+
+=== ADE Schema Usage
+
+[source,xml]
+----
+<!-- ADE schema extends base schema -->
+<xs:schema targetNamespace="http://example.org/ade"
+           xmlns:ade="http://example.org/ade"
+           xmlns:bldg="http://example.org/building">
+
+  <xs:import namespace="http://example.org/building"
+             schemaLocation="building.xsd"/>
+
+  <!-- Suppressed Building class properties become ADE extensions -->
+  <xs:element name="height"
+              type="gml:MeasureType"
+              substitutionGroup="bldg:_GenericApplicationPropertyOfAbstractBuilding"/>
+
+  <xs:element name="floors"
+              type="xs:integer"
+              substitutionGroup="bldg:_GenericApplicationPropertyOfAbstractBuilding"/>
+</xs:schema>
+----
+
+== Related Rules
+
+* link:rule-xsd-cls-adehook.adoc[rule-xsd-cls-adehook] - Creates ADE hook elements
+* link:rule-xsd-cls-no-abstract-classes.adoc[rule-xsd-cls-no-abstract-classes] - Abstract class handling
+* link:rule-xsd-all-naming-gml.adoc[rule-xsd-all-naming-gml] - Element naming conventions
+
+== Notes
+
+* Used in CityGML and similar extensible schemas
+* Allows ADE (Application Domain Extension) schemas to add properties
+* Suppressed classes are not directly encoded but their properties become extension points
+* The `_GenericApplicationPropertyOf` prefix is a GML convention
+* Each property becomes a separate substitutable element
+* Requires proper ADE hook elements in the base schema
+* Error if suppressed class has no unsuppressed supertype

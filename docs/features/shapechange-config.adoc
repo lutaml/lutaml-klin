@@ -1,0 +1,459 @@
+= ShapeChange Configuration
+:toc:
+:toclevels: 3
+
+== Purpose
+
+The ShapeChange configuration feature enables lutaml-klin to parse and utilize ShapeChange XML configuration files. These configurations define encoding rules, type mappings, namespace definitions, and other metadata essential for accurate UML-to-XSD mapping generation.
+
+ShapeChange is a Java-based tool that transforms UML models into various formats including XML Schema. lutaml-klin leverages ShapeChange's configuration format to ensure compatibility and consistency with existing PLATEAU workflows.
+
+== Concepts
+
+=== Encoding Rules
+
+Encoding rules define how UML constructs are transformed into XML Schema elements. Common encoding rules include:
+
+* `iso19136_2007` - GML 3.2 encoding
+* `gml33` - GML 3.3 encoding
+* `citygml` - CityGML encoding (used by PLATEAU)
+
+Each encoding rule specifies transformation behavior for:
+
+* Class stereotypes (FeatureType, DataType, CodeList, etc.)
+* Attribute mappings
+* Association handling
+* Inheritance patterns
+
+=== Type Mapping Entries
+
+Type mapping entries (`XsdMapEntry`) define how UML types map to XML Schema types:
+
+[source,xml]
+----
+<XsdMapEntry
+  type="CharacterString"
+  xsdEncodingRules="iso19136_2007"
+  xmlPropertyType="string"
+  xmlType="string"
+  xmlTypeType="simple"
+  xmlTypeContent="simple"/>
+----
+
+Where:
+
+* `type` - UML type name (e.g., "CharacterString", "Integer")
+* `xsdEncodingRules` - Applicable encoding rules
+* `xmlPropertyType` - XML property element type
+* `xmlType` - XML type definition
+* `xmlTypeType` - Type category (simple, complex)
+* `xmlTypeContent` - Content model (simple, complex)
+
+=== XML Namespaces
+
+Namespace definitions (`XmlNamespace`) map namespace prefixes to URIs and schema locations:
+
+[source,xml]
+----
+<XmlNamespace
+  nsabr="gml"
+  ns="http://www.opengis.net/gml/3.2"
+  location="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+----
+
+Where:
+
+* `nsabr` - Namespace abbreviation/prefix
+* `ns` - Namespace URI
+* `location` - Schema location URL
+
+=== XInclude Support
+
+ShapeChange configs use XInclude to reference external configuration files:
+
+[source,xml]
+----
+<xi:include href="http://shapechange.net/resources/config/StandardNamespaces.xml"/>
+<xi:include href="StandardMapEntries.xml"/>
+----
+
+lutaml-klin fully supports XInclude resolution for:
+
+* HTTP/HTTPS URLs
+* Local file paths
+* Relative paths
+
+== Configuration File Structure
+
+A typical ShapeChange configuration file:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<ShapeChangeConfiguration
+    xmlns="http://www.interactive-instruments.de/ShapeChange/Configuration/1.1"
+    xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <!-- Include standard configurations -->
+  <xi:include href="StandardNamespaces.xml"/>
+  <xi:include href="StandardMapEntries.xml"/>
+
+  <!-- Custom type mappings -->
+  <xsdMapEntries>
+    <XsdMapEntry
+      type="xs::string"
+      xsdEncodingRules="citygml"
+      xmlPropertyType="xs:string"
+      xmlType="xs:string"
+      xmlTypeType="simple"
+      xmlTypeContent="simple"/>
+  </xsdMapEntries>
+
+  <!-- Custom namespaces -->
+  <xmlNamespaces>
+    <XmlNamespace
+      nsabr="uro"
+      ns="https://www.geospatial.jp/iur/uro/3.2"
+      location="https://www.geospatial.jp/iur/schemas/uro/3.2/urbanObject.xsd"/>
+  </xmlNamespaces>
+</ShapeChangeConfiguration>
+----
+
+== Loading Configuration Files
+
+=== Basic Loading
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Parse ShapeChange configuration
+config = Lutaml::Klin::Shapechange::ConfigParser.parse('ShapeChangeConfig.xml')
+
+# Access configuration components
+encoding_rules = config.encoding_rules
+type_mappings = config.type_mappings
+namespaces = config.namespaces
+----
+
+=== With XInclude Resolution
+
+[source,ruby]
+----
+# XInclude resolution is automatic
+config = Lutaml::Klin::Shapechange::ConfigParser.parse(
+  'ShapeChangeConfig_Plateau_uro.xml'
+)
+
+# All included files are resolved and merged
+puts "Total type mappings: #{config.type_mappings.count}"
+puts "Total namespaces: #{config.namespaces.count}"
+----
+
+== Accessing Type Mappings
+
+=== Find Mapping by Type
+
+[source,ruby]
+----
+# Look up type mapping for a UML type
+mapping = config.find_type_mapping('CharacterString', 'iso19136_2007')
+
+if mapping
+  puts "XML Type: #{mapping.xml_type}"
+  puts "Property Type: #{mapping.xml_property_type}"
+end
+----
+
+=== List All Mappings for Encoding Rule
+
+[source,ruby]
+----
+# Get all mappings for specific encoding rule
+citygml_mappings = config.type_mappings_for_rule('citygml')
+
+citygml_mappings.each do |mapping|
+  puts "#{mapping.type} → #{mapping.xml_type}"
+end
+----
+
+=== Handle Namespaced Types
+
+[source,ruby]
+----
+# UML type with namespace prefix
+uml_type = 'gml::CodeType'
+
+# Parse prefix and local name
+prefix, local_name = uml_type.split('::')
+
+# Find namespace definition
+namespace = config.find_namespace_by_prefix(prefix)
+
+# Find type mapping
+mapping = config.find_type_mapping(uml_type, 'citygml')
+
+puts "Full type: #{namespace.ns_abr}:#{local_name}"
+puts "Namespace URI: #{namespace.ns}"
+----
+
+== Working with Namespaces
+
+=== List All Namespaces
+
+[source,ruby]
+----
+config.namespaces.each do |ns|
+  puts "Prefix: #{ns.nsabr}"
+  puts "  URI: #{ns.ns}"
+  puts "  Location: #{ns.location}"
+  puts
+end
+----
+
+=== Namespace Lookup
+
+[source,ruby]
+----
+# By prefix
+gml_ns = config.find_namespace_by_prefix('gml')
+
+# By URI
+namespace = config.find_namespace_by_uri('http://www.opengis.net/gml/3.2')
+
+# Check if namespace is defined
+if config.has_namespace?('uro')
+  puts "URO namespace is configured"
+end
+----
+
+== Encoding Rules
+
+=== Available Rules
+
+[source,ruby]
+----
+# List all encoding rules defined in config
+rules = config.encoding_rules
+
+rules.each do |rule|
+  puts "Rule: #{rule.name}"
+  puts "  Extends: #{rule.extends_rule}" if rule.extends_rule
+  puts "  Type mappings: #{config.type_mappings_for_rule(rule.name).count}"
+end
+----
+
+=== Rule Inheritance
+
+Some encoding rules extend others:
+
+[source,ruby]
+----
+# Get effective mappings (including inherited)
+all_mappings = config.effective_mappings_for_rule('citygml')
+
+# vs. direct mappings only
+direct_mappings = config.type_mappings_for_rule('citygml')
+
+puts "Direct: #{direct_mappings.count}"
+puts "Effective: #{all_mappings.count}"
+----
+
+== XInclude Resolution
+
+=== Automatic Resolution
+
+[source,ruby]
+----
+# XIncludes are resolved automatically during parsing
+config = Lutaml::Klin::Shapechange::ConfigParser.parse('config.xml')
+
+# Check which files were included
+included_files = config.included_files
+included_files.each do |file|
+  puts "Included: #{file}"
+end
+----
+
+=== Handling Remote Includes
+
+[source,ruby]
+----
+# Remote URLs are fetched and cached
+config = Lutaml::Klin::Shapechange::ConfigParser.parse('config.xml')
+
+# Cache directory for remote files (default: ~/.cache/lutaml-klin)
+cache_dir = config.cache_directory
+puts "Cache: #{cache_dir}"
+----
+
+=== Local File Resolution
+
+[source,ruby]
+----
+# Relative paths resolved from config file directory
+config = Lutaml::Klin::Shapechange::ConfigParser.parse(
+  '/path/to/configs/ShapeChangeConfig.xml'
+)
+
+# Files like "StandardNamespaces.xml" are resolved to:
+# /path/to/configs/StandardNamespaces.xml
+----
+
+== Integration with Mapping Generation
+
+=== Providing Configuration to Generator
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load configuration
+config = Lutaml::Klin::Shapechange::ConfigParser.parse('config.xml')
+
+# Load XMI
+navigator = Lutaml::Klin::XmiNavigator.new('model.xmi')
+
+# Create generator with config
+generator = Lutaml::Klin::MappingGenerator.new(
+  xmi_navigator: navigator,
+  config: config,
+  encoding_rule: 'citygml'
+)
+
+# Generate mappings
+mapping = generator.generate_for_package('urf')
+----
+
+=== Configuration-Driven Type Resolution
+
+[source,ruby]
+----
+# The generator uses config for type resolution
+uml_attribute = uml_class.attributes.find { |a| a.name == 'name' }
+
+# Type from UML: "CharacterString"
+uml_type = uml_attribute.type
+
+# Resolve using config
+mapping = config.find_type_mapping(uml_type, 'citygml')
+
+# Result: xs:string
+xml_type = mapping.xml_type
+----
+
+== Common Configuration Patterns
+
+=== PLATEAU Configuration
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<ShapeChangeConfiguration>
+  <!-- Standard GML/ISO mappings -->
+  <xi:include href="http://shapechange.net/resources/config/StandardNamespaces.xml"/>
+  <xi:include href="http://shapechange.net/resources/config/StandardMapEntries.xml"/>
+
+  <!-- PLATEAU-specific mappings -->
+  <xsdMapEntries>
+    <!-- CityGML types -->
+    <XsdMapEntry type="xs::string" xsdEncodingRules="citygml"
+                 xmlPropertyType="xs:string" xmlType="xs:string"/>
+    <XsdMapEntry type="gml::CodeType" xsdEncodingRules="citygml"
+                 xmlPropertyType="gml:CodeType" xmlType="gml:CodeType"/>
+  </xsdMapEntries>
+
+  <!-- PLATEAU namespaces -->
+  <xmlNamespaces>
+    <XmlNamespace nsabr="uro"
+                  ns="https://www.geospatial.jp/iur/uro/3.2"
+                  location="https://www.geospatial.jp/iur/schemas/uro/3.2/urbanObject.xsd"/>
+    <XmlNamespace nsabr="urf"
+                  ns="https://www.geospatial.jp/iur/urf/3.2"
+                  location="https://www.geospatial.jp/iur/schemas/urf/3.2/urbanFunction.xsd"/>
+  </xmlNamespaces>
+</ShapeChangeConfiguration>
+----
+
+== Error Handling
+
+=== Configuration Parsing Errors
+
+[source,ruby]
+----
+begin
+  config = Lutaml::Klin::Shapechange::ConfigParser.parse('config.xml')
+rescue Lutaml::Klin::ConfigParseError => e
+  puts "Failed to parse config: #{e.message}"
+  # Handle malformed XML
+rescue Lutaml::Klin::XIncludeError => e
+  puts "XInclude error: #{e.message}"
+  # Handle missing included files
+end
+----
+
+=== Validation
+
+[source,ruby]
+----
+# Validate configuration
+unless config.valid?
+  errors = config.validation_errors
+  errors.each do |error|
+    puts "ERROR: #{error}"
+  end
+end
+----
+
+=== Missing Mappings
+
+[source,ruby]
+----
+# Check for missing type mapping
+mapping = config.find_type_mapping('CustomType', 'citygml')
+
+if mapping.nil?
+  puts "WARNING: No mapping for CustomType in citygml encoding"
+  # Use default or fallback mapping
+end
+----
+
+== Performance Considerations
+
+=== Configuration Caching
+
+[source,ruby]
+----
+# Parse config once, reuse for multiple generations
+config = Lutaml::Klin::Shapechange::ConfigParser.parse('config.xml')
+
+# Generate multiple package mappings
+packages.each do |pkg|
+  generator = Lutaml::Klin::MappingGenerator.new(
+    xmi_navigator: navigator,
+    config: config,  # Reuse same config
+    encoding_rule: 'citygml'
+  )
+
+  mapping = generator.generate_for_package(pkg)
+end
+----
+
+=== Remote File Caching
+
+[source,ruby]
+----
+# Remote XInclude files are cached locally
+# Cache location: ~/.cache/lutaml-klin/
+
+# Clear cache if needed
+FileUtils.rm_rf(File.expand_path('~/.cache/lutaml-klin'))
+----
+
+== Relevant Documents
+
+* link:../architecture.adoc[Architecture Documentation] - Configuration integration
+* link:../ruby-api.adoc[Ruby API Reference] - ConfigParser API
+* link:xmi-parsing.adoc[XMI Parsing] - UML model input
+* link:mapping-generation.adoc[Mapping Generation] - Using config for generation
+* link:namespace-resolution.adoc[Namespace Resolution] - Namespace handling

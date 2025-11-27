@@ -1,0 +1,268 @@
+= Rule: rule-xsd-cls-basictype
+
+== Overview
+
+Enables basic types with facet restrictions in XSD generation.
+
+Basic types may be restricted with facets such as length, pattern, and numeric
+ranges through the use of tagged values.
+
+== Priority
+
+Must-have (used by PLATEAU)
+
+== ShapeChange Documentation
+
+Source:: [`/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/Non_Standard_Conversion_Rules.adoc`]
+
+Description::
+Basic types may be restricted with facets. For example, the length of a subtype
+of [`CharacterString`] may be restricted through the use of the "length" tagged
+value, or the allowed range of numeric values may be limited through the use of
+the tagged values "rangeMinimum" and "rangeMaximum".
+
+== Java Implementation
+
+Source:: [`XsdDocument.java:pAnonymousBasicType`] (lines 1438-1631)
+
+=== Algorithm
+
+The Java implementation follows this process:
+
+. Check if class matches [`rule-xsd-cls-basictype-list`] for list-based types
+. Read tagged values from the class:
+  * [`base`]: Base XSD type
+  * [`length`] or [`maxLength`]: Length restriction
+  * [`pattern`]: Regex pattern restriction
+  * [`rangeMinimum`]: Minimum value for numeric types
+  * [`rangeMaximum`]: Maximum value for numeric types
+. Determine base type:
+  * If [`base`] tagged value is blank, search supertypes for map entries
+  * Identify base type from supertypes that map to simple types
+. Determine type content (simple/simple, complex/simple, or complex/complex)
+. Create appropriate XSD structure:
+  * For simple/simple: `<simpleType>` with `<restriction>`
+  * For complex/simple: `<complexType>` with `<simpleContent>` and `<restriction>`
+  * For complex/complex: `<complexType>` with `<complexContent>` and `<extension>`
+. Add facets based on base type support:
+  * [`totalDigits`]: For numeric types with length restriction
+  * [`maxLength`]: For string types with length restriction
+  * [`pattern`]: For types supporting pattern restrictions
+  * [`minInclusive`]: For numeric types with range minimum
+  * [`maxInclusive`]: For numeric types with range maximum
+
+=== Facet Support Matrix
+
+The implementation checks which facets are supported for each base type:
+
+* Numeric facets ([`minInclusive`], [`maxInclusive`], etc.):
+  ** [`integer`], [`positiveInteger`], [`negativeInteger`]
+  ** [`nonNegativeInteger`], [`nonPositiveInteger`]
+  ** [`long`], [`unsignedLong`]
+  ** [`int`], [`unsignedInt`]
+  ** [`short`], [`unsignedShort`]
+  ** [`byte`], [`unsignedByte`]
+  ** [`decimal`], [`float`], [`double`]
+
+* Length facets ([`totalDigits`], [`maxLength`]):
+  ** Numeric types support [`totalDigits`]
+  ** String types support [`maxLength`]
+
+* Pattern facets ([`pattern`]):
+  ** Most types support pattern restrictions
+
+== Our Implementation
+
+Type:: Processor Class
+File:: [`lib/lutaml/klin/shapechange/rule_processors/class_rules/basic_type_processor.rb`]
+Spec:: [`spec/lutaml/klin/shapechange/rule_processors/class_rules/basic_type_processor_spec.rb`]
+
+=== Design Principles
+
+. Model-driven architecture with proper separation of concerns
+. Configuration over code (read all settings from tagged values)
+. Extensible facet support system
+. Clear error messages when base type is missing
+
+=== Implementation Details
+
+The [`BasicTypeProcessor`] class extends [`BaseRuleProcessor`] and:
+
+. Validates that the class has [`basictype`] stereotype
+. Checks for list-based encoding ([`rule-xsd-cls-basictype-list`])
+. Reads and validates tagged values
+. Determines base type from tagged values or supertypes
+. Creates appropriate XSD type structure
+. Adds supported facets based on base type
+. Handles both named and anonymous type generation
+
+== Implementation Status
+
+* [x] Documentation read
+* [x] Java code analyzed
+* [ ] Processor implemented
+* [ ] Spec written
+* [ ] Integrated
+* [ ] Committed
+
+== Test Cases
+
+=== Test Case 1: Basic Type with Length Restriction
+
+Input UML::
+[source]
+----
+«basicType» RestrictedString
+  base: string
+  maxLength: 50
+----
+
+Expected XSD::
+[source,xml]
+----
+<simpleType name="RestrictedStringType">
+  <restriction base="string">
+    <maxLength value="50"/>
+  </restriction>
+</simpleType>
+----
+
+=== Test Case 2: Basic Type with Pattern
+
+Input UML::
+[source]
+----
+«basicType» EmailString
+  base: string
+  pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
+----
+
+Expected XSD::
+[source,xml]
+----
+<simpleType name="EmailStringType">
+  <restriction base="string">
+    <pattern value="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"/>
+  </restriction>
+</simpleType>
+----
+
+=== Test Case 3: Basic Type with Range (Min/Max)
+
+Input UML::
+[source]
+----
+«basicType» PercentageValue
+  base: decimal
+  rangeMinimum: 0.0
+  rangeMaximum: 100.0
+----
+
+Expected XSD::
+[source,xml]
+----
+<simpleType name="PercentageValueType">
+  <restriction base="decimal">
+    <minInclusive value="0.0"/>
+    <maxInclusive value="100.0"/>
+  </restriction>
+</simpleType>
+----
+
+=== Test Case 4: Combined Facets
+
+Input UML::
+[source]
+----
+«basicType» RestrictedInteger
+  base: integer
+  length: 10
+  rangeMinimum: 0
+  rangeMaximum: 9999999999
+----
+
+Expected XSD::
+[source,xml]
+----
+<simpleType name="RestrictedIntegerType">
+  <restriction base="integer">
+    <totalDigits value="10"/>
+    <minInclusive value="0"/>
+    <maxInclusive value="9999999999"/>
+  </restriction>
+</simpleType>
+----
+
+=== Test Case 5: Complex Type with Simple Content
+
+Input UML::
+[source]
+----
+«basicType» AnnotatedString
+  base: string
+  supertypes: SomeComplexType
+  maxLength: 100
+----
+
+Expected XSD::
+[source,xml]
+----
+<complexType name="AnnotatedStringType">
+  <simpleContent>
+    <restriction base="SomeComplexType">
+      <maxLength value="100"/>
+    </restriction>
+  </simpleContent>
+</complexType>
+----
+
+=== Test Case 6: List-Based Basic Type
+
+Input UML::
+[source]
+----
+«basicType» TransformationMatrix2x2
+  property list: Real [4] {sequence}
+----
+
+Expected XSD::
+[source,xml]
+----
+<simpleType name="TransformationMatrix2x2Type">
+  <restriction>
+    <simpleType>
+      <list itemType="double"/>
+    </simpleType>
+    <length value="4"/>
+  </restriction>
+</simpleType>
+----
+
+== Dependencies
+
+Depends on::
+* [`rule-xsd-cls-type`]: Basic class to type conversion
+* Map entries for base type resolution
+* Supertype hierarchy for base type inference
+
+Used by::
+* [`rule-xsd-cls-local-basictype`]: Modifies to create anonymous types
+
+Related rules::
+* [`rule-xsd-cls-basictype-list`]: List-based basic types
+* [`rule-xsd-prop-facets`]: Property-level facet restrictions
+
+== Notes
+
+* Base type must be specified either via [`base`] tagged value or through
+  supertypes with map entries
+* Facet support depends on the base XSD type
+* Type content (simple/simple vs complex/simple) is determined from map entries
+* Anonymous vs named type generation controlled by
+  [`rule-xsd-cls-local-basictype`]
+
+== References
+
+* ShapeChange documentation: Non-Standard Conversion Rules
+* ISO 19136 (GML) specification for basic types
+* XML Schema Part 2: Datatypes specification for facet definitions

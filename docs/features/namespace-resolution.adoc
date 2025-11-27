@@ -1,0 +1,298 @@
+= Namespace Resolution
+:toc:
+:toclevels: 3
+
+== Purpose
+
+Namespace resolution is the process of resolving prefixed type references (e.g., `gml:CodeType`, `xs:string`) to their full namespace URIs and schema locations. This is critical for accurate UML-to-XSD mapping, especially for complex models like PLATEAU that reference dozens of XML Schema namespaces.
+
+Without proper namespace resolution, 94% of attribute types in PLATEAU models remain unresolved, making the mappings unusable.
+
+== Concepts
+
+=== Namespace Prefixes
+
+XML types use namespace prefixes to avoid naming conflicts:
+
+* `xs:string` - XML Schema built-in type
+* `gml:CodeType` - GML 3.2 complex type
+* `uro:BuildingIDAttribute` - PLATEAU URO type
+* `urf:Building` - PLATEAU URF type
+
+=== Namespace Configuration
+
+Namespaces are configured in ShapeChange XML files:
+
+[source,xml]
+----
+<XmlNamespace
+  nsabr="gml"
+  ns="http://www.opengis.net/gml/3.2"
+  location="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+----
+
+Where:
+
+* `nsabr` - Namespace prefix (gml)
+* `ns` - Namespace URI
+* `location` - XSD schema location
+
+=== Resolution Flow
+
+[source,text]
+----
+UML Type: "gml::CodeType" (from XMI)
+    ↓
+Type Override (optional): "gml::CodeType" → "gml:CodeType"
+    ↓
+Parse prefix: "gml"
+Parse local name: "CodeType"
+    ↓
+Look up namespace in config
+    ↓
+Found: ns="http://www.opengis.net/gml/3.2"
+       location="http://schemas.opengis.net/gml/3.2.1/gml.xsd"
+    ↓
+Delegate to lutaml-xsd SchemaRepository
+    ↓
+Load XSD from location
+Parse schema for type "CodeType"
+    ↓
+Result: Full type definition with constraints
+----
+
+== Type Override Mapping
+
+=== Problem: Malformed Type References
+
+Some XMI files use non-standard separators:
+
+* `xs::string` instead of `xs:string`
+* `gml::CodeType` instead of `gml:CodeType`
+
+This breaks namespace resolution because `::` is not a valid XML namespace separator.
+
+=== Solution: Type Override File
+
+Create a mapping file to normalize types before resolution:
+
+[source,yaml]
+----
+# type_overrides.yaml
+type_overrides:
+  # Fix double colon issues
+  "xs::string": "xs:string"
+  "xs::integer": "xs:integer"
+  "xs::boolean": "xs:boolean"
+  "xs::double": "xs:double"
+  "xs::date": "xs:date"
+  "xs::anyURI": "xs:anyURI"
+
+  # Fix GML types
+  "gml::CodeType": "gml:CodeType"
+  "gml::MeasureType": "gml:MeasureType"
+  "gml::LengthType": "gml:LengthType"
+
+  # Fix typos
+  "CharString": "CharacterString"
+  "Intger": "Integer"
+----
+
+=== Using Type Overrides
+
+[source,bash]
+----
+lutaml-klin generate \
+  --xmi model.xmi \
+  --config config.xml \
+  --package urf \
+  --type-mapping type_overrides.yaml \
+  --output urf_mapping.yaml
+----
+
+[source,ruby]
+----
+# Load type overrides
+overrides = YAML.load_file('type_overrides.yaml')['type_overrides']
+
+# Create generator with overrides
+generator = Lutaml::Klin::MappingGenerator.new(
+  xmi_navigator: navigator,
+  config: config,
+  type_overrides: overrides
+)
+----
+
+=== Type Override Priority
+
+Type resolution follows this priority:
+
+1. **Type Override** - Explicit mapping from override file
+2. **ShapeChange Mapping** - Type from XsdMapEntry
+3. **Namespace Resolution** - Resolve via namespace prefix
+4. **Fallback** - Use type as-is (may be unresolved)
+
+Example:
+
+[source,ruby]
+----
+# XMI type: "xs::string"
+# Step 1: Check override
+override = type_overrides["xs::string"]  # => "xs:string"
+
+# Step 2: Use overridden type for further resolution
+corrected_type = override || original_type  # => "xs:string"
+
+# Step 3: Continue with namespace resolution
+prefix, local = corrected_type.split(':')  # => ["xs", "string"]
+namespace = config.find_namespace_by_prefix(prefix)
+# => {ns: "http://www.w3.org/2001/XMLSchema"}
+----
+
+== Integration with lutaml-xsd
+
+=== Architecture
+
+lutaml-klin delegates XSD schema operations to lutaml-xsd:
+
+* **lutaml-klin** - Orchestration, XMI parsing, ShapeChange config
+* **lutaml-xsd** - XSD schema parsing, type resolution, schema repository
+
+This separation of concerns maintains clean boundaries.
+
+=== SchemaRepository
+
+lutaml-xsd provides a `SchemaRepository` for managing XSD schemas:
+
+[source,ruby]
+----
+require 'lutaml/xsd'
+
+# Create schema repository
+repo = Lutaml::Xsd::SchemaRepository.new
+
+# Register namespace
+repo.register_namespace(
+  prefix: 'gml',
+  uri: 'http://www.opengis.net/gml/3.2',
+  location: 'http://schemas.opengis.net/gml/3.2.1/gml.xsd'
+)
+
+# Resolve type
+type_def = repo.resolve_type('gml:CodeType')
+
+# Result includes full type definition
+puts type_def.name          # => "CodeType"
+puts type_def.namespace     # => "http://www.opengis.net/gml/3.2"
+puts type_def.base_type     # => "xs:string"
+puts type_def.restrictions  # => {pattern: ".*"}
+----
+
+=== Usage in MappingGenerator
+
+[source,ruby]
+----
+# Generator creates and populates SchemaRepository
+generator = Lutaml::Klin::MappingGenerator.new(
+  xmi_navigator: navigator,
+  config: config
+)
+
+# Repository is populated from ShapeChange config
+# All XmlNamespace entries are registered
+# All XSD schemas are loaded on-demand
+
+# When resolving attribute types
+attribute_type = "gml:CodeType"
+resolved = generator.schema_repository.resolve_type(attribute_type)
+----
+
+== Troubleshooting
+
+=== Common Issues
+
+**94% Unresolved Types**
+
+Symptom: Most attributes show as unresolved in mapping
+
+Cause: Missing namespace configuration or malformed type names
+
+Solution:
+1. Check ShapeChange config has all namespaces
+2. Create type override file for malformed types
+3. Verify XSD schema locations are accessible
+
+**Type Override Not Applied**
+
+Symptom: Type overrides in YAML file are ignored
+
+Cause: Override file not loaded or wrong format
+
+Solution:
+[source,bash]
+----
+# Verify override file format
+cat type_overrides.yaml
+
+# Ensure it has top-level 'type_overrides' key
+type_overrides:
+  "old": "new"
+
+# Use --type-mapping option
+lutaml-klin generate ... --type-mapping type_overrides.yaml
+----
+
+**Namespace Not Found**
+
+Symptom: Error "Namespace prefix 'gml' not defined"
+
+Cause: ShapeChange config missing namespace definition
+
+Solution:
+[source,xml]
+----
+<!-- Add to ShapeChange config -->
+<xmlNamespaces>
+  <XmlNamespace
+    nsabr="gml"
+    ns="http://www.opengis.net/gml/3.2"
+    location="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+</xmlNamespaces>
+----
+
+== Performance Considerations
+
+=== Schema Caching
+
+XSD schemas are loaded on-demand and cached:
+
+[source,ruby]
+----
+# First access: loads from URL/file
+type1 = repo.resolve_type('gml:CodeType')  # Load schema
+
+# Subsequent access: uses cache
+type2 = repo.resolve_type('gml:MeasureType')  # From cache
+----
+
+=== Batch Resolution
+
+For better performance, resolve types in batches:
+
+[source,ruby]
+----
+# Collect all types
+types = mapping.classes.flat_map do |cls|
+  cls.attributes.map(&:type)
+end.uniq
+
+# Resolve in batch
+resolutions = repo.resolve_types(types)
+----
+
+== Relevant Documents
+
+* link:../architecture.adoc[Architecture] - Namespace resolution flow diagram
+* link:shapechange-config.adoc[ShapeChange Configuration] - Namespace configuration
+* link:mapping-generation.adoc[Mapping Generation] - Type resolution in context
+* link:../ruby-api.adoc[Ruby API] - SchemaRepository API

@@ -1,0 +1,3513 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:urf="https://www.geospatial.jp/iur/urf/3.2" targetNamespace="https://www.geospatial.jp/iur/urf/3.2" elementFormDefault="qualified" version="3.2.1">
+  <xs:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+  <xs:element name="AccomodationType" type="urf:AccomodationTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="AccomodationTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="gml:CodeType"/>
+          <xs:element name="numberOfAccomodation" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AccomodationTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:AccomodationType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Administration" type="urf:AdministrationType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="AdministrationType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="dmAttribute" type="urf:DmAttributePropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AdministrationPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:Administration"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="Agreement" type="urf:AgreementType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="AgreementType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="applicableArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="expiration" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AgreementPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:Agreement"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="AgriculturalDevelopmentProjectType" type="urf:AgriculturalDevelopmentProjectTypeType"/>
+  <xs:complexType name="AgriculturalDevelopmentProjectTypeType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element name="blockName" type="xs:string" minOccurs="0"/>
+      <xs:element name="projectType" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="implementationBody" type="xs:string" minOccurs="0"/>
+      <xs:element name="benefitArea" type="gml:MeasureType" minOccurs="0"/>
+      <xs:element name="benefitAreaInUrbanArea" type="gml:MeasureType" minOccurs="0"/>
+      <xs:element name="startFiscalYear" type="xs:gYear" minOccurs="0"/>
+      <xs:element name="measureType" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="benefitPeriod" type="xs:string" minOccurs="0"/>
+      <xs:element name="note" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AgriculturalDevelopmentProjectTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:AgriculturalDevelopmentProjectType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AreaClassicificationType" type="urf:AreaClassicificationTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="AreaClassicificationTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="urf:UrbanAreaClassValuePropertyType"/>
+          <xs:element name="area" type="gml:MeasureType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AreaClassicificationTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:AreaClassicificationType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BreakdownOfNominalArea" type="urf:BreakdownOfNominalAreaType"/>
+  <xs:complexType name="BreakdownOfNominalAreaType">
+    <xs:sequence>
+      <xs:element name="breakdown" type="xs:string"/>
+      <xs:element name="areaInSquareMeter" type="gml:MeasureType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BreakdownOfNominalAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:BreakdownOfNominalArea"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CensusBlock" type="urf:CensusBlockType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="CensusBlockType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="townName" type="xs:string" minOccurs="0"/>
+          <xs:element name="blockName" type="xs:string" minOccurs="0"/>
+          <xs:element name="daytimePopulationType" type="urf:DaytimePopulationTypePropertyType" minOccurs="0"/>
+          <xs:element name="economicActivityType" type="urf:EconomicActivityTypePropertyType" minOccurs="0"/>
+          <xs:element name="populationType" type="urf:PopulationTypePropertyType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CensusBlockPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:CensusBlock"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="CityObjectGroup" type="urf:CityObjectGroupType"/>
+  <xs:complexType name="CityObjectGroupType">
+    <xs:sequence>
+      <xs:element name="urf::fiscalYearOfPublication" type="xs:gYear" minOccurs="0"/>
+      <xs:element name="urf::language" type="gml:CodeType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CityObjectGroupPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:CityObjectGroup"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CommutingPopulationType" type="urf:CommutingPopulationTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="CommutingPopulationTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="urf:gml:NameListPropertyType"/>
+          <xs:element name="commutingPopulation" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CommutingPopulationTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:CommutingPopulationType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DaytimePopulationType" type="urf:DaytimePopulationTypeType"/>
+  <xs:complexType name="DaytimePopulationTypeType">
+    <xs:sequence>
+      <xs:element name="daytimePopulation" type="xs:integer" minOccurs="0"/>
+      <xs:element name="daytimePopulationDensity" type="xs:double" minOccurs="0"/>
+      <xs:element name="daytimeOfficeCommuter" type="xs:integer" minOccurs="0"/>
+      <xs:element name="daytimeSchoolCommuter" type="xs:integer" minOccurs="0"/>
+      <xs:element name="daytimeUnder15" type="xs:integer" minOccurs="0"/>
+      <xs:element name="daytimeOver15" type="xs:integer" minOccurs="0"/>
+      <xs:element name="agriculturalWorker" type="xs:integer" minOccurs="0"/>
+      <xs:element name="nonCommuter" type="xs:integer" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DaytimePopulationTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DaytimePopulationType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DevelopmentProject" type="urf:DevelopmentProjectType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="DevelopmentProjectType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="agriculturalDevelopmentType" type="urf:AgriculturalDevelopmentProjectTypePropertyType" minOccurs="0"/>
+          <xs:element name="urbanDevelopmentType" type="urf:UrbanDevelopmentProjectTypePropertyType" minOccurs="0"/>
+          <xs:element name="residentialDevelopmentType" type="urf:ResidentialDevelopmentTypePropertyType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DevelopmentProjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DevelopmentProject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DID" type="urf:DIDType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="DIDType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="population" type="xs:integer" minOccurs="0"/>
+          <xs:element name="populationDensity" type="xs:double" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DIDPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DID"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DisasterDamage" type="urf:DisasterDamageType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="DisasterDamageType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="date" type="xs:date" minOccurs="0"/>
+          <xs:element name="damagedArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="numberOfDamagedHouses" type="xs:integer" minOccurs="0"/>
+          <xs:element name="numberOfHousesFloodedAboveFloorLevel" type="xs:integer" minOccurs="0"/>
+          <xs:element name="numberOfHousesFloodedBelowFlooeLevel" type="xs:integer" minOccurs="0"/>
+          <xs:element name="maximumRainfallPerHour" type="xs:integer" minOccurs="0"/>
+          <xs:element name="totalRainfall" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisasterDamagePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DisasterDamage"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DisasterPreventionBase" type="urf:DisasterPreventionBaseType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="DisasterPreventionBaseType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="capacity" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisasterPreventionBasePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DisasterPreventionBase"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DisasterPreventionBaseType" type="urf:DisasterPreventionBaseTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="DisasterPreventionBaseTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="name" type="xs:string"/>
+          <xs:element name="type" type="gml:CodeType"/>
+          <xs:element name="capacity" type="xs:integer"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisasterPreventionBaseTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DisasterPreventionBaseType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DistributionOfFloraAndFauna" type="urf:DistributionOfFloraAndFaunaType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="DistributionOfFloraAndFaunaType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DistributionOfFloraAndFaunaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DistributionOfFloraAndFauna"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="District" type="urf:DistrictType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="DistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="buildingRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="useRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="maximumFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="minimumFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="maximumBuildingCoverageRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="minimumBuildingCoverageRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="minimumSiteArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="minimumBuildingArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="minimumGroundHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="setbackSize" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="structurePlacementRestriction" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="maximumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="minimumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="minimumFloorHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="buildingDesignRestriction" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="minimumGreeningRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="fenceGuideline" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="restrictionsForFireProtection" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="restrictionsForNoiseProtection" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="minimumFrontageRate" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:District"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="EconomicActivitySumType" type="urf:EconomicActivitySumTypeType"/>
+  <xs:complexType name="EconomicActivitySumTypeType">
+    <xs:sequence>
+      <xs:element name="industryType" type="gml:CodeType"/>
+      <xs:element name="number" type="xs:integer"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="EconomicActivitySumTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:EconomicActivitySumType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="EconomicActivityType" type="urf:EconomicActivityTypeType"/>
+  <xs:complexType name="EconomicActivityTypeType">
+    <xs:sequence>
+      <xs:element name="numberOfOffices" type="urf:EconomicActivitySumTypePropertyType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="numberOfEmployees" type="urf:EconomicActivitySumTypePropertyType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="retailSales" type="urf:EconomicActivitySumTypePropertyType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="manufactureShipments" type="urf:EconomicActivitySumTypePropertyType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="EconomicActivityTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:EconomicActivityType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="FarmlandConversionType" type="urf:FarmlandConversionTypeType"/>
+  <xs:complexType name="FarmlandConversionTypeType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element name="yearOfDiversion" type="xs:gYear" minOccurs="0"/>
+      <xs:element name="isDesignated" type="xs:boolean" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FarmlandConversionTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:FarmlandConversionType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="FloodingDamage" type="urf:FloodingDamageType"/>
+  <xs:complexType name="FloodingDamageType">
+    <xs:sequence>
+      <xs:element name="disasterId" type="xs:string"/>
+      <xs:element name="dateOfOccurence" type="xs:date"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FloodingDamagePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:FloodingDamage"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="FloodingDamageType" type="urf:FloodingDamageTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="FloodingDamageTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="disasterId" type="xs:string"/>
+          <xs:element name="areaName" type="xs:string"/>
+          <xs:element name="dateOfOccuring" type="xs:date"/>
+          <xs:element name="damagedArea" type="gml:MeasureType"/>
+          <xs:element name="numberOfHousesFloodedAboveFloorLevel" type="xs:nonNegativeInteger"/>
+          <xs:element name="numberOfHousesFloodedBelowFloorLevel" type="xs:nonNegativeInteger"/>
+          <xs:element name="note" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FloodingDamageTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:FloodingDamageType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ForestConversionType" type="urf:ForestConversionTypeType"/>
+  <xs:complexType name="ForestConversionTypeType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element name="yearOfDiversion" type="xs:gYear" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ForestConversionTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ForestConversionType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GlobalHubCityDevelopmentProject" type="urf:GlobalHubCityDevelopmentProjectType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="GlobalHubCityDevelopmentProjectType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="implementationBody" type="xs:string" minOccurs="0"/>
+          <xs:element name="implementationPeriod" type="xs:string" minOccurs="0"/>
+          <xs:element name="plan" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GlobalHubCityDevelopmentProjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:GlobalHubCityDevelopmentProject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="GreenSpace" type="urf:GreenSpaceType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="GreenSpaceType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GreenSpacePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:GreenSpace"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="GreenSpaceAreaType" type="urf:GreenSpaceAreaTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="GreenSpaceAreaTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="xs:string"/>
+          <xs:element name="totalGreenArea" type="gml:MeasureType"/>
+          <xs:element name="greenArea" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GreenSpaceAreaTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:GreenSpaceAreaType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="HousingLandDevelopmentStatus" type="urf:HousingLandDevelopmentStatusType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="HousingLandDevelopmentStatusType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="ongoingArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="completedArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="projectArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="projectCost" type="xs:double"/>
+          <xs:element name="totalProjectCost" type="xs:double"/>
+          <xs:element name="startDate" type="xs:date" minOccurs="0"/>
+          <xs:element name="endDate" type="xs:date" minOccurs="0"/>
+          <xs:element name="status" type="gml:CodeType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HousingLandDevelopmentStatusPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:HousingLandDevelopmentStatus"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="HubCity" type="urf:HubCityType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="HubCityType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HubCityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:HubCity"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="IndicationMark" type="urf:IndicationMarkType" substitutionGroup="urf:PortrayalObject"/>
+  <xs:complexType name="IndicationMarkType">
+    <xs:complexContent>
+      <xs:extension base="urf:PortrayalObjectType">
+        <xs:sequence>
+          <xs:element name="lod0Geometry" type="gml:PointType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="IndicationMarkPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:IndicationMark"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="InlandFloodingDamageType" type="urf:InlandFloodingDamageTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="InlandFloodingDamageTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="disasterId" type="xs:string"/>
+          <xs:element name="areaName" type="xs:string"/>
+          <xs:element name="dateOfOccuring" type="xs:date"/>
+          <xs:element name="damagedArea" type="gml:MeasureType"/>
+          <xs:element name="numberOfHousesFloodedAboveFloorLevel" type="xs:nonNegativeInteger"/>
+          <xs:element name="numberOfHousesFloodedBelowFloorLevel" type="xs:nonNegativeInteger"/>
+          <xs:element name="maximumRainfallPerHour" type="gml:LengthType"/>
+          <xs:element name="totalRainfall" type="gml:LengthType"/>
+          <xs:element name="note" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="InlandFloodingDamageTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:InlandFloodingDamageType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ItemRecordType" type="urf:ItemRecordTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="ItemRecordTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="item" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ItemRecordTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ItemRecordType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="LandPrice" type="urf:LandPriceType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="LandPriceType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="pointCode" type="xs:string"/>
+          <xs:element name="pointCodeOfLastYear" type="xs:string" minOccurs="0"/>
+          <xs:element name="fiscalYear" type="xs:gYear" minOccurs="0"/>
+          <xs:element name="landPrice" type="xs:integer" minOccurs="0"/>
+          <xs:element name="variability" type="xs:double" minOccurs="0"/>
+          <xs:element name="isSelected" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="isAddressChanged" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="isAcreageChanged" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="isUseChanged" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="isBuildingStructureChanged" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="isSupplyFacilitiesChanged" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="isDistanceFromStationChanged" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="isUseDistrictChanged" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="isFirePrventionChanged" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="isUrbanPlanAreaChanged" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="isBuildingCoverageRateChanged" type="xs:string" minOccurs="0"/>
+          <xs:element name="isFloorAreaRateChanged" type="xs:string" minOccurs="0"/>
+          <xs:element name="cityCode" type="gml:CodeType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="cityName" type="xs:string" minOccurs="0"/>
+          <xs:element name="location" type="xs:string" minOccurs="0"/>
+          <xs:element name="address" type="xs:string" minOccurs="0"/>
+          <xs:element name="acreage" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="useStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="useStatusDescription" type="xs:string" minOccurs="0"/>
+          <xs:element name="useType" type="xs:string" minOccurs="0"/>
+          <xs:element name="buildingStructure" type="xs:string" minOccurs="0"/>
+          <xs:element name="water" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="gas" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="sewage" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="shape" type="xs:string" minOccurs="0"/>
+          <xs:element name="frontageRate" type="xs:double" minOccurs="0"/>
+          <xs:element name="depthRate" type="xs:double" minOccurs="0"/>
+          <xs:element name="storeysAboveGround" type="xs:integer"/>
+          <xs:element name="storeysBelowGround" type="xs:integer" minOccurs="0"/>
+          <xs:element name="frontageRoad" type="xs:string" minOccurs="0"/>
+          <xs:element name="frontageRoadDirection" type="xs:string" minOccurs="0"/>
+          <xs:element name="frontageRoadWidth" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="stationSquare" type="xs:string" minOccurs="0"/>
+          <xs:element name="frontageRoadSurface" type="xs:string" minOccurs="0"/>
+          <xs:element name="sideRoad" type="xs:string" minOccurs="0"/>
+          <xs:element name="sideRoadDirection" type="xs:string" minOccurs="0"/>
+          <xs:element name="transportationFacilities" type="xs:string" minOccurs="0"/>
+          <xs:element name="surroundings" type="xs:string" minOccurs="0"/>
+          <xs:element name="stationName" type="xs:string" minOccurs="0"/>
+          <xs:element name="distanceFromStation" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="useDistrict" type="urf:LegalRestrictionValuePropertyType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="firePrevention" type="xs:string" minOccurs="0"/>
+          <xs:element name="urbanPlanType" type="xs:string" minOccurs="0"/>
+          <xs:element name="heightControl" type="xs:string" minOccurs="0"/>
+          <xs:element name="forest" type="xs:string" minOccurs="0"/>
+          <xs:element name="park" type="xs:string" minOccurs="0"/>
+          <xs:element name="buildingCoverageRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="floorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="extraFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="isSame" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="selectionStatus" type="xs:string" minOccurs="0"/>
+          <xs:element name="landPriceHistory" type="urf:ValueByCodesPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="attributeHistory" type="urf:ValueByCodesPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LandPricePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:LandPrice"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="LandPriceAverageType" type="urf:LandPriceAverageTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="LandPriceAverageTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="urf:UrbanAreaClassValuePropertyType"/>
+          <xs:element name="landPrice" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LandPriceAverageTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:LandPriceAverageType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="LandslideDamageType" type="urf:LandslideDamageTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="LandslideDamageTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="disasterId" type="xs:string"/>
+          <xs:element name="areaName" type="xs:string"/>
+          <xs:element name="dateOfOccuring" type="xs:date"/>
+          <xs:element name="damagedArea" type="gml:MeasureType"/>
+          <xs:element name="numberOfDamagedHouses" type="xs:nonNegativeInteger"/>
+          <xs:element name="note" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LandslideDamageTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:LandslideDamageType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="LandUseDiversion" type="urf:LandUseDiversionType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="LandUseDiversionType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="forestConversionType" type="urf:ForestConversionTypePropertyType" minOccurs="0"/>
+          <xs:element name="farmlandConversionType" type="urf:FarmlandConversionTypePropertyType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LandUseDiversionPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:LandUseDiversion"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="LanduseIDAttribute" type="urf:LanduseIDAttributeType"/>
+  <xs:complexType name="LanduseIDAttributeType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="LanduseIDAttributePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:LanduseIDAttribute"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="LandUseType" type="urf:LandUseTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="LandUseTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="use" type="gml:CodeType"/>
+          <xs:element name="area" type="gml:MeasureType"/>
+          <xs:element name="vacancy" type="xs:boolean" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LandUseTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:LandUseType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="LargeCustomerFacilityType" type="urf:LargeCustomerFacilityTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="LargeCustomerFacilityTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="islRetailStore" type="xs:boolean"/>
+          <xs:element name="islCustomerAttractingFacility" type="xs:boolean"/>
+          <xs:element name="yearOpened" type="xs:gYear" minOccurs="0"/>
+          <xs:element name="yearClosed" type="xs:gYear" minOccurs="0"/>
+          <xs:element name="totalFloorArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="facilityName" type="xs:string" minOccurs="0"/>
+          <xs:element name="facilityType" type="gml:CodeType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LargeCustomerFacilityTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:LargeCustomerFacilityType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="NaturalConditions" type="urf:NaturalConditionsType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="NaturalConditionsType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NaturalConditionsPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:NaturalConditions"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="NewHousing" type="urf:NewHousingType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="NewHousingType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="purpose" type="gml:CodeType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="developer" type="xs:string" minOccurs="0"/>
+          <xs:element name="yearOfConstruction" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NewHousingPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:NewHousing"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="NumberOfEmploees" type="urf:NumberOfEmploeesType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="NumberOfEmploeesType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="gml:CodeType"/>
+          <xs:element name="numberOfEmployees" type="urf:ValueByNamesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NumberOfEmploeesPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:NumberOfEmploees"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="NumberOfEmployeesByIndustryCategoryType" type="urf:NumberOfEmployeesByIndustryCategoryTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="NumberOfEmployeesByIndustryCategoryTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="gml:CodeType"/>
+          <xs:element name="numberOfEmployeesByIndustoryCategory" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NumberOfEmployeesByIndustryCategoryTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:NumberOfEmployeesByIndustryCategoryType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="NumberOfEmployeesByOccupationType" type="urf:NumberOfEmployeesByOccupationTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="NumberOfEmployeesByOccupationTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="gml:CodeType"/>
+          <xs:element name="numberOfEmployeesByOccupation" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NumberOfEmployeesByOccupationTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:NumberOfEmployeesByOccupationType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="NumberOfHouseholdsByOwnershipType" type="urf:NumberOfHouseholdsByOwnershipTypeType" substitutionGroup="urf:NumberOfHouseholdsType"/>
+  <xs:complexType name="NumberOfHouseholdsByOwnershipTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:NumberOfHouseholdsTypeType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NumberOfHouseholdsByOwnershipTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:NumberOfHouseholdsByOwnershipType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="NumberOfHouseholdsByStructureType" type="urf:NumberOfHouseholdsByStructureTypeType" substitutionGroup="urf:NumberOfHouseholdsType"/>
+  <xs:complexType name="NumberOfHouseholdsByStructureTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:NumberOfHouseholdsTypeType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NumberOfHouseholdsByStructureTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:NumberOfHouseholdsByStructureType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="NumberOfHouseholdsType" type="urf:NumberOfHouseholdsTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="NumberOfHouseholdsTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="urf:UrbanAreaClassValuePropertyType"/>
+          <xs:element name="value" type="urf:ValueByCodesPropertyType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NumberOfHouseholdsTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:NumberOfHouseholdsType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ObservationPoint" type="urf:ObservationPointType"/>
+  <xs:complexType name="ObservationPointType">
+    <xs:sequence>
+      <xs:element name="lod0MultiPoint" type="gml:MultiPointType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ObservationPointPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ObservationPoint"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Pollution" type="urf:PollutionType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="PollutionType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="year" type="xs:gYear" minOccurs="0"/>
+          <xs:element name="cause" type="xs:string" minOccurs="0"/>
+          <xs:element name="damagedArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="observationPoint" type="urf:ObservationPointPropertyType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PollutionPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:Pollution"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="PollutionType" type="urf:PollutionTypeType"/>
+  <xs:complexType name="PollutionTypeType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:gYear"/>
+      <xs:element name="type" type="gml:CodeType"/>
+      <xs:element name="year" type="xs:string"/>
+      <xs:element name="cause" type="xs:gYear"/>
+      <xs:element name="damagedArea" type="gml:MeasureType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PollutionTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:PollutionType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PopulationByAgeAndSexType" type="urf:PopulationByAgeAndSexTypeType"/>
+  <xs:complexType name="PopulationByAgeAndSexTypeType">
+    <xs:sequence>
+      <xs:element name="ageAndSex" type="gml:CodeType"/>
+      <xs:element name="number" type="xs:integer" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PopulationByAgeAndSexTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:PopulationByAgeAndSexType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PopulationType" type="urf:PopulationTypeType"/>
+  <xs:complexType name="PopulationTypeType">
+    <xs:sequence>
+      <xs:element name="population" type="urf:PopulationByAgeAndSexTypePropertyType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="populationDensity" type="xs:double" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PopulationTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:PopulationType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PortrayalObject" type="urf:PortrayalObjectType" substitutionGroup="gml:AbstractFeature"/>
+  <xs:complexType name="PortrayalObjectType">
+    <xs:complexContent>
+      <xs:extension base="gml:AbstractFeatureType">
+        <xs:sequence>
+          <xs:element name="dmCode" type="gml:CodeType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="object" type="urf:_CityObjectPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PortrayalObjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:PortrayalObject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="PrivateUrbanRenewalProjectPlan" type="urf:PrivateUrbanRenewalProjectPlanType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="PrivateUrbanRenewalProjectPlanType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="developer" type="xs:string" minOccurs="0"/>
+          <xs:element name="plan" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PrivateUrbanRenewalProjectPlanPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:PrivateUrbanRenewalProjectPlan"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="PublicLandType" type="urf:PublicLandTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="PublicLandTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="ownerType" type="gml:CodeType"/>
+          <xs:element name="category" type="gml:CodeType"/>
+          <xs:element name="area" type="gml:MeasureType"/>
+          <xs:element name="status" type="xs:string"/>
+          <xs:element name="note" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PublicLandTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:PublicLandType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PublicTransitFacility" type="urf:PublicTransitFacilityType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="PublicTransitFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="companyName" type="xs:string" minOccurs="0"/>
+          <xs:element name="companyType" type="xs:string" minOccurs="0"/>
+          <xs:element name="facilityType" type="xs:string" minOccurs="0"/>
+          <xs:element name="sectionName" type="xs:string" minOccurs="0"/>
+          <xs:element name="frequencyOfService" type="xs:integer" minOccurs="0"/>
+          <xs:element name="numberOfCustomers" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PublicTransitFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:PublicTransitFacility"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RailwayType" type="urf:RailwayTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="RailwayTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="railwayType" type="gml:CodeType"/>
+          <xs:element name="companyType" type="gml:CodeType"/>
+          <xs:element name="routeName" type="xs:string"/>
+          <xs:element name="stationName" type="xs:string"/>
+          <xs:element name="companyName" type="xs:string"/>
+          <xs:element name="frequencyOfService" type="xs:integer"/>
+          <xs:element name="numberOfCustomers" type="xs:integer"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RailwayTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:RailwayType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Recreations" type="urf:RecreationsType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="RecreationsType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="capacity" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="numberOfUsers" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RecreationsPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:Recreations"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="RecreationType" type="urf:RecreationTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="RecreationTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="id" type="gml:CodeType"/>
+          <xs:element name="name" type="xs:string"/>
+          <xs:element name="type" type="xs:string"/>
+          <xs:element name="custodian" type="xs:string"/>
+          <xs:element name="capacity" type="gml:MeasureType"/>
+          <xs:element name="numberOfUser" type="xs:integer"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RecreationTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:RecreationType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Regulation" type="urf:RegulationType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="RegulationType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RegulationPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:Regulation"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ReportingUnit" type="urf:ReportingUnitType"/>
+  <xs:complexType name="ReportingUnitType">
+    <xs:choice>
+      <xs:element name="subregion" type="urf:SubregionNamePropertyType"/>
+      <xs:element name="urbanArea" type="urf:UrbanAreaClassValuePropertyType"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="ReportingUnitPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ReportingUnit"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ResidenceAttractionArea" type="urf:ResidenceAttractionAreaType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="ResidenceAttractionAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ResidenceAttractionAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ResidenceAttractionArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ResidentialDevelopmentType" type="urf:ResidentialDevelopmentTypeType"/>
+  <xs:complexType name="ResidentialDevelopmentTypeType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element name="area" type="gml:MeasureType" minOccurs="0"/>
+      <xs:element name="projectPeriod" type="xs:string" minOccurs="0"/>
+      <xs:element name="purpose" type="xs:string" minOccurs="0"/>
+      <xs:element name="status" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="note" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ResidentialDevelopmentTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ResidentialDevelopmentType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ResidentialLandDevelopmentType" type="urf:ResidentialLandDevelopmentTypeType"/>
+  <xs:complexType name="ResidentialLandDevelopmentTypeType">
+    <xs:sequence>
+      <xs:element name="startDate" type="xs:date" minOccurs="0"/>
+      <xs:element name="endDate" type="xs:date" minOccurs="0"/>
+      <xs:element name="costUpToLastFiscalYear" type="xs:double" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ResidentialLandDevelopmentTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ResidentialLandDevelopmentType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Resource" type="urf:ResourceType"/>
+  <xs:complexType name="ResourceType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="referenceDate" type="xs:date"/>
+      <xs:element name="authority" type="xs:string"/>
+      <xs:element name="url" type="xs:anyURI" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ResourcePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:Resource"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ResourceTable" type="urf:ResourceTableType"/>
+  <xs:complexType name="ResourceTableType">
+    <xs:sequence>
+      <xs:element name="resourceList" type="urf:ResourcePropertyType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ResourceTablePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ResourceTable"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RoadWidthType" type="urf:RoadWidthTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="RoadWidthTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="urf:UrbanAreaClassValuePropertyType"/>
+          <xs:element name="value" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RoadWidthTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:RoadWidthType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SalesAmount" type="urf:SalesAmountType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="SalesAmountType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="gml:CodeType"/>
+          <xs:element name="salesAmount" type="urf:ValueByNamesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SalesAmountPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SalesAmount"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ScenicResource" type="urf:ScenicResourceType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="ScenicResourceType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="typeName" type="xs:string" minOccurs="0"/>
+          <xs:element name="address" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ScenicResourcePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ScenicResource"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SedimentDisasterProneArea" type="urf:SedimentDisasterProneAreaType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="SedimentDisasterProneAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="disasterType" type="gml:CodeType"/>
+          <xs:element name="areaType" type="gml:CodeType"/>
+          <xs:element name="zoneNumber" type="xs:string"/>
+          <xs:element name="zoneName" type="xs:string"/>
+          <xs:element name="status" type="gml:CodeType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SedimentDisasterProneAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SedimentDisasterProneArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SpecifiedUrgentUrbanRenewalArea" type="urf:SpecifiedUrgentUrbanRenewalAreaType" substitutionGroup="urf:UrgentUrbanRenewalArea"/>
+  <xs:complexType name="SpecifiedUrgentUrbanRenewalAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrgentUrbanRenewalAreaType">
+        <xs:sequence>
+          <xs:element name="developmentProject" type="urf:GlobalHubCityDevelopmentProjectPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpecifiedUrgentUrbanRenewalAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SpecifiedUrgentUrbanRenewalArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SubregionName" type="urf:SubregionNameType"/>
+  <xs:complexType name="SubregionNameType">
+    <xs:sequence>
+      <xs:element name="townName" type="xs:string" minOccurs="0"/>
+      <xs:element name="blockName" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SubregionNamePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SubregionName"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SummaryRecordType" type="urf:SummaryRecordTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="SummaryRecordTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="classCode" type="gml:CodeType" minOccurs="0"/>
+          <xs:element name="classLabel" type="xs:string" minOccurs="0"/>
+          <xs:element name="item" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SummaryRecordTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SummaryRecordType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Symbol" type="urf:SymbolType" substitutionGroup="urf:PortrayalObject"/>
+  <xs:complexType name="SymbolType">
+    <xs:complexContent>
+      <xs:extension base="urf:PortrayalObjectType">
+        <xs:sequence>
+          <xs:element name="lod0Geometry" type="gml:PointType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SymbolPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:Symbol"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="TotalAreaByLandUseType" type="urf:TotalAreaByLandUseTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="TotalAreaByLandUseTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="urf:UnitAreaPropertyType"/>
+          <xs:element name="areaByLandUseType" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TotalAreaByLandUseTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TotalAreaByLandUseType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TotalEconomicStructureAndActivitiesType" type="urf:TotalEconomicStructureAndActivitiesTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="TotalEconomicStructureAndActivitiesTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="gml:CodeType"/>
+          <xs:element name="economicStructureAndActivities" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TotalEconomicStructureAndActivitiesTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TotalEconomicStructureAndActivitiesType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TotalLandUseChangeClass" type="urf:TotalLandUseChangeClassType"/>
+  <xs:complexType name="TotalLandUseChangeClassType">
+    <xs:sequence>
+      <xs:element name="urbanArea" type="urf:UrbanAreaClassValuePropertyType" minOccurs="0"/>
+      <xs:element name="year" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TotalLandUseChangeClassPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TotalLandUseChangeClass"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TotalLandUseChangeType" type="urf:TotalLandUseChangeTypeType"/>
+  <xs:complexType name="TotalLandUseChangeTypeType">
+    <xs:sequence>
+      <xs:element name="class" type="urf:TotalLandUseChangeClassPropertyType"/>
+      <xs:element name="total" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TotalLandUseChangeTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TotalLandUseChangeType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TotalLandUseDiversion" type="urf:TotalLandUseDiversionType"/>
+  <xs:complexType name="TotalLandUseDiversionType">
+    <xs:sequence>
+      <xs:element name="unit" type="urf:ReportingUnitPropertyType"/>
+      <xs:element name="year" type="xs:gYear"/>
+      <xs:element name="total" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TotalLandUseDiversionPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TotalLandUseDiversion"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TotalNewHousing" type="urf:TotalNewHousingType"/>
+  <xs:complexType name="TotalNewHousingType">
+    <xs:sequence>
+      <xs:element name="class" type="gml:CodeType"/>
+      <xs:element name="total" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TotalNewHousingPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TotalNewHousing"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TouristTripConsumptionType" type="urf:TouristTripConsumptionTypeType" substitutionGroup="urf:TravelAndTourismConsumptionType"/>
+  <xs:complexType name="TouristTripConsumptionTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:TravelAndTourismConsumptionTypeType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TouristTripConsumptionTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TouristTripConsumptionType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TrafficFlowVolumeType" type="urf:TrafficFlowVolumeTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="TrafficFlowVolumeTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="departure" type="gml:CodeType"/>
+          <xs:element name="destination" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TrafficFlowVolumeTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TrafficFlowVolumeType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TrafficVolumeType" type="urf:TrafficVolumeTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="TrafficVolumeTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="sectionId" type="xs:string"/>
+          <xs:element name="routeName" type="xs:string"/>
+          <xs:element name="observationPointName" type="xs:string"/>
+          <xs:element name="weekday12hourTrafficVolume" type="xs:integer"/>
+          <xs:element name="weekday24hourTrafficVolume" type="xs:integer"/>
+          <xs:element name="largeVehicleRate" type="xs:double"/>
+          <xs:element name="congestionRate" type="xs:double"/>
+          <xs:element name="averageTravelSpeedInCongestion" type="xs:double"/>
+          <xs:element name="averageInboundTravelSpeedInCongestion" type="xs:double"/>
+          <xs:element name="averageOutboundTravelSpeedInCongestion" type="xs:double"/>
+          <xs:element name="averageInboundTravelSpeedNoCongestion" type="xs:double"/>
+          <xs:element name="averageOutboundTravelSpeedNoCongestion" type="xs:double"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TrafficVolumeTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TrafficVolumeType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TransportationNode" type="urf:TransportationNodeType" substitutionGroup="gml:AbstractFeature"/>
+  <xs:complexType name="TransportationNodeType">
+    <xs:complexContent>
+      <xs:extension base="gml:AbstractFeatureType">
+        <xs:sequence>
+          <xs:element name="urf::node" type="urf:utility::NodePropertyType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TransportationNodePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TransportationNode"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="TravelAndTourismConsumptionType" type="urf:TravelAndTourismConsumptionTypeType" substitutionGroup="urf:UrbanPlanningBasicSurveyRecord"/>
+  <xs:complexType name="TravelAndTourismConsumptionTypeType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanPlanningBasicSurveyRecordType">
+        <xs:sequence>
+          <xs:element name="class" type="xs:gYear"/>
+          <xs:element name="value" type="urf:ValueByCodesPropertyType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TravelAndTourismConsumptionTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TravelAndTourismConsumptionType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UnclassifiedBlankArea" type="urf:UnclassifiedBlankAreaType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="UnclassifiedBlankAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UnclassifiedBlankAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UnclassifiedBlankArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UnclassifiedUseDistrict" type="urf:UnclassifiedUseDistrictType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="UnclassifiedUseDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UnclassifiedUseDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UnclassifiedUseDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UnitArea" type="urf:UnitAreaType"/>
+  <xs:complexType name="UnitAreaType">
+    <xs:choice>
+      <xs:element name="subregionCode" type="gml:CodeType"/>
+      <xs:element name="subregionName" type="urf:SubregionNamePropertyType"/>
+      <xs:element name="meshCode" type="gml:CodeType"/>
+      <xs:element name="urbanArea" type="urf:UrbanAreaClassValuePropertyType"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="UnitAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UnitArea"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UrbanDevelopmentProjectType" type="urf:UrbanDevelopmentProjectTypeType"/>
+  <xs:complexType name="UrbanDevelopmentProjectTypeType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element name="dateOfDecision" type="xs:date" minOccurs="0"/>
+      <xs:element name="projectName" type="xs:string" minOccurs="0"/>
+      <xs:element name="plannedArea" type="gml:MeasureType" minOccurs="0"/>
+      <xs:element name="ongoingArea" type="gml:MeasureType" minOccurs="0"/>
+      <xs:element name="costUpToLastFiscalYear" type="xs:double" minOccurs="0"/>
+      <xs:element name="cost" type="xs:double" minOccurs="0"/>
+      <xs:element name="completedArea" type="gml:MeasureType" minOccurs="0"/>
+      <xs:element name="projectPeriod" type="xs:string" minOccurs="0"/>
+      <xs:element name="note" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="UrbanDevelopmentProjectTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanDevelopmentProjectType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UrbanFacilityStatus" type="urf:UrbanFacilityStatusType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="UrbanFacilityStatusType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="dateOfDecision" type="xs:date" minOccurs="0"/>
+          <xs:element name="facilityName" type="xs:string" minOccurs="0"/>
+          <xs:element name="isPlanned" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="isImplemented" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="costUpToLastYear" type="xs:double" minOccurs="0"/>
+          <xs:element name="totalCost" type="xs:double" minOccurs="0"/>
+          <xs:element name="isCompleted" type="xs:string" minOccurs="0"/>
+          <xs:element name="startDate" type="xs:date" minOccurs="0"/>
+          <xs:element name="completedDate" type="xs:date" minOccurs="0"/>
+          <xs:element name="note" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UrbanFacilityStatusPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanFacilityStatus"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UrbanFacilitySurveyData" type="urf:UrbanFacilitySurveyDataType"/>
+  <xs:complexType name="UrbanFacilitySurveyDataType">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="UrbanFacilitySurveyDataPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanFacilitySurveyData"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UrbanFunctionAttractionArea" type="urf:UrbanFunctionAttractionAreaType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="UrbanFunctionAttractionAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UrbanFunctionAttractionAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanFunctionAttractionArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="Urbanization" type="urf:UrbanizationType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="UrbanizationType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="period" type="xs:string" minOccurs="0"/>
+          <xs:element name="resources" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UrbanizationPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:Urbanization"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UrbanParkAttribute" type="urf:UrbanParkAttributeType"/>
+  <xs:complexType name="UrbanParkAttributeType">
+    <xs:sequence>
+      <xs:element name="parkCode" type="gml:CodeType"/>
+      <xs:element name="startFrom" type="xs:date"/>
+      <xs:element name="breakdownOfNominalArea" type="urf:BreakdownOfNominalAreaPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="UrbanParkAttributePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanParkAttribute"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UrbanPlanningBasicSurveyRecord" type="urf:UrbanPlanningBasicSurveyRecordType" abstract="true"/>
+  <xs:complexType name="UrbanPlanningBasicSurveyRecordType" abstract="true">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="UrbanPlanningBasicSurveyRecordPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanPlanningBasicSurveyRecord"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UrbanPlanningBasicSurveyTable" type="urf:UrbanPlanningBasicSurveyTableType"/>
+  <xs:complexType name="UrbanPlanningBasicSurveyTableType">
+    <xs:sequence>
+      <xs:element name="prefecture" type="gml:CodeType"/>
+      <xs:element name="city" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="dataItemNumber" type="gml:CodeType"/>
+      <xs:element name="tableName" type="xs:string"/>
+      <xs:element name="unit" type="xs:string" minOccurs="0"/>
+      <xs:element name="referenceDate" type="xs:date" minOccurs="0"/>
+      <xs:element name="record" type="urf:UrbanPlanningBasicSurveyRecordPropertyType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="UrbanPlanningBasicSurveyTablePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanPlanningBasicSurveyTable"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UrbanPlanningDesicion" type="urf:UrbanPlanningDesicionType"/>
+  <xs:complexType name="UrbanPlanningDesicionType">
+    <xs:sequence>
+      <xs:element name="surveyYear" type="xs:gYear"/>
+      <xs:element name="prefecture" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="city" type="gml:CodeType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="UrbanPlanningDesicionPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanPlanningDesicion"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UrgentUrbanRenewalArea" type="urf:UrgentUrbanRenewalAreaType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="UrgentUrbanRenewalAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="developmentPolicy" type="gml:StringOrRefType"/>
+          <xs:element name="specialDistrict" type="urf:SpecialUrbanRenaissanceDistrictPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="privateProject" type="urf:PrivateUrbanRenewalProjectPlanPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="specifiedArea" type="urf:SpecifiedUrgentUrbanRenewalAreaPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UrgentUrbanRenewalAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrgentUrbanRenewalArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ValueByCodes" type="urf:ValueByCodesType"/>
+  <xs:complexType name="ValueByCodesType">
+    <xs:sequence>
+      <xs:element name="class" type="gml:CodeType" maxOccurs="unbounded"/>
+      <xs:element name="intValue" type="xs:integer" minOccurs="0"/>
+      <xs:element name="doubleValue" type="xs:double" minOccurs="0"/>
+      <xs:element name="measureValue" type="gml:MeasureType" minOccurs="0"/>
+      <xs:element name="stringValue" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ValueByCodesPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ValueByCodes"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="WeatherObservation" type="urf:WeatherObservationType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="WeatherObservationType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="weatherObservationType" type="urf:WeatherObservationTypePropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="WeatherObservationPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:WeatherObservation"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="WeatherObservationType" type="urf:WeatherObservationTypeType"/>
+  <xs:complexType name="WeatherObservationTypeType">
+    <xs:sequence>
+      <xs:element name="class" type="xs:string" minOccurs="0"/>
+      <xs:element name="date" type="xs:date"/>
+      <xs:element name="totalRainfall" type="gml:LengthType"/>
+      <xs:element name="maxRainfallPerHour" type="gml:LengthType"/>
+      <xs:element name="averageTemperature" type="xs:double"/>
+      <xs:element name="maxTemperature" type="xs:double"/>
+      <xs:element name="minTemperature" type="xs:double"/>
+      <xs:element name="averageWindSpeed" type="xs:double"/>
+      <xs:element name="maxWindDirection" type="gml:CodeType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="WeatherObservationTypePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:WeatherObservationType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="_UrbanFunction" type="urf:_UrbanFunctionType" abstract="true" substitutionGroup="urf:_CityObject"/>
+  <xs:complexType name="_UrbanFunctionType" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="urf:_CityObjectType">
+        <xs:sequence>
+          <xs:element name="class" type="gml:CodeType" minOccurs="0"/>
+          <xs:element name="function" type="gml:CodeType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="usage" type="gml:CodeType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="validFrom" type="xs:date" minOccurs="0"/>
+          <xs:element name="validFromType" type="gml:CodeType" minOccurs="0"/>
+          <xs:element name="enactmentFiscalYear" type="xs:gYear" minOccurs="0"/>
+          <xs:element name="validTo" type="xs:date" minOccurs="0"/>
+          <xs:element name="validToType" type="gml:CodeType" minOccurs="0"/>
+          <xs:element name="expirationFiscalYear" type="xs:gYear" minOccurs="0"/>
+          <xs:element name="legalGrounds" type="xs:string" minOccurs="0"/>
+          <xs:element name="custodian" type="xs:string" minOccurs="0"/>
+          <xs:element name="notificationNumber" type="xs:string" minOccurs="0"/>
+          <xs:element name="finalNotificationNumber" type="xs:string" minOccurs="0"/>
+          <xs:element name="finalNotificationDate" type="xs:date" minOccurs="0"/>
+          <xs:element name="urbanPlanType" type="gml:CodeType" minOccurs="0"/>
+          <xs:element name="areaClassificationType" type="gml:CodeType" minOccurs="0"/>
+          <xs:element name="nominalArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="prefecture" type="gml:CodeType" minOccurs="0"/>
+          <xs:element name="city" type="gml:CodeType" minOccurs="0"/>
+          <xs:element name="reference" type="xs:anyURI" minOccurs="0"/>
+          <xs:element name="reason" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="note" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="surveyYear" type="xs:gYear" minOccurs="0"/>
+          <xs:element name="lod0MultiCurve" type="gml:MultiCurveType" minOccurs="0"/>
+          <xs:element name="lod0MultiSurface" type="gml:MultiSurfaceType" minOccurs="0"/>
+          <xs:element name="lod1MultiSurface" type="gml:MultiSurfaceType" minOccurs="0"/>
+          <xs:element name="lod0MultiPoint" type="gml:MultiPointType" minOccurs="0"/>
+          <xs:element name="dataQualityAttribute" type="urf:DataQualityAttributePropertyType" minOccurs="0"/>
+          <xs:element name="table" type="urf:UrbanPlanningBasicSurveyTablePropertyType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="attributes" type="urf:UrbanPlanningBasicSurveyRecordPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="keyValuePairAttribute" type="urf:KeyValuePairAttributePropertyType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_UrbanFunctionPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:_UrbanFunction"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="Zone" type="urf:ZoneType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="ZoneType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="location" type="xs:string" minOccurs="0"/>
+          <xs:element name="urbanParkAttribute" type="urf:UrbanParkAttributePropertyType" minOccurs="0"/>
+          <xs:element name="boundary" type="urf:BoundaryPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ZonePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:Zone"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="Boundary" type="urf:BoundaryType"/>
+  <xs:complexType name="BoundaryType">
+    <xs:sequence>
+      <xs:element name="class" type="gml:CodeType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="function" type="gml:CodeType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="usage" type="gml:CodeType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="offset" type="gml:LengthType" minOccurs="0"/>
+      <xs:element name="offsetDirection" type="xs:string" minOccurs="0"/>
+      <xs:element name="location" type="gml:MultiCurveType" minOccurs="0"/>
+      <xs:element name="dmAttribute" type="urf:DmAttributePropertyType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BoundaryPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:Boundary"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ThreeDimensionalExtent" type="urf:ThreeDimensionalExtentType" substitutionGroup="urf:_UrbanFunction"/>
+  <xs:complexType name="ThreeDimensionalExtentType">
+    <xs:complexContent>
+      <xs:extension base="urf:_UrbanFunctionType">
+        <xs:sequence>
+          <xs:element name="minimumDistance" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="maximumLoad" type="gml:MeasureType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ThreeDimensionalExtentPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ThreeDimensionalExtent"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UrbanPlanningArea" type="urf:UrbanPlanningAreaType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="UrbanPlanningAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="areaClassification" type="gml:CodeType"/>
+          <xs:element name="reasonForAreaClassification" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="policyForAreaClassification" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="purposeForUrbanPlan" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="policyForUrbanPlanDecision" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="population" type="xs:integer" minOccurs="0"/>
+          <xs:element name="cityArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="cityPopulation" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UrbanPlanningAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanPlanningArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="QuasiUrbanPlanningArea" type="urf:QuasiUrbanPlanningAreaType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="QuasiUrbanPlanningAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="population" type="xs:integer" minOccurs="0"/>
+          <xs:element name="cityArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="cityPopulation" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="QuasiUrbanPlanningAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:QuasiUrbanPlanningArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="AreaClassification" type="urf:AreaClassificationType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="AreaClassificationType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="population" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AreaClassificationPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:AreaClassification"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DistrictsAndZones" type="urf:DistrictsAndZonesType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="DistrictsAndZonesType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="areaInTotal" type="gml:MeasureType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DistrictsAndZonesPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DistrictsAndZones"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UseDistrict" type="urf:UseDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="UseDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="floorAreaRate" type="xs:integer"/>
+          <xs:element name="minimumSiteArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="buildingCoverageRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="wallSetbackDistance" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="buildingHeightLimits" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="buildingRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="otherRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="setbackRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="frontRoadRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="adjacentLandRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="northDirectionRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="shadeRegulation" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UseDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UseDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SpecialUseDistrict" type="urf:SpecialUseDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="SpecialUseDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="buildingRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="otherRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpecialUseDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SpecialUseDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SpecialUseRestrictionDistrict" type="urf:SpecialUseRestrictionDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="SpecialUseRestrictionDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="buildingRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="otherRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpecialUseRestrictionDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SpecialUseRestrictionDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ExceptionalFloorAreaRateDistrict" type="urf:ExceptionalFloorAreaRateDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="ExceptionalFloorAreaRateDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="buildingHeightLimits" type="gml:LengthType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ExceptionalFloorAreaRateDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ExceptionalFloorAreaRateDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="HighRiseResidentialAttractionDistrict" type="urf:HighRiseResidentialAttractionDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="HighRiseResidentialAttractionDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="floorAreaRate" type="xs:integer"/>
+          <xs:element name="maximumBuildingCoverageRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="minimumSiteArea" type="gml:MeasureType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HighRiseResidentialAttractionDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:HighRiseResidentialAttractionDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="HeightControlDistrict" type="urf:HeightControlDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="HeightControlDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="maximumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="minimumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HeightControlDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:HeightControlDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="HighLevelUseDistrict" type="urf:HighLevelUseDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="HighLevelUseDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="maximumFloorAreaRate" type="xs:integer" maxOccurs="unbounded"/>
+          <xs:element name="minimumFloorAreaRate" type="xs:integer" maxOccurs="unbounded"/>
+          <xs:element name="maximumBuildingCoverageRate" type="xs:integer" maxOccurs="unbounded"/>
+          <xs:element name="minimumBuildingArea" type="gml:MeasureType" maxOccurs="unbounded"/>
+          <xs:element name="setbackSize" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HighLevelUseDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:HighLevelUseDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SpecifiedBlock" type="urf:SpecifiedBlockType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="SpecifiedBlockType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="floorAreaRate" type="xs:integer"/>
+          <xs:element name="maximumBuildingHeight" type="gml:LengthType"/>
+          <xs:element name="setbackSize" type="gml:StringOrRefType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpecifiedBlockPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SpecifiedBlock"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SpecialUrbanRenaissanceDistrict" type="urf:SpecialUrbanRenaissanceDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="SpecialUrbanRenaissanceDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="useToBeInduced" type="gml:StringOrRefType"/>
+          <xs:element name="maximumFloorAreaRate" type="xs:integer"/>
+          <xs:element name="minimumFloorAreaRate" type="xs:integer"/>
+          <xs:element name="maximumBuildingCoverageRate" type="xs:integer"/>
+          <xs:element name="minimumBuildingArea" type="gml:MeasureType"/>
+          <xs:element name="maximumBuildingHeight" type="gml:StringOrRefType"/>
+          <xs:element name="setbackSize" type="gml:StringOrRefType"/>
+          <xs:element name="otherRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpecialUrbanRenaissanceDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SpecialUrbanRenaissanceDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="HousingControlArea" type="urf:HousingControlAreaType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="HousingControlAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HousingControlAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:HousingControlArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ResidentialEnvironmentImprovementDistrict" type="urf:ResidentialEnvironmentImprovementDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="ResidentialEnvironmentImprovementDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="useToBeInduced" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="maximumFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="maximumBuildingCoverageRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="maximumBuildingHeight" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="setbackSize" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="otherRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ResidentialEnvironmentImprovementDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ResidentialEnvironmentImprovementDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SpecialUseAttractionDistrict" type="urf:SpecialUseAttractionDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="SpecialUseAttractionDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="useToBeInduced" type="gml:StringOrRefType"/>
+          <xs:element name="maximumFloorAreaRate" type="xs:integer"/>
+          <xs:element name="minimumFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="minimumBuildingArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="maximumBuildingHeight" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="otherRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpecialUseAttractionDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SpecialUseAttractionDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="FirePreventionDistrict" type="urf:FirePreventionDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="FirePreventionDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FirePreventionDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:FirePreventionDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SpecifiedDisasterPreventionBlockImprovementZone" type="urf:SpecifiedDisasterPreventionBlockImprovementZoneType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="SpecifiedDisasterPreventionBlockImprovementZoneType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="minimumSiteArea" type="gml:MeasureType"/>
+          <xs:element name="setbackSize" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="minimumFrontageRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="minimumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpecifiedDisasterPreventionBlockImprovementZonePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SpecifiedDisasterPreventionBlockImprovementZone"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="LandscapeZone" type="urf:LandscapeZoneType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="LandscapeZoneType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="buildingDesignRestriction" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="maximumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="minimumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="setbackSize" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="minimumSiteArea" type="gml:MeasureType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LandscapeZonePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:LandscapeZone"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ScenicDistrict" type="urf:ScenicDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="ScenicDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="buildingCoverageRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="buildingHeightLimits" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="wallSetbackDistanceWithRoad" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="wallSetbaskDistanceWithAdjoiningLand" type="gml:LengthType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ScenicDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ScenicDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ParkingPlaceDevelopmentZone" type="urf:ParkingPlaceDevelopmentZoneType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="ParkingPlaceDevelopmentZoneType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ParkingPlaceDevelopmentZonePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ParkingPlaceDevelopmentZone"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="PortZone" type="urf:PortZoneType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="PortZoneType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="floorAreaRate" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PortZonePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:PortZone"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SpecialZoneForPreservationOfHistoricalLandscape" type="urf:SpecialZoneForPreservationOfHistoricalLandscapeType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="SpecialZoneForPreservationOfHistoricalLandscapeType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpecialZoneForPreservationOfHistoricalLandscapePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SpecialZoneForPreservationOfHistoricalLandscape"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ZoneForPreservationOfHistoricalLandscape" type="urf:ZoneForPreservationOfHistoricalLandscapeType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="ZoneForPreservationOfHistoricalLandscapeType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ZoneForPreservationOfHistoricalLandscapePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ZoneForPreservationOfHistoricalLandscape"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="GreenSpaceConservationDistrict" type="urf:GreenSpaceConservationDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="GreenSpaceConservationDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GreenSpaceConservationDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:GreenSpaceConservationDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SpecialGreenSpaceConservationDistrict" type="urf:SpecialGreenSpaceConservationDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="SpecialGreenSpaceConservationDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="requirement" type="gml:CodeType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpecialGreenSpaceConservationDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SpecialGreenSpaceConservationDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="TreePlantingDistrict" type="urf:TreePlantingDistrictType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="TreePlantingDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="minimumGreeningRate" type="xs:integer"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TreePlantingDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TreePlantingDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DistributionBusinessZone" type="urf:DistributionBusinessZoneType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="DistributionBusinessZoneType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="guidelinePublicationDate" type="xs:date" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DistributionBusinessZonePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DistributionBusinessZone"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ProductiveGreenZone" type="urf:ProductiveGreenZoneType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="ProductiveGreenZoneType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence>
+          <xs:element name="zoneNumber" type="xs:string" minOccurs="0"/>
+          <xs:element name="specificication" type="gml:CodeType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ProductiveGreenZonePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ProductiveGreenZone"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ConservationZoneForClustersOfTraditionalStructures" type="urf:ConservationZoneForClustersOfTraditionalStructuresType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="ConservationZoneForClustersOfTraditionalStructuresType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ConservationZoneForClustersOfTraditionalStructuresPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ConservationZoneForClustersOfTraditionalStructures"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="AircraftNoiseControlZone" type="urf:AircraftNoiseControlZoneType" substitutionGroup="urf:DistrictsAndZones"/>
+  <xs:complexType name="AircraftNoiseControlZoneType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictsAndZonesType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AircraftNoiseControlZonePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:AircraftNoiseControlZone"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ProjectPromotionArea" type="urf:ProjectPromotionAreaType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="ProjectPromotionAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="developmentPolicy" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="publicFacilitiesPlans" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ProjectPromotionAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ProjectPromotionArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UrbanRedevelopmentPromotionArea" type="urf:UrbanRedevelopmentPromotionAreaType" substitutionGroup="urf:ProjectPromotionArea"/>
+  <xs:complexType name="UrbanRedevelopmentPromotionAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ProjectPromotionAreaType">
+        <xs:sequence>
+          <xs:element name="publicFacilities" type="gml:StringOrRefType"/>
+          <xs:element name="unitArea" type="gml:StringOrRefType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UrbanRedevelopmentPromotionAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanRedevelopmentPromotionArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="LandReadjustmentPromotionArea" type="urf:LandReadjustmentPromotionAreaType" substitutionGroup="urf:ProjectPromotionArea"/>
+  <xs:complexType name="LandReadjustmentPromotionAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ProjectPromotionAreaType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LandReadjustmentPromotionAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:LandReadjustmentPromotionArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ResidentialBlockConstructionPromotionArea" type="urf:ResidentialBlockConstructionPromotionAreaType" substitutionGroup="urf:ProjectPromotionArea"/>
+  <xs:complexType name="ResidentialBlockConstructionPromotionAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ProjectPromotionAreaType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ResidentialBlockConstructionPromotionAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ResidentialBlockConstructionPromotionArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="LandReadjustmentPromotionAreasForCoreBusinessUrbanDevelopment" type="urf:LandReadjustmentPromotionAreasForCoreBusinessUrbanDevelopmentType" substitutionGroup="urf:ProjectPromotionArea"/>
+  <xs:complexType name="LandReadjustmentPromotionAreasForCoreBusinessUrbanDevelopmentType">
+    <xs:complexContent>
+      <xs:extension base="urf:ProjectPromotionAreaType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LandReadjustmentPromotionAreasForCoreBusinessUrbanDevelopmentPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:LandReadjustmentPromotionAreasForCoreBusinessUrbanDevelopment"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UnusedLandUsePromotionArea" type="urf:UnusedLandUsePromotionAreaType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="UnusedLandUsePromotionAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UnusedLandUsePromotionAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UnusedLandUsePromotionArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UrbanDisasterRecoveryPromotionArea" type="urf:UrbanDisasterRecoveryPromotionAreaType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="UrbanDisasterRecoveryPromotionAreaType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="expirationDate" type="xs:date"/>
+          <xs:element name="emergencyRecoveryPolicy" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="plannedProjectType" type="gml:CodeType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UrbanDisasterRecoveryPromotionAreaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanDisasterRecoveryPromotionArea"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UrbanFacility" type="urf:UrbanFacilityType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="UrbanFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="number" type="xs:string" minOccurs="0"/>
+          <xs:element name="threeDimensionalExtent" type="urf:ThreeDimensionalExtentPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UrbanFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="TrafficFacility" type="urf:TrafficFacilityType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="TrafficFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="startLocation" type="xs:string" minOccurs="0"/>
+          <xs:element name="endLocation" type="xs:string" minOccurs="0"/>
+          <xs:element name="viaLocations" type="xs:string" minOccurs="0"/>
+          <xs:element name="length" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="width" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="parkingPlaceAttribute" type="urf:ParkingPlaceAttributePropertyType" minOccurs="0"/>
+          <xs:element name="vehicleTerminalAttribute" type="urf:VehicleTerminalAttributePropertyType" minOccurs="0"/>
+          <xs:element name="urbanRapidTransitRailroadAttribute" type="urf:UrbanRapidTransitRailroadAttributePropertyType" minOccurs="0"/>
+          <xs:element name="urbanRoadAttribute" type="urf:UrbanRoadAttributePropertyType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TrafficFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TrafficFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UrbanRoadAttribute" type="urf:UrbanRoadAttributeType"/>
+  <xs:complexType name="UrbanRoadAttributeType">
+    <xs:sequence>
+      <xs:element name="routeTypeNumber" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="routeSizeNumber" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="routeSerialNumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="roadType" type="gml:CodeType"/>
+      <xs:element name="numberOfLanes" type="xs:integer" minOccurs="0"/>
+      <xs:element name="roadStructure" type="gml:StringOrRefType" minOccurs="0"/>
+      <xs:element name="structureType" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="crossType" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="trafficPlazas" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="structuralDetails" type="urf:StructureDetailsPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="UrbanRoadAttributePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanRoadAttribute"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UrbanRapidTransitRailroadAttribute" type="urf:UrbanRapidTransitRailroadAttributeType"/>
+  <xs:complexType name="UrbanRapidTransitRailroadAttributeType">
+    <xs:sequence>
+      <xs:element name="structureType" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="crossType" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="structuralDetails" type="urf:StructureDetailsPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="UrbanRapidTransitRailroadAttributePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanRapidTransitRailroadAttribute"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="StructureDetails" type="urf:StructureDetailsType"/>
+  <xs:complexType name="StructureDetailsType">
+    <xs:sequence>
+      <xs:element name="startLocation" type="xs:string"/>
+      <xs:element name="endLocation" type="xs:string"/>
+      <xs:element name="viaLocations" type="xs:string" minOccurs="0"/>
+      <xs:element name="length" type="gml:LengthType" minOccurs="0"/>
+      <xs:element name="structureType" type="gml:CodeType"/>
+      <xs:element name="minimumWidth" type="gml:LengthType" minOccurs="0"/>
+      <xs:element name="maximumWidth" type="gml:LengthType" minOccurs="0"/>
+      <xs:element name="standardWidth" type="gml:LengthType" minOccurs="0"/>
+      <xs:element name="crossType" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="StructureDetailsPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:StructureDetails"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ParkingPlaceAttribute" type="urf:ParkingPlaceAttributeType"/>
+  <xs:complexType name="ParkingPlaceAttributeType">
+    <xs:sequence>
+      <xs:element name="storeysAboveGround" type="xs:integer"/>
+      <xs:element name="storeysBelowGround" type="xs:integer"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ParkingPlaceAttributePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ParkingPlaceAttribute"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="VehicleTerminalAttribute" type="urf:VehicleTerminalAttributeType"/>
+  <xs:complexType name="VehicleTerminalAttributeType">
+    <xs:sequence>
+      <xs:element name="terminalType" type="gml:CodeType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="VehicleTerminalAttributePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:VehicleTerminalAttribute"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="OpenSpaceForPublicUse" type="urf:OpenSpaceForPublicUseType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="OpenSpaceForPublicUseType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="parkAttribute" type="urf:ParkAttributePropertyType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="OpenSpaceForPublicUsePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:OpenSpaceForPublicUse"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SupplyFacility" type="urf:SupplyFacilityType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="SupplyFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="waterWorksAttribute" type="urf:WaterWorksAttributePropertyType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SupplyFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SupplyFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ParkAttribute" type="urf:ParkAttributeType"/>
+  <xs:complexType name="ParkAttributeType">
+    <xs:sequence>
+      <xs:element name="parkSerialNumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="parkSizeNumber" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="parkTypeNumber" type="gml:CodeType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ParkAttributePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ParkAttribute"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="WaterWorksAttribute" type="urf:WaterWorksAttributeType"/>
+  <xs:complexType name="WaterWorksAttributeType">
+    <xs:sequence>
+      <xs:element name="startLocation" type="xs:string" minOccurs="0"/>
+      <xs:element name="endLocation" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="WaterWorksAttributePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:WaterWorksAttribute"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TreatmentFacility" type="urf:TreatmentFacilityType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="TreatmentFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="sewerSystemAttribute" type="urf:SewerSystemAttributePropertyType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TreatmentFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TreatmentFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SewerSystemAttribute" type="urf:SewerSystemAttributeType"/>
+  <xs:complexType name="SewerSystemAttributeType">
+    <xs:sequence>
+      <xs:element name="startLocation" type="xs:string" minOccurs="0"/>
+      <xs:element name="endLocation" type="xs:string" minOccurs="0"/>
+      <xs:element name="systemType" type="gml:CodeType" minOccurs="0"/>
+      <xs:element name="drainageArea" type="gml:StringOrRefType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SewerSystemAttributePropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SewerSystemAttribute"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Waterway" type="urf:WaterwayType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="WaterwayType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="startLocation" type="xs:string" minOccurs="0"/>
+          <xs:element name="endLocation" type="xs:string" minOccurs="0"/>
+          <xs:element name="structure" type="gml:CodeType" minOccurs="0"/>
+          <xs:element name="length" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="width" type="gml:LengthType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="WaterwayPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:Waterway"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="EducationalAndCulturalFacility" type="urf:EducationalAndCulturalFacilityType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="EducationalAndCulturalFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EducationalAndCulturalFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:EducationalAndCulturalFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="MedicalFacility" type="urf:MedicalFacilityType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="MedicalFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MedicalFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:MedicalFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SocialWelfareFacility" type="urf:SocialWelfareFacilityType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="SocialWelfareFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SocialWelfareFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SocialWelfareFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="MarketsSlaughterhousesCrematoria" type="urf:MarketsSlaughterhousesCrematoriaType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="MarketsSlaughterhousesCrematoriaType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MarketsSlaughterhousesCrematoriaPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:MarketsSlaughterhousesCrematoria"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="CollectiveHousingFacilities" type="urf:CollectiveHousingFacilitiesType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="CollectiveHousingFacilitiesType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="buildingCoverageRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="floorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="numberOfLowRiseHousing" type="xs:integer" minOccurs="0"/>
+          <xs:element name="numberOfMiddleRiseHousing" type="xs:integer" minOccurs="0"/>
+          <xs:element name="numberOfHighRiseHousing" type="xs:integer" minOccurs="0"/>
+          <xs:element name="totalNumberOfHousing" type="xs:integer" minOccurs="0"/>
+          <xs:element name="publicFacilitiesAllocationPolicy" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="scheduledExecutor" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CollectiveHousingFacilitiesPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:CollectiveHousingFacilities"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="CollectiveGovernmentAndPublicOfficeFacilities" type="urf:CollectiveGovernmentAndPublicOfficeFacilitiesType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="CollectiveGovernmentAndPublicOfficeFacilitiesType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="buildingCoverageRate" type="xs:double" minOccurs="0"/>
+          <xs:element name="floorAreaRate" type="xs:double" minOccurs="0"/>
+          <xs:element name="publicFacilitiesAllocationPolicy" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="scheduledExecutor" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CollectiveGovernmentAndPublicOfficeFacilitiesPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:CollectiveGovernmentAndPublicOfficeFacilities"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="CollectiveUrbanDisasterPreventionFacilities" type="urf:CollectiveUrbanDisasterPreventionFacilitiesType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="CollectiveUrbanDisasterPreventionFacilitiesType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="specificUtilityAndPublicFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="maximumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="minimumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="maximumFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="minimumFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="maximumBuildingCoverageRate" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CollectiveUrbanDisasterPreventionFacilitiesPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:CollectiveUrbanDisasterPreventionFacilities"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DistributionBusinessPark" type="urf:DistributionBusinessParkType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="DistributionBusinessParkType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="distributionBusinessPark" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="publicAndUtilityFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="buildingCoverageRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="floorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="maximumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="minimumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="setbackSize" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="scheduledExecutor" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DistributionBusinessParkPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DistributionBusinessPark"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="CollectiveFacilitiesForTsunamiDisasterPrevention" type="urf:CollectiveFacilitiesForTsunamiDisasterPreventionType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="CollectiveFacilitiesForTsunamiDisasterPreventionType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="housingFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="supecificBusinessFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="publicFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="utilityFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="maximumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="minimumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="maximumFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="minimumFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="maximumBuildingCoverageRate" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CollectiveFacilitiesForTsunamiDisasterPreventionPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:CollectiveFacilitiesForTsunamiDisasterPrevention"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="CollectiveFacilitiesForReconstructionAndRevitalization" type="urf:CollectiveFacilitiesForReconstructionAndRevitalizationType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="CollectiveFacilitiesForReconstructionAndRevitalizationType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="housingFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="supecificBusinessFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="publicFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="utilityFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="maximumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="minimumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="maximumFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="minimumFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="maximumBuildingCoverageRate" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CollectiveFacilitiesForReconstructionAndRevitalizationPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:CollectiveFacilitiesForReconstructionAndRevitalization"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="CollectiveFacilitiesForReconstruction" type="urf:CollectiveFacilitiesForReconstructionType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="CollectiveFacilitiesForReconstructionType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="housingFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="supecificBusinessFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="publicFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="utilityFacilities" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="maximumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="minimumBuildingHeight" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="maximumFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="minimumFloorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="maximumBuildingCoverageRate" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CollectiveFacilitiesForReconstructionPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:CollectiveFacilitiesForReconstruction"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UrbanFacilityStipulatedByCabinetOrder" type="urf:UrbanFacilityStipulatedByCabinetOrderType" substitutionGroup="urf:UrbanFacility"/>
+  <xs:complexType name="UrbanFacilityStipulatedByCabinetOrderType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityType">
+        <xs:sequence>
+          <xs:element name="length" type="gml:LengthType" minOccurs="0"/>
+          <xs:element name="width" type="gml:LengthType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UrbanFacilityStipulatedByCabinetOrderPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanFacilityStipulatedByCabinetOrder"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="TelecommunicationFacility" type="urf:TelecommunicationFacilityType" substitutionGroup="urf:UrbanFacilityStipulatedByCabinetOrder"/>
+  <xs:complexType name="TelecommunicationFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityStipulatedByCabinetOrderType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TelecommunicationFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TelecommunicationFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="WindProtectionFacility" type="urf:WindProtectionFacilityType" substitutionGroup="urf:UrbanFacilityStipulatedByCabinetOrder"/>
+  <xs:complexType name="WindProtectionFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityStipulatedByCabinetOrderType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="WindProtectionFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:WindProtectionFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="FireProtectionFacility" type="urf:FireProtectionFacilityType" substitutionGroup="urf:UrbanFacilityStipulatedByCabinetOrder"/>
+  <xs:complexType name="FireProtectionFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityStipulatedByCabinetOrderType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FireProtectionFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:FireProtectionFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="TideFacility" type="urf:TideFacilityType" substitutionGroup="urf:UrbanFacilityStipulatedByCabinetOrder"/>
+  <xs:complexType name="TideFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityStipulatedByCabinetOrderType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TideFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:TideFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SandControlFacility" type="urf:SandControlFacilityType" substitutionGroup="urf:UrbanFacilityStipulatedByCabinetOrder"/>
+  <xs:complexType name="SandControlFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityStipulatedByCabinetOrderType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SandControlFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SandControlFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="FloodPreventionFacility" type="urf:FloodPreventionFacilityType" substitutionGroup="urf:UrbanFacilityStipulatedByCabinetOrder"/>
+  <xs:complexType name="FloodPreventionFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityStipulatedByCabinetOrderType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FloodPreventionFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:FloodPreventionFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SnowProtectionFacility" type="urf:SnowProtectionFacilityType" substitutionGroup="urf:UrbanFacilityStipulatedByCabinetOrder"/>
+  <xs:complexType name="SnowProtectionFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanFacilityStipulatedByCabinetOrderType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SnowProtectionFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SnowProtectionFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UrbanDevelopmentProject" type="urf:UrbanDevelopmentProjectType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="UrbanDevelopmentProjectType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="scheduledExecutor" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UrbanDevelopmentProjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanDevelopmentProject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="LandReadjustmentProject" type="urf:LandReadjustmentProjectType" substitutionGroup="urf:UrbanDevelopmentProject"/>
+  <xs:complexType name="LandReadjustmentProjectType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanDevelopmentProjectType">
+        <xs:sequence>
+          <xs:element name="publicFacilityAllocation" type="gml:StringOrRefType"/>
+          <xs:element name="buildingLotDevelopment" type="gml:StringOrRefType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LandReadjustmentProjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:LandReadjustmentProject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="NewHousingAndUrbanDevelopmentProject" type="urf:NewHousingAndUrbanDevelopmentProjectType" substitutionGroup="urf:UrbanDevelopmentProject"/>
+  <xs:complexType name="NewHousingAndUrbanDevelopmentProjectType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanDevelopmentProjectType">
+        <xs:sequence>
+          <xs:element name="housing" type="gml:StringOrRefType"/>
+          <xs:element name="publicFacilityAllocation" type="gml:StringOrRefType"/>
+          <xs:element name="residentialLandUsePlan" type="gml:StringOrRefType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NewHousingAndUrbanDevelopmentProjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:NewHousingAndUrbanDevelopmentProject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="IndustrialParkDevelopmentProject" type="urf:IndustrialParkDevelopmentProjectType" substitutionGroup="urf:UrbanDevelopmentProject"/>
+  <xs:complexType name="IndustrialParkDevelopmentProjectType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanDevelopmentProjectType">
+        <xs:sequence>
+          <xs:element name="publicFacilityAllocation" type="gml:StringOrRefType"/>
+          <xs:element name="residentialLandUsePlan" type="gml:StringOrRefType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="IndustrialParkDevelopmentProjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:IndustrialParkDevelopmentProject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UrbanRedevelopmentProject" type="urf:UrbanRedevelopmentProjectType" substitutionGroup="urf:UrbanDevelopmentProject"/>
+  <xs:complexType name="UrbanRedevelopmentProjectType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanDevelopmentProjectType">
+        <xs:sequence>
+          <xs:element name="publicFacilityAllocation" type="gml:StringOrRefType"/>
+          <xs:element name="developmentPlan" type="gml:StringOrRefType"/>
+          <xs:element name="housingTarget" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="siteArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="totalFloorArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="numberOfHousing" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UrbanRedevelopmentProjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanRedevelopmentProject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="NewUrbanInfrastructureProject" type="urf:NewUrbanInfrastructureProjectType" substitutionGroup="urf:UrbanDevelopmentProject"/>
+  <xs:complexType name="NewUrbanInfrastructureProjectType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanDevelopmentProjectType">
+        <xs:sequence>
+          <xs:element name="landForCentralPublicFacilities" type="gml:StringOrRefType"/>
+          <xs:element name="districtsAllocation" type="gml:StringOrRefType"/>
+          <xs:element name="landUsePlan" type="gml:StringOrRefType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NewUrbanInfrastructureProjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:NewUrbanInfrastructureProject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ResidentialBlockConstructionProject" type="urf:ResidentialBlockConstructionProjectType" substitutionGroup="urf:UrbanDevelopmentProject"/>
+  <xs:complexType name="ResidentialBlockConstructionProjectType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanDevelopmentProjectType">
+        <xs:sequence>
+          <xs:element name="publicFacilityAllocation" type="gml:StringOrRefType"/>
+          <xs:element name="developmentPlan" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="siteArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="totalFloorArea" type="gml:MeasureType" minOccurs="0"/>
+          <xs:element name="" type="urf:LandReadjustmentPromotionAreaPropertyType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ResidentialBlockConstructionProjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ResidentialBlockConstructionProject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DisasterPreventionBlockImprovementProject" type="urf:DisasterPreventionBlockImprovementProjectType" substitutionGroup="urf:UrbanDevelopmentProject"/>
+  <xs:complexType name="DisasterPreventionBlockImprovementProjectType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanDevelopmentProjectType">
+        <xs:sequence>
+          <xs:element name="disasterPreventionPublicFacilityAllocation" type="gml:StringOrRefType"/>
+          <xs:element name="otherPublicFacilityAllocation" type="gml:StringOrRefType"/>
+          <xs:element name="developmentPlan" type="gml:StringOrRefType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisasterPreventionBlockImprovementProjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DisasterPreventionBlockImprovementProject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="UrbanRenewalProject" type="urf:UrbanRenewalProjectType" substitutionGroup="urf:UrbanDevelopmentProject"/>
+  <xs:complexType name="UrbanRenewalProjectType">
+    <xs:complexContent>
+      <xs:extension base="urf:UrbanDevelopmentProjectType">
+        <xs:sequence>
+          <xs:element name="storeysAboveGround" type="xs:nonNegativeInteger" minOccurs="0"/>
+          <xs:element name="storeysBelowGround" type="xs:nonNegativeInteger" minOccurs="0"/>
+          <xs:element name="setbackSize" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="floorAreaRate" type="xs:integer" minOccurs="0"/>
+          <xs:element name="buildingUsage" type="xs:string" minOccurs="0"/>
+          <xs:element name="siteArea" type="gml:MeasureType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UrbanRenewalProjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:UrbanRenewalProject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ScheduledAreaForUrbanDevelopmentProject" type="urf:ScheduledAreaForUrbanDevelopmentProjectType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="ScheduledAreaForUrbanDevelopmentProjectType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="scheduledExecutor" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ScheduledAreaForUrbanDevelopmentProjectPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ScheduledAreaForUrbanDevelopmentProject"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ScheduledAreaForNewHousingAndUrbanDevelopmentProjects" type="urf:ScheduledAreaForNewHousingAndUrbanDevelopmentProjectsType" substitutionGroup="urf:ScheduledAreaForUrbanDevelopmentProject"/>
+  <xs:complexType name="ScheduledAreaForNewHousingAndUrbanDevelopmentProjectsType">
+    <xs:complexContent>
+      <xs:extension base="urf:ScheduledAreaForUrbanDevelopmentProjectType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ScheduledAreaForNewHousingAndUrbanDevelopmentProjectsPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ScheduledAreaForNewHousingAndUrbanDevelopmentProjects"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ScheduledAreaForIndustrialParkDevelopmentProjects" type="urf:ScheduledAreaForIndustrialParkDevelopmentProjectsType" substitutionGroup="urf:ScheduledAreaForUrbanDevelopmentProject"/>
+  <xs:complexType name="ScheduledAreaForIndustrialParkDevelopmentProjectsType">
+    <xs:complexContent>
+      <xs:extension base="urf:ScheduledAreaForUrbanDevelopmentProjectType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ScheduledAreaForIndustrialParkDevelopmentProjectsPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ScheduledAreaForIndustrialParkDevelopmentProjects"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ScheduledAreaForNewUrbanInfrastructureProjects" type="urf:ScheduledAreaForNewUrbanInfrastructureProjectsType" substitutionGroup="urf:ScheduledAreaForUrbanDevelopmentProject"/>
+  <xs:complexType name="ScheduledAreaForNewUrbanInfrastructureProjectsType">
+    <xs:complexContent>
+      <xs:extension base="urf:ScheduledAreaForUrbanDevelopmentProjectType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ScheduledAreaForNewUrbanInfrastructureProjectsPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ScheduledAreaForNewUrbanInfrastructureProjects"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ScheduledAreaForCollectiveHousingFacilities" type="urf:ScheduledAreaForCollectiveHousingFacilitiesType" substitutionGroup="urf:ScheduledAreaForUrbanDevelopmentProject"/>
+  <xs:complexType name="ScheduledAreaForCollectiveHousingFacilitiesType">
+    <xs:complexContent>
+      <xs:extension base="urf:ScheduledAreaForUrbanDevelopmentProjectType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ScheduledAreaForCollectiveHousingFacilitiesPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ScheduledAreaForCollectiveHousingFacilities"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ScheduledAreaForCollectiveGovernmentAndPublicOfficeFacilities" type="urf:ScheduledAreaForCollectiveGovernmentAndPublicOfficeFacilitiesType" substitutionGroup="urf:ScheduledAreaForUrbanDevelopmentProject"/>
+  <xs:complexType name="ScheduledAreaForCollectiveGovernmentAndPublicOfficeFacilitiesType">
+    <xs:complexContent>
+      <xs:extension base="urf:ScheduledAreaForUrbanDevelopmentProjectType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ScheduledAreaForCollectiveGovernmentAndPublicOfficeFacilitiesPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ScheduledAreaForCollectiveGovernmentAndPublicOfficeFacilities"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ScheduledAreaForDistributionBusinessPark" type="urf:ScheduledAreaForDistributionBusinessParkType" substitutionGroup="urf:ScheduledAreaForUrbanDevelopmentProject"/>
+  <xs:complexType name="ScheduledAreaForDistributionBusinessParkType">
+    <xs:complexContent>
+      <xs:extension base="urf:ScheduledAreaForUrbanDevelopmentProjectType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ScheduledAreaForDistributionBusinessParkPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ScheduledAreaForDistributionBusinessPark"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="_AbstractDistrictPlan" type="urf:_AbstractDistrictPlanType" abstract="true" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="_AbstractDistrictPlanType" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="objectives" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="policy" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="promotionDistrict" type="urf:PromotionDistrictPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="districtDevelopmentPlan" type="urf:DistrictDevelopmentPlanPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_AbstractDistrictPlanPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:_AbstractDistrictPlan"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DistrictPlan" type="urf:DistrictPlanType" substitutionGroup="urf:_AbstractDistrictPlan"/>
+  <xs:complexType name="DistrictPlanType">
+    <xs:complexContent>
+      <xs:extension base="urf:_AbstractDistrictPlanType">
+        <xs:sequence>
+          <xs:element name="facilityAllocation" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="landUsePolicy" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DistrictPlanPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DistrictPlan"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DisasterPreventionBlockImprovementZonePlan" type="urf:DisasterPreventionBlockImprovementZonePlanType" substitutionGroup="urf:_AbstractDistrictPlan"/>
+  <xs:complexType name="DisasterPreventionBlockImprovementZonePlanType">
+    <xs:complexContent>
+      <xs:extension base="urf:_AbstractDistrictPlanType">
+        <xs:sequence>
+          <xs:element name="zonalDisasterPreventionFacilitiesAllocation" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="specifiedZonalDisasterPreventionFacilitiesAllocation" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="zonalDisasterPreventionFacilities" type="urf:ZonalDisasterPreventionFacilityPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisasterPreventionBlockImprovementZonePlanPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DisasterPreventionBlockImprovementZonePlan"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="HistoricSceneryMaintenanceAndImprovementDistrictPlan" type="urf:HistoricSceneryMaintenanceAndImprovementDistrictPlanType" substitutionGroup="urf:_AbstractDistrictPlan"/>
+  <xs:complexType name="HistoricSceneryMaintenanceAndImprovementDistrictPlanType">
+    <xs:complexContent>
+      <xs:extension base="urf:_AbstractDistrictPlanType">
+        <xs:sequence>
+          <xs:element name="landUsePolicy" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HistoricSceneryMaintenanceAndImprovementDistrictPlanPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:HistoricSceneryMaintenanceAndImprovementDistrictPlan"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="RoadsideDistrictPlan" type="urf:RoadsideDistrictPlanType" substitutionGroup="urf:_AbstractDistrictPlan"/>
+  <xs:complexType name="RoadsideDistrictPlanType">
+    <xs:complexContent>
+      <xs:extension base="urf:_AbstractDistrictPlanType">
+        <xs:sequence>
+          <xs:element name="facilitiesAllocation" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="landUsePolicy" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RoadsideDistrictPlanPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:RoadsideDistrictPlan"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="RuralDistrictPlan" type="urf:RuralDistrictPlanType" substitutionGroup="urf:_AbstractDistrictPlan"/>
+  <xs:complexType name="RuralDistrictPlanType">
+    <xs:complexContent>
+      <xs:extension base="urf:_AbstractDistrictPlanType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RuralDistrictPlanPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:RuralDistrictPlan"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="PromotionDistrict" type="urf:PromotionDistrictType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="PromotionDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PromotionDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:PromotionDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DistrictDevelopmentPlan" type="urf:DistrictDevelopmentPlanType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="DistrictDevelopmentPlanType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="districtFacilitiesAllocation" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="buildingRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="urbanGreenSpaceConservation" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="activityRestrictionInFarmland" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="landuseRestrictions" type="gml:StringOrRefType" minOccurs="0"/>
+          <xs:element name="districtFacility" type="urf:DistrictFacilityPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="district" type="urf:DistrictPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DistrictDevelopmentPlanPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DistrictDevelopmentPlan"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="SpecifiedBuildingZoneImprovementPlan" type="urf:SpecifiedBuildingZoneImprovementPlanType" substitutionGroup="urf:DistrictDevelopmentPlan"/>
+  <xs:complexType name="SpecifiedBuildingZoneImprovementPlanType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictDevelopmentPlanType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpecifiedBuildingZoneImprovementPlanPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:SpecifiedBuildingZoneImprovementPlan"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DistrictImprovementPlanForDisasterPreventionBlockImprovementZonePlan" type="urf:DistrictImprovementPlanForDisasterPreventionBlockImprovementZonePlanType" substitutionGroup="urf:DistrictDevelopmentPlan"/>
+  <xs:complexType name="DistrictImprovementPlanForDisasterPreventionBlockImprovementZonePlanType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictDevelopmentPlanType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DistrictImprovementPlanForDisasterPreventionBlockImprovementZonePlanPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DistrictImprovementPlanForDisasterPreventionBlockImprovementZonePlan"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DistrictImprovementPlanForHistoricSceneryMaintenanceAndImprovementDistrict" type="urf:DistrictImprovementPlanForHistoricSceneryMaintenanceAndImprovementDistrictType" substitutionGroup="urf:DistrictDevelopmentPlan"/>
+  <xs:complexType name="DistrictImprovementPlanForHistoricSceneryMaintenanceAndImprovementDistrictType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictDevelopmentPlanType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DistrictImprovementPlanForHistoricSceneryMaintenanceAndImprovementDistrictPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DistrictImprovementPlanForHistoricSceneryMaintenanceAndImprovementDistrict"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="RoadsideDistrictImprovementPlan" type="urf:RoadsideDistrictImprovementPlanType" substitutionGroup="urf:DistrictDevelopmentPlan"/>
+  <xs:complexType name="RoadsideDistrictImprovementPlanType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictDevelopmentPlanType">
+        <xs:sequence>
+          <xs:element name="roadsideDistrictFacilitiesAllocation" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RoadsideDistrictImprovementPlanPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:RoadsideDistrictImprovementPlan"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="RuralDistrictImprovementPlan" type="urf:RuralDistrictImprovementPlanType" substitutionGroup="urf:DistrictDevelopmentPlan"/>
+  <xs:complexType name="RuralDistrictImprovementPlanType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictDevelopmentPlanType">
+        <xs:sequence>
+          <xs:element name="ruralDistrictFacilitiesAllocation" type="gml:StringOrRefType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RuralDistrictImprovementPlanPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:RuralDistrictImprovementPlan"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="DistrictFacility" type="urf:DistrictFacilityType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="DistrictFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DistrictFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:DistrictFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="RoadsideDistrictFacility" type="urf:RoadsideDistrictFacilityType" substitutionGroup="urf:DistrictFacility"/>
+  <xs:complexType name="RoadsideDistrictFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictFacilityType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RoadsideDistrictFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:RoadsideDistrictFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="RuralDistrictFacility" type="urf:RuralDistrictFacilityType" substitutionGroup="urf:DistrictFacility"/>
+  <xs:complexType name="RuralDistrictFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:DistrictFacilityType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RuralDistrictFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:RuralDistrictFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+  <xs:element name="ZonalDisasterPreventionFacility" type="urf:ZonalDisasterPreventionFacilityType" substitutionGroup="urf:Zone"/>
+  <xs:complexType name="ZonalDisasterPreventionFacilityType">
+    <xs:complexContent>
+      <xs:extension base="urf:ZoneType">
+        <xs:sequence>
+          <xs:element name="facilityType" type="gml:CodeType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ZonalDisasterPreventionFacilityPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element ref="urf:ZonalDisasterPreventionFacility"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,150 @@
+= rule-xsd-cls-union-asGroup
+
+== Purpose
+
+Process union types as xs:group references instead of inline elements when the union has the `asGroup` characteristic.
+
+== ShapeChange Reference
+
+=== Java Implementation
+
+[source,java]
+----
+// XsdDocument.java lines 2083-2094 (property mapping)
+if (typeCi != null && typeCi.category() == Options.UNION && typeCi.asGroup()
+    && typeCi.matches("rule-xsd-cls-union-asGroup")) {
+    e1 = document.createElementNS(Options.W3C_XML_SCHEMA, "group");
+    addStandardAnnotation(e1, pi);
+    if (typeCi.pkg() == null || typeCi.pkg().xmlns() == null) {
+        MessageContext mc = result.addError(null, 132, typeCi.name());
+        if (mc != null)
+            mc.addDetail(null, 400, "Class", typeCi.fullName());
+    } else {
+        addAttribute(e1, "ref", typeCi.qname() + "Group");
+        addImport(typeCi.pkg().xmlns(), typeCi.pkg().targetNamespace());
+    }
+    addMinMaxOccurs(e1, m);
+}
+
+// XsdDocument.java lines 1070-1094 (group creation)
+public Element pGroup(ClassInfo ci, ClassInfo cibase) {
+    Element e1 = document.createElementNS(Options.W3C_XML_SCHEMA, "group");
+    document.getDocumentElement().appendChild(e1);
+    addAttribute(e1, "name", ci.name() + "Group");
+    addStandardAnnotation(e1, ci);
+
+    Element ret = null;
+    if (ci.category() == Options.UNION && ci.matches("rule-xsd-cls-union-as-choice")) {
+        ret = document.createElementNS(Options.W3C_XML_SCHEMA, "choice");
+    } else if (ci.category() == Options.UNION && ci.matches("rule-xsd-cls-union-as-group-property-type")) {
+        ret = document.createElementNS(Options.W3C_XML_SCHEMA, "choice");
+    } else if (ci.matches("rule-xsd-cls-sequence")) {
+        ret = document.createElementNS(Options.W3C_XML_SCHEMA, "sequence");
+        if (ci.matches("rule-xsd-cls-mixin-classes") && ci.matches("rule-xsd-cls-mixin-classes-as-group")) {
+            addGroupReferences(ci, ret, true);
+        }
+    } else {
+        MessageContext mc = result.addError(this, 155, ci.name());
+        if (mc != null)
+            mc.addDetail(null, 400, "Class", ci.fullName());
+        ret = document.createElementNS(Options.W3C_XML_SCHEMA, "sequence");
+    }
+    e1.appendChild(ret);
+
+    return ret;
+}
+----
+
+== Algorithm
+
+When a property has a union type with `asGroup` characteristic:
+
+. Create an xs:group reference element
+. Set the reference to `{unionQName}Group`
+. Add standard annotations
+. Apply multiplicity constraints
+. Import the namespace if needed
+
+== Configuration
+
+This rule is triggered when:
+
+* Property type is a union (`category == UNION`)
+* Union has `asGroup` characteristic (`as_group == true`)
+* Rule `rule-xsd-cls-union-asGroup` is enabled
+
+== Input Model Requirements
+
+* Union class must have `asGroup` characteristic set
+* Union must be in a package with valid namespace
+
+== Output
+
+=== Property Element
+
+[source,xml]
+----
+<xs:element name="propertyName">
+  <xs:group ref="prefix:UnionNameGroup" minOccurs="0" maxOccurs="unbounded"/>
+</xs:element>
+----
+
+=== Group Definition
+
+[source,xml]
+----
+<xs:group name="UnionNameGroup">
+  <xs:annotation>
+    <xs:documentation>Union documentation</xs:documentation>
+  </xs:annotation>
+  <xs:choice>
+    <!-- Union options as elements -->
+  </xs:choice>
+</xs:group>
+----
+
+== Example
+
+=== Input Model
+
+[source]
+----
+Union: GeometryUnion
+  asGroup: true
+  Properties:
+    - point: Point
+    - curve: Curve
+    - surface: Surface
+----
+
+=== Output XSD
+
+[source,xml]
+----
+<!-- Group definition -->
+<xs:group name="GeometryUnionGroup">
+  <xs:choice>
+    <xs:element ref="gml:Point"/>
+    <xs:element ref="gml:Curve"/>
+    <xs:element ref="gml:Surface"/>
+  </xs:choice>
+</xs:group>
+
+<!-- Property using the group -->
+<xs:element name="geometry">
+  <xs:group ref="prefix:GeometryUnionGroup"/>
+</xs:element>
+----
+
+== Related Rules
+
+* link:rule-xsd-cls-union-as-choice.adoc[rule-xsd-cls-union-as-choice] - Alternative union encoding
+* link:rule-xsd-cls-sequence.adoc[rule-xsd-cls-sequence] - Group structure
+* link:rule-xsd-cls-mixin-classes-as-group.adoc[rule-xsd-cls-mixin-classes-as-group] - Mixin group handling
+
+== Notes
+
+* Union must have `asGroup` characteristic enabled
+* Group reference allows reuse across multiple properties
+* Multiplicity applies to the group reference, not individual options
+* Group name is formed by appending "Group" to the union name

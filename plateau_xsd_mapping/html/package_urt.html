@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>urt - PLATEAU Mapping</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px 20px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+    }
+    .breadcrumb {
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+    .breadcrumb a {
+      color: white;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    h1 { font-size: 2em; }
+    .class-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .class-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #667eea;
+    }
+    .class-name {
+      font-size: 1.4em;
+      font-weight: bold;
+      color: #667eea;
+    }
+    .stereotype-badge {
+      background: #e3f2fd;
+      color: #1976d2;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.9em;
+    }
+    .attributes-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .attributes-table th {
+      text-align: left;
+      padding: 10px;
+      background: #f5f5f5;
+      font-weight: 600;
+      border-bottom: 2px solid #ddd;
+    }
+    .attributes-table td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .resolved {
+      background: #e8f5e9;
+    }
+    .unresolved {
+      background: #fff3e0;
+    }
+    .status-badge {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .badge-resolved {
+      background: #4caf50;
+      color: white;
+    }
+    .badge-unresolved {
+      background: #ff9800;
+      color: white;
+    }
+    .type-info {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      color: #666;
+    }
+    .resolution-path {
+      font-size: 0.85em;
+      color: #4caf50;
+      font-style: italic;
+      margin-top: 5px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="breadcrumb">
+        <a href="index.html">← Back to All Packages</a>
+      </div>
+      <h1>📦 urt</h1>
+      <p>28 classes</p>
+    </header>
+
+    <div id="classes">
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_PublicTransit</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::orgId</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::target</strong></td>
+  <td class="type-info">_CityObject</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_PublicTransitDataType</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Agency</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::name</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::url</strong></td>
+  <td class="type-info">xs:anyURI</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::timezone</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::language</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::phone</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::fareUrl</strong></td>
+  <td class="type-info">xs:anyURI</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::email</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::officialName</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::zipNumber</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::address</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::presidentPosition</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::presidentName</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Attribution</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::organizationName</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::isProducer</strong></td>
+  <td class="type-info">xs:boolean</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::isOperator</strong></td>
+  <td class="type-info">xs:boolean</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::isAuthority</strong></td>
+  <td class="type-info">xs:boolean</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::url</strong></td>
+  <td class="type-info">xs:anyURI</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::email</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::phoneNumber</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>route</strong></td>
+  <td class="type-info">Route</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>trip</strong></td>
+  <td class="type-info">Trip</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>agency</strong></td>
+  <td class="type-info">Agency</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Calendar</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::monday</strong></td>
+  <td class="type-info">xs:boolean</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::tuesday</strong></td>
+  <td class="type-info">xs:boolean</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::wednesday</strong></td>
+  <td class="type-info">xs:boolean</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::thursday</strong></td>
+  <td class="type-info">xs:boolean</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::friday</strong></td>
+  <td class="type-info">xs:boolean</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::saturday</strong></td>
+  <td class="type-info">xs:boolean</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::sunday</strong></td>
+  <td class="type-info">xs:boolean</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::startDate</strong></td>
+  <td class="type-info">xs:date</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::endDate</strong></td>
+  <td class="type-info">xs:date</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">CalendarDate</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::date</strong></td>
+  <td class="type-info">xs:date</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::exceptionType</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>calendar</strong></td>
+  <td class="type-info">Calendar</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">CityObjectGroup</div>
+    <div class='stereotype-badge'>«ADEElement»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>dataType</strong></td>
+  <td class="type-info">_PublicTransitDataType</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Description</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::description</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::frequencyOfService</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::numberOfCustomers</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">FareAttribute</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::price</strong></td>
+  <td class="type-info">xs:double</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::currencyType</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::paymentMethod</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::transfers</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::transferDuration</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>agency</strong></td>
+  <td class="type-info">Agency</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">FareRule</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::originId</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::destinationId</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::containsId</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>route</strong></td>
+  <td class="type-info">Route</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>fare</strong></td>
+  <td class="type-info">FareAttribute</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">FeedInfo</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::publisherName</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::publisherUrl</strong></td>
+  <td class="type-info">xs:anyURI</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::language</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::defaultLanguage</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::startDate</strong></td>
+  <td class="type-info">xs:date</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::endDate</strong></td>
+  <td class="type-info">xs:date</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::version</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::contactEmail</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::contactURL</strong></td>
+  <td class="type-info">xs:anyURI</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::detailedInfo</strong></td>
+  <td class="type-info">xs:anyURI</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Frequency</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::startTime</strong></td>
+  <td class="type-info">xs:time</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::endTime</strong></td>
+  <td class="type-info">xs:time</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::headwaySecs</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::exactTimes</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>trip</strong></td>
+  <td class="type-info">Trip</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Level</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::index</strong></td>
+  <td class="type-info">xs:double</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Level0</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Level1</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Level2</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Level3</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Office</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::name</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::url</strong></td>
+  <td class="type-info">xs:anyURI</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::phone</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Pathway</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::mode</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::isBidirectional</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::length</strong></td>
+  <td class="type-info">gml:LengthType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::traversalTime</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::stairCount</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::maxSlope</strong></td>
+  <td class="type-info">xs:double</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::minWidth</strong></td>
+  <td class="type-info">xs:double</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::signpostedAs</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::reversedSignpostedAs</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>from</strong></td>
+  <td class="type-info">Stop</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>to</strong></td>
+  <td class="type-info">Stop</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Point</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>pointSequence</strong></td>
+  <td class="type-info">xs:nonNegativeInteger</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>pointDistanceTraveled</strong></td>
+  <td class="type-info">xs:double</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>point</strong></td>
+  <td class="type-info">Point</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Route</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::shortName</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::longName</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::description</strong></td>
+  <td class="type-info">Description</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::type</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::url</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::color</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::textColor</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::updateDate</strong></td>
+  <td class="type-info">xs:date</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::originStop</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::viaStop</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::destinationStop</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::routeSortOrder</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::continuousPickup</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::continuousDropOff</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>agency</strong></td>
+  <td class="type-info">Agency</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>parentRoute</strong></td>
+  <td class="type-info">Route</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Shape</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>point</strong></td>
+  <td class="type-info">Point</td>
+  <td>1..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Stop</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::code</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::ttsName</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::latitude</strong></td>
+  <td class="type-info">xs:double</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::zoneId</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::longitude</strong></td>
+  <td class="type-info">xs:double</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::url</strong></td>
+  <td class="type-info">xs:anyURI</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::locationType</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::timezone</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::wheelchairBoarding</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::platformCode</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>point</strong></td>
+  <td class="type-info">Point</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>parentStation</strong></td>
+  <td class="type-info">Stop</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>level</strong></td>
+  <td class="type-info">Level</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">StopTime</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::arrivalTime</strong></td>
+  <td class="type-info">xs:time</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::departureTime</strong></td>
+  <td class="type-info">xs:time</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::stopSequence</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::headsign</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::pickupType</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::dropoffType</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::continuousPickupType</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::continuousDropoffType</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::shapeDistanceTraveled</strong></td>
+  <td class="type-info">xs:double</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::timePoint</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>stop</strong></td>
+  <td class="type-info">Stop</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>trip</strong></td>
+  <td class="type-info">Trip</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Transfer</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::transferType</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::minTransferTime</strong></td>
+  <td class="type-info">xs:integer</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>to</strong></td>
+  <td class="type-info">Stop</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>from</strong></td>
+  <td class="type-info">Stop</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Translation</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::tableName</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::fieldName</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::language</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::translation</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::recordedSubId</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::fieldValue</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>recordId</strong></td>
+  <td class="type-info">_PublicTransit</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">TranslationJP</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::language</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::translation</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Trip</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>urt::headsign</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::shortName</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::directionId</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::blockId</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::wheelchairAccessible</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::bikeAllowed</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>urt::symbol</strong></td>
+  <td class="type-info">xs:string</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>shape</strong></td>
+  <td class="type-info">Shape</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>route</strong></td>
+  <td class="type-info">Route</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>calendar</strong></td>
+  <td class="type-info">Calendar</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>calendarDate</strong></td>
+  <td class="type-info">CalendarDate</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>office</strong></td>
+  <td class="type-info">Office</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+    </div>
+
+    <footer>
+      <p><a href="index.html">← Back to All Packages</a></p>
+    </footer>
+  </div>
+</body>
+</html>

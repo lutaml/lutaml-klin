@@ -1,0 +1,114 @@
+= Mapping Merging
+:toc:
+:toclevels: 3
+
+== Purpose
+
+The merging feature combines multiple mapping documents into a single unified mapping. This is essential for projects that generate mappings for individual packages separately and need to consolidate them for documentation or schema generation.
+
+== Concepts
+
+=== Merge Strategies
+
+* **Append** - Combine all mappings sequentially
+* **Merge** - Combine with deduplication and conflict resolution
+* **Override** - Later mappings override earlier ones
+
+=== Conflict Resolution
+
+When merging conflicting definitions:
+
+* Same class in different packages - Keep both with qualified names
+* Same attribute with different types - Report error or use priority
+* Duplicate namespaces - Merge and deduplicate
+
+== Basic Merging
+
+=== Command Line
+
+[source,bash]
+----
+# Merge multiple mapping files
+lutaml-klin merge \
+  --input urf_mapping.yaml \
+  --input uro_mapping.yaml \
+  --input core_mapping.yaml \
+  --output combined_mapping.yaml
+
+# Merge all files in directory
+lutaml-klin merge \
+  --input mappings/*.yaml \
+  --output complete_mapping.yaml
+----
+
+=== Ruby API
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load individual mappings
+urf = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(
+  File.read('urf_mapping.yaml')
+)
+uro = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(
+  File.read('uro_mapping.yaml')
+)
+
+# Merge mappings
+merger = Lutaml::Klin::MappingMerger.new
+merged = merger.merge([urf, uro])
+
+# Save result
+File.write('combined_mapping.yaml', merged.to_yaml)
+----
+
+== Advanced Options
+
+=== Conflict Resolution Strategy
+
+[source,bash]
+----
+# Use priority order (first wins)
+lutaml-klin merge \
+  --input high_priority.yaml \
+  --input low_priority.yaml \
+  --strategy first-wins \
+  --output merged.yaml
+
+# Use priority order (last wins)
+lutaml-klin merge \
+  --input base.yaml \
+  --input override.yaml \
+  --strategy last-wins \
+  --output merged.yaml
+----
+
+=== Selective Merging
+
+[source,ruby]
+----
+# Merge only specific packages
+merger = Lutaml::Klin::MappingMerger.new
+merged = merger.merge(mappings, packages: ['urf', 'uro'])
+
+# Exclude certain packages
+merged = merger.merge(mappings, exclude: ['deprecated'])
+----
+
+== Validation After Merge
+
+[source,bash]
+----
+# Merge and validate in one step
+lutaml-klin merge \
+  --input mappings/*.yaml \
+  --output merged.yaml \
+  --validate
+----
+
+== Relevant Documents
+
+* link:../cli.adoc[CLI Reference] - Merge command
+* link:mapping-generation.adoc[Mapping Generation] - Source format
+* link:validation.adoc[Validation] - Post-merge validation

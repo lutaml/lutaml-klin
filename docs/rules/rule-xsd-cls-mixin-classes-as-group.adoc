@@ -1,0 +1,186 @@
+= rule-xsd-cls-mixin-classes-as-group
+
+== Purpose
+
+Reference mixin class properties via xs:group instead of inline property definitions. This provides a cleaner separation and allows reuse of mixin property structures.
+
+== ShapeChange Reference
+
+=== Java Implementation
+
+[source,java]
+----
+// XsdDocument.java lines 940-942 (complexType with mixin references)
+if (ci.matches("rule-xsd-cls-sequence")) {
+    ret = document.createElementNS(Options.W3C_XML_SCHEMA, "sequence");
+    if (ci.matches("rule-xsd-cls-mixin-classes")) {
+        if (ci.matches("rule-xsd-cls-mixin-classes-as-group"))
+            addGroupReferences(ci, ret, false);
+        else
+            addMixinProperties(ci, ret, schDoc);
+    }
+}
+
+// XsdDocument.java lines 1097-1119 (addGroupReferences method)
+private void addGroupReferences(ClassInfo ci, Element e, boolean recursive) {
+    SortedSet<String> st = ci.supertypes();
+    if (st != null && ci.matches("rule-xsd-cls-mixin-classes")
+        && ci.matches("rule-xsd-cls-mixin-classes-as-group")) {
+        for (String sid : st) {
+            ClassInfo cix = model.classById(sid);
+            if (cix != null && (cix.category() == Options.MIXIN
+                || (cix.matches("rule-xsd-cls-no-abstract-classes") && cix.isAbstract()))) {
+                Element eg = document.createElementNS(Options.W3C_XML_SCHEMA, "group");
+                e.appendChild(eg);
+                addAttribute(eg, "ref", cix.qname() + "Group");
+                if (recursive)
+                    addGroupReferences(cix, e, true);
+            } else if (cix != null && cix.category() != Options.MIXIN
+                && ci.matches("rule-xsd-cls-mixin-classes-non-mixin-supertypes") && recursive) {
+                processLocalProperties(cix, e, null);
+                if (recursive)
+                    addGroupReferences(cix, e, true);
+            }
+        }
+    }
+}
+----
+
+== Algorithm
+
+When processing a class that uses mixin classes:
+
+. Check if both `rule-xsd-cls-mixin-classes` and `rule-xsd-cls-mixin-classes-as-group` are enabled
+. For each supertype:
+  - If supertype is a mixin or abstract class with `rule-xsd-cls-no-abstract-classes`
+    * Add xs:group reference to `{mixinQName}Group`
+    * Recursively process mixin's supertypes if recursive flag is true
+  - If supertype is non-mixin and `rule-xsd-cls-mixin-classes-non-mixin-supertypes` enabled
+    * Process local properties inline
+    * Recursively process its supertypes
+. Import necessary namespaces
+
+== Configuration
+
+This rule requires:
+
+* `rule-xsd-cls-sequence` - To create sequence container
+* `rule-xsd-cls-mixin-classes` - To enable mixin processing
+* `rule-xsd-cls-mixin-classes-as-group` - To use group references instead of inline
+
+Optional:
+* `rule-xsd-cls-no-abstract-classes` - Treat abstract classes as mixins
+* `rule-xsd-cls-mixin-classes-non-mixin-supertypes` - Handle non-mixin supertypes
+
+== Input Model Requirements
+
+* Class must have mixin supertypes
+* Mixin classes must be properly categorized
+* Mixin classes must have valid packages with namespaces
+
+== Output
+
+=== Class with Mixin References
+
+[source,xml]
+----
+<xs:complexType name="FeatureType">
+  <xs:complexContent>
+    <xs:extension base="gml:AbstractFeatureType">
+      <xs:sequence>
+        <!-- Reference to mixin group instead of inline properties -->
+        <xs:group ref="prefix:IdentifiableMixinGroup"/>
+        <xs:group ref="prefix:TemporalMixinGroup"/>
+
+        <!-- Local properties -->
+        <xs:element name="localProperty" type="xs:string"/>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+----
+
+=== Mixin Group Definition
+
+[source,xml]
+----
+<xs:group name="IdentifiableMixinGroup">
+  <xs:sequence>
+    <xs:element name="identifier" type="xs:string"/>
+    <xs:element name="name" type="xs:string" minOccurs="0"/>
+  </xs:sequence>
+</xs:group>
+----
+
+== Example
+
+=== Input Model
+
+[source]
+----
+Class: Building
+  Supertypes:
+    - Feature (non-mixin)
+    - Identifiable (mixin)
+    - Temporal (mixin)
+  Properties:
+    - buildingType: String
+
+Mixin: Identifiable
+  Properties:
+    - identifier: String
+    - name: String [0..1]
+
+Mixin: Temporal
+  Properties:
+    - validFrom: DateTime
+    - validTo: DateTime [0..1]
+----
+
+=== Output XSD
+
+[source,xml]
+----
+<!-- Building type with group references -->
+<xs:complexType name="BuildingType">
+  <xs:complexContent>
+    <xs:extension base="prefix:FeatureType">
+      <xs:sequence>
+        <xs:group ref="prefix:IdentifiableGroup"/>
+        <xs:group ref="prefix:TemporalGroup"/>
+        <xs:element name="buildingType" type="xs:string"/>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<!-- Mixin group definitions -->
+<xs:group name="IdentifiableGroup">
+  <xs:sequence>
+    <xs:element name="identifier" type="xs:string"/>
+    <xs:element name="name" type="xs:string" minOccurs="0"/>
+  </xs:sequence>
+</xs:group>
+
+<xs:group name="TemporalGroup">
+  <xs:sequence>
+    <xs:element name="validFrom" type="xs:dateTime"/>
+    <xs:element name="validTo" type="xs:dateTime" minOccurs="0"/>
+  </xs:sequence>
+</xs:group>
+----
+
+== Related Rules
+
+* link:rule-xsd-cls-sequence.adoc[rule-xsd-cls-sequence] - Sequence container
+* link:rule-xsd-cls-mixin-classes.adoc[rule-xsd-cls-mixin-classes] - Mixin class handling
+* link:rule-xsd-cls-no-abstract-classes.adoc[rule-xsd-cls-no-abstract-classes] - Abstract class handling
+* link:rule-xsd-cls-union-asGroup.adoc[rule-xsd-cls-union-asGroup] - Similar group pattern
+
+== Notes
+
+* Group references provide better modularity and reusability
+* Recursive processing handles mixin inheritance hierarchies
+* Non-mixin supertypes can be processed inline if configured
+* Group reference order follows supertype declaration order
+* Each mixin must have its own group definition created separately

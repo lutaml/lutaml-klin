@@ -1,0 +1,115 @@
+= rule-xsd-cls-standard-swe-property-types
+
+== Purpose
+
+Generates SWE Common-style property types with `swe:AssociationAttributeGroup` and `swe:ReferenceType` for sensor/observation encoding.
+
+This enables encoding of sensor and observation data according to SWE Common standards.
+
+== Applies To
+
+* Classes (Object, DataType, Feature, etc.)
+* Properties with class types
+
+== Algorithm
+
+When this rule is enabled for a class:
+
+1. **For property types**: Generate SWE Common-style property type
+   - Add `<xs:sequence minOccurs="0">` with element reference (if class has identity)
+   - Add `swe:AssociationAttributeGroup` attribute group
+   - Import `swe` namespace
+
+2. **Type structure for classes with identity**:
+   ```xml
+   <xs:complexType name="{ClassName}PropertyType">
+     <xs:sequence minOccurs="0">
+       <xs:element ref="prefix:ClassName"/>
+     </xs:sequence>
+     <xs:attributeGroup ref="swe:AssociationAttributeGroup"/>
+   </xs:complexType>
+   ```
+
+3. **For by-reference encoding**: Use `swe:ReferenceType`
+   ```xml
+   <xs:element name="property" type="swe:ReferenceType"/>
+   ```
+
+4. **Identity check**: Uses `classHasIdentity()` to determine if class has:
+   - Category: MIXIN, FEATURE, OBJECT, OKSTRAFID
+   - OR: DATATYPE/UNION with this rule enabled
+
+== Configuration
+
+No additional parameters required beyond enabling the rule.
+
+== Example Output
+
+For an object type with identity:
+[source,xml]
+----
+<xs:complexType name="Observation_PropertyType">
+  <xs:sequence minOccurs="0">
+    <xs:element ref="swe:Observation"/>
+  </xs:sequence>
+  <xs:attributeGroup ref="swe:AssociationAttributeGroup"/>
+</xs:complexType>
+----
+
+For by-reference property:
+[source,xml]
+----
+<xs:element name="observationRef" type="swe:ReferenceType"/>
+----
+
+== Java Implementation Reference
+
+See `XsdDocument.java`:
+- Line 551: `classHasIdentity()` - checks if class has identity including SWE types
+- Lines 1242, 1280-1287: Generate property type with SWE structure
+- Lines 3026-3027: Check for `rule-xsd-cls-standard-swe-property-types`
+- Lines 3271-3274: Import `swe` namespace
+- Lines 4003-4006: Use `swe:ReferenceType` for by-reference encoding
+
+== SWE Common Namespace
+
+The `swe` namespace is:
+- URI: `http://www.opengis.net/swe/2.0`
+- Provides: `AssociationAttributeGroup`, `ReferenceType`
+- Used for: Sensor Web Enablement applications
+
+== Use Cases
+
+* **Sensor observations**: Encoding sensor observation data
+* **Data streams**: Real-time sensor data streams
+* **Sensor metadata**: Sensor descriptions and capabilities
+* **Quality information**: Data quality metrics
+
+== Attribute Groups
+
+=== swe:AssociationAttributeGroup
+
+Provides attributes for referencing SWE objects:
+- Standard XLink attributes for remote references
+- Similar to GML's AssociationAttributeGroup but for SWE
+
+=== swe:ReferenceType
+
+A simple type for referencing SWE resources:
+- Simpler than full property types
+- Used for by-reference encoding
+
+== Related Rules
+
+* `rule-xsd-cls-standard-gml-property-types` - GML 3.2 encoding (alternative)
+* `rule-xsd-cls-standard-19139-property-types` - ISO 19139 encoding (alternative)
+* `rule-xsd-all-naming-swe` - SWE Common naming conventions
+* `rule-xsd-prop-soft-typed` - Soft-typed properties for SWE
+
+== Notes
+
+- Property types have `minOccurs="0"` on sequence when class has identity
+- No nilReason attribute (unlike GML encoding)
+- Simpler than GML encoding (no OwnershipAttributeGroup)
+- Supports soft-typed properties via `name` attribute
+- Part of OGC SWE Common 2.0 standard

@@ -1,0 +1,477 @@
+================================================================================
+XSD Comparison using Canon Gem
+================================================================================
+
+Parsing XSD files...
+❌ XSD files differ
+
+📊 Element Statistics:
+  Generated: 208
+  Reference: 696
+
+❌ Missing elements (346):
+  - NumberOfHouseholds
+  - Target
+  - acreage
+  - activityRestrictionInFarmland
+  - address
+  - adjacentLandRestrictions
+  - ageAndSex
+  - agriculturalDevelopmentType
+  - agriculturalWorker
+  - applicableArea
+  - area
+  - areaClassification
+  - areaClassificationType
+  - areaInSquareMeter
+  - areaInTotal
+  - areaType
+  - attributeHistory
+  - averageTemperature
+  - averageWindSpeed
+  - benefitArea
+  - benefitAreaInUrbanArea
+  - benefitPeriod
+  - blockName
+  - boundary
+  - breakdown
+  - breakdownOfNominalArea
+  - buildingCoverageRate
+  - buildingDesignRestriction
+  - buildingHeightLimits
+  - buildingLotDevelopment
+  - buildingRestrictions
+  - buildingStructure
+  - buildingUsage
+  - capacity
+  - cause
+  - city
+  - cityArea
+  - cityCode
+  - cityName
+  - cityPopulation
+  - class
+  - classCode
+  - classLabel
+  - companyName
+  - companyType
+  - completedArea
+  - completedDate
+  - cost
+  - costUpToLastFiscalYear
+  - costUpToLastYear
+  - crossType
+  - custodian
+  - damagedArea
+  - dataItemNumber
+  - dataQualityAttribute
+  - date
+  - dateOfDecision
+  - daytimeOfficeCommuter
+  - daytimeOver15
+  - daytimePopulation
+  - daytimePopulationDensity
+  - daytimePopulationType
+  - daytimeSchoolCommuter
+  - daytimeUnder15
+  - depthRate
+  - developer
+  - developmentPlan
+  - developmentPolicy
+  - developmentProject
+  - disasterPreventionPublicFacilityAllocation
+  - disasterType
+  - distanceFromStation
+  - distributionBusinessPark
+  - district
+  - districtDevelopmentPlan
+  - districtFacilitiesAllocation
+  - districtFacility
+  - districtsAllocation
+  - doubleValue
+  - drainageArea
+  - economicActivityType
+  - emergencyRecoveryPolicy
+  - enactmentFiscalYear
+  - endLocation
+  - expiration
+  - expirationDate
+  - expirationFiscalYear
+  - extraFloorAreaRate
+  - facilitiesAllocation
+  - facilityAllocation
+  - facilityName
+  - facilityType
+  - farmlandConversionType
+  - fenceGuideline
+  - finalNotificationDate
+  - finalNotificationNumber
+  - firePrevention
+  - fiscalYear
+  - floorAreaRate
+  - forest
+  - forestConversionType
+  - frequencyOfService
+  - frontRoadRestrictions
+  - frontageRate
+  - frontageRoad
+  - frontageRoadDirection
+  - frontageRoadSurface
+  - frontageRoadWidth
+  - function
+  - gas
+  - guidelinePublicationDate
+  - heightControl
+  - housing
+  - housingFacilities
+  - housingTarget
+  - id
+  - implementationBody
+  - implementationPeriod
+  - industryType
+  - intValue
+  - isAcreageChanged
+  - isAddressChanged
+  - isBuildingCoverageRateChanged
+  - isBuildingStructureChanged
+  - isCompleted
+  - isDesignated
+  - isDistanceFromStationChanged
+  - isFirePreventionChanged
+  - isFloorAreaRateChanged
+  - isImplemented
+  - isPlanned
+  - isSame
+  - isSelected
+  - isSupplyFacilitiesChanged
+  - isUrbanPlanAreaChanged
+  - isUseChanged
+  - isUseDistrictChanged
+  - item
+  - keyValuePairAttribute
+  - landForCentralPublicFacilities
+  - landPrice
+  - landPriceHistory
+  - landUsePlan
+  - landUsePolicy
+  - landuseRestrictions
+  - legalGrounds
+  - length
+  - location
+  - lod-1MultiCurve
+  - lod-1MultiPoint
+  - lod-1MultiSurface
+  - lod-2MultiCurve
+  - lod-2MultiPoint
+  - lod-2MultiSurface
+  - lod0MultiCurve
+  - lod0MultiPoint
+  - lod0MultiSurface
+  - lod1MultiCurve
+  - lod1MultiSurface
+  - manufactureShipments
+  - maxRainfallPerHour
+  - maxTemperature
+  - maxWindDirection
+  - maximumBuildingCoverageRate
+  - maximumBuildingHeight
+  - maximumFloorAreaRate
+  - maximumLoad
+  - maximumRainfallPerHour
+  - maximumWidth
+  - measureType
+  - measureValue
+  - minTemperature
+  - minimumBuildingArea
+  - minimumBuildingCoverageRate
+  - minimumBuildingHeight
+  - minimumDistance
+  - minimumFloorAreaRate
+  - minimumFloorHeight
+  - minimumFrontageRate
+  - minimumGreeningRate
+  - minimumGroundHeight
+  - minimumSiteArea
+  - minimumWidth
+  - nominalArea
+  - nonCommuter
+  - northDirectionRestrictions
+  - note
+  - notificationNumber
+  - number
+  - numberOfCustomers
+  - numberOfDamagedHouses
+  - numberOfEmployees
+  - numberOfHighRiseHousing
+  - numberOfHousesFloodedAboveFloorLevel
+  - numberOfHousesFloodedBelowFloorLevel
+  - numberOfHousing
+  - numberOfLanes
+  - numberOfLowRiseHousing
+  - numberOfMiddleRiseHousing
+  - numberOfOffices
+  - numberOfUsers
+  - objectives
+  - observationPoint
+  - offset
+  - offsetDirection
+  - ongoingArea
+  - otherPublicFacilityAllocation
+  - otherRestrictions
+  - park
+  - parkAttribute
+  - parkCode
+  - parkSerialNumber
+  - parkSizeNumber
+  - parkTypeNumber
+  - parkingPlaceAttribute
+  - period
+  - plan
+  - plannedArea
+  - plannedProjectType
+  - pointCode
+  - pointCodeOfLastYear
+  - policy
+  - policyForAreaClassification
+  - policyForUrbanPlanDecision
+  - population
+  - populationDensity
+  - populationType
+  - prefecture
+  - privateProject
+  - projectName
+  - projectPeriod
+  - projectType
+  - promotionDistrict
+  - publicAndUtilityFacilities
+  - publicFacilities
+  - publicFacilitiesAllocationPolicy
+  - publicFacilitiesPlans
+  - publicFacilityAllocation
+  - purpose
+  - purposeForUrbanPlan
+  - reason
+  - reasonForAreaClassification
+  - record
+  - reference
+  - referenceDate
+  - requirement
+  - residentialDevelopmentType
+  - residentialLandUsePlan
+  - resources
+  - restrictionsForFireProtection
+  - restrictionsForNoiseProtection
+  - retailSales
+  - roadStructure
+  - roadType
+  - roadsideDistrictFacilitiesAllocation
+  - routeSerialNumber
+  - routeSizeNumber
+  - routeTypeNumber
+  - ruralDistrictFacilitiesAllocation
+  - scheduledExecutor
+  - sectionName
+  - selectionStatus
+  - setbackRestrictions
+  - setbackSize
+  - sewerSystemsAttribute
+  - sewerage
+  - shadeRegulation
+  - shape
+  - sideRoad
+  - sideRoadDirection
+  - siteArea
+  - specialDistrict
+  - specificUtilityAndPublicFacilities
+  - specification
+  - specifiedArea
+  - specifiedZonalDisasterPreventionFacilitiesAllocation
+  - standardWidth
+  - startDate
+  - startFiscalYear
+  - startFrom
+  - startLocation
+  - stationName
+  - stationSquare
+  - status
+  - storeysAboveGround
+  - storeysBelowGround
+  - stringValue
+  - structuralDetails
+  - structure
+  - structurePlacementRestrictions
+  - structureType
+  - supecificBusinessFacilities
+  - surroundings
+  - surveyYear
+  - systemType
+  - tableName
+  - target
+  - terminalType
+  - threeDimensionalExtent
+  - totalCost
+  - totalFloorArea
+  - totalNumberOfHousing
+  - totalRainfall
+  - townName
+  - trafficPlazas
+  - transportationFacilities
+  - typeName
+  - unit
+  - unitArea
+  - urbanDevelopmentType
+  - urbanGreenSpaceConservation
+  - urbanParkAttribute
+  - urbanPlanAreaType
+  - urbanPlanType
+  - urbanRapidTransitRailroadAttribute
+  - urbanRoadAttribute
+  - urfDmAttribute
+  - usage
+  - useDistrict
+  - useRestrictions
+  - useStatus
+  - useStatusDescription
+  - useToBeInduced
+  - useType
+  - utilityFacilities
+  - validFrom
+  - validFromType
+  - validTo
+  - validToType
+  - variability
+  - vehicleTerminalAttribute
+  - viaLocations
+  - wallSetbackDistance
+  - wallSetbackDistanceWithAdjoiningLand
+  - wallSetbackDistanceWithRoad
+  - water
+  - waterWorksAttribute
+  - weatherObservationType
+  - width
+  - year
+  - yearOfConstruction
+  - yearOfDiversion
+  - zonalDisasterPreventionFacilities
+  - zonalDisasterPreventionFacilitiesAllocation
+  - zoneName
+  - zoneNumber
+
+⚠️  Extra elements (49):
+  - AccomodationType
+  - AreaClassicificationType
+  - CityObjectGroup
+  - CommutingPopulationType
+  - DisasterPreventionBaseType
+  - FloodingDamage
+  - FloodingDamageType
+  - GreenSpaceAreaType
+  - HousingLandDevelopmentStatus
+  - IndicationMark
+  - InlandFloodingDamageType
+  - LandPriceAverageType
+  - LandUseType
+  - LandslideDamageType
+  - LanduseIDAttribute
+  - LargeCustomerFacilityType
+  - NumberOfEmploees
+  - NumberOfEmployeesByIndustryCategoryType
+  - NumberOfEmployeesByOccupationType
+  - NumberOfHouseholdsByOwnershipType
+  - NumberOfHouseholdsByStructureType
+  - NumberOfHouseholdsType
+  - PollutionType
+  - PortrayalObject
+  - PublicLandType
+  - RailwayType
+  - RecreationType
+  - ReportingUnitscripts/compare_xsd.rb:149:in `block (2 levels) in <main>': undefined local variable or method `canon_generated' for main (NameError)
+
+      gen_file.write(canon_generated)
+                     ^^^^^^^^^^^^^^^
+	from /Users/mulgogi/.asdf/installs/ruby/3.3.2/lib/ruby/gems/3.3.0/gems/tempfile-0.3.1/lib/tempfile.rb:576:in `create_with_filename'
+	from /Users/mulgogi/.asdf/installs/ruby/3.3.2/lib/ruby/gems/3.3.0/gems/tempfile-0.3.1/lib/tempfile.rb:562:in `create'
+	from scripts/compare_xsd.rb:148:in `block in <main>'
+	from /Users/mulgogi/.asdf/installs/ruby/3.3.2/lib/ruby/gems/3.3.0/gems/tempfile-0.3.1/lib/tempfile.rb:576:in `create_with_filename'
+	from /Users/mulgogi/.asdf/installs/ruby/3.3.2/lib/ruby/gems/3.3.0/gems/tempfile-0.3.1/lib/tempfile.rb:562:in `create'
+	from scripts/compare_xsd.rb:147:in `<main>'
+
+  - ResidentialLandDevelopmentType
+  - Resource
+  - ResourceTable
+  - RoadWidthType
+  - SalesAmount
+  - SubregionName
+  - Symbol
+  - TotalAreaByLandUseType
+  - TotalEconomicStructureAndActivitiesType
+  - TotalLandUseChangeClass
+  - TotalLandUseChangeType
+  - TotalLandUseDiversion
+  - TotalNewHousing
+  - TouristTripConsumptionType
+  - TrafficFlowVolumeType
+  - TrafficVolumeType
+  - TransportationNode
+  - TravelAndTourismConsumptionType
+  - UnitArea
+  - UrbanFacilitySurveyData
+  - UrbanPlanningDesicion
+
+📊 ComplexType Statistics:
+  Generated: 416
+  Reference: 322
+
+❌ Missing complexTypes (4):
+  - NumberOfHouseholdsPropertyType
+  - NumberOfHouseholdsType
+  - TargetPropertyType
+  - TargetType
+
+⚠️  Extra complexTypes (98):
+  - AccomodationTypePropertyType
+  - AccomodationTypeType
+  - AreaClassicificationTypePropertyType
+  - AreaClassicificationTypeType
+  - CityObjectGroupPropertyType
+  - CityObjectGroupType
+  - CommutingPopulationTypePropertyType
+  - CommutingPopulationTypeType
+  - DisasterPreventionBaseTypePropertyType
+  - DisasterPreventionBaseTypeType
+  - FloodingDamagePropertyType
+  - FloodingDamageType
+  - FloodingDamageTypePropertyType
+  - FloodingDamageTypeType
+  - GreenSpaceAreaTypePropertyType
+  - GreenSpaceAreaTypeType
+  - HousingLandDevelopmentStatusPropertyType
+  - HousingLandDevelopmentStatusType
+  - IndicationMarkPropertyType
+  - IndicationMarkType
+  ... and 78 more
+
+📊 Namespace Comparison:
+  Generated: xmlns, xmlns:urf
+  Reference: xmlns:core, xmlns:gml, xmlns:urf, xmlns:uro, xmlns:xs
+
+❌ Missing namespaces:
+  - xmlns:xs => http://www.w3.org/2001/XMLSchema
+  - xmlns:core => http://www.opengis.net/citygml/2.0
+  - xmlns:gml => http://www.opengis.net/gml
+  - xmlns:uro => https://www.geospatial.jp/iur/uro/3.2
+
+⚠️  Extra namespaces:
+  - xmlns => http://www.w3.org/2001/XMLSchema
+
+📊 Root Element Comparison:
+  Generated namespace: http://www.w3.org/2001/XMLSchema
+  Reference namespace: http://www.w3.org/2001/XMLSchema
+  Generated targetNamespace: https://www.geospatial.jp/iur/urf/3.2
+  Reference targetNamespace: https://www.geospatial.jp/iur/urf/3.2
+  Generated elementFormDefault: qualified
+  Reference elementFormDefault: qualified
+  Generated version:  3.2.1
+  Reference version: 3.2.1
+
+📝 Detailed Diff (first 50 lines):

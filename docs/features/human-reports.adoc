@@ -1,0 +1,125 @@
+= Human-Readable Reports
+:toc:
+:toclevels: 3
+
+== Purpose
+
+The human-readable reports feature transforms YAML mapping documents into accessible formats (HTML, Markdown, plain text) for review by stakeholders, documentation, and quality assurance. This bridges the gap between technical mapping artifacts and human understanding.
+
+== Concepts
+
+=== Report Formats
+
+lutaml-klin generates reports in multiple formats:
+
+* **HTML** - Interactive, styled reports with navigation
+* **Markdown** - Documentation-friendly format for GitHub/wikis
+* **Plain Text** - Simple, grep-able format for command-line review
+
+=== Report Contents
+
+Each report includes:
+
+* Package overview with namespace information
+* Class listings with stereotypes
+* Attribute details with XML mappings
+* Type resolution status
+* Coverage statistics
+
+== Generating Reports
+
+=== Basic HTML Report
+
+[source,bash]
+----
+lutaml-klin report \
+  --input urf_mapping.yaml \
+  --format html \
+  --output urf_report.html
+----
+
+=== Markdown Report
+
+[source,bash]
+----
+lutaml-klin report \
+  --input urf_mapping.yaml \
+  --format markdown \
+  --output urf_report.md
+----
+
+=== Ruby API
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load mapping
+mapping = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(
+  File.read('urf_mapping.yaml')
+)
+
+# Generate HTML report
+html = Lutaml::Klin::Reports::HtmlGenerator.generate(mapping)
+File.write('report.html', html)
+
+# Generate Markdown
+markdown = Lutaml::Klin::Reports::MarkdownGenerator.generate(mapping)
+File.write('report.md', markdown)
+----
+
+== Report Features
+
+=== Coverage Statistics
+
+Reports include coverage metrics:
+
+* Total classes processed
+* Attributes with resolved types
+* Attributes with unresolved types
+* Percentage of successful mappings
+
+[source,text]
+----
+Coverage Summary:
+  Classes: 45
+  Attributes: 312
+  Resolved: 295 (94.6%)
+  Unresolved: 17 (5.4%)
+----
+
+=== Interactive HTML Features
+
+HTML reports provide:
+
+* Expandable/collapsible sections
+* Search functionality
+* Filtering by stereotype
+* Jump-to-class navigation
+* Syntax highlighting for types
+
+=== Customization Options
+
+[source,bash]
+----
+# Custom CSS styling
+lutaml-klin report \
+  --input mapping.yaml \
+  --format html \
+  --style custom.css \
+  --output report.html
+
+# Include/exclude sections
+lutaml-klin report \
+  --input mapping.yaml \
+  --format html \
+  --no-statistics \
+  --no-unresolved \
+  --output report.html
+----
+
+== Relevant Documents
+
+* link:../cli.adoc[CLI Reference] - Report command options
+* link:mapping-generation.adoc[Mapping Generation] - Source data format
+* link:validation.adoc[Validation] - Report validation info

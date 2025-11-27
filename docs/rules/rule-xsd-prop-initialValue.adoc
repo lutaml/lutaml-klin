@@ -1,0 +1,203 @@
+= Rule: rule-xsd-prop-initialValue
+
+== Overview
+
+Adds `default` or `fixed` attribute to property elements based on the initialValue and readonly status of the property.
+
+== Priority
+
+Must-have (supports default and constant values in schemas)
+
+== ShapeChange Documentation
+
+Source:: `/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/General_Conversion_Rules.adoc`
+
+Description::
+Properties with initial values should have those values reflected in the XML Schema through `default` or `fixed` attributes, depending on whether the property is readonly.
+
+== Java Implementation
+
+Source:: [`XsdDocument.java:addProperty`](lines 2139-2150 and 2245-2250)
+
+=== Algorithm
+
+The Java implementation follows this process:
+
+. Check if property has `initialValue()` that is not null/empty
+. Check if property matches [`rule-xsd-prop-initialValue`]
+. Strip quotes from the initial value
+. Determine attribute type based on readonly status:
+  * If `isReadOnly()` is true: Use `fixed` attribute
+  * If `isReadOnly()` is false: Use `default` attribute
+. For XML attributes with default: Remove `use` attribute (default implies optional)
+
+=== Implementation Logic
+
+[source,java]
+----
+if (pi.initialValue() != null && !pi.initialValue().isEmpty()
+        && pi.matches("rule-xsd-prop-initialValue")) {
+    if (pi.isReadOnly()) {
+        addAttribute(e1, "fixed", stripQuotes(pi.initialValue()));
+    } else {
+        addAttribute(e1, "default", stripQuotes(pi.initialValue()));
+
+        if (e1.hasAttribute("use")) {
+            // if @default is present, the @use attribute must have
+            // the value optional (default)
+            e1.removeAttribute("use");
+        }
+    }
+}
+----
+
+== Our Implementation
+
+Type:: Processor Class
+File:: [`lib/lutaml/klin/shapechange/rule_processors/property_rules/initial_value_processor.rb`]
+Spec:: [`spec/lutaml/klin/shapechange/rule_processors/property_rules/initial_value_processor_spec.rb`]
+
+=== Design Principles
+
+. Clear distinction between default (changeable) and fixed (readonly) values
+. Quote stripping for cleaner XML output
+. Proper handling of XML attribute use restrictions
+. Configuration over code (reads from property metadata)
+
+=== Implementation Details
+
+The [`InitialValueProcessor`] class extends [`BaseRuleProcessor`] and:
+
+. Checks if property has initialValue
+. Determines if property is readonly
+. Strips quotes from value string
+. Adds appropriate attribute (default or fixed)
+. Handles use attribute for XML attributes with defaults
+
+== Test Cases
+
+=== Test Case 1: Default Value (Non-Readonly)
+
+Input UML::
+[source]
+----
+class Building
+  property floors: Integer [1] {initialValue = "1"}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="floors" type="integer" default="1"/>
+----
+
+=== Test Case 2: Fixed Value (Readonly)
+
+Input UML::
+[source]
+----
+class Constants
+  property pi: Real [1] {initialValue = "3.14159", readonly}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="pi" type="double" fixed="3.14159"/>
+----
+
+=== Test Case 3: String Value with Quotes
+
+Input UML::
+[source]
+----
+class Config
+  property status: String [1] {initialValue = "active"}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="status" type="string" default="active"/>
+----
+
+=== Test Case 4: XML Attribute with Default
+
+Input UML::
+[source]
+----
+class Feature
+  property enabled: Boolean [1] {initialValue = "true", xsdAsAttribute = "true"}
+----
+
+Expected XSD::
+[source,xml]
+----
+<attribute name="enabled" type="boolean" default="true"/>
+<!-- Note: use="required" is removed when default is present -->
+----
+
+=== Test Case 5: No Initial Value
+
+Input UML::
+[source]
+----
+class Feature
+  property name: String [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="name" type="string"/>
+<!-- No default or fixed attribute -->
+----
+
+=== Test Case 6: Numeric Fixed Value
+
+Input UML::
+[source]
+----
+class Constants
+  property maxItems: Integer [1] {initialValue = "100", readonly}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="maxItems" type="integer" fixed="100"/>
+----
+
+== Implementation Status
+
+* [ ] Documentation read
+* [ ] Java code analyzed
+* [ ] Processor implemented
+* [ ] Spec written
+* [ ] Integrated
+* [ ] Committed
+
+== Dependencies
+
+Depends on::
+* Property element generation
+* Property metadata (initialValue, readonly flags)
+
+Related rules::
+* [`rule-xsd-prop-nillable`]: Can coexist with initial values
+* [`rule-xsd-prop-xsdAsAttribute`]: Special handling for attributes
+
+== Notes
+
+* `default` allows value to be changed in XML instances
+* `fixed` makes the value immutable (constant)
+* Quotes are stripped from the initial value string
+* For XML attributes, `default` implies optional (use attribute removed)
+* Initial values work with both elements and attributes
+* Empty initial values are ignored (no default/fixed added)
+
+== References
+
+* ShapeChange documentation: General Conversion Rules
+* XML Schema Part 0: Primer - Default and fixed values
+* UML specification: Initial values and readonly properties

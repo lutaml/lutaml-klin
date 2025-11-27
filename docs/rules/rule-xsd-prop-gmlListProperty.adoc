@@ -1,0 +1,96 @@
+= rule-xsd-prop-gmlListProperty
+
+== Purpose
+
+Creates XML Schema list-based simple types for properties with the `gmlListProperty` tagged value.
+
+== Algorithm
+
+1. Check if property has tagged value `gmlListProperty="true"`
+2. Create `xs:list` with `itemType` from mapped type
+3. Add `minLength`/`maxLength` restrictions based on cardinality:
+   - If min=max: use `length` restriction
+   - If min>0: use `minLength` restriction
+   - If max<∞: use `maxLength` restriction
+
+== Java Implementation Reference
+
+From `XsdDocument.java` (lines 2449-2455):
+
+[source,java]
+----
+private boolean asList(PropertyInfo propi) {
+    boolean asList = false;
+    if (propi.matches("rule-xsd-prop-gmlListProperty")) {
+        String s = propi.taggedValue("gmlListProperty");
+        asList = "true".equalsIgnoreCase(s);
+    }
+    return asList;
+}
+----
+
+From `XsdDocument.java` (lines 2737-2782):
+
+[source,java]
+----
+} else if (asList) {
+    e1 = document.createElementNS(Options.W3C_XML_SCHEMA, "simpleType");
+    e.appendChild(e1);
+    Multiplicity m = propi.cardinality();
+    if (m.minOccurs == 0 && m.maxOccurs == Integer.MAX_VALUE) {
+        Element e4 = document.createElementNS(Options.W3C_XML_SCHEMA, "list");
+        e1.appendChild(e4);
+        addAttribute(e4, "itemType", me.p1);
+    } else {
+        Element e4 = document.createElementNS(Options.W3C_XML_SCHEMA, "restriction");
+        e1.appendChild(e4);
+        Element e5 = document.createElementNS(Options.W3C_XML_SCHEMA, "simpleType");
+        e4.appendChild(e5);
+        Element e6 = document.createElementNS(Options.W3C_XML_SCHEMA, "list");
+        e5.appendChild(e6);
+        addAttribute(e6, "itemType", me.p1);
+        if (m.minOccurs > 0) {
+            e6 = document.createElementNS(Options.W3C_XML_SCHEMA, "minLength");
+            e4.appendChild(e6);
+            addAttribute(e6, "value", "" + m.minOccurs);
+        }
+        if (m.maxOccurs != Integer.MAX_VALUE) {
+            e6 = document.createElementNS(Options.W3C_XML_SCHEMA, "maxLength");
+            e4.appendChild(e6);
+            addAttribute(e6, "value", "" + m.maxOccurs);
+        }
+    }
+    multiplicityAlreadySet = true;
+    if (isAttribute) {
+        if (propi.cardinality().minOccurs > 0)
+            addAttribute(e, "required", "true");
+    } else {
+        if (propi.cardinality().minOccurs == 0)
+            addAttribute(e, "minOccurs", "0");
+    }
+}
+----
+
+== Constraints
+
+* Property type must map to a simple type
+* Not compatible with complex types
+
+== Example
+
+Property with `gmlListProperty="true"` and cardinality 2..5 generates:
+
+[source,xml]
+----
+<element name="values">
+  <simpleType>
+    <restriction>
+      <simpleType>
+        <list itemType="xs:double"/>
+      </simpleType>
+      <minLength value="2"/>
+      <maxLength value="5"/>
+    </restriction>
+  </simpleType>
+</element>
+----

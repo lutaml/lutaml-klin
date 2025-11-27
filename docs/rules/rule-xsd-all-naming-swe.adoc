@@ -1,0 +1,159 @@
+= rule-xsd-all-naming-swe
+
+== Purpose
+
+Applies SWE Common naming conventions for types, elements, and property types in XML Schema.
+
+This ensures consistency with SWE Common 2.0 naming standards.
+
+== Applies To
+
+* All classes (Object, DataType, Feature, etc.)
+* Type names, element names, property type names
+
+== Algorithm
+
+When this rule is enabled:
+
+1. **Element names**: Use class name as-is
+   ```
+   Class: Observation → Element: <prefix:Observation>
+   ```
+
+2. **Type names**: Append "Type" (with underscore for names ending in "Property")
+   ```
+   Class: Observation → Type: ObservationType
+   Class: TimeProperty → Type: TimeProperty_Type
+   ```
+
+3. **Property type names**: Append "PropertyType" (with underscore for names ending in "Property")
+   ```
+   Class: Observation → PropertyType: ObservationPropertyType
+   Class: TimeProperty → PropertyType: TimeProperty_PropertyType
+   ```
+
+4. **Substitution groups**: Use `swe:AbstractSWE` for OBJECT category
+   ```xml
+   <xs:element name="DataRecord" type="swe:DataRecordType"
+               substitutionGroup="swe:AbstractSWE"/>
+   ```
+
+5. **Base types**: Use `swe:AbstractSWEType` for OBJECT category
+   ```xml
+   <xs:complexType name="DataRecordType">
+     <xs:complexContent>
+       <xs:extension base="swe:AbstractSWEType">
+         ...
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+   ```
+
+== Configuration
+
+No additional parameters required beyond enabling the rule.
+
+== Example Output
+
+For an object class:
+[source,xml]
+----
+<xs:element name="DataRecord" type="swe:DataRecordType"
+            substitutionGroup="swe:AbstractSWE"/>
+
+<xs:complexType name="DataRecordType">
+  <xs:complexContent>
+    <xs:extension base="swe:AbstractSWEType">
+      <xs:sequence>
+        <!-- properties -->
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="DataRecordPropertyType">
+  <xs:sequence minOccurs="0">
+    <xs:element ref="swe:DataRecord"/>
+  </xs:sequence>
+  <xs:attributeGroup ref="swe:AssociationAttributeGroup"/>
+</xs:complexType>
+----
+
+== Java Implementation Reference
+
+See `XsdDocument.java`:
+- Lines 632-633, 658-660: Check `rule-xsd-all-naming-swe` and generate names
+- Lines 682-687: Generate property type name with SWE conventions
+- Lines 733-737: Default substitution group `swe:AbstractSWE`
+- Lines 770-774: Default base type `swe:AbstractSWEType`
+
+== Naming Patterns
+
+[cols="1,1,2",options="header"]
+|===
+|Item |Pattern |Example
+
+|Element
+|`{name}`
+|`DataRecord`
+
+|Type
+|`{name}Type` or `{name}_Type`
+|`DataRecordType`, `TimeProperty_Type`
+
+|Property Type
+|`{name}PropertyType` or `{name}_PropertyType`
+|`DataRecordPropertyType`, `TimeProperty_PropertyType`
+
+|Substitution Group
+|`swe:AbstractSWE`
+|Objects use this group
+
+|Base Type
+|`swe:AbstractSWEType`
+|Objects extend this type
+|===
+
+== Use Cases
+
+* **SWE Common schemas**: Sensor observation data
+* **SensorML**: Sensor descriptions
+* **O&M**: Observations and measurements
+* **Data streams**: Real-time sensor data
+
+== Comparison with Other Naming Rules
+
+[cols="1,1,1,1",options="header"]
+|===
+|Rule |Element |Type |Property Type
+
+|GML
+|`{name}`
+|`{name}Type`
+|`{name}PropertyType`
+
+|SWE
+|`{name}`
+|`{name}Type`
+|`{name}PropertyType`
+
+|ISO 19139
+|`Abstract{name}` (if abstract)
+|`Abstract{name}_Type` or `{name}_Type`
+|`Abstract{name}_PropertyType` or `{name}_PropertyType`
+|===
+
+== Related Rules
+
+* `rule-xsd-all-naming-gml` - GML naming conventions (similar)
+* `rule-xsd-all-naming-19139` - ISO 19139 naming (different)
+* `rule-xsd-cls-standard-swe-property-types` - SWE property type generation
+* `rule-xsd-cls-no-gml-types` - Non-GML/SWE encoding
+
+== Notes
+
+- Very similar to GML naming conventions
+- Handles "Property" suffix with underscore
+- Uses SWE-specific base types and substitution groups
+- Part of OGC SWE Common 2.0 standard
+- No "Abstract" prefix for abstract types (unlike ISO 19139)

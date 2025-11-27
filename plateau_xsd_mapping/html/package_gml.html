@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gml - PLATEAU Mapping</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px 20px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+    }
+    .breadcrumb {
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+    .breadcrumb a {
+      color: white;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    h1 { font-size: 2em; }
+    .class-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .class-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #667eea;
+    }
+    .class-name {
+      font-size: 1.4em;
+      font-weight: bold;
+      color: #667eea;
+    }
+    .stereotype-badge {
+      background: #e3f2fd;
+      color: #1976d2;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.9em;
+    }
+    .attributes-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .attributes-table th {
+      text-align: left;
+      padding: 10px;
+      background: #f5f5f5;
+      font-weight: 600;
+      border-bottom: 2px solid #ddd;
+    }
+    .attributes-table td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .resolved {
+      background: #e8f5e9;
+    }
+    .unresolved {
+      background: #fff3e0;
+    }
+    .status-badge {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .badge-resolved {
+      background: #4caf50;
+      color: white;
+    }
+    .badge-unresolved {
+      background: #ff9800;
+      color: white;
+    }
+    .type-info {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      color: #666;
+    }
+    .resolution-path {
+      font-size: 0.85em;
+      color: #4caf50;
+      font-style: italic;
+      margin-top: 5px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="breadcrumb">
+        <a href="index.html">← Back to All Packages</a>
+      </div>
+      <h1>📦 gml</h1>
+      <p>47 classes</p>
+    </header>
+
+    <div id="classes">
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_AbstractGeometricAggregate</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_Curve</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_Feature</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>description</strong></td>
+  <td class="type-info">gml:StringOrRefType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>name</strong></td>
+  <td class="type-info">gml:CodeType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>boundedBy</strong></td>
+  <td class="type-info">gml:Envelope</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_FeatureCollection</div>
+    <div class='stereotype-badge'>«FeatureType»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_GeometricPrimitive</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_Geometry</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_Ring</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_Solid</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_Surface</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">_SurfacePatch</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">CompositeCurve</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>curveMember</strong></td>
+  <td class="type-info">_Curve</td>
+  <td>1..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">CompositeSolid</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>solidMember</strong></td>
+  <td class="type-info">_Solid</td>
+  <td>1..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">CompositeSurface</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>surfaceMember</strong></td>
+  <td class="type-info">_Surface</td>
+  <td>1..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Curve</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">GeometricComplex</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>element</strong></td>
+  <td class="type-info">_GeometricPrimitive</td>
+  <td>1..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:CodeType</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:DirectionPositionList</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:DirectPosition</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:doubleList</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:Envelope</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:LengthType</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:LineStringSegment</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:MeasureOrNullListType</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:MeasureType</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:NameList</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:PointPropertyType</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:posList</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:SignType</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">gml:StringOrRefType</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">LinearRing</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>pos</strong></td>
+  <td class="type-info">gml:DirectPosition</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>posList</strong></td>
+  <td class="type-info">gml:DirectionPositionList</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">LineString</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>pos</strong></td>
+  <td class="type-info">gml:DirectPosition</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>posList</strong></td>
+  <td class="type-info">gml:DirectionPositionList</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">LineStringSegment</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>pos</strong></td>
+  <td class="type-info">gml:DirectPosition</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>posList</strong></td>
+  <td class="type-info">gml:DirectionPositionList</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">MultiCurve</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>curveMember</strong></td>
+  <td class="type-info">_Curve</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">MultiGeometry</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>geometryMember</strong></td>
+  <td class="type-info">_Geometry</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">MultiPoint</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>pointMember</strong></td>
+  <td class="type-info">Point</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">MultiSolid</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>solidMember</strong></td>
+  <td class="type-info">_Solid</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">MultiSurface</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>surfaceMember</strong></td>
+  <td class="type-info">_Surface</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">OrientableSurface</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>orientation</strong></td>
+  <td class="type-info">gml:SignType</td>
+  <td>0..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>baseSurface</strong></td>
+  <td class="type-info">_Surface</td>
+  <td>0..2</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Point</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>position</strong></td>
+  <td class="type-info">gml:DirectPosition</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Polygon</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>interior</strong></td>
+  <td class="type-info">_Ring</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>exterior</strong></td>
+  <td class="type-info">_Ring</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Primitive</div>
+    
+  </div>
+
+  <p style='color: #999;'>No attributes</p>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Rectangle</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>exterior</strong></td>
+  <td class="type-info">_Ring</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Solid</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>interior</strong></td>
+  <td class="type-info">_Surface</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>exterior</strong></td>
+  <td class="type-info">_Surface</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Surface</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>patches</strong></td>
+  <td class="type-info">_SurfacePatch</td>
+  <td>1..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Tin</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>stopLines</strong></td>
+  <td class="type-info">gml:LineStringSegment</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>breakLines</strong></td>
+  <td class="type-info">gml:LineStringSegment</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="unresolved">
+  <td><strong>maxLength</strong></td>
+  <td class="type-info">gml:LengthType</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+<tr class="resolved">
+  <td><strong>controlPoint</strong></td>
+  <td class="type-info">gml:posList</td>
+  <td>1..1</td>
+  <td>element: ControlPoint<div class='resolution-path'>Matched element: urbanObject:element:ControlPoint</div></td>
+  <td><span class="status-badge badge-resolved">✓ Resolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">Triangle</div>
+    <div class='stereotype-badge'>«DataType»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>exterior</strong></td>
+  <td class="type-info">_Ring</td>
+  <td>1..1</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div class="class-card">
+  <div class="class-header">
+    <div class="class-name">TriangulatedSurface</div>
+    <div class='stereotype-badge'>«Type»</div>
+  </div>
+
+  
+<table class="attributes-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>UML Type</th>
+      <th>Multiplicity</th>
+      <th>XSD Resolution</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class="unresolved">
+  <td><strong>trianglePatches</strong></td>
+  <td class="type-info">Triangle</td>
+  <td>0..*</td>
+  <td><span style='color: #999;'>Not found in XSD</span></td>
+  <td><span class="status-badge badge-unresolved">⚠ Unresolved</span></td>
+</tr>
+  </tbody>
+</table>
+</div>
+    </div>
+
+    <footer>
+      <p><a href="index.html">← Back to All Packages</a></p>
+    </footer>
+  </div>
+</body>
+</html>

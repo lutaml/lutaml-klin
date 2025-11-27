@@ -1,0 +1,193 @@
+= Rule: rule-xsd-cls-union-as-choice
+
+== Overview
+
+Generates `<xs:choice>` elements for union types instead of sequence elements, allowing exactly one property from the union to be selected.
+
+== Priority
+
+Must-have (used by PLATEAU for union types)
+
+== ShapeChange Documentation
+
+Source:: `/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/Non_Standard_Conversion_Rules.adoc`
+
+Description::
+Union types represent a choice between multiple options. This rule encodes unions using `<xs:choice>` to reflect this semantic, ensuring only one option can be selected in XML instances.
+
+== Java Implementation
+
+Source:: [`XsdDocument.java:pComplexType`](lines 903-936) and [`XsdDocument.java:pGroup`](lines 1077-1078)
+
+=== Algorithm
+
+The Java implementation follows this process:
+
+. Check if class category is UNION and matches [`rule-xsd-cls-union-as-choice`]
+. Validate union hierarchy:
+  * If union has no supertype and has properties > 0: Create `<choice>` element
+  * If union is subtype of union and both have properties: Report error (incompatible)
+  * If union is subtype of union but only supertype has properties: Skip choice (inherit)
+. For groups: Apply same `<choice>` generation logic
+. Append choice element to the appropriate parent (extension or type)
+
+=== Edge Cases
+
+* **Empty unions**: Unions without properties do not generate a choice
+* **Union subtypes**: Subtype unions that don't define properties inherit supertype's choice
+* **Conflicting choices**: Union subtype with properties where supertype also has properties generates error
+
+== Our Implementation
+
+Type:: Processor Class
+File:: [`lib/lutaml/klin/shapechange/rule_processors/class_rules/union_choice_processor.rb`]
+Spec:: [`spec/lutaml/klin/shapechange/rule_processors/class_rules/union_choice_processor_spec.rb`]
+
+=== Design Principles
+
+. Model-driven architecture with proper separation of concerns
+. Validates union hierarchy to prevent incompatible encodings
+. Clear error messages for conflicting union subtypes
+. Supports both complexType and group generation
+
+=== Implementation Details
+
+The [`UnionChoiceProcessor`] class extends [`BaseRuleProcessor`] and:
+
+. Validates that the class category is UNION
+. Checks for supertype unions and validates compatibility
+. Creates `<choice>` element when appropriate
+. Handles both named types and groups
+. Processes properties as choice options
+
+== Test Cases
+
+=== Test Case 1: Simple Union with Choice
+
+Input UML::
+[source]
+----
+«union» GeometryValue
+  property pointValue: Point [0..1]
+  property lineValue: Line [0..1]
+  property polygonValue: Polygon [0..1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<complexType name="GeometryValueType">
+  <choice>
+    <element name="pointValue" type="PointType"/>
+    <element name="lineValue" type="LineType"/>
+    <element name="polygonValue" type="PolygonType"/>
+  </choice>
+</complexType>
+----
+
+=== Test Case 2: Union without Properties
+
+Input UML::
+[source]
+----
+«union» EmptyUnion
+  (no properties)
+----
+
+Expected XSD::
+[source,xml]
+----
+<complexType name="EmptyUnionType">
+  <!-- No choice element generated -->
+</complexType>
+----
+
+=== Test Case 3: Union Subtype (Valid)
+
+Input UML::
+[source]
+----
+«union» BaseUnion
+  property option1: Type1 [0..1]
+  property option2: Type2 [0..1]
+
+«union» DerivedUnion extends BaseUnion
+  (no additional properties, inherits choice)
+----
+
+Expected XSD::
+[source,xml]
+----
+<complexType name="DerivedUnionType">
+  <complexContent>
+    <extension base="BaseUnionType">
+      <!-- No additional choice -->
+    </extension>
+  </complexContent>
+</complexType>
+----
+
+=== Test Case 4: Union with Supertype Extension
+
+Input UML::
+[source]
+----
+«union» SpecializedUnion extends BaseUnion
+  property option3: Type3 [0..1]
+----
+
+Expected::
+Error reported - cannot add choice when supertype union also has properties
+
+=== Test Case 5: Union Group
+
+Input UML::
+[source]
+----
+«union» GeometryGroup (asGroup=true)
+  property point: Point [0..1]
+  property line: Line [0..1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<group name="GeometryGroupGroup">
+  <choice>
+    <element name="point" type="PointType"/>
+    <element name="line" type="LineType"/>
+  </choice>
+</group>
+----
+
+== Implementation Status
+
+* [ ] Documentation read
+* [ ] Java code analyzed
+* [ ] Processor implemented
+* [ ] Spec written
+* [ ] Integrated
+* [ ] Committed
+
+== Dependencies
+
+Depends on::
+* [`rule-xsd-cls-type`]: Base complex type generation
+* [`rule-xsd-cls-sequence`]: Default container element
+
+Related rules::
+* [`rule-xsd-cls-union-direct`]: Alternative union encoding
+* [`rule-xsd-cls-union-asGroup`]: Group-based union encoding
+
+== Notes
+
+* Choice elements represent exclusive selection (exactly one option)
+* Union inheritance requires careful validation to avoid double-choice scenarios
+* Properties of unions become child elements of the choice
+* Empty unions (no properties) do not generate choice elements
+
+== References
+
+* ShapeChange documentation: Non-Standard Conversion Rules
+* XML Schema Part 1: Structures - choice compositor
+* UML specification: Union types

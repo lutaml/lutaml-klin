@@ -1,0 +1,208 @@
+= Rule: rule-xsd-prop-length-size-pattern
+
+== Overview
+
+CharacterString valued properties that carry the tagged values [`length`], [`size`], or [`pattern`] are converted to anonymous types with restricting facets according to the tagged values.
+
+== Priority
+
+Must-have (PLATEAU uses for string constraints)
+
+== ShapeChange Documentation
+
+Source:: `/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/Non_Standard_Conversion_Rules.adoc` (lines 898-903)
+
+Description::
+This rule creates inline restrictions on string-typed properties based on length/size/pattern constraints defined in the UML model via tagged values.
+
+== Java Implementation
+
+Source:: [`XsdDocument.java:addProperty`](lines 2267-2298)
+
+=== Algorithm
+
+The Java implementation follows this process:
+
+. Check if property matches [`rule-xsd-prop-length-size-pattern`]
+. Check if property has tagged value [`length`], OR (tagged value [`size`] AND [`pattern`])
+. Create anonymous `<simpleType>` child of property element
+. Create `<restriction>` with base="string"
+. Remove any existing `type` attribute from property element
+. Add appropriate facet:
+  * If [`length`] is present: Add `<maxLength>` facet
+  * If [`size`] AND [`pattern`] are present: Add `<pattern>` facet with value `{pattern}\{size}`
+
+=== Implementation Logic
+
+[source,java]
+----
+if (pi.matches("rule-xsd-prop-length-size-pattern") &&
+    (StringUtils.isNotBlank(pi.taggedValue("length")) ||
+     (StringUtils.isNotBlank(pi.taggedValue("size")) &&
+      StringUtils.isNotBlank(pi.taggedValue("pattern"))))) {
+
+    Element simpleType = document.createElementNS(Options.W3C_XML_SCHEMA, "simpleType");
+    e1.appendChild(simpleType);
+
+    Element restriction = document.createElementNS(Options.W3C_XML_SCHEMA, "restriction");
+    addAttribute(restriction, "base", "string");
+    e1.removeAttribute("type");
+    simpleType.appendChild(restriction);
+
+    Element concreteRestriction = null;
+    // maxLength
+    if (StringUtils.isNotBlank(pi.taggedValue("length"))) {
+        concreteRestriction = document.createElementNS(Options.W3C_XML_SCHEMA, "maxLength");
+        addAttribute(concreteRestriction, "value", pi.taggedValue("length"));
+    // pattern
+    } else if (StringUtils.isNotBlank(pi.taggedValue("size")) &&
+               StringUtils.isNotBlank(pi.taggedValue("pattern"))) {
+        concreteRestriction = document.createElementNS(Options.W3C_XML_SCHEMA, "pattern");
+        addAttribute(concreteRestriction, "value",
+            pi.taggedValue("pattern") + "{" + pi.taggedValue("size") + "}");
+    }
+    if (concreteRestriction != null)
+        restriction.appendChild(concreteRestriction);
+}
+----
+
+== Our Implementation
+
+Type:: Processor Class
+File:: [`lib/lutaml/klin/shapechange/rule_processors/property_rules/length_size_pattern_processor.rb`]
+Spec:: [`spec/lutaml/klin/shapechange/rule_processors/property_rules/length_size_pattern_processor_spec.rb`]
+
+=== Design Principles
+
+. Tagged value driven constraint generation
+. Inline type restriction (anonymous simpleType)
+. Supports both maxLength and pattern facets
+. Removes global type reference when adding restriction
+
+=== Implementation Details
+
+The [`LengthSizePatternProcessor`] class extends [`BaseRuleProcessor`] and:
+
+. Checks if property has [`length`], [`size`], or [`pattern`] tagged values
+. Creates anonymous simpleType with string restriction
+. Adds appropriate facet (maxLength or pattern)
+. Removes any existing type attribute from the element
+
+== Test Cases
+
+=== Test Case 1: Property with length constraint
+
+Input UML::
+[source]
+----
+class Address
+  property street: String [1] {length=255}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="street">
+  <simpleType>
+    <restriction base="string">
+      <maxLength value="255"/>
+    </restriction>
+  </simpleType>
+</element>
+----
+
+=== Test Case 2: Property with size and pattern constraint
+
+Input UML::
+[source]
+----
+class Person
+  property phoneNumber: String [1] {size=10, pattern="\d"}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="phoneNumber">
+  <simpleType>
+    <restriction base="string">
+      <pattern value="\d{10}"/>
+    </restriction>
+  </simpleType>
+</element>
+----
+
+=== Test Case 3: Property without constraints
+
+Input UML::
+[source]
+----
+class Person
+  property name: String [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="name" type="string"/>
+----
+
+=== Test Case 4: Property with only size (no pattern)
+
+Input UML::
+[source]
+----
+class Product
+  property code: String [1] {size=8}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="code" type="string"/>
+<!-- No restriction added - requires both size AND pattern -->
+----
+
+=== Test Case 5: Property with only pattern (no size)
+
+Input UML::
+[source]
+----
+class Product
+  property sku: String [1] {pattern="[A-Z]+"}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="sku" type="string"/>
+<!-- No restriction added - size pattern requires both size AND pattern -->
+----
+
+== Implementation Status
+
+* [x] Documentation read
+* [x] Java code analyzed
+* [ ] Processor implemented
+* [ ] Spec written
+* [ ] Integrated
+* [ ] Committed
+
+== Dependencies
+
+Depends on::
+* Property element generation
+* Property tagged value access
+
+== Notes
+
+* Only applies to string-typed properties
+* Tagged value [`length`] takes priority over size/pattern combination
+* Pattern restriction requires BOTH [`size`] AND [`pattern`] to be present
+* The rule creates an inline (anonymous) simple type
+
+== References
+
+* ShapeChange documentation: Non-Standard Conversion Rules
+* XML Schema Part 2: Datatypes - String facets
+* ISO 19103: String constraints

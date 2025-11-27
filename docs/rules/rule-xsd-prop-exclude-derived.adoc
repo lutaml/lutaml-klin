@@ -1,0 +1,152 @@
+= rule-xsd-prop-exclude-derived
+
+== Purpose
+
+Excludes derived properties from XML Schema generation when this rule is active.
+
+== Background
+
+In UML models, derived properties are those whose values are computed from other properties rather than being stored directly. When this rule is enabled, derived properties are filtered out during XML Schema generation because:
+
+* Derived values are computed and not serialized
+* Including them would create redundant schema elements
+* XML instances should not contain derived property values
+
+== Implementation
+
+Based on `XsdDocument.java:includeProperty()` lines 1896-1903.
+
+=== Algorithm
+
+When processing properties for schema generation:
+
+1. Check if the rule is active for the property
+2. Check if the property is marked as derived (`isDerived()`)
+3. If both conditions are true, exclude the property from processing
+
+The filtering occurs before property element generation.
+
+=== Syntax Definition
+
+[source,ruby]
+----
+# Property filtering logic
+def include_property?(property)
+  property.navigable? && <1>
+  !property.restriction? && <2>
+  (!property.matches?("rule-xsd-prop-exclude-derived") || !property.derived?) && <3>
+  # ... other conditions
+end
+----
+<1> Property must be navigable
+<2> Property must not be a restriction
+<3> If rule active, property must not be derived
+
+Where,
+
+`navigable?`:: Property is navigable in the association
+`restriction?`:: Property is a UML restriction
+`matches?(rule)`:: Rule is active for this property
+`derived?`:: Property value is computed/derived
+
+== Examples
+
+=== Example 1: Derived Property Excluded
+
+.Property marked as derived
+[source,ruby]
+----
+class Building < Lutaml::Model::Serializable
+  attribute :height, :float
+  attribute :width, :float
+  attribute :area, :float, derived: true <1>
+end
+----
+<1> Area is derived (computed from height × width)
+
+.Generated XML Schema (with rule active)
+[source,xml]
+----
+<complexType name="BuildingType">
+  <sequence>
+    <element name="height" type="double"/> <!--1-->
+    <element name="width" type="double"/> <!--2-->
+    <!-- area is NOT included --> <!--3-->
+  </sequence>
+</complexType>
+----
+<1> Height property included
+<2> Width property included
+<3> Derived area property excluded
+
+=== Example 2: Without Rule
+
+.Generated XML Schema (without rule or rule inactive)
+[source,xml]
+----
+<complexType name="BuildingType">
+  <sequence>
+    <element name="height" type="double"/>
+    <element name="width" type="double"/>
+    <element name="area" type="double"/> <!--1-->
+  </sequence>
+</complexType>
+----
+<1> Derived property IS included when rule is inactive
+
+=== Example 3: Multiple Derived Properties
+
+.Class with multiple derived properties
+[source,ruby]
+----
+class Rectangle < Lutaml::Model::Serializable
+  attribute :length, :float
+  attribute :width, :float
+  attribute :area, :float, derived: true
+  attribute :perimeter, :float, derived: true
+  attribute :diagonal, :float, derived: true
+end
+----
+
+.Generated XML Schema (with rule active)
+[source,xml]
+----
+<complexType name="RectangleType">
+  <sequence>
+    <element name="length" type="double"/>
+    <element name="width" type="double"/>
+    <!-- area, perimeter, diagonal all excluded --> <!--1-->
+  </sequence>
+</complexType>
+----
+<1> All three derived properties excluded
+
+== Configuration
+
+=== When This Rule Applies
+
+* Rule is active in encoding rules
+* Property is marked as derived (`isDerived == true`)
+* Property is navigable
+
+=== Property Inclusion Criteria
+
+For a property to be included in the schema, ALL must be true:
+
+1. Property is navigable (`isNavigable`)
+2. Property is not a restriction (`!isRestriction`)
+3. Rule is inactive OR property is not derived
+4. Property is not marked as "notEncoded"
+5. No property map entry excludes it
+
+=== Related Rules
+
+* `rule-xsd-all-notEncoded`: Excludes properties with notEncoded encoding rule
+* `rule-xsd-prop-metadata`: Handles metadata properties
+* `rule-xsd-cls-mixin-classes`: Handles mixin property inheritance
+
+== References
+
+* ShapeChange: `XsdDocument.java` lines 1896-1903 (`includeProperty()`)
+* UML 2.5: Section 9.5.3 (Derived Properties)
+* ISO 19109: Application Schema Rules

@@ -1,0 +1,77 @@
+{
+  "version": "1.0",
+  "generated_at": "2025-10-25T23:00:55Z",
+  "metadata": {
+    "lur_package": "plateau_uro.lur",
+    "lxr_package": "plateau_schemas.lxr",
+    "config_file": "ShapeChangeConfig_Plateau_uro.xml"
+  },
+  "packages": [
+    {
+      "id": "pkg_uro",
+      "name": "ModelRoot::Conceptual Models::i-UR::Urban Planning ADE 3.2::uro",
+      "namespace": "https://www.geospatial.jp/iur/uro/3.2",
+      "qualified_name": "ModelRoot::i-UR::uro",
+      "classes": [
+        {
+          "id": "class_building",
+          "uml_name": "Building",
+          "uml_qualified_name": "ModelRoot::i-UR::uro::Building",
+          "uml_stereotype": "featureType",
+          "uml_documentation": "Represents a building feature in urban planning areas",
+          "xsd_element_name": "uro:Building",
+          "xsd_type_name": "uro:BuildingType",
+          "xsd_namespace": "https://www.geospatial.jp/iur/uro/3.2",
+          "xsd_documentation": "Complex type for building features",
+          "resolved": true,
+          "resolution_status": "resolved",
+          "resolution_method": "schema_repository",
+          "resolution_confidence": 0.95,
+          "attributes": [
+            {
+              "id": "attr_building_type",
+              "uml_name": "buildingType",
+              "uml_type": "gml::CodeType",
+              "uml_multiplicity": "0..1",
+              "uml_documentation": "Classification of building type",
+              "xsd_element_name": "uro:buildingType",
+              "xsd_type": "gml:CodeType",
+              "xsd_namespace": "http://www.opengis.net/gml/3.2",
+              "xsd_min_occurs": "0",
+              "xsd_max_occurs": "1",
+              "xsd_documentation": "gml:CodeType for coded values",
+              "resolved": true,
+              "resolution_status": "resolved",
+              "resolution_method": "schema_repository"
+            },
+            {
+              "id": "attr_height",
+              "uml_name": "measuredHeight",
+              "uml_type": "Measure",
+              "uml_multiplicity": "0..1",
+              "uml_documentation": "Measured height in meters",
+              "xsd_element_name": "uro:measuredHeight",
+              "xsd_type": "gml:MeasureType",
+              "xsd_namespace": "http://www.opengis.net/gml/3.2",
+              "xsd_min_occurs": "0",
+              "xsd_max_occurs": "1",
+              "resolved": true,
+              "resolution_status": "resolved",
+              "resolution_method": "shapechange"
+            },
+            {
+              "id": "attr_custom",
+              "uml_name": "customProperty",
+              "uml_type": "CustomType",
+              "uml_multiplicity": "0..1",
+              "uml_documentation": "Custom extended property",
+              "resolved": false,
+              "resolution_status": "unresolved",
+              "resolution_error": "Type 'CustomType' not found in XSD repository"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,266 @@
+= Rule: rule-xsd-cls-mixin-classes
+
+== Overview
+
+Process properties from mixin supertypes by including them in the class's sequence element. Mixin classes provide a way to achieve multiple inheritance in XML Schema which only supports single inheritance.
+
+== Priority
+
+Must-have (PLATEAU uses mixins extensively)
+
+== ShapeChange Documentation
+
+Source:: `/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/Non_Standard_Conversion_Rules.adoc` (lines 497-511)
+Source:: `/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/Support_for_Mixin_Classes.adoc`
+
+Description::
+Due to XML Schema supporting only single inheritance (type derivation from a single base type, element substitutability restricted to a single element), multiple inheritance is not directly supported. However, for conceptual modelling, the ability to define abstract types which capture a set of properties associated with a concept is very convenient. The mixin pattern provides a solution.
+
+== Java Implementation
+
+Source:: [`XsdDocument.java:pComplexType`](lines 938-945) and [`XsdDocument.java:addMixinProperties`](lines 1121-1135)
+
+=== Algorithm
+
+The Java implementation follows this process:
+
+==== In pComplexType:
+
+. Check if class matches [`rule-xsd-cls-sequence`] (creates sequence element)
+. Check if class matches [`rule-xsd-cls-mixin-classes`]
+. If class matches [`rule-xsd-cls-mixin-classes-as-group`]:
+  * Call [`addGroupReferences()`] to add group references
+. Else:
+  * Call [`addMixinProperties()`] to inline mixin properties
+
+==== In addMixinProperties (Recursive):
+
+. Get supertypes of the class
+. For each supertype:
+  * Check if supertype is a MIXIN
+  * OR if supertype is abstract and matches [`rule-xsd-cls-no-abstract-classes`]
+  * If match found:
+    ** Call [`processLocalProperties()`] to add supertype's properties
+    ** Recursively call [`addMixinProperties()`] on the supertype
+. This flattens the mixin hierarchy into the class's property sequence
+
+=== Implementation Logic
+
+[source,java]
+----
+// In pComplexType lines 938-945
+} else if (ci.matches("rule-xsd-cls-sequence")) {
+    ret = document.createElementNS(Options.W3C_XML_SCHEMA, "sequence");
+    if (ci.matches("rule-xsd-cls-mixin-classes")) {
+        if (ci.matches("rule-xsd-cls-mixin-classes-as-group"))
+            addGroupReferences(ci, ret, false);
+        else
+            addMixinProperties(ci, ret, schDoc);
+    }
+}
+
+// In addMixinProperties lines 1121-1135
+private void addMixinProperties(ClassInfo ci, Element e,
+                                 SchematronSchema schDoc) {
+    SortedSet<String> st = ci.supertypes();
+    if (st != null && ci.matches("rule-xsd-cls-mixin-classes") &&
+        !ci.matches("rule-xsd-cls-mixin-classes-as-group")) {
+        for (String sid : st) {
+            ClassInfo cix = model.classById(sid);
+            if (cix != null && (cix.category() == Options.MIXIN ||
+                (cix.matches("rule-xsd-cls-no-abstract-classes") &&
+                 cix.isAbstract()))) {
+                processLocalProperties(cix, e, schDoc);
+                addMixinProperties(cix, e, schDoc);
+            }
+        }
+    }
+}
+----
+
+== Our Implementation
+
+Type:: Processor Class
+File:: [`lib/lutaml/klin/shapechange/rule_processors/class_rules/mixin_classes_processor.rb`]
+Spec:: [`spec/lutaml/klin/shapechange/rule_processors/class_rules/mixin_classes_processor_spec.rb`]
+
+=== Design Principles
+
+. Recursive property flattening from mixin hierarchy
+. Supports both inline properties and group references
+. Handles abstract classes as mixins
+. Maintains property order
+
+=== Implementation Details
+
+The [`MixinClassesProcessor`] class extends [`BaseRuleProcessor`] and:
+
+. Identifies mixin supertypes of a class
+. Recursively processes mixin properties
+. Adds properties from each mixin to the class's sequence
+. Supports both direct property inclusion and group references
+. Handles abstract classes that match [`rule-xsd-cls-no-abstract-classes`]
+
+== Test Cases
+
+=== Test Case 1: Simple mixin inclusion
+
+Input UML::
+[source]
+----
+«mixin» Identifiable
+  property id: String [1]
+  property name: String [0..1]
+
+class Building extends Identifiable
+  property floors: Integer [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<complexType name="BuildingType">
+  <sequence>
+    <!-- Mixin properties added first -->
+    <element name="id" type="string"/>
+    <element name="name" type="string" minOccurs="0"/>
+    <!-- Own properties follow -->
+    <element name="floors" type="integer"/>
+  </sequence>
+</complexType>
+----
+
+=== Test Case 2: Multiple mixins
+
+Input UML::
+[source]
+----
+«mixin» Identifiable
+  property id: String [1]
+
+«mixin» Temporal
+  property timestamp: DateTime [1]
+
+class Event extends Identifiable, Temporal
+  property description: String [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<complexType name="EventType">
+  <sequence>
+    <element name="id" type="string"/>
+    <element name="timestamp" type="dateTime"/>
+    <element name="description" type="string"/>
+  </sequence>
+</complexType>
+----
+
+=== Test Case 3: Nested mixin hierarchy
+
+Input UML::
+[source]
+----
+«mixin» Base
+  property baseId: String [1]
+
+«mixin» Extended extends Base
+  property extendedCode: String [1]
+
+class Concrete extends Extended
+  property value: String [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<complexType name="ConcreteType">
+  <sequence>
+    <!-- From Base (via Extended) -->
+    <element name="baseId" type="string"/>
+    <!-- From Extended -->
+    <element name="extendedCode" type="string"/>
+    <!-- From Concrete -->
+    <element name="value" type="string"/>
+  </sequence>
+</complexType>
+----
+
+=== Test Case 4: Abstract class as mixin
+
+Input UML::
+[source]
+----
+abstract class AbstractBase
+  property version: String [1]
+
+class Concrete extends AbstractBase
+  property data: String [1]
+----
+
+Expected XSD (with rule-xsd-cls-no-abstract-classes)::
+[source,xml]
+----
+<complexType name="ConcreteType">
+  <sequence>
+    <!-- Abstract parent treated as mixin -->
+    <element name="version" type="string"/>
+    <element name="data" type="string"/>
+  </sequence>
+</complexType>
+----
+
+=== Test Case 5: Class with no mixins
+
+Input UML::
+[source]
+----
+class SimpleClass
+  property name: String [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<complexType name="SimpleClassType">
+  <sequence>
+    <element name="name" type="string"/>
+  </sequence>
+</complexType>
+----
+
+== Implementation Status
+
+* [x] Documentation read
+* [x] Java code analyzed
+* [ ] Processor implemented
+* [ ] Spec written
+* [ ] Integrated
+* [ ] Committed
+
+== Dependencies
+
+Depends on::
+* [`rule-xsd-cls-sequence`]: Sequence container creation
+* Property processing infrastructure
+* Supertype discovery
+
+Related rules::
+* [`rule-xsd-cls-mixin-classes-as-group`]: Alternative (group-based) encoding
+* [`rule-xsd-cls-no-abstract-classes`]: Abstract classes can be treated as mixins
+* [`rule-xsd-cls-mixin-classes-non-mixin-supertypes`]: Extension for non-mixin supertypes
+
+== Notes
+
+* Mixin properties are added before own properties
+* Recursive processing handles nested mixin hierarchies
+* Property order is preserved (important for sequence)
+* Abstract classes can be treated as mixins
+* Alternative encoding via groups available with [`rule-xsd-cls-mixin-classes-as-group`]
+
+== References
+
+* ShapeChange documentation: Support for Mixin Classes
+* XML Schema Part 1: Structures - Type derivation
+* UML specification: Multiple inheritance patterns

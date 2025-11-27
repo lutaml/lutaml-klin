@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PLATEAU URO Package - UML Class Mapping (SPA)</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+      background: #f8f9fa;
+      border-bottom: 3px solid #e9ecef;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: #666;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .controls {
+      padding: 1.5rem 2rem;
+      background: white;
+      border-bottom: 1px solid #e9ecef;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.75rem 1.5rem;
+      border: 2px solid #e9ecef;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .filter-btn:hover {
+      border-color: #667eea;
+      background: #f8f9fa;
+    }
+
+    .filter-btn.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .classes-grid {
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .class-card {
+      background: white;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .class-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      border-color: #667eea;
+    }
+
+    .class-card.expanded {
+      border-color: #667eea;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+    }
+
+    .class-header {
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .class-header-content {
+      flex: 1;
+    }
+
+    .class-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      word-break: break-word;
+    }
+
+    .class-stereotype {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .expand-icon {
+      font-size: 1.5rem;
+      transition: transform 0.3s;
+    }
+
+    .class-card.expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+
+    .class-body {
+      padding: 1.5rem;
+      max-height: 300px;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .class-card.expanded .class-body {
+      max-height: none;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 0.75rem;
+      margin-top: 1rem;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title:first-child {
+      margin-top: 0;
+    }
+
+    .badge {
+      background: #667eea;
+      color: white;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .attributes-list, .associations-list {
+      list-style: none;
+    }
+
+    .attribute-item {
+      padding: 0.6rem;
+      margin-bottom: 0.35rem;
+      background: #f8f9fa;
+      border-radius: 6px;
+      font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+      font-size: 0.85rem;
+      border-left: 3px solid #667eea;
+    }
+
+    .attr-name {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .attr-type {
+      color: #e83e8c;
+    }
+
+    .attr-multiplicity {
+      color: #6c757d;
+      font-size: 0.8rem;
+    }
+
+    .association-item {
+      padding: 0.6rem;
+      margin-bottom: 0.35rem;
+      background: #fff3cd;
+      border-left: 3px solid #ffc107;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .assoc-arrow {
+      color: #666;
+      font-weight: bold;
+    }
+
+    .no-items {
+      color: #999;
+      font-style: italic;
+      font-size: 0.9rem;
+      padding: 0.5rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+
+    .results-count {
+      padding: 1rem 2rem;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      padding: 2rem;
+      text-align: center;
+      color: #666;
+      background: #f8f9fa;
+      border-top: 1px solid #e9ecef;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .classes-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+    }
+
+    .class-id {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      font-family: monospace;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>PLATEAU URO Package</h1>
+      <div class="subtitle">Urban Object (URO) - UML to XSD Mapping (SPA)</div>
+    </header>
+
+    <div class="summary" id="summary">
+      <div class="loading">Loading statistics...</div>
+    </div>
+
+    <div class="controls">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="🔍 Search classes by name, type, or attribute...">
+      </div>
+      <div class="filter-buttons" id="filterButtons">
+        <button class="filter-btn active" data-filter="all">All</button>
+      </div>
+    </div>
+
+    <div class="results-count" id="resultsCount"></div>
+
+    <div class="classes-grid" id="classesGrid">
+      <div class="loading">Loading classes...</div>
+    </div>
+
+    <footer>
+      <p><strong>Generated from PLATEAU URO XMI</strong></p>
+      <p id="footerInfo">Loading...</p>
+    </footer>
+  </div>
+
+  <script>
+    // Embedded mapping data
+    const MAPPING_DATA = {"package_name":"uro","total_classes":174,"classes":[{"name":"_BoundarySurface","stereotype":"FeatureType","id":"EAID_28A336C5_806D_4b20_80D6_D4EB0BB33335","attributes":[{"name":"lod2MultiSurface","type":"EAID_9CD87EC7_BBC1_4503_B284_14860C27C0BF","multiplicity":"0..1"},{"name":"lod3MultiSurface","type":"EAID_9CD87EC7_BBC1_4503_B284_14860C27C0BF","multiplicity":"0..1"}],"associations":[]},{"name":"AbstractConstruction","stereotype":"FeatureType","id":"EAID_E82076B9_A433_4e3c_8A7E_588940128669","attributes":[{"name":"conditionOfConstruction","type":"ConditionOfConstructionValue","multiplicity":"0..1"},{"name":"dateOfConstruction","type":"xs:date","multiplicity":"0..1"},{"name":"dateOfDemolition","type":"xs:date","multiplicity":"0..1"},{"name":"constructionEvent","type":"ConstructionEvent","multiplicity":"0..*"},{"name":"elevation","type":"Elevation","multiplicity":"0..*"},{"name":"height","type":"Height","multiplicity":"0..*"},{"name":"occupancy","type":"Occupancy","multiplicity":"0..*"},{"name":"boundedBy","type":"_BoundarySurface","multiplicity":"0..*"},{"name":"lod3Geometry","type":"EAID_1FFA9854_10E5_47a7_BE3E_4447F57FE997","multiplicity":"0..1"},{"name":"consFacilityTypeAttribute","type":"FacilityTypeAttribute","multiplicity":"0..*"},{"name":"lod2Geometry","type":"EAID_1FFA9854_10E5_47a7_BE3E_4447F57FE997","multiplicity":"0..1"},{"name":"lod1Geometry","type":"EAID_1FFA9854_10E5_47a7_BE3E_4447F57FE997","multiplicity":"0..1"},{"name":"consDataQualityAttribute","type":"DataQualityAttribute","multiplicity":"0..1"},{"name":"consDmAttribute","type":"DmAttribute","multiplicity":"0..*"},{"name":"consDisasterRiskAttribute","type":"DisasterRiskAttribute","multiplicity":"0..*"},{"name":"lod4Geometry","type":"EAID_1FFA9854_10E5_47a7_BE3E_4447F57FE997","multiplicity":"0..1"},{"name":"consFacilityAttribute","type":"FacilityAttribute","multiplicity":"0..*"},{"name":"constructionInstallation","type":"ConstructionInstallation","multiplicity":"0..*"},{"name":"consFacilityIdAttribute","type":"FacilityIdAttribute","multiplicity":"0..1"},{"name":"consStructureAttribute","type":"ConstructionStructureAttribute","multiplicity":"0..1"},{"name":"consKeyValuePairAttribute","type":"KeyValuePairAttribute","multiplicity":"0..*"},{"name":"lod0Geometry","type":"EAID_1FFA9854_10E5_47a7_BE3E_4447F57FE997","multiplicity":"0..1"},{"name":"consBaseAttribute","type":"ConstructionBaseAttribute","multiplicity":"0..1"}],"associations":[]},{"name":"AbstractPointCloud","stereotype":"FeatureType","id":"EAID_65E11618_153D_4399_B684_12CA5BB27451","attributes":[],"associations":[]},{"name":"Appurtenance","stereotype":"FeatureType","id":"EAID_9EEEBD18_9612_4926_8767_05CEB295B73F","attributes":[{"name":"appurtenanceType","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"BridgeFunctionalAttribute","stereotype":"DataType","id":"EAID_65D5FD18_3F61_44ed_BD2A_7EA7FCEB610B","attributes":[{"name":"directionType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"userType","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"BridgeStructureAttribute","stereotype":"DataType","id":"EAID_8840E7E6_7521_48b6_8BF6_F9B4CD0AC1FA","attributes":[{"name":"material","type":"gml:CodeType","multiplicity":"0..1"},{"name":"bridgeType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"length","type":"gml:LengthType","multiplicity":"0..1"},{"name":"width","type":"gml:LengthType","multiplicity":"0..1"},{"name":"area","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"weightRestriction","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"heightRestriction","type":"gml:LengthType","multiplicity":"0..1"},{"name":"widthRestriction","type":"gml:LengthType","multiplicity":"0..1"},{"name":"underGirderHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"slopeType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"escalator","type":"xs:boolean","multiplicity":"0..1"}],"associations":[]},{"name":"BuildingAttribute","stereotype":"DataType","id":"EAID_2D223B46_1D97_406b_AE0D_043325A8B5E7","attributes":[],"associations":[]},{"name":"BuildingDetailAttribute","stereotype":"DataType","id":"EAID_D8C53C6E_9F5D_4fc9_AA35_4EF04D106292","attributes":[{"name":"serialNumberOfBuildingCertification","type":"xs:string","multiplicity":"0..1"},{"name":"siteArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"totalFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"buildingFootprintArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"buildingRoofEdgeArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"developmentArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"buildingStructureType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"buildingStructureOrgType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"fireproofStructureType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"implementingBody","type":"xs:string","multiplicity":"0..1"},{"name":"urbanPlanType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"areaClassificationType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"districtsAndZonesType","type":"gml:CodeType","multiplicity":"0..*"},{"name":"landUseType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"reference","type":"xs:string","multiplicity":"0..1"},{"name":"majorUsage","type":"gml:CodeType","multiplicity":"0..1"},{"name":"majorUsage2","type":"gml:CodeType","multiplicity":"0..1"},{"name":"orgUsage","type":"gml:CodeType","multiplicity":"0..1"},{"name":"orgUsage2","type":"gml:CodeType","multiplicity":"0..1"},{"name":"detailedUsage","type":"gml:CodeType","multiplicity":"0..1"},{"name":"detailedUsage2","type":"gml:CodeType","multiplicity":"0..1"},{"name":"detailedUsage3","type":"gml:CodeType","multiplicity":"0..1"},{"name":"groundFloorUsage","type":"gml:CodeType","multiplicity":"0..1"},{"name":"secondFloorUsage","type":"gml:CodeType","multiplicity":"0..1"},{"name":"thirdFloorUsage","type":"gml:CodeType","multiplicity":"0..1"},{"name":"basementUsage","type":"gml:CodeType","multiplicity":"0..1"},{"name":"basementFirstUsage","type":"gml:CodeType","multiplicity":"0..1"},{"name":"basementSecondUsage","type":"gml:CodeType","multiplicity":"0..1"},{"name":"vacancy","type":"gml:CodeType","multiplicity":"0..1"},{"name":"buildingCoverageRate","type":"xs:double","multiplicity":"0..1"},{"name":"floorAreaRate","type":"xs:double","multiplicity":"0..1"},{"name":"specifiedBuildingCoverageRate","type":"xs:double","multiplicity":"0..1"},{"name":"specifiedFloorAreaRate","type":"xs:double","multiplicity":"0..1"},{"name":"standardFloorAreaRate","type":"xs:double","multiplicity":"0..1"},{"name":"buildingHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"eaveHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"},{"name":"surveyYear","type":"xs:gYear","multiplicity":"1..1"}],"associations":[]},{"name":"BuildingIDAttribute","stereotype":"DataType","id":"EAID_E7389C4C_C19E_47e5_82DA_97982DD1AFEC","attributes":[{"name":"buildingID","type":"xs:string","multiplicity":"1..1"},{"name":"branchID","type":"xs:integer","multiplicity":"0..1"},{"name":"partID","type":"xs:integer","multiplicity":"0..1"},{"name":"prefecture","type":"gml:CodeType","multiplicity":"0..1"},{"name":"city","type":"gml:CodeType","multiplicity":"1..1"}],"associations":[]},{"name":"BuildingUsecaseAttribute","stereotype":"DataType","id":"EAID_992A128B_7715_4ce8_A8B8_2D5C7E828246","attributes":[{"name":"isTemporal","type":"gml:CodeType","multiplicity":"0..1"},{"name":"floorHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"isGroundFloorOpen","type":"xs:boolean","multiplicity":"0..1"}],"associations":[]},{"name":"Cable","stereotype":"FeatureType","id":"EAID_7C26675B_F0BE_47aa_AAA9_A717C7CC5FE5","attributes":[{"name":"columns","type":"xs:integer","multiplicity":"0..1"},{"name":"rows","type":"xs:integer","multiplicity":"0..1"},{"name":"cables","type":"xs:integer","multiplicity":"0..1"}],"associations":[]},{"name":"CargoHandlingFacility","stereotype":"DataType","id":"EAID_30E719F1_F3C8_4303_979A_109B24CD9CA0","attributes":[{"name":"mainCargo","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mooringFacility","type":"xs:string","multiplicity":"0..1"},{"name":"liftableLoad","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"ability","type":"xs:integer","multiplicity":"0..1"},{"name":"packingName","type":"gml:CodeType","multiplicity":"0..1"},{"name":"acquisitionYear","type":"xs:gYear","multiplicity":"0..1"},{"name":"innerTotalFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"innerOfSiteArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"outerOfTotalFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"outerSiteArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"mainMaterial","type":"gml:CodeType","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"CircularCurveType","stereotype":"DataType","id":"EAID_1D728874_08A3_44c3_8B75_119367BA0B59","attributes":[{"name":"radius","type":"gml:LengthType","multiplicity":"1..1"},{"name":"intersection","type":"xs:double","multiplicity":"1..1"},{"name":"cutLength","type":"gml:LengthType","multiplicity":"1..1"},{"name":"curveLength","type":"gml:LengthType","multiplicity":"1..1"}],"associations":[]},{"name":"CityFurnitureAttribute","stereotype":"DataType","id":"EAID_15EB5F38_D9BA_43f5_8F86_2BF1EE2C8E4A","attributes":[],"associations":[]},{"name":"CityFurnitureDetailAttribute","stereotype":"DataType","id":"EAID_D16E1099_1CE2_4533_8478_CA4976745B5B","attributes":[{"name":"facilityType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"description","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"ClosureSurface","stereotype":"FeatureType","id":"EAID_DEFC45D2_B1EC_43b5_A89E_115BC8C23C8C","attributes":[],"associations":[]},{"name":"ConstructionBaseAttribute","stereotype":"DataType","id":"EAID_7C9666FA_BBDF_435a_8627_02FD981E3173","attributes":[{"name":"adminType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"administrator","type":"xs:string","multiplicity":"0..1"},{"name":"adminOffice","type":"xs:string","multiplicity":"0..1"},{"name":"operatorType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"installerType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"installer","type":"xs:string","multiplicity":"0..1"},{"name":"structureOrdinance","type":"xs:string","multiplicity":"0..1"},{"name":"specification","type":"xs:string","multiplicity":"0..1"},{"name":"kana","type":"xs:string","multiplicity":"0..1"},{"name":"constructionStartYear","type":"xs:gYear","multiplicity":"0..1"},{"name":"completionYear","type":"xs:gYear","multiplicity":"0..1"},{"name":"facilityAge","type":"xs:integer","multiplicity":"0..1"},{"name":"update","type":"xs:date","multiplicity":"0..1"},{"name":"purpose","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"ConstructionEvent","stereotype":"DataType","id":"EAID_0A159582_531E_4577_832B_C245CD51A3E4","attributes":[{"name":"event","type":"gml:CodeType","multiplicity":"1..1"},{"name":"dateOfEvent","type":"xs:date","multiplicity":"1..1"},{"name":"description","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"ConstructionInstallation","stereotype":"FeatureType","id":"EAID_05AC07E6_F13D_46ba_9F90_AD6BDEC013B6","attributes":[{"name":"class","type":"gml:CodeType","multiplicity":"0..1"},{"name":"function","type":"gml:CodeType","multiplicity":"0..*"},{"name":"usage","type":"gml:CodeType","multiplicity":"0..*"},{"name":"lod2Geometry","type":"EAID_1FFA9854_10E5_47a7_BE3E_4447F57FE997","multiplicity":"0..1"},{"name":"lod3Geometry","type":"EAID_1FFA9854_10E5_47a7_BE3E_4447F57FE997","multiplicity":"0..1"}],"associations":[]},{"name":"ConstructionRiskAssessmentAttribute","stereotype":"DataType","id":"EAID_3737444F_4BFA_487c_B1BE_76A4484A7F66","attributes":[{"name":"surveyYear","type":"xs:gYear","multiplicity":"0..1"},{"name":"riskType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"status","type":"gml:CodeType","multiplicity":"0..1"},{"name":"referenceDate","type":"xs:date","multiplicity":"1..1"}],"associations":[]},{"name":"ConstructionStructureAttribute","stereotype":"DataType","id":"EAID_0BF155C7_0F72_43bb_9805_1DFAAD4CC368","attributes":[{"name":"structureType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"length","type":"gml:LengthType","multiplicity":"0..1"},{"name":"width","type":"gml:LengthType","multiplicity":"0..1"},{"name":"depth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"volume","type":"gml:MeasureType","multiplicity":"0..1"}],"associations":[]},{"name":"ControlPoint","stereotype":"DataType","id":"EAID_73FEC978_744D_409f_8BB7_6168EBCA0168","attributes":[{"name":"startPost","type":"xs:string","multiplicity":"0..1"},{"name":"endPost","type":"xs:string","multiplicity":"0..1"},{"name":"function","type":"gml:CodeType","multiplicity":"1..1"},{"name":"parameter","type":"ControlPointType","multiplicity":"1..1"},{"name":"endPoint","type":"Point","multiplicity":"0..1"},{"name":"startPoint","type":"Point","multiplicity":"0..1"}],"associations":[]},{"name":"ControlPointType","stereotype":"Union","id":"EAID_E7E7A9AF_849E_4797_8186_23CE9AE9703C","attributes":[{"name":"circularCurve","type":"CircularCurveType","multiplicity":"1..1"},{"name":"transitionCurve","type":"TransitionCurveType","multiplicity":"1..1"},{"name":"slopeType","type":"SlopeType","multiplicity":"1..1"},{"name":"verticalCurve","type":"VerticalCurveType","multiplicity":"1..1"}],"associations":[]},{"name":"CountermeasuresCost","stereotype":"DataType","id":"EAID_36E2104D_48B0_455f_A62F_93108A811424","attributes":[{"name":"cost","type":"xs:integer","multiplicity":"0..1"},{"name":"costUnit","type":"xs:string","multiplicity":"1..1"}],"associations":[]},{"name":"CyberportMarinaAndPBS","stereotype":"DataType","id":"EAID_13D20342_6319_46f6_8BD3_874C9CF71823","attributes":[{"name":"geologicalType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"obstructingStructures","type":"xs:string","multiplicity":"0..1"},{"name":"mainPartLength","type":"gml:LengthType","multiplicity":"0..1"},{"name":"totalLength","type":"gml:LengthType","multiplicity":"0..1"},{"name":"waveDissipatorLength","type":"gml:LengthType","multiplicity":"0..1"},{"name":"facilityWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"apronWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"restrictionStructure","type":"xs:string","multiplicity":"0..1"},{"name":"plannedDepth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"currentDepth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"innerTotalFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"innerOfSiteArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"outerOfTotalFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"outerSiteArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"ceilingHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"gravityResistant","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"form","type":"gml:CodeType","multiplicity":"0..1"},{"name":"areaType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mainVessels","type":"gml:CodeType","multiplicity":"0..1"},{"name":"isDredged","type":"xs:boolean","multiplicity":"0..1"},{"name":"mooringPostWeight","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"numberOfMooringPosts","type":"xs:integer","multiplicity":"0..1"},{"name":"resistantMaterial","type":"xs:integer","multiplicity":"0..1"},{"name":"lighting","type":"xs:integer","multiplicity":"0..1"},{"name":"stairs","type":"xs:integer","multiplicity":"0..1"},{"name":"lifesaving","type":"xs:string","multiplicity":"0..1"},{"name":"lifesavingNumber","type":"xs:integer","multiplicity":"0..1"},{"name":"bumper","type":"gml:LengthType","multiplicity":"0..1"},{"name":"numberOfVehicleBoardings","type":"xs:integer","multiplicity":"0..1"},{"name":"vehicleBoardingWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"shipType","type":"xs:string","multiplicity":"0..1"},{"name":"numberOfSeats","type":"xs:integer","multiplicity":"0..1"},{"name":"mainCargo","type":"gml:CodeType","multiplicity":"0..1"},{"name":"storageCapacity","type":"xs:integer","multiplicity":"0..1"},{"name":"storageCapacityUnit","type":"gml:CodeType","multiplicity":"0..1"},{"name":"structureType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mainMaterial","type":"gml:CodeType","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"subsidy","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"DamAttribute","stereotype":"DataType","id":"EAID_72009871_1055_44c0_84A7_A29DB992FD9B","attributes":[{"name":"damCode","type":"gml:CodeType","multiplicity":"0..1"},{"name":"totalWaterStorage","type":"gml:MeasureType","multiplicity":"0..1"}],"associations":[]},{"name":"DataQualityAttribute","stereotype":"DataType","id":"EAID_8E4996A7_C42C_4613_A0A4_9A6D855F0CF7","attributes":[{"name":"geometrySrcDescLod0","type":"gml:CodeType","multiplicity":"0..*"},{"name":"geometrySrcDescLod1","type":"gml:CodeType","multiplicity":"1..*"},{"name":"geometrySrcDescLod2","type":"gml:CodeType","multiplicity":"0..*"},{"name":"geometrySrcDescLod3","type":"gml:CodeType","multiplicity":"0..*"},{"name":"geometrySrcDescLod4","type":"gml:CodeType","multiplicity":"0..*"},{"name":"thematicSrcDesc","type":"gml:CodeType","multiplicity":"0..*"},{"name":"appearanceSrcDescLod0","type":"gml:CodeType","multiplicity":"0..*"},{"name":"appearanceSrcDescLod1","type":"gml:CodeType","multiplicity":"0..*"},{"name":"appearanceSrcDescLod2","type":"gml:CodeType","multiplicity":"0..*"},{"name":"appearanceSrcDescLod3","type":"gml:CodeType","multiplicity":"0..*"},{"name":"appearanceSrcDescLod4","type":"gml:CodeType","multiplicity":"0..*"},{"name":"lodType","type":"gml:CodeType","multiplicity":"0..*"},{"name":"lod1HeightType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"tranDataAcquisition","type":"xs:string","multiplicity":"0..1"},{"name":"publicSurveyDataQualityAttribute","type":"PublicSurveyDataQualityAttribute","multiplicity":"0..1"}],"associations":[]},{"name":"DisasterRiskAttribute","stereotype":"DataType","id":"EAID_C10479E1_7804_407d_ADF1_CB78E5F970F4","attributes":[{"name":"description","type":"gml:CodeType","multiplicity":"1..1"}],"associations":[]},{"name":"DmAnnotation","stereotype":"DataType","id":"EAID_FA65EA18_9554_4ab4_B1EB_8C34EFD57926","attributes":[{"name":"geometryType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"shapeType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"label","type":"xs:string","multiplicity":"1..1"},{"name":"isVertical","type":"xs:boolean","multiplicity":"1..1"},{"name":"size","type":"xs:integer","multiplicity":"1..1"},{"name":"orientation","type":"xs:integer","multiplicity":"1..1"},{"name":"linewidth","type":"xs:integer","multiplicity":"1..1"},{"name":"spacing","type":"xs:integer","multiplicity":"1..1"},{"name":"lod0anchorPoint","type":"EAID_1FFA9854_10E5_47a7_BE3E_4447F57FE997","multiplicity":"1..1"}],"associations":[]},{"name":"DmAttribute","stereotype":"DataType","id":"EAID_C957C9A8_14C3_43ac_93F5_DCC06A1FB3A8","attributes":[{"name":"dmCode","type":"gml:CodeType","multiplicity":"1..1"},{"name":"meshCode","type":"gml:CodeType","multiplicity":"0..1"},{"name":"dmElement","type":"DmElement","multiplicity":"0..1"}],"associations":[]},{"name":"DmElement","stereotype":"DataType","id":"EAID_FFAACAE2_3792_4295_917F_D896AF8B6BF5","attributes":[{"name":"locationType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"infoType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"elementKey","type":"xs:string","multiplicity":"0..1"},{"name":"hierarchyLevel","type":"xs:string","multiplicity":"0..1"},{"name":"dataType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"annotationType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"precisionType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"dislocationType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"breakType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"attributeValue","type":"xs:string","multiplicity":"0..1"},{"name":"attributeType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"attributeValueType","type":"xs:string","multiplicity":"0..1"},{"name":"creationDate","type":"xs:gYearMonth","multiplicity":"0..1"},{"name":"updateDate","type":"xs:gYearMonth","multiplicity":"0..1"},{"name":"terminationDate","type":"xs:gYearMonth","multiplicity":"0..1"},{"name":"freeSpace","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"DmGeometricAttribute","stereotype":"DataType","id":"EAID_75DBB25D_29E9_4cb4_9813_1ACA7B4B73FD","attributes":[{"name":"geometryType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"mapLevel","type":"gml:CodeType","multiplicity":"1..1"},{"name":"shapeType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"visibility","type":"xs:boolean","multiplicity":"0..1"},{"name":"is3d","type":"xs:boolean","multiplicity":"0..1"},{"name":"isInstallation","type":"xs:boolean","multiplicity":"0..1"},{"name":"isEdited","type":"xs:boolean","multiplicity":"0..1"},{"name":"isSupplementarySymbol","type":"xs:boolean","multiplicity":"0..1"},{"name":"angle","type":"xs:double","multiplicity":"0..1"},{"name":"elevation","type":"gml:LengthType","multiplicity":"0..1"},{"name":"lod0Geometry","type":"EAID_1FFA9854_10E5_47a7_BE3E_4447F57FE997","multiplicity":"0..1"}],"associations":[]},{"name":"Duct","stereotype":"FeatureType","id":"EAID_9897F520_E972_4916_8A38_E97AFC5A504C","attributes":[{"name":"width","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"ElectricityCable","stereotype":"FeatureType","id":"EAID_051B541D_8E88_4053_8BEE_243293BA99C6","attributes":[],"associations":[]},{"name":"Elevation","stereotype":"DataType","id":"EAID_4083E489_EB54_4f43_9824_3B621F5DDC43","attributes":[{"name":"elevationReference","type":"gml:CodeType","multiplicity":"1..1"},{"name":"elevationValue","type":"gml:DirectPosition","multiplicity":"1..1"}],"associations":[]},{"name":"EmbankmentAttribute","stereotype":"DataType","id":"EAID_19BCA167_9E15_4835_9B7E_815BCDCBF3C6","attributes":[{"name":"mainPartLength","type":"gml:LengthType","multiplicity":"0..1"},{"name":"ceilingHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"waveDissipatorLength","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"FacilityAttribute","stereotype":"DataType","id":"EAID_E93090C4_A8F1_4c8b_86CA_0D4E72D5722B","attributes":[{"name":"facilityId","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"FacilityIdAttribute","stereotype":"DataType","id":"EAID_E66C1C01_AE82_4fc8_ACB5_0C3541A6240A","attributes":[{"name":"id","type":"xs:string","multiplicity":"0..1"},{"name":"partId","type":"xs:string","multiplicity":"0..1"},{"name":"branchId","type":"xs:string","multiplicity":"0..1"},{"name":"prefecture","type":"gml:CodeType","multiplicity":"0..*"},{"name":"city","type":"gml:CodeType","multiplicity":"0..*"},{"name":"route","type":"xs:string","multiplicity":"0..1"},{"name":"startPost","type":"xs:string","multiplicity":"0..1"},{"name":"endPost","type":"xs:string","multiplicity":"0..1"},{"name":"startLat","type":"xs:double","multiplicity":"0..1"},{"name":"startLong","type":"xs:double","multiplicity":"0..1"},{"name":"alternativeName","type":"xs:string","multiplicity":"0..*"}],"associations":[]},{"name":"FacilityTypeAttribute","stereotype":"DataType","id":"EAID_0D84639F_7E62_4824_B70E_58121A43C064","attributes":[{"name":"class","type":"gml:CodeType","multiplicity":"0..1"},{"name":"function","type":"gml:CodeType","multiplicity":"0..*"}],"associations":[]},{"name":"FishingPortAttribute","stereotype":"DataType","id":"EAID_4842CFEF_3341_4d62_84AD_99E51DF75C07","attributes":[],"associations":[]},{"name":"FishingPortCapacity","stereotype":"DataType","id":"EAID_BC836CC8_3EE7_42c7_AC50_A87EA19C2EFA","attributes":[{"name":"capacity","type":"xs:string","multiplicity":"0..1"},{"name":"weightCapacity","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"hullForm","type":"xs:integer","multiplicity":"0..1"},{"name":"shipNumber","type":"xs:integer","multiplicity":"0..1"},{"name":"waterDepth-2m","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"waterDepth2-3m","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"waterDepth3-6m","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"waterDepth6-m","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"heightAboveAWL","type":"gml:LengthType","multiplicity":"0..1"},{"name":"heightOnFoundations","type":"gml:LengthType","multiplicity":"0..1"},{"name":"luminousRange","type":"gml:LengthType","multiplicity":"0..1"},{"name":"luminousColor","type":"xs:string","multiplicity":"0..1"},{"name":"candlePower","type":"xs:integer","multiplicity":"0..1"},{"name":"lightType","type":"xs:string","multiplicity":"0..1"},{"name":"period","type":"xs:string","multiplicity":"0..1"},{"name":"maximumGroundingWeight","type":"xs:integer","multiplicity":"0..1"},{"name":"handleablePower","type":"xs:integer","multiplicity":"0..1"},{"name":"maximumWaterSupply","type":"xs:integer","multiplicity":"0..1"},{"name":"maximumRefueling","type":"xs:string","multiplicity":"0..1"},{"name":"people","type":"xs:integer","multiplicity":"0..1"},{"name":"other","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"FishingPortFacility","stereotype":"DataType","id":"EAID_C77092C6_560E_4343_9C26_2BDC57BD096D","attributes":[{"name":"facilityDetailsType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"portName","type":"xs:string","multiplicity":"1..1"},{"name":"portType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"address","type":"xs:string","multiplicity":"1..1"},{"name":"designatedArea","type":"xs:string","multiplicity":"1..1"},{"name":"designation","type":"xs:string","multiplicity":"0..*"},{"name":"designatedAdministrator","type":"xs:string","multiplicity":"0..*"},{"name":"referenceNumber","type":"xs:string","multiplicity":"0..*"},{"name":"grantType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"administrator","type":"xs:string","multiplicity":"0..1"},{"name":"facilityManager","type":"xs:string","multiplicity":"0..1"},{"name":"structureType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mainMaterial","type":"gml:CodeType","multiplicity":"0..1"},{"name":"otherStructure","type":"xs:string","multiplicity":"0..1"},{"name":"length","type":"gml:LengthType","multiplicity":"0..1"},{"name":"width","type":"gml:LengthType","multiplicity":"0..1"},{"name":"ceilingHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"depth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"area","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"otherSizeDescription","type":"xs:string","multiplicity":"0..1"},{"name":"dateOfConstructionOrAcquisition","type":"xs:date","multiplicity":"0..1"},{"name":"cost","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"FloodingRiskAttribute","stereotype":"DataType","id":"EAID_F3EC493F_F242_4cd1_B267_8EC7EA00AD16","attributes":[{"name":"rank","type":"gml:CodeType","multiplicity":"0..1"},{"name":"rankOrg","type":"gml:CodeType","multiplicity":"0..1"},{"name":"depth","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"GroundSurface","stereotype":"FeatureType","id":"EAID_FFD30293_9FB3_41ef_8C68_A657F20E25FB","attributes":[],"associations":[]},{"name":"Handhole","stereotype":"FeatureType","id":"EAID_24FC6428_04C4_4bef_9C65_39AE711FC4CC","attributes":[],"associations":[]},{"name":"HarborFacility","stereotype":"DataType","id":"EAID_C34FD2EA_0B5D_4d60_85CB_54E7F18AFC69","attributes":[{"name":"geologicalType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"obstructingStructures","type":"xs:string","multiplicity":"0..1"},{"name":"structuralLimitations","type":"gml:LengthType","multiplicity":"0..1"},{"name":"length","type":"gml:LengthType","multiplicity":"0..1"},{"name":"minimumWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"maximumWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"plannedDepth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"currentDepth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"isDredged","type":"xs:boolean","multiplicity":"0..1"},{"name":"areaType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"innerArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"outerArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"subsidy","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..*"}],"associations":[]},{"name":"Height","stereotype":"DataType","id":"EAID_023E6A67_7288_4e21_967E_6AE42F592EDA","attributes":[{"name":"highReference","type":"gml:CodeType","multiplicity":"1..1"},{"name":"lowReference","type":"gml:CodeType","multiplicity":"1..1"},{"name":"status","type":"HightStatusValue","multiplicity":"1..1"},{"name":"value","type":"gml:LengthType","multiplicity":"1..1"}],"associations":[]},{"name":"HighTideRiskAttribute","stereotype":"DataType","id":"EAID_CED08D2D_0DB0_48da_92F0_294ED56E5615","attributes":[],"associations":[]},{"name":"IfcClassification","stereotype":"DataType","id":"EAID_69BBA40A_92CA_4483_8768_03203246CA04","attributes":[{"name":"source","type":"xs:string","multiplicity":"0..1"},{"name":"edition","type":"xs:string","multiplicity":"0..1"},{"name":"editionDate","type":"xs:date","multiplicity":"0..1"},{"name":"name","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"IfcClassificationReference","stereotype":"DataType","id":"EAID_0E2B9254_D88F_4eed_9A5E_C6B09DD3C136","attributes":[{"name":"location","type":"xs:anyURI","multiplicity":"0..1"},{"name":"itemReference","type":"gml:CodeType","multiplicity":"0..1"},{"name":"name","type":"xs:string","multiplicity":"0..1"},{"name":"referencedSource","type":"IfcClassification","multiplicity":"0..1"}],"associations":[]},{"name":"IfcCoordinateReferenceSystem","stereotype":"DataType","id":"EAID_C5C84EA7_5A1A_4fb7_85C8_DCFD62A9D8C7","attributes":[{"name":"name","type":"xs:string","multiplicity":"0..1"},{"name":"description","type":"xs:string","multiplicity":"0..1"},{"name":"geodeticDatum","type":"xs:string","multiplicity":"0..1"},{"name":"verticalDatum","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"IfcCoordinateReferenceSystemSelect","stereotype":"Union","id":"EAID_62D473FE_3CF0_4e35_A712_451DD2D4AEBA","attributes":[{"name":"crs","type":"IfcCoordinateReferenceSystem","multiplicity":"1..1"},{"name":"context","type":"IfcGeometricRepresentationContext","multiplicity":"1..1"}],"associations":[]},{"name":"IfcCurtainWall","stereotype":"DataType","id":"EAID_50DFC2CB_1AE2_4169_A633_5B1C131DFDA1","attributes":[],"associations":[]},{"name":"IfcGroup","stereotype":"DataType","id":"EAID_66FD365B_1277_4ddb_A32D_C4E5B336CBB3","attributes":[],"associations":[]},{"name":"IfcMapConversion","stereotype":"DataType","id":"EAID_4B5E4BEF_CC17_4886_B49A_29F8FD342867","attributes":[{"name":"sourceCRS","type":"IfcCoordinateReferenceSystemSelect","multiplicity":"0..1"},{"name":"targetCRS","type":"IfcCoordinateReferenceSystem","multiplicity":"0..1"},{"name":"eastings","type":"gml:LengthType","multiplicity":"0..1"},{"name":"northings","type":"gml:LengthType","multiplicity":"0..1"},{"name":"orthogonalHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"xAxisAbscissa","type":"xs:double","multiplicity":"0..1"},{"name":"xAxisOrdinate","type":"xs:double","multiplicity":"0..1"},{"name":"scale","type":"xs:double","multiplicity":"0..1"}],"associations":[]},{"name":"IfcOpeningElement","stereotype":"DataType","id":"EAID_B817B8CB_C204_4527_A5A7_B1BC8183A4B7","attributes":[{"name":"nominalArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"nominalVolume","type":"gml:MeasureType","multiplicity":"0..1"}],"associations":[]},{"name":"IfcProjectedCRS","stereotype":"DataType","id":"EAID_E6829968_EAD2_47b0_B269_CFEBD251FE7D","attributes":[{"name":"mapUnit","type":"xs:string","multiplicity":"0..1"},{"name":"mapProjection","type":"xs:string","multiplicity":"0..1"},{"name":"mapZone","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"IfcPsetOpeningElementCommon","stereotype":"DataType","id":"EAID_1DC3C410_33D6_4db6_BA82_E0D56B170A3F","attributes":[{"name":"reference","type":"xs:string","multiplicity":"0..1"},{"name":"purpose","type":"xs:string","multiplicity":"0..1"},{"name":"fireExit","type":"xs:boolean","multiplicity":"0..1"},{"name":"protectedOpening","type":"xs:boolean","multiplicity":"0..1"},{"name":"parallelJambs","type":"xs:boolean","multiplicity":"0..1"}],"associations":[]},{"name":"IfcPsetSpaceCommon","stereotype":"DataType","id":"EAID_1D1E3BCA_E86F_4bd2_995D_32F224C28F6A","attributes":[{"name":"reference","type":"xs:string","multiplicity":"0..1"},{"name":"category","type":"xs:string","multiplicity":"0..1"},{"name":"floorCovering","type":"xs:string","multiplicity":"0..1"},{"name":"wallCovering","type":"xs:string","multiplicity":"0..1"},{"name":"ceilingCovering","type":"xs:string","multiplicity":"0..1"},{"name":"skirtingBoard","type":"xs:string","multiplicity":"0..1"},{"name":"grossPlannedArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"netPlannedArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"publiclyAccessible","type":"xs:boolean","multiplicity":"0..1"},{"name":"handicapAccessible","type":"xs:boolean","multiplicity":"0..1"},{"name":"concealedFlooring","type":"xs:boolean","multiplicity":"0..1"},{"name":"concealedCeiling","type":"xs:boolean","multiplicity":"0..1"}],"associations":[]},{"name":"IfcZone","stereotype":"DataType","id":"EAID_FCBF6DF9_F6CC_4901_A044_0FD06506D8B6","attributes":[],"associations":[]},{"name":"IndoorAttribute","stereotype":"DataType","id":"EAID_AEFC90D7_4F88_4669_ABA9_0366ECF81C09","attributes":[{"name":"source","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"IndoorFacilityAttribute","stereotype":"DataType","id":"EAID_8F0BF2DF_E2EC_49c8_B7E9_17236D873A33","attributes":[{"name":"weekdayHours","type":"xs:string","multiplicity":"0..1"},{"name":"weekendHours","type":"xs:string","multiplicity":"0..1"},{"name":"phone","type":"xs:string","multiplicity":"0..1"},{"name":"website","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"IndoorFurnishingAttribute","stereotype":"DataType","id":"EAID_ADA53F90_EC03_49ca_BF89_B9A0BA65D5C7","attributes":[{"name":"floorId","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"IndoorPublicTagAttribute","stereotype":"DataType","id":"EAID_2EEB36B4_2C0C_4390_A85B_6AC13BCE663F","attributes":[{"name":"ucode","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"IndoorSpaceAttribute","stereotype":"DataType","id":"EAID_311C40CE_F5D3_4e34_AD6A_3E9B3A0BD7DD","attributes":[{"name":"floorId","type":"xs:string","multiplicity":"0..1"},{"name":"isRestricted","type":"xs:boolean","multiplicity":"0..1"},{"name":"suite","type":"xs:string","multiplicity":"0..1"},{"name":"isPublic","type":"xs:boolean","multiplicity":"0..1"},{"name":"tollType","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"IndoorStoreyAttribute","stereotype":"DataType","id":"EAID_816EF4B2_7C58_41a8_944B_C10AF1ABBE83","attributes":[{"name":"category","type":"xs:boolean","multiplicity":"0..1"},{"name":"ordinal","type":"xs:double","multiplicity":"0..1"}],"associations":[]},{"name":"IndoorTactileTileAttribute","stereotype":"DataType","id":"EAID_9E6943D2_831D_4b81_AFE7_8195E485C132","attributes":[{"name":"startNode","type":"xs:string","multiplicity":"0..1"},{"name":"endNode","type":"xs:string","multiplicity":"0..1"},{"name":"category","type":"gml:CodeType","multiplicity":"0..1"},{"name":"roof","type":"gml:CodeType","multiplicity":"0..1"},{"name":"floorId","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"IndoorUserDefinedAttribute","stereotype":"DataType","id":"EAID_6368E691_DA29_4db0_831A_C260666E71D1","attributes":[{"name":"name","type":"xs:string","multiplicity":"0..1"},{"name":"nominalValue","type":"UserDefinedValue","multiplicity":"0..1"},{"name":"description","type":"xs:string","multiplicity":"0..1"},{"name":"unit","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"IndoorZoneAttribute","stereotype":"DataType","id":"EAID_A17632AB_4A4F_4bd4_AFED_3B6AF6A293CB","attributes":[{"name":"floorId","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"InlandFloodingRiskAttribute","stereotype":"DataType","id":"EAID_09EBE9B4_4F94_4f1b_BD13_AFED32CEFF4D","attributes":[],"associations":[]},{"name":"KeyValuePairAttribute","stereotype":"DataType","id":"EAID_21B83B38_B136_475a_AAAA_8761EE9D273D","attributes":[{"name":"key","type":"gml:CodeType","multiplicity":"1..1"},{"name":"codeValue","type":"gml:CodeType","multiplicity":"1..1"}],"associations":[]},{"name":"LandSlideRiskAttribute","stereotype":"DataType","id":"EAID_4618F2DB_233B_402a_945B_5500E8CF9668","attributes":[{"name":"areaType","type":"gml:CodeType","multiplicity":"1..1"}],"associations":[]},{"name":"LandUseAttribute","stereotype":"DataType","id":"EAID_43AE1CAC_6E4B_4bee_A5D9_F59E78411EDE","attributes":[],"associations":[]},{"name":"LandUseDetailAttribute","stereotype":"DataType","id":"EAID_38DBDE3D_DC81_4505_A700_7EC81CED4BD1","attributes":[{"name":"id","type":"xs:string","multiplicity":"0..1"},{"name":"orgLandUse","type":"gml:CodeType","multiplicity":"0..1"},{"name":"nominalArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"ownerType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"owner","type":"xs:string","multiplicity":"0..1"},{"name":"areaInSquareMeter","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"areaInHa","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"buildingCoverageRate","type":"xs:double","multiplicity":"0..1"},{"name":"floorAreaRate","type":"xs:double","multiplicity":"0..1"},{"name":"specifiedBuildingCoverageRate","type":"xs:double","multiplicity":"0..1"},{"name":"specifiedFloorAreaRate","type":"xs:double","multiplicity":"0..1"},{"name":"standardFloorAreaRate","type":"xs:double","multiplicity":"0..1"},{"name":"urbanPlanType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"areaClassificationType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"districtsAndZonesType","type":"gml:CodeType","multiplicity":"0..*"},{"name":"prefecture","type":"gml:CodeType","multiplicity":"0..1"},{"name":"city","type":"gml:CodeType","multiplicity":"0..1"},{"name":"reference","type":"xs:string","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"},{"name":"surveyYear","type":"xs:gYear","multiplicity":"0..1"}],"associations":[]},{"name":"LargeCustomerFacilityAttribute","stereotype":"DataType","id":"EAID_E9A46B26_434D_4630_8289_D814EDB6BF38","attributes":[{"name":"class","type":"gml:CodeType","multiplicity":"0..1"},{"name":"name","type":"xs:string","multiplicity":"0..1"},{"name":"capacity","type":"xs:integer","multiplicity":"0..1"},{"name":"owner","type":"xs:string","multiplicity":"0..1"},{"name":"totalFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"totalStoreFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"inauguralDate","type":"xs:date","multiplicity":"0..1"},{"name":"yearOpened","type":"xs:gYear","multiplicity":"0..1"},{"name":"yearClosed","type":"xs:gYear","multiplicity":"0..1"},{"name":"keyTenants","type":"xs:string","multiplicity":"0..1"},{"name":"availability","type":"xs:boolean","multiplicity":"0..1"},{"name":"urbanPlanType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"areaClassificationType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"districtsAndZonesType","type":"gml:CodeType","multiplicity":"0..*"},{"name":"landUseType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"reference","type":"xs:string","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"},{"name":"surveyYear","type":"xs:gYear","multiplicity":"1..1"}],"associations":[]},{"name":"LengthAttribute","stereotype":"DataType","id":"EAID_4E24300A_A653_4755_866B_B8E298C02D2C","attributes":[{"name":"length","type":"gml:LengthType","multiplicity":"0..1"},{"name":"measureType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"phaseType","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"LongevityMeasures","stereotype":"DataType","id":"EAID_38DCB837_14CB_43fd_BB65_FA59F2BCA9AF","attributes":[{"name":"fiscalYearForCountermeasures","type":"xs:gYear","multiplicity":"1..1"},{"name":"countermeasuresCost","type":"CountermeasuresCost","multiplicity":"0..1"},{"name":"description","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"MaintenanceHistoryAttribute","stereotype":"DataType","id":"EAID_9509AFD5_D08B_4aa1_ADE5_1CEDC2C2F804","attributes":[{"name":"maintenanceType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"maintenanceFiscalYear","type":"xs:gYear","multiplicity":"0..1"},{"name":"maintenanceYear","type":"xs:gYear","multiplicity":"0..1"},{"name":"maintenanceDate","type":"xs:date","multiplicity":"0..1"},{"name":"status","type":"xs:string","multiplicity":"0..1"},{"name":"description","type":"gml:StringOrRefType","multiplicity":"0..1"}],"associations":[]},{"name":"Manhole","stereotype":"FeatureType","id":"EAID_D1B777D0_96BF_418c_BDBA_54D82904832C","attributes":[{"name":"elevation","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"MooringFacility","stereotype":"DataType","id":"EAID_4E714C89_DF06_488a_B9AE_0081E23CA548","attributes":[{"name":"mainPartLength","type":"gml:LengthType","multiplicity":"0..1"},{"name":"totalLength","type":"gml:LengthType","multiplicity":"0..1"},{"name":"facilityWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"apronWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"plannedDepth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"currentDepth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"area","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"ceilingHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"gravityResistant","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"form","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mainVessels","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mooringPostWeight","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"numberOfMooringPosts","type":"xs:integer","multiplicity":"0..1"},{"name":"resistantMaterial","type":"xs:integer","multiplicity":"0..1"},{"name":"lighting","type":"xs:integer","multiplicity":"0..1"},{"name":"stairs","type":"xs:integer","multiplicity":"0..1"},{"name":"lifesavingAppliances","type":"xs:string","multiplicity":"0..1"},{"name":"numberOfLifesavingAppliances","type":"xs:integer","multiplicity":"0..1"},{"name":"bumper","type":"gml:LengthType","multiplicity":"0..1"},{"name":"numberOfVehicleBoardings","type":"xs:integer","multiplicity":"0..1"},{"name":"vehicleBoardingWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"shipType","type":"xs:string","multiplicity":"0..1"},{"name":"numberOfSeats","type":"xs:integer","multiplicity":"0..1"},{"name":"mainCargo","type":"gml:CodeType","multiplicity":"0..1"},{"name":"structureType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mainMaterial","type":"gml:CodeType","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"subsidy","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"NavigationAssistanceFacility","stereotype":"DataType","id":"EAID_DE9E527A_A181_4b62_B308_6F52D1C996F3","attributes":[{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"subsidy","type":"xs:string","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"NumberOfFacilities","stereotype":"DataType","id":"EAID_DF2EEDCE_21E0_45f2_8932_5736E300D626","attributes":[{"name":"quantity","type":"xs:integer","multiplicity":"1..1"},{"name":"quantityUnit","type":"gml:CodeType","multiplicity":"1..1"}],"associations":[]},{"name":"Occupancy","stereotype":"DataType","id":"EAID_222883AF_1028_479a_8015_C39C9DF57CA0","attributes":[{"name":"interval","type":"gml:CodeType","multiplicity":"0..1"},{"name":"numberOfOccupants","type":"xs:integer","multiplicity":"1..1"},{"name":"occupantType","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"OffsetDepth","stereotype":"DataType","id":"EAID_E168CC03_B8D0_463a_BCAF_1A17213B20ED","attributes":[{"name":"pos","type":"gml:DirectPosition","multiplicity":"0..1"},{"name":"offset","type":"gml:LengthType","multiplicity":"0..1"},{"name":"depth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"minDepth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"maxDepth","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"OilGasChemicalsPipe","stereotype":"FeatureType","id":"EAID_A891BC45_A02D_4fcc_BD3D_C3224314FB54","attributes":[],"associations":[]},{"name":"OtherConstruction","stereotype":"FeatureType","id":"EAID_13CD36DD_5798_4c92_9968_957B41C60204","attributes":[{"name":"class","type":"gml:CodeType","multiplicity":"0..1"},{"name":"function","type":"gml:CodeType","multiplicity":"0..*"},{"name":"usage","type":"gml:CodeType","multiplicity":"0..*"}],"associations":[]},{"name":"OuterCeilingSurface","stereotype":"FeatureType","id":"EAID_9713463F_4AE0_4259_9254_337D505F4B28","attributes":[],"associations":[]},{"name":"OuterFloorSurface","stereotype":"FeatureType","id":"EAID_525A1256_0380_4ebe_8FE1_449E94824E9B","attributes":[],"associations":[]},{"name":"ParkFacilityLongevityPlanAttribute","stereotype":"DataType","id":"EAID_59FDB048_64DA_4230_BB04_A426F10028A0","attributes":[{"name":"parkCode","type":"gml:CodeType","multiplicity":"1..1"},{"name":"parkName","type":"gml:CodeType","multiplicity":"1..1"},{"name":"parkType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"facilityName","type":"gml:CodeType","multiplicity":"0..1"},{"name":"facilityNameOptional","type":"xs:string","multiplicity":"0..1"},{"name":"specificFacilityName","type":"xs:string","multiplicity":"1..1"},{"name":"numberOfFacilities","type":"NumberOfFacilities","multiplicity":"0..1"},{"name":"size","type":"xs:string","multiplicity":"0..1"},{"name":"mainMaterial","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mainMaterialOptional","type":"xs:string","multiplicity":"0..1"},{"name":"installationYear","type":"xs:gYear","multiplicity":"1..1"},{"name":"disposalLimitPeriod","type":"xs:integer","multiplicity":"0..1"},{"name":"expectedUsagePeriod","type":"xs:integer","multiplicity":"0..1"},{"name":"repairsBeforeParkHealthAssessment","type":"RepairsBeforeParkHealthAssessment","multiplicity":"0..1"},{"name":"parkHealthAssessment","type":"ParkHealthAssessment","multiplicity":"0..*"},{"name":"managementType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"expectedRenewalYearWithMeasures","type":"xs:gYear","multiplicity":"0..1"},{"name":"longevityMeasures","type":"LongevityMeasures","multiplicity":"0..*"},{"name":"noteForLongevity","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"ParkHealthAssessment","stereotype":"DataType","id":"EAID_2F533E02_E6AF_42d2_A64F_F720E116D01D","attributes":[{"name":"assessmentFiscalYear","type":"xs:gYear","multiplicity":"1..1"},{"name":"deteriorationStatus","type":"xs:string","multiplicity":"0..1"},{"name":"condition","type":"gml:CodeType","multiplicity":"0..1"},{"name":"urgency","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"Pipe","stereotype":"FeatureType","id":"EAID_629140D0_8004_4d7e_9EEF_85F540AF1B85","attributes":[{"name":"innerDiameter","type":"gml:LengthType","multiplicity":"0..1"},{"name":"outerDiameter","type":"gml:LengthType","multiplicity":"0..1"},{"name":"sleeveType","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"PointCloud","stereotype":"FeatureType","id":"EAID_049D3AE5_0C57_4755_864A_64B82A85ECB3","attributes":[{"name":"mimeType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"pointFile","type":"xs:anyURI","multiplicity":"0..1"},{"name":"pointFileSrsName","type":"xs:string","multiplicity":"0..1"},{"name":"pointCloudSpecAttribute","type":"PointCloudSpecAttribute","multiplicity":"0..1"},{"name":"points","type":"EAID_78F13906_DAA9_46d1_8050_E1EFD18DBC03","multiplicity":"0..1"}],"associations":[]},{"name":"PointCloudSpecAttribute","stereotype":"DataType","id":"EAID_7399E0CC_2E0F_4813_9346_1F854BAA2824","attributes":[{"name":"class","type":"gml:CodeType","multiplicity":"1..1"},{"name":"function","type":"gml:CodeType","multiplicity":"0..*"},{"name":"srcScale","type":"gml:CodeType","multiplicity":"0..1"},{"name":"srcRequiredHorizontalAccuracy","type":"gml:LengthType","multiplicity":"0..1"},{"name":"srcRequiredVerticalAccuracy","type":"gml:LengthType","multiplicity":"0..1"},{"name":"srcRequiredPointDensity","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"srcFilteringCriteria","type":"gml:CodeType","multiplicity":"0..*"},{"name":"srcGridInterval","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"isIntensity","type":"xs:boolean","multiplicity":"0..1"},{"name":"spectralBandSet","type":"gml:CodeType","multiplicity":"0..*"},{"name":"isReturnInfo","type":"xs:boolean","multiplicity":"0..1"},{"name":"isStandardClassification","type":"xs:boolean","multiplicity":"0..1"},{"name":"customClassificationType","type":"gml:CodeType","multiplicity":"0..*"},{"name":"pointCloudAssociationMethod","type":"gml:CodeType","multiplicity":"1..1"},{"name":"pointSubsamplingInfo","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"PortAttribute","stereotype":"DataType","id":"EAID_D78AD559_6B7A_4b02_BAC8_B7B9F041E863","attributes":[{"name":"portFacilityDetailsType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"portName","type":"xs:string","multiplicity":"1..1"},{"name":"portStatus","type":"gml:CodeType","multiplicity":"0..1"},{"name":"district","type":"xs:string","multiplicity":"0..1"},{"name":"grantType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"isDesignated","type":"xs:boolean","multiplicity":"0..1"},{"name":"degradationLevel","type":"xs:integer","multiplicity":"0..1"}],"associations":[]},{"name":"PortEnvironmentalImprovementFacility","stereotype":"DataType","id":"EAID_B342E817_0FDD_4c7e_9377_FB7F02AE03E1","attributes":[{"name":"usage","type":"xs:string","multiplicity":"0..1"},{"name":"length","type":"gml:LengthType","multiplicity":"0..1"},{"name":"area","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"totalFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"subsidy","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"PortManagementFacility","stereotype":"DataType","id":"EAID_DFD1267B_7C97_425b_A8D1_CA7D0031FDA0","attributes":[{"name":"totalFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"numberOfShipTypes","type":"xs:integer","multiplicity":"0..1"},{"name":"unitOfShipType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"loadingCapacity","type":"xs:integer","multiplicity":"0..1"},{"name":"acquisitionYear","type":"xs:gYear","multiplicity":"0..1"},{"name":"usage","type":"xs:string","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"subsidy","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"PortPassengerFacility","stereotype":"DataType","id":"EAID_D8B98AF2_D4CC_42e3_8BAC_0B0D5182B57E","attributes":[{"name":"length","type":"gml:LengthType","multiplicity":"0..1"},{"name":"width","type":"gml:LengthType","multiplicity":"0..1"},{"name":"mainMaterial","type":"gml:CodeType","multiplicity":"0..1"},{"name":"totalFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"acquisitionYear","type":"xs:gYear","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"PortPollutionControlFacility","stereotype":"DataType","id":"EAID_E4F80549_3431_415d_9BBC_CF776A033037","attributes":[{"name":"length","type":"gml:LengthType","multiplicity":"0..1"},{"name":"width","type":"gml:LengthType","multiplicity":"0..1"},{"name":"crossSectionalArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"area","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"height","type":"gml:LengthType","multiplicity":"0..1"},{"name":"mainMaterial","type":"gml:CodeType","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"subsidy","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"PortProtectiveFacility","stereotype":"DataType","id":"EAID_85BC1C43_58C9_4844_8B6A_8E1F72A88F3B","attributes":[{"name":"structureType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mainMaterial","type":"gml:CodeType","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"subsidy","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..*"}],"associations":[]},{"name":"PortStorageFacility","stereotype":"DataType","id":"EAID_8A90C374_CE9A_4b9c_8216_A8A064CF09D2","attributes":[{"name":"innerTotalFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"innerOfSiteArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"outerOfTotalFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"outerSiteArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"mainCargo","type":"gml:CodeType","multiplicity":"0..1"},{"name":"storageCapacity","type":"xs:integer","multiplicity":"0..1"},{"name":"storageCapacityUnit","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mainMaterial","type":"gml:CodeType","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"PortTransportationFacility","stereotype":"DataType","id":"EAID_F3458C3A_9AF1_429a_A605_BDF9294736AC","attributes":[{"name":"structureType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"startingPoint","type":"xs:string","multiplicity":"0..1"},{"name":"length","type":"gml:LengthType","multiplicity":"0..1"},{"name":"area","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"beddingWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"numberOfLanes","type":"xs:integer","multiplicity":"0..1"},{"name":"parkingLotCapacityOfBus","type":"xs:integer","multiplicity":"0..1"},{"name":"parkingLotCapacityOfCars","type":"xs:integer","multiplicity":"0..1"},{"name":"routeType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"heightToDigit","type":"gml:LengthType","multiplicity":"0..1"},{"name":"heightLimit","type":"gml:LengthType","multiplicity":"0..1"},{"name":"minimumWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"minimumDepth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"numberOfAircraftParkingSpaces","type":"xs:integer","multiplicity":"0..1"},{"name":"pavementType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mainCargo","type":"gml:CodeType","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"subsidy","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"PortWasteTreatmentFacility","stereotype":"DataType","id":"EAID_D2624E36_BEAF_4ec0_B6F4_E80E78008284","attributes":[{"name":"structureType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"perimeter","type":"gml:LengthType","multiplicity":"0..1"},{"name":"mainPartLength","type":"gml:LengthType","multiplicity":"0..1"},{"name":"innerShoreLength","type":"gml:LengthType","multiplicity":"0..1"},{"name":"ceilingHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"waveDissipatorLength","type":"gml:LengthType","multiplicity":"0..1"},{"name":"mainMaterial","type":"gml:CodeType","multiplicity":"0..1"},{"name":"wasteType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"plannedDisposalArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"plannedDisposalAmount","type":"xs:integer","multiplicity":"0..1"},{"name":"receivingCapacity","type":"xs:integer","multiplicity":"0..1"},{"name":"shipType","type":"xs:string","multiplicity":"0..1"},{"name":"unitOfReceivingCapacity","type":"gml:CodeType","multiplicity":"0..1"},{"name":"acquisitionYear","type":"xs:gYear","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"subsidy","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"PortWelfareFacility","stereotype":"DataType","id":"EAID_630E431A_57E4_4fe3_B6C7_ECBC4DAA7F0A","attributes":[{"name":"totalFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"PublicLand","stereotype":"FeatureType","id":"EAID_61A1C88E_7BE0_4c91_9683_419908672089","attributes":[{"name":"id","type":"xs:string","multiplicity":"1..1"},{"name":"ownerName","type":"xs:string","multiplicity":"0..1"},{"name":"ownerType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"landCategory","type":"xs:string","multiplicity":"0..1"},{"name":"area","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"status","type":"xs:string","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"PublicSurveyDataQualityAttribute","stereotype":"DataType","id":"EAID_4E3B64AD_AC35_41be_84B1_9D973ED9F949","attributes":[{"name":"srcScaleLod0","type":"gml:CodeType","multiplicity":"0..1"},{"name":"srcScaleLod1","type":"gml:CodeType","multiplicity":"0..1"},{"name":"srcScaleLod2","type":"gml:CodeType","multiplicity":"0..1"},{"name":"srcScaleLod3","type":"gml:CodeType","multiplicity":"0..1"},{"name":"srcScaleLod4","type":"gml:CodeType","multiplicity":"0..1"},{"name":"publicSurveySrcDescLod0","type":"gml:CodeType","multiplicity":"0..*"},{"name":"publicSurveySrcDescLod1","type":"gml:CodeType","multiplicity":"0..*"},{"name":"publicSurveySrcDescLod2","type":"gml:CodeType","multiplicity":"0..*"},{"name":"publicSurveySrcDescLod3","type":"gml:CodeType","multiplicity":"0..*"},{"name":"publicSurveySrcDescLod4","type":"gml:CodeType","multiplicity":"0..*"}],"associations":[]},{"name":"RailwayRouteAttribute","stereotype":"DataType","id":"EAID_AE93EC91_C79D_4a7d_9DB9_5E65E34546BD","attributes":[{"name":"operatorType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"operator","type":"xs:string","multiplicity":"1..1"},{"name":"alternativeName","type":"xs:string","multiplicity":"0..*"},{"name":"railwayType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"startStation","type":"xs:string","multiplicity":"1..1"},{"name":"endStation","type":"xs:string","multiplicity":"1..1"}],"associations":[]},{"name":"RailwayTrackAttribute","stereotype":"DataType","id":"EAID_EB2A2324_3351_4dd9_A47D_8C73C1F752BC","attributes":[{"name":"routeName","type":"xs:string","multiplicity":"0..1"},{"name":"directionType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"trackType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"startPost","type":"xs:string","multiplicity":"0..1"},{"name":"endPost","type":"xs:string","multiplicity":"0..1"},{"name":"alignmentType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"lod2Network","type":"EAID_8A3A51A1_8509_4272_ACE5_F6C907B53824","multiplicity":"0..1"},{"name":"lod3Network","type":"EAID_8A3A51A1_8509_4272_ACE5_F6C907B53824","multiplicity":"0..1"},{"name":"controlPoint","type":"ControlPoint","multiplicity":"0..*"}],"associations":[]},{"name":"RealEstateIDAttribute","stereotype":"DataType","id":"EAID_021544AC_C757_4816_96A1_C207E495CFAC","attributes":[{"name":"realEstateIDOfBuilding","type":"xs:string","multiplicity":"1..1"},{"name":"numberOfBuildingUnitOwnership","type":"xs:integer","multiplicity":"0..1"},{"name":"realEstateIDOfBuildingUnitOwnership","type":"xs:string","multiplicity":"0..*"},{"name":"numberOfRealEstateIDOfLand","type":"xs:integer","multiplicity":"0..1"},{"name":"realEstateIDOfLand","type":"xs:string","multiplicity":"0..*"},{"name":"matchingScore","type":"xs:integer","multiplicity":"1..1"}],"associations":[]},{"name":"RepairsBeforeParkHealthAssessment","stereotype":"DataType","id":"EAID_FD889BC8_C1F0_41aa_9258_7FB9F61ABCBF","attributes":[{"name":"repair","type":"gml:CodeType","multiplicity":"1..1"},{"name":"repairFiscalYear","type":"xs:gYear","multiplicity":"0..1"}],"associations":[]},{"name":"ReservoirFloodingRiskAttribute","stereotype":"DataType","id":"EAID_B8B71174_9A86_45a6_AB51_204F9C103631","attributes":[],"associations":[]},{"name":"RiverFacilityIdAttribute","stereotype":"DataType","id":"EAID_D6642069_623A_47d6_8781_9663ABEA7DF8","attributes":[{"name":"riverCode","type":"gml:CodeType","multiplicity":"1..1"},{"name":"riverName","type":"xs:string","multiplicity":"0..1"},{"name":"sideType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"leftPost","type":"gml:LengthType","multiplicity":"0..1"},{"name":"leftDistance","type":"gml:LengthType","multiplicity":"0..1"},{"name":"rightPost","type":"gml:LengthType","multiplicity":"0..1"},{"name":"rightDistance","type":"gml:LengthType","multiplicity":"0..1"},{"name":"leftStartPost","type":"gml:LengthType","multiplicity":"0..1"},{"name":"leftStartDistance","type":"gml:LengthType","multiplicity":"0..1"},{"name":"leftEndPost","type":"gml:LengthType","multiplicity":"0..1"},{"name":"leftEndDistance","type":"gml:LengthType","multiplicity":"0..1"},{"name":"rightStartPost","type":"gml:LengthType","multiplicity":"0..1"},{"name":"rightStartDistance","type":"gml:LengthType","multiplicity":"0..1"},{"name":"rightEndPost","type":"gml:LengthType","multiplicity":"0..1"},{"name":"rightEndDistance","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"RiverFloodingRiskAttribute","stereotype":"DataType","id":"EAID_4BB4308C_C686_4e24_862B_C0D2397A5BF5","attributes":[{"name":"adminType","type":"gml:CodeType","multiplicity":"1..1"},{"name":"scale","type":"gml:CodeType","multiplicity":"1..1"},{"name":"duration","type":"gml:MeasureType","multiplicity":"0..1"}],"associations":[]},{"name":"RoadAttribute","stereotype":"DataType","id":"EAID_B2294B41_DC3C_4253_B80C_9B2F774DE188","attributes":[],"associations":[]},{"name":"RoadStructureAttribute","stereotype":"DataType","id":"EAID_D0EA9B6E_7DBF_4285_BF6F_AE9B0F642AC2","attributes":[{"name":"widthType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"width","type":"gml:LengthType","multiplicity":"0..1"},{"name":"numberOfLanes","type":"xs:integer","multiplicity":"0..1"},{"name":"sectionType","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"RoadType","stereotype":"DataType","id":"EAID_17C743E5_1F7A_4e25_AD95_810B4DA84CF7","attributes":[{"name":"id","type":"xs:string","multiplicity":"0..1"},{"name":"creationDate","type":"xs:date","multiplicity":"0..1"},{"name":"isTemporary","type":"xs:boolean","multiplicity":"0..1"},{"name":"roadType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"widthType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"isTollRoad","type":"xs:boolean","multiplicity":"0..1"},{"name":"separator","type":"gml:LengthType","multiplicity":"0..1"},{"name":"isHighWay","type":"xs:boolean","multiplicity":"0..1"}],"associations":[]},{"name":"RoofSurface","stereotype":"FeatureType","id":"EAID_AD8F0C28_D53D_4792_BD74_29A0D194EF4B","attributes":[],"associations":[]},{"name":"RoomAttribute","stereotype":"DataType","id":"EAID_C192411E_82C4_4d36_AA2D_134B5DAFC006","attributes":[],"associations":[]},{"name":"SewerPipe","stereotype":"FeatureType","id":"EAID_49B2E0B2_BC4A_4cb4_9651_0FFB40776662","attributes":[{"name":"slope","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"invertElevationUpstream","type":"gml:LengthType","multiplicity":"0..1"},{"name":"invertElevationDownstream","type":"gml:LengthType","multiplicity":"0..1"},{"name":"flowDirection","type":"xs:boolean","multiplicity":"0..1"}],"associations":[]},{"name":"ShipServiceFacility","stereotype":"DataType","id":"EAID_BBBC9C83_4D57_4985_B418_2914E9791D58","attributes":[{"name":"shipType","type":"xs:string","multiplicity":"0..1"},{"name":"supplyAbility","type":"xs:integer","multiplicity":"0..1"},{"name":"supplyAbilityUnit","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mooringPlace","type":"xs:string","multiplicity":"0..1"},{"name":"length","type":"gml:LengthType","multiplicity":"0..1"},{"name":"width","type":"gml:LengthType","multiplicity":"0..1"},{"name":"area","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"acquisitionYear","type":"xs:gYear","multiplicity":"0..1"},{"name":"totalCost","type":"xs:integer","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"SlopeType","stereotype":"DataType","id":"EAID_7CDC163F_D2CA_4bdc_92D3_A8147E68272A","attributes":[{"name":"angle","type":"xs:double","multiplicity":"1..1"},{"name":"elevation","type":"gml:LengthType","multiplicity":"1..1"}],"associations":[]},{"name":"SquareUrbanPlanAttribute","stereotype":"DataType","id":"EAID_623A9EF0_EC12_4575_96C2_ACE58D809265","attributes":[{"name":"prefecture","type":"gml:CodeType","multiplicity":"0..1"},{"name":"city","type":"gml:CodeType","multiplicity":"0..1"},{"name":"urbanPlanningAreaName","type":"xs:string","multiplicity":"0..1"},{"name":"enforcer","type":"xs:string","multiplicity":"0..*"},{"name":"dateOfDecision","type":"xs:date","multiplicity":"0..1"},{"name":"dateOfRevision","type":"xs:date","multiplicity":"0..*"},{"name":"areaPlanned","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"areaInService","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"remarks","type":"xs:string","multiplicity":"0..1"},{"name":"status","type":"gml:CodeType","multiplicity":"0..1"},{"name":"areaImproved","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"areaCompleted","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"projectStartDate","type":"xs:date","multiplicity":"0..1"},{"name":"projectEndDate","type":"xs:date","multiplicity":"0..1"},{"name":"isCompleted","type":"xs:boolean","multiplicity":"0..1"},{"name":"isAuthorized","type":"xs:boolean","multiplicity":"0..1"},{"name":"purpose","type":"xs:string","multiplicity":"0..1"},{"name":"note","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"StationSquareAttribute","stereotype":"DataType","id":"EAID_21620D87_76FE_4d00_964F_57423ACB2441","attributes":[{"name":"station","type":"xs:string","multiplicity":"0..*"},{"name":"route","type":"xs:string","multiplicity":"0..*"},{"name":"railwayType","type":"gml:CodeType","multiplicity":"0..*"}],"associations":[]},{"name":"TelecommunicationsCable","stereotype":"FeatureType","id":"EAID_2F999387_0A9C_4e13_B156_2F683D996648","attributes":[],"associations":[]},{"name":"TerminalAttribute","stereotype":"DataType","id":"EAID_15869097_752B_4ffa_B9A3_9FCA6CD7C499","attributes":[{"name":"terminalType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"structure","type":"xs:string","multiplicity":"0..1"},{"name":"numberOfBerthsPlanned","type":"xs:integer","multiplicity":"0..1"},{"name":"numberOfBerthsInService","type":"xs:integer","multiplicity":"0..1"},{"name":"userType","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"ThematicShape","stereotype":"DataType","id":"EAID_A80E44CF_C86F_41c4_9D07_972B6FBB971C","attributes":[{"name":"horizontalType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"heightType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"shape","type":"EAID_1FFA9854_10E5_47a7_BE3E_4447F57FE997","multiplicity":"1..1"}],"associations":[]},{"name":"ThermalPipe","stereotype":"FeatureType","id":"EAID_D990E2A0_7413_4a9d_A12A_80A3211CE387","attributes":[],"associations":[]},{"name":"TrackAttribute","stereotype":"DataType","id":"EAID_C02FB7A3_DFCE_466c_8FD2_565FBC1EA058","attributes":[{"name":"alternativeName","type":"xs:string","multiplicity":"0..*"},{"name":"adminType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"relativeLevel","type":"xs:integer","multiplicity":"0..1"},{"name":"widthType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"structureType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"isTollRoad","type":"xs:boolean","multiplicity":"0..1"},{"name":"separator","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"TrafficAreaAttribute","stereotype":"DataType","id":"EAID_A618F664_2394_47af_8DFF_412E28D00C15","attributes":[],"associations":[]},{"name":"TrafficAreaStructureAttribute","stereotype":"DataType","id":"EAID_216A17E6_EB58_42ea_B3B8_D48F4230DACA","attributes":[{"name":"numberOfLanes","type":"xs:integer","multiplicity":"0..1"}],"associations":[]},{"name":"TrafficObjectUsecaseAttribute","stereotype":"DataType","id":"EAID_7624F52A_5012_4810_A029_7040925CC5B7","attributes":[{"name":"minWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"maxWidth","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"TrafficVolumeAttribute","stereotype":"DataType","id":"EAID_B3A52D3D_6905_4302_AEBF_755C5EA6728C","attributes":[{"name":"sectionID","type":"xs:string","multiplicity":"0..1"},{"name":"routeName","type":"xs:string","multiplicity":"0..1"},{"name":"weekday12hourTrafficVolume","type":"xs:integer","multiplicity":"0..1"},{"name":"weekday24hourTrafficVolume","type":"xs:integer","multiplicity":"0..1"},{"name":"largeVehicleRate","type":"xs:double","multiplicity":"0..1"},{"name":"congestionRate","type":"xs:double","multiplicity":"0..1"},{"name":"averageTravelSpeedInCongestion","type":"xs:double","multiplicity":"0..1"},{"name":"averageInboundTravelSpeedInCongestion","type":"xs:double","multiplicity":"0..1"},{"name":"averageOutboundTravelSpeedInCongestion","type":"xs:double","multiplicity":"0..1"},{"name":"averageInboundTravelSpeedNotCongestion","type":"xs:double","multiplicity":"0..1"},{"name":"averageOutboundTravelSpeedNotCongestion","type":"xs:double","multiplicity":"0..1"},{"name":"observationPointName","type":"xs:string","multiplicity":"0..1"},{"name":"reference","type":"xs:string","multiplicity":"0..1"},{"name":"surveyYear","type":"xs:gYear","multiplicity":"0..1"}],"associations":[]},{"name":"TransitionCurveType","stereotype":"DataType","id":"EAID_18B41BE2_4C1F_4eb4_A19A_D16E6D336083","attributes":[{"name":"intersection","type":"gml:MeasureType","multiplicity":"1..1"},{"name":"distance","type":"gml:LengthType","multiplicity":"1..1"},{"name":"curveLength","type":"gml:LengthType","multiplicity":"1..1"}],"associations":[]},{"name":"TsunamiRiskAttribute","stereotype":"DataType","id":"EAID_613EAA81_0878_4d6d_809B_780F8C5974BB","attributes":[],"associations":[]},{"name":"TunnelFunctionalAttribute","stereotype":"DataType","id":"EAID_5BDED978_DDEE_4a95_B8DB_304FCA34B892","attributes":[{"name":"directionType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"userType","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"TunnelStructureAttribute","stereotype":"DataType","id":"EAID_8F20FB6B_675F_4ccb_A338_A2022C49C36B","attributes":[{"name":"tunnelType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"tunnelSubtype","type":"gml:CodeType","multiplicity":"0..1"},{"name":"mouthType","type":"gml:CodeType","multiplicity":"0..*"},{"name":"length","type":"gml:LengthType","multiplicity":"0..1"},{"name":"width","type":"gml:LengthType","multiplicity":"0..1"},{"name":"area","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"innerHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"effectiveHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"slopeType","type":"gml:CodeType","multiplicity":"0..1"}],"associations":[]},{"name":"UndergroundBuilding","stereotype":"FeatureType","id":"EAID_88BEB495_757C_4d39_B6B1_46BD08CF43D1","attributes":[],"associations":[]},{"name":"UserDefinedValue","stereotype":"DataType","id":"EAID_3D702EC6_BB60_4673_97CC_8AFEBD5EB209","attributes":[{"name":"stringValue","type":"xs:string","multiplicity":"0..1"},{"name":"intValue","type":"xs:integer","multiplicity":"0..1"},{"name":"doubleValue","type":"xs:double","multiplicity":"0..1"},{"name":"codeValue","type":"gml:CodeType","multiplicity":"0..1"},{"name":"dateValue","type":"xs:date","multiplicity":"0..1"},{"name":"uriValue","type":"xs:anyURI","multiplicity":"0..1"},{"name":"measuredValue","type":"gml:MeasureType","multiplicity":"0..1"}],"associations":[]},{"name":"UtilityLink","stereotype":"FeatureType","id":"EAID_EB836FE5_47CB_4e7f_822C_1A2BB52F8F66","attributes":[{"name":"routeStartNode","type":"xs:string","multiplicity":"0..1"},{"name":"startNode","type":"xs:string","multiplicity":"0..1"},{"name":"routeEndNode","type":"xs:string","multiplicity":"0..1"},{"name":"endNode","type":"xs:string","multiplicity":"0..1"},{"name":"depth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"minDepth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"maxDepth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"maxWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"offset","type":"gml:LengthType","multiplicity":"0..1"},{"name":"material","type":"gml:CodeType","multiplicity":"0..1"},{"name":"lengthAttribute","type":"LengthAttribute","multiplicity":"0..*"}],"associations":[]},{"name":"UtilityNetworkElement","stereotype":"FeatureType","id":"EAID_3E46EE5D_E168_4083_AAB7_15FABD64F5CA","attributes":[{"name":"occupierType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"occupierName","type":"gml:CodeType","multiplicity":"0..1"},{"name":"year","type":"xs:gYear","multiplicity":"0..1"},{"name":"yearType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"administrator","type":"gml:CodeType","multiplicity":"0..1"},{"name":"thematicShape","type":"ThematicShape","multiplicity":"0..*"},{"name":"offsetDepth","type":"OffsetDepth","multiplicity":"0..*"}],"associations":[]},{"name":"UtilityNode","stereotype":"FeatureType","id":"EAID_4E83C6A0_F2C3_47df_84F3_7E39E949F184","attributes":[{"name":"previousLink","type":"xs:string","multiplicity":"0..*"},{"name":"nextLink","type":"xs:string","multiplicity":"0..*"},{"name":"rotationAngle","type":"xs:double","multiplicity":"0..1"}],"associations":[]},{"name":"UtilityNodeContainer","stereotype":"FeatureType","id":"EAID_3928E0B4_0EB8_4acd_B6C7_169A2C747527","attributes":[{"name":"containerType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"innerDiameterLong","type":"gml:LengthType","multiplicity":"0..1"},{"name":"outerDiameterLong","type":"gml:LengthType","multiplicity":"0..1"},{"name":"innerDiameterShort","type":"gml:LengthType","multiplicity":"0..1"},{"name":"outerDiameterShort","type":"gml:LengthType","multiplicity":"0..1"},{"name":"depth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"appurtenance","type":"xs:string","multiplicity":"0..*"},{"name":"rotationAngle","type":"xs:double","multiplicity":"0..1"}],"associations":[]},{"name":"VerticalCurveType","stereotype":"DataType","id":"EAID_058689A9_3462_4b96_930A_EB83B78D19A1","attributes":[{"name":"length","type":"gml:LengthType","multiplicity":"1..1"},{"name":"verticalDistance","type":"gml:LengthType","multiplicity":"1..1"}],"associations":[]},{"name":"WallSurface","stereotype":"FeatureType","id":"EAID_1274E3AB_D70C_459d_8257_9D7D7B5835C3","attributes":[],"associations":[]},{"name":"WaterBodyDetailAttribute","stereotype":"DataType","id":"EAID_529E17F1_2375_4579_9B01_5BF18481EE31","attributes":[{"name":"kana","type":"xs:string","multiplicity":"0..1"},{"name":"waterSystemCode","type":"gml:CodeType","multiplicity":"0..1"},{"name":"riverCode","type":"gml:CodeType","multiplicity":"0..1"},{"name":"adminType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"flowDirection","type":"xs:boolean","multiplicity":"0..1"},{"name":"maximumDepth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"waterSurfaceElevation","type":"gml:LengthType","multiplicity":"0..1"},{"name":"area","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"measurementYearMonth","type":"xs:gYearMonth","multiplicity":"0..1"},{"name":"prefecture","type":"gml:CodeType","multiplicity":"0..*"},{"name":"city","type":"gml:CodeType","multiplicity":"0..*"}],"associations":[]},{"name":"WaterPipe","stereotype":"FeatureType","id":"EAID_1FFFA46D_EC73_4c41_A860_3AD1704F8872","attributes":[],"associations":[]},{"name":"Waterway","stereotype":"FeatureType","id":"EAID_C53E2807_3500_4f3f_B531_9CF969A06657","attributes":[{"name":"waterwayDetailAttribute","type":"WaterwayDetailAttribute","multiplicity":"0..1"}],"associations":[]},{"name":"WaterwayDetailAttribute","stereotype":"DataType","id":"EAID_A4DAFB75_9D93_4ac7_AD9D_2DC433A82450","attributes":[{"name":"routeId","type":"xs:string","multiplicity":"1..1"},{"name":"routeDirection","type":"gml:CodeType","multiplicity":"0..1"},{"name":"minimumWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"maximumWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"length","type":"gml:LengthType","multiplicity":"0..1"},{"name":"navigation","type":"xs:string","multiplicity":"0..1"},{"name":"plannedDepth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"speedLimit","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"targetShipType","type":"xs:string","multiplicity":"0..*"}],"associations":[]},{"name":"IfcRoot","stereotype":"DataType","id":"EAID_C1B740FE_4C0F_4d2c_87AE_A8492FC51735","attributes":[{"name":"globalId","type":"xs:string","multiplicity":"0..1"},{"name":"name","type":"xs:string","multiplicity":"0..1"},{"name":"description","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"IfcObject","stereotype":"DataType","id":"EAID_7D560A3E_3B13_4540_8A59_5A151C799436","attributes":[{"name":"objectType","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"IfcObjectDefinition","stereotype":"DataType","id":"EAID_58A1E035_A7FB_4ce3_949C_64FA8CFB5C0E","attributes":[],"associations":[]},{"name":"IfcProduct","stereotype":"DataType","id":"EAID_7AD5E81F_E9C6_4f3e_87D2_B27CAEDFC609","attributes":[],"associations":[]},{"name":"IfcElement","stereotype":"DataType","id":"EAID_D5300FC3_286D_496e_BD8E_58DA1C5F6818","attributes":[{"name":"tag","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"IfcSpatialStructureElement","stereotype":"DataType","id":"EAID_DA9193EA_011C_45c2_8C72_CBFEA7727F6C","attributes":[{"name":"longName","type":"xs:string","multiplicity":"0..1"},{"name":"compositionType","type":"IfcElementCompositionEnum","multiplicity":"0..1"}],"associations":[]},{"name":"IfcAttribute","stereotype":"DataType","id":"EAID_DBC5DC2F_1584_40c3_92A7_6EC3170C34BA","attributes":[],"associations":[]},{"name":"IfcAxis2Placement3D","stereotype":"DataType","id":"EAID_BCF7C753_A161_45d9_AF13_456D37FB7F61","attributes":[{"name":"location","type":"Point","multiplicity":"0..1"},{"name":"axis","type":"gml:doubleList","multiplicity":"0..1"},{"name":"refDirection","type":"gml:doubleList","multiplicity":"0..1"}],"associations":[]},{"name":"IfcBuilding","stereotype":"DataType","id":"EAID_46DAEC65_BAC2_4fa7_A2B7_12248EB7C279","attributes":[{"name":"elevationOfRefHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"elevationOfTerrain","type":"gml:LengthType","multiplicity":"0..1"},{"name":"buildingAddress","type":"Address","multiplicity":"0..1"}],"associations":[]},{"name":"IfcBuildingStorey","stereotype":"DataType","id":"EAID_A8E86F66_120A_41c8_B170_D4B1EE8C00B3","attributes":[{"name":"elevation","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"IfcRoof","stereotype":"DataType","id":"EAID_796A34A8_BE0A_4fda_9B32_575A040B7DB0","attributes":[],"associations":[]},{"name":"IfcDoor","stereotype":"DataType","id":"EAID_185C964E_00C6_4cf9_A484_8ACEDB94D18B","attributes":[{"name":"overallHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"overallWidth","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"IfcFurnishingElement","stereotype":"DataType","id":"EAID_CE55BD88_E45E_45b0_86C9_9DE631A6E704","attributes":[],"associations":[]},{"name":"IfcGeometricRepresentationContext","stereotype":"DataType","id":"EAID_5A8FD6D3_A897_475b_84CB_A196083474DC","attributes":[{"name":"contextIdentifier","type":"xs:string","multiplicity":"0..1"},{"name":"contextType","type":"xs:string","multiplicity":"0..1"},{"name":"coordinateSpaceDimension","type":"xs:integer","multiplicity":"0..1"},{"name":"precision","type":"xs:double","multiplicity":"0..1"},{"name":"worldCoordinateSystem","type":"IfcAxis2Placement3D","multiplicity":"1..1"},{"name":"trueNorth","type":"gml:doubleList","multiplicity":"0..1"}],"associations":[]},{"name":"IfcProject","stereotype":"DataType","id":"EAID_CBAAF3F2_95CE_40b7_AA8B_788CB85EEAF0","attributes":[{"name":"longName","type":"xs:string","multiplicity":"0..1"},{"name":"phase","type":"xs:string","multiplicity":"0..1"},{"name":"representationContexts","type":"IfcGeometricRepresentationContext","multiplicity":"0..1"},{"name":"unitsInContext","type":"IfcUnit","multiplicity":"0..*"}],"associations":[]},{"name":"IfcPsetBuildingCommon","stereotype":"DataType","id":"EAID_8695E7B1_DCBC_43be_9735_96FC699D2A90","attributes":[{"name":"buildingId","type":"xs:string","multiplicity":"0..1"},{"name":"isPermanentId","type":"xs:boolean","multiplicity":"0..1"},{"name":"mainFireUse","type":"xs:string","multiplicity":"0..1"},{"name":"ancillaryFireUse","type":"xs:string","multiplicity":"0..1"},{"name":"sprinklerProtection","type":"xs:boolean","multiplicity":"0..1"},{"name":"sprinklerProtectionAutomatic","type":"xs:boolean","multiplicity":"0..1"},{"name":"occupancyType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"grossPlannedArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"numberOfStoreys","type":"xs:integer","multiplicity":"0..1"},{"name":"yearOfConstruction","type":"xs:gYear","multiplicity":"0..1"},{"name":"isLandmarked","type":"xs:boolean","multiplicity":"0..1"}],"associations":[]},{"name":"IfcPsetDoorCommon","stereotype":"DataType","id":"EAID_174AE681_E458_4887_A1C4_D67054DD658A","attributes":[{"name":"reference","type":"xs:string","multiplicity":"0..1"},{"name":"acousticRating","type":"xs:string","multiplicity":"0..1"},{"name":"firerating","type":"xs:string","multiplicity":"0..1"},{"name":"securityRating","type":"xs:string","multiplicity":"0..1"},{"name":"isExternal","type":"xs:boolean","multiplicity":"0..1"},{"name":"infiltration","type":"xs:double","multiplicity":"0..1"},{"name":"thermalTransmittance","type":"xs:double","multiplicity":"0..1"},{"name":"glazingAreaFraction","type":"xs:double","multiplicity":"0..1"},{"name":"handicapAccessible","type":"xs:boolean","multiplicity":"0..1"},{"name":"fireExit","type":"xs:boolean","multiplicity":"0..1"},{"name":"selfClosing","type":"xs:boolean","multiplicity":"0..1"},{"name":"smokeStop","type":"xs:boolean","multiplicity":"0..1"}],"associations":[]},{"name":"IfcPsetSiteCommon","stereotype":"DataType","id":"EAID_020635B6_FC84_49f8_BFA3_8C38FEFCD747","attributes":[{"name":"buildableArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"totalArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"buildingHeightLimit","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"IfcPsetWindowCommon","stereotype":"DataType","id":"EAID_6C62B2BF_3FC2_4173_9F5A_89B26FF15CA7","attributes":[{"name":"reference","type":"xs:string","multiplicity":"0..1"},{"name":"acousticRating","type":"xs:string","multiplicity":"0..1"},{"name":"fireRating","type":"xs:string","multiplicity":"0..1"},{"name":"securityRating","type":"xs:string","multiplicity":"0..1"},{"name":"isExternal","type":"xs:boolean","multiplicity":"0..1"},{"name":"infiltration","type":"xs:double","multiplicity":"0..1"},{"name":"thermalTransmittance","type":"xs:double","multiplicity":"0..1"},{"name":"glazingAreaFraction","type":"xs:double","multiplicity":"0..1"},{"name":"smokeStop","type":"xs:boolean","multiplicity":"0..1"}],"associations":[]},{"name":"IfcSite","stereotype":"DataType","id":"EAID_D8FC4DF7_5234_4e44_AA1B_F4F954E01710","attributes":[{"name":"refLongitude","type":"xs:double","multiplicity":"0..1"},{"name":"refLatitude","type":"xs:double","multiplicity":"0..1"},{"name":"refElevation","type":"gml:LengthType","multiplicity":"0..1"},{"name":"landTitleNumber","type":"xs:string","multiplicity":"0..1"},{"name":"siteAddress","type":"Address","multiplicity":"0..1"}],"associations":[]},{"name":"IfcSpace","stereotype":"DataType","id":"EAID_5752669D_3F62_49f7_A2D8_3BFF7896B531","attributes":[{"name":"interiorOrExteriorSpace","type":"ifcInternalOrExternalEnum","multiplicity":"0..1"},{"name":"elevationWithFlooring","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"IfcSpaceBaseQuantity","stereotype":"DataType","id":"EAID_229D5958_A9CF_4a4d_A073_51B72C33FC11","attributes":[{"name":"nominalHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"clearHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"finishCeilingHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"grossPerimeter","type":"gml:LengthType","multiplicity":"0..1"},{"name":"netPerimeter","type":"gml:LengthType","multiplicity":"0..1"},{"name":"grossCeilingArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"grossFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"netCeilingArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"netFloorArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"grossWallArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"netWallArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"grossVolume","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"netVolume","type":"gml:MeasureType","multiplicity":"0..1"}],"associations":[]},{"name":"IfcBuildingElement","stereotype":"DataType","id":"EAID_E6799DFA_20BB_4a72_B07D_D840B3E2F11B","attributes":[{"name":"elementType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"predefinedType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"shapeType","type":"gml:CodeType","multiplicity":"0..1"},{"name":"numberOfRiser","type":"xs:integer","multiplicity":"0..1"},{"name":"numberOfTreads","type":"xs:integer","multiplicity":"0..1"},{"name":"riserHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"treadLength","type":"gml:LengthType","multiplicity":"0..1"},{"name":"operationType","type":"IfcTransportElementTypeEnum","multiplicity":"0..1"},{"name":"capacityByWeight","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"capacityByNumber","type":"xs:integer","multiplicity":"0..1"}],"associations":[]},{"name":"IfcWall","stereotype":"DataType","id":"EAID_9A68AA59_CC95_45ae_8776_06B3F43EBCC8","attributes":[{"name":"nominalLength","type":"gml:LengthType","multiplicity":"0..1"},{"name":"nominalWidth","type":"gml:LengthType","multiplicity":"0..1"},{"name":"nominalHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"grossFootPrintArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"netFootPrintArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"grossSideArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"netSideArea","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"grossSideAreaLeft","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"netSideAreaLeft","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"grossSideAreaRight","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"netSideAreaRight","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"grossVolume","type":"gml:MeasureType","multiplicity":"0..1"},{"name":"netVolume","type":"gml:MeasureType","multiplicity":"0..1"}],"associations":[]},{"name":"IfcWindow","stereotype":"DataType","id":"EAID_6DC73312_B920_4b48_9749_FDA410C80FE6","attributes":[{"name":"overallHeight","type":"gml:LengthType","multiplicity":"0..1"},{"name":"overallWidth","type":"gml:LengthType","multiplicity":"0..1"}],"associations":[]},{"name":"IfcUnit","stereotype":"DataType","id":"EAID_DC70B1B9_114C_4b90_A726_41596FEFAE9A","attributes":[{"name":"dimensions","type":"xs:integer","multiplicity":"0..1"},{"name":"unitType","type":"IfcUnitEnum","multiplicity":"0..1"},{"name":"prefix","type":"xs:string","multiplicity":"0..1"},{"name":"name","type":"xs:string","multiplicity":"0..1"}],"associations":[]},{"name":"IfcWallStandardCase","stereotype":"DataType","id":"EAID_651644CA_EBC2_4ca3_BB98_3C704A8DC35D","attributes":[],"associations":[]}],"stereotypes":{"FeatureType":31,"DataType":141,"Union":2}};
+
+    // Application state
+    let currentFilter = 'all';
+    let currentSearch = '';
+    let expandedCards = new Set();
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', () => {
+      renderSummary();
+      renderFilterButtons();
+      renderClasses();
+      setupEventListeners();
+      updateResultsCount();
+      updateFooter();
+    });
+
+    function renderSummary() {
+      const summary = document.getElementById('summary');
+      const stereotypes = MAPPING_DATA.stereotypes;
+
+      let html = `
+        <div class="stat-card">
+          <div class="stat-number">${MAPPING_DATA.total_classes}</div>
+          <div class="stat-label">Total Classes</div>
+        </div>
+      `;
+
+      Object.entries(stereotypes)
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([stereotype, count]) => {
+          html += `
+            <div class="stat-card">
+              <div class="stat-number">${count}</div>
+              <div class="stat-label">${stereotype}</div>
+            </div>
+          `;
+        });
+
+      summary.innerHTML = html;
+    }
+
+    function renderFilterButtons() {
+      const container = document.getElementById('filterButtons');
+      const stereotypes = Object.keys(MAPPING_DATA.stereotypes).sort();
+
+      let html = '<button class="filter-btn active" data-filter="all">All</button>';
+      stereotypes.forEach(stereotype => {
+        html += `<button class="filter-btn" data-filter="${stereotype}">${stereotype}</button>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function renderClasses() {
+      const grid = document.getElementById('classesGrid');
+      const sortedClasses = [...MAPPING_DATA.classes].sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
+
+      const html = sortedClasses.map(cls => createClassCard(cls)).join('');
+      grid.innerHTML = html;
+    }
+
+    function createClassCard(cls) {
+      const isExpanded = expandedCards.has(cls.id);
+      const expandedClass = isExpanded ? 'expanded' : '';
+
+      return `
+        <div class="class-card ${expandedClass}"
+             data-id="${cls.id}"
+             data-stereotype="${cls.stereotype}"
+             data-name="${cls.name.toLowerCase()}"
+             data-search-text="${getSearchText(cls)}">
+          <div class="class-header" onclick="toggleCard('${cls.id}')">
+            <div class="class-header-content">
+              <div class="class-name">${cls.name}</div>
+              <span class="class-stereotype">«${cls.stereotype}»</span>
+              <div class="class-id">${cls.id}</div>
+            </div>
+            <div class="expand-icon">${isExpanded ? '▲' : '▼'}</div>
+          </div>
+          <div class="class-body">
+            ${renderAttributes(cls.attributes)}
+            ${renderAssociations(cls.associations)}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAttributes(attributes) {
+      if (!attributes || attributes.length === 0) {
+        return `
+          <div class="section-title">Attributes</div>
+          <div class="no-items">No attributes</div>
+        `;
+      }
+
+      const attrList = attributes.map(attr => `
+        <li class="attribute-item">
+          <span class="attr-name">${attr.name}</span>:
+          <span class="attr-type">${attr.type || 'unknown'}</span>
+          <span class="attr-multiplicity">[${attr.multiplicity}]</span>
+        </li>
+      `).join('');
+
+      return `
+        <div class="section-title">
+          Attributes <span class="badge">${attributes.length}</span>
+        </div>
+        <ul class="attributes-list">${attrList}</ul>
+      `;
+    }
+
+    function renderAssociations(associations) {
+      if (!associations || associations.length === 0) {
+        return '';
+      }
+
+      const assocList = associations.map(assoc => `
+        <li class="association-item">
+          <span class="assoc-arrow">→</span> ${assoc.target_class}
+          <span class="attr-multiplicity">[${assoc.multiplicity}]</span>
+        </li>
+      `).join('');
+
+      return `
+        <div class="section-title">
+          Associations <span class="badge">${associations.length}</span>
+        </div>
+        <ul class="associations-list">${assocList}</ul>
+      `;
+    }
+
+    function getSearchText(cls) {
+      const attrText = (cls.attributes || [])
+        .map(a => `${a.name} ${a.type}`)
+        .join(' ');
+      const assocText = (cls.associations || [])
+        .map(a => a.target_class)
+        .join(' ');
+      return `${cls.name} ${cls.stereotype} ${attrText} ${assocText}`.toLowerCase();
+    }
+
+    function toggleCard(id) {
+      if (expandedCards.has(id)) {
+        expandedCards.delete(id);
+      } else {
+        expandedCards.add(id);
+      }
+
+      const card = document.querySelector(`[data-id="${id}"]`);
+      card.classList.toggle('expanded');
+    }
+
+    function setupEventListeners() {
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', (e) => {
+        currentSearch = e.target.value.toLowerCase();
+        filterClasses();
+      });
+
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.dataset.filter;
+          filterClasses();
+        });
+      });
+    }
+
+    function filterClasses() {
+      const cards = document.querySelectorAll('.class-card');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const name = card.dataset.name;
+        const stereotype = card.dataset.stereotype;
+        const searchText = card.dataset.searchText;
+
+        const matchesSearch = searchText.includes(currentSearch);
+        const matchesFilter = currentFilter === 'all' || stereotype === currentFilter;
+
+        if (matchesSearch && matchesFilter) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      updateResultsCount(visibleCount);
+    }
+
+    function updateResultsCount(count = MAPPING_DATA.total_classes) {
+      const resultsCount = document.getElementById('resultsCount');
+      resultsCount.textContent = `Showing ${count} of ${MAPPING_DATA.total_classes} classes`;
+    }
+
+    function updateFooter() {
+      const footer = document.getElementById('footerInfo');
+      footer.textContent = `Package: ${MAPPING_DATA.package_name} | Classes: ${MAPPING_DATA.total_classes}`;
+    }
+  </script>
+</body>
+</html>

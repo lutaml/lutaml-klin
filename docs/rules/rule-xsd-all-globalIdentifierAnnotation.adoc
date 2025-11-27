@@ -1,0 +1,295 @@
+= rule-xsd-all-globalIdentifierAnnotation
+:toc:
+:sectnums:
+
+== Purpose
+
+Add [`sc:globalIdentifier`](http://www.interactive-instruments.de/ShapeChange/AppInfo#globalIdentifier) annotation for classes and properties with global identifiers.
+
+This rule enables unique identification of schema elements across different schemas and applications, supporting schema management and integration.
+
+== ShapeChange Analysis
+
+=== Java Implementation
+
+The rule is implemented in [`XsdDocument.java:addStandardAnnotation()`](../../reference/shapechange-sources/de/interactive_instruments/ShapeChange/Target/XmlSchema/XsdDocument.java:363-372):
+
+[source,java]
+----
+if ((info instanceof PropertyInfo || info instanceof ClassInfo)
+        && StringUtils.isNotBlank(info.globalIdentifier())
+        && info.matches("rule-xsd-all-globalIdentifierAnnotation")) {
+
+    if (e2 == null)
+        e2 = document.createElementNS(Options.W3C_XML_SCHEMA, "appinfo");
+    Element e3 = document.createElementNS(Options.SCAI_NS, Options.SCAI_NS_PREFIX + ":globalIdentifier");
+    e2.appendChild(e3);
+    e3.appendChild(document.createTextNode(info.globalIdentifier()));
+    addImport(Options.SCAI_NS_PREFIX, Options.SCAI_NS);
+}
+----
+
+=== Algorithm
+
+When this rule is enabled:
+
+1. Check if element is PropertyInfo or ClassInfo
+2. Check if `globalIdentifier` value exists and is non-blank
+3. Check if [`rule-xsd-all-globalIdentifierAnnotation`](rule-xsd-all-globalIdentifierAnnotation.adoc) applies
+4. If all conditions met:
+   * Create `<appinfo>` element if needed
+   * Create [`sc:globalIdentifier`](http://www.interactive-instruments.de/ShapeChange/AppInfo#globalIdentifier) element
+   * Set text content to global identifier value
+   * Add import for ShapeChange AppInfo namespace
+
+=== Key Characteristics
+
+* **Scope**: Classes and Properties
+* **Context**: Schema element annotation
+* **Element**: [`sc:globalIdentifier`](http://www.interactive-instruments.de/ShapeChange/AppInfo#globalIdentifier)
+* **Namespace**: `http://www.interactive-instruments.de/ShapeChange/AppInfo`
+
+== Implementation Requirements
+
+=== Input Detection
+
+Identify elements requiring global identifier annotation:
+
+* Element is a class or property
+* Element has `globalIdentifier` tagged value or property
+* Value is non-blank
+* Rule [`rule-xsd-all-globalIdentifierAnnotation`](rule-xsd-all-globalIdentifierAnnotation.adoc) is enabled
+
+=== Processing Logic
+
+[source,ruby]
+----
+def process_global_identifier(element, context)
+  # Get global identifier value
+  global_id = element.global_identifier
+
+  return if global_id.nil? || global_id.strip.empty?
+
+  # Create appinfo element
+  appinfo = context[:annotation][:appinfo] ||= []
+
+  # Add sc:globalIdentifier element
+  appinfo << {
+    namespace: SCAI_NAMESPACE,
+    element: "globalIdentifier",
+    text: global_id
+  }
+
+  # Add namespace import
+  context[:imports] << {
+    prefix: "sc",
+    namespace: SCAI_NAMESPACE
+  }
+end
+----
+
+=== Output Generation
+
+Generate annotation with global identifier:
+
+[source,xml]
+----
+<element name="Feature">
+  <annotation>
+    <appinfo>
+      <sc:globalIdentifier>urn:x-shapechange:def:feature:MyFeature</sc:globalIdentifier>
+    </appinfo>
+  </annotation>
+  <!-- element definition -->
+</element>
+----
+
+== Configuration
+
+=== Rule Declaration
+
+[source,xml]
+----
+<EncodingRule name="iso19136_2007">
+  <rule name="rule-xsd-all-globalIdentifierAnnotation"/>
+</EncodingRule>
+----
+
+=== Tagged Value or Property
+
+Element must have `globalIdentifier`:
+
+[source]
+----
+Class: Building
+  globalIdentifier: "urn:x-shapechange:def:featureType:Building"
+
+Property: height
+  globalIdentifier: "urn:x-shapechange:def:propertyType:height"
+----
+
+== Examples
+
+=== Example 1: Class with Global Identifier
+
+.Input Model
+[source]
+----
+Class: Road
+  globalIdentifier: "urn:example:def:featureType:Road"
+----
+
+.Output XSD
+[source,xml]
+----
+<element name="Road" type="RoadType">
+  <annotation>
+    <appinfo>
+      <sc:globalIdentifier>urn:example:def:featureType:Road</sc:globalIdentifier>
+    </appinfo>
+  </annotation>
+</element>
+
+<complexType name="RoadType">
+  <annotation>
+    <appinfo>
+      <sc:globalIdentifier>urn:example:def:featureType:Road</sc:globalIdentifier>
+    </appinfo>
+  </annotation>
+  <!-- type definition -->
+</complexType>
+----
+
+=== Example 2: Property with Global Identifier
+
+.Input Model
+[source]
+----
+Class: Building
+  Property: buildingHeight
+    globalIdentifier: "urn:example:def:propertyType:buildingHeight"
+    type: Measure
+----
+
+.Output XSD
+[source,xml]
+----
+<element name="buildingHeight" type="gml:MeasureType">
+  <annotation>
+    <appinfo>
+      <sc:globalIdentifier>urn:example:def:propertyType:buildingHeight</sc:globalIdentifier>
+    </appinfo>
+  </annotation>
+</element>
+----
+
+=== Example 3: Multiple Global Identifiers
+
+.Input Model
+[source]
+----
+Class: LandParcel
+  globalIdentifier: "urn:inspire:def:featureType:LandParcel"
+
+  Property: areaValue
+    globalIdentifier: "urn:inspire:def:propertyType:areaValue"
+
+  Property: referencePoint
+    globalIdentifier: "urn:inspire:def:propertyType:referencePoint"
+----
+
+.Output XSD
+[source,xml]
+----
+<element name="LandParcel" type="LandParcelType">
+  <annotation>
+    <appinfo>
+      <sc:globalIdentifier>urn:inspire:def:featureType:LandParcel</sc:globalIdentifier>
+    </appinfo>
+  </annotation>
+</element>
+
+<complexType name="LandParcelType">
+  <annotation>
+    <appinfo>
+      <sc:globalIdentifier>urn:inspire:def:featureType:LandParcel</sc:globalIdentifier>
+    </appinfo>
+  </annotation>
+  <sequence>
+    <element name="areaValue" type="gml:MeasureType">
+      <annotation>
+        <appinfo>
+          <sc:globalIdentifier>urn:inspire:def:propertyType:areaValue</sc:globalIdentifier>
+        </appinfo>
+      </annotation>
+    </element>
+    <element name="referencePoint" type="gml:PointPropertyType">
+      <annotation>
+        <appinfo>
+          <sc:globalIdentifier>urn:inspire:def:propertyType:referencePoint</sc:globalIdentifier>
+        </appinfo>
+      </annotation>
+    </element>
+  </sequence>
+</complexType>
+----
+
+== Testing Strategy
+
+=== Test Coverage
+
+1. **Class Global Identifier**
+   * Class with identifier → annotation added
+   * Applied to both element and type
+
+2. **Property Global Identifier**
+   * Property with identifier → annotation added
+   * Correct placement in property element
+
+3. **Missing or Empty Identifier**
+   * No identifier → no annotation
+   * Empty string → no annotation
+
+4. **Rule Disabled**
+   * Identifier present but rule disabled
+   * No annotation added
+
+5. **Namespace Import**
+   * ShapeChange AppInfo namespace imported
+   * Prefix `sc` used
+
+=== Expected Behaviors
+
+* [`sc:globalIdentifier`](http://www.interactive-instruments.de/ShapeChange/AppInfo#globalIdentifier) element in `<appinfo>`
+* Identifier value as text content
+* ShapeChange namespace with `sc` prefix
+* Applied to both classes and properties
+
+== Notes
+
+=== Global Identifier Purpose
+
+Global identifiers enable:
+
+* **Unique Identification**: Unambiguous reference across schemas
+* **Schema Integration**: Linking elements from different schemas
+* **Semantic Web**: URN/URI-based identification
+* **Registry Integration**: Connection to concept registries
+
+=== Identifier Patterns
+
+Common patterns for global identifiers:
+
+* URN format: `urn:{namespace}:def:{type}:{name}`
+* HTTP URI: `http://example.org/def/{type}/{name}`
+* ISO 19135 registry: `urn:iso:dis:19135:role:{code}`
+
+=== Relationship to Other Rules
+
+* Complementary to tagged value annotations
+* Works with schema documentation
+* Part of ShapeChange AppInfo extensions
+
+=== Reference Implementation
+
+See [`GlobalIdentifierAnnotationProcessor`](../../lib/lutaml/klin/xsd_gen/rule_processors/global_identifier_annotation_processor.rb) for Ruby implementation.

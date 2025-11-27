@@ -1,0 +1,124 @@
+= Mapping Validation
+:toc:
+:toclevels: 3
+
+== Purpose
+
+The validation feature ensures mapping documents are complete, consistent, and correct before use in downstream processes. It catches common errors, missing data, and structural issues that could cause problems in schema generation or documentation.
+
+== Concepts
+
+=== Validation Levels
+
+* **Structure** - YAML/JSON format correctness
+* **Completeness** - Required fields present
+* **Consistency** - Namespace/type coherence
+* **Semantics** - Logical correctness of mappings
+
+=== Validation Rules
+
+The validator checks:
+
+* All classes have valid XML elements and types
+* Attributes have resolved XML types
+* Namespaces are properly defined
+* Multiplicities are valid
+* No circular dependencies
+* Stereotype consistency
+
+== Basic Validation
+
+=== Command Line
+
+[source,bash]
+----
+# Validate single mapping
+lutaml-klin validate --input urf_mapping.yaml
+
+# Validate multiple mappings
+lutaml-klin validate --input mappings/*.yaml
+
+# Strict mode (warnings as errors)
+lutaml-klin validate --input mapping.yaml --strict
+----
+
+=== Ruby API
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load and validate mapping
+mapping = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(
+  File.read('urf_mapping.yaml')
+)
+
+# Run validation
+validator = Lutaml::Klin::Validator.new(mapping)
+result = validator.validate
+
+if result.valid?
+  puts "✓ Mapping is valid"
+else
+  puts "✗ Validation failed:"
+  result.errors.each { |err| puts "  - #{err}" }
+end
+----
+
+== Validation Output
+
+=== Success
+
+[source,text]
+----
+✓ Validation passed
+  - 45 classes validated
+  - 312 attributes validated
+  - All types resolved
+  - No errors or warnings
+----
+
+=== Errors
+
+[source,text]
+----
+✗ Validation failed with 3 errors:
+
+ERROR: Class 'Building' missing xml_type
+  Location: urf_mapping.yaml:15
+
+ERROR: Attribute 'buildingID' has unresolved type 'xs::string'
+  Location: urf_mapping.yaml:23
+  Expected: xs:string (with colon, not double colon)
+
+ERROR: Namespace prefix 'uro' not defined
+  Location: urf_mapping.yaml:45
+
+Warnings: 2
+  - Attribute 'deprecated' has no multiplicity specified
+  - Class 'OldBuilding' uses deprecated stereotype
+----
+
+== Custom Validation Rules
+
+[source,ruby]
+----
+# Add custom validation rule
+validator = Lutaml::Klin::Validator.new(mapping)
+
+validator.add_rule('require_descriptions') do |mapping|
+  mapping.classes.each do |cls|
+    if cls.description.nil? || cls.description.empty?
+      add_warning("Class #{cls.name} missing description")
+    end
+  end
+end
+
+result = validator.validate
+----
+
+== Relevant Documents
+
+* link:../cli.adoc[CLI Reference] - Validate command
+* link:mapping-generation.adoc[Mapping Generation] - Source format
+* link:human-reports.adoc[Reports] - Validation in reports

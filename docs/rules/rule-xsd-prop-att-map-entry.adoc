@@ -1,0 +1,196 @@
+= rule-xsd-prop-att-map-entry
+
+== Purpose
+
+Use attribute map entries for properties that have types without element content (attributes only). This creates an anonymous complex type with the mapped attributes instead of requiring element content.
+
+== ShapeChange Reference
+
+=== Java Implementation
+
+[source,java]
+----
+// XsdDocument.java lines 2613-2673
+if (propi.matches("rule-xsd-prop-att-map-entry") && !isAttribute) {
+    MapEntry mea = options.attributeMapEntry(ti.name, cibase.encodingRule("xsd"));
+    String asAttRef = (mea != null ? mea.rule : "");
+    MapEntry meag = options.attributeGroupMapEntry(ti.name, cibase.encodingRule("xsd"));
+    String asAttGroupRef = (meag != null ? meag.rule : "");
+
+    if (!asAttRef.equals("") || !asAttGroupRef.equals("")) {
+        /*
+         * The property type has no element content, only attributes / attributeGroups:
+         * add an anonymous type with the attributes
+         */
+        e1 = document.createElementNS(Options.W3C_XML_SCHEMA, "complexType");
+        e.appendChild(e1);
+
+        /*
+         * add nilReason, if needed
+         */
+        if (addNilReason) {
+            Element e2 = document.createElementNS(Options.W3C_XML_SCHEMA, "attribute");
+            e1.appendChild(e2);
+            addNilReason(e2);
+        }
+        if (addMetadata) {
+            addMetadata(e1);
+        }
+        if (softtyped) {
+            Element e2 = document.createElementNS(Options.W3C_XML_SCHEMA, "attribute");
+            e1.appendChild(e2);
+            addName(e2);
+        }
+
+        /*
+         * add attribute
+         */
+        if (!asAttRef.equals("")) {
+            Element e2 = document.createElementNS(Options.W3C_XML_SCHEMA, "attribute");
+            addAttribute(e2, "ref", asAttRef);
+            int ix = asAttRef.indexOf(":");
+            if (ix > 0) {
+                String nsabr = asAttRef.substring(0, ix);
+                addImport(nsabr, options.fullNamespace(nsabr));
+            }
+            e1.appendChild(e2);
+        }
+
+        /*
+         * add attribute group
+         */
+        if (!asAttGroupRef.equals("")) {
+            Element e2 = document.createElementNS(Options.W3C_XML_SCHEMA, "attributeGroup");
+            addAttribute(e2, "ref", asAttGroupRef);
+            int ix = asAttGroupRef.indexOf(":");
+            if (ix > 0) {
+                String nsabr = asAttGroupRef.substring(0, ix);
+                addImport(nsabr, options.fullNamespace(nsabr));
+            }
+            e1.appendChild(e2);
+        }
+        return false;
+    }
+}
+----
+
+== Algorithm
+
+When processing a property with a type that has attribute/attributeGroup map entries:
+
+. Check if property matches `rule-xsd-prop-att-map-entry`
+. Check if property is not already an attribute element
+. Look up attribute and attributeGroup map entries for the property type
+. If map entries exist:
+  - Create anonymous complexType element
+  - Add nilReason attribute if needed
+  - Add metadata attributes if needed
+  - Add soft-typed name attribute if needed
+  - Add attribute reference if attribute map entry exists
+  - Add attributeGroup reference if attributeGroup map entry exists
+  - Import required namespaces
+
+== Configuration
+
+This rule requires:
+
+* `rule-xsd-prop-att-map-entry` - Enable the rule
+* Attribute or attributeGroup map entries defined for the property type
+
+Optional enhancements:
+* `rule-xsd-prop-nillable` or `nilReasonAllowed` - Add nilReason attribute
+* `rule-xsd-prop-metadata` - Add metadata attribute
+* `rule-xsd-prop-soft-typed` - Add name attribute for soft typing
+
+== Input Model Requirements
+
+* Property type must have attribute or attributeGroup map entry
+* Property must not already be encoded as an xs:attribute
+* Map entries must reference valid XSD attributes or attribute groups
+
+== Output
+
+=== Anonymous Complex Type with Attributes
+
+[source,xml]
+----
+<xs:element name="propertyName">
+  <xs:complexType>
+    <!-- Optional nilReason -->
+    <xs:attribute ref="gml:nilReason"/>
+
+    <!-- Optional metadata -->
+    <xs:attribute name="metadata" type="xs:anyURI"/>
+
+    <!-- Mapped attribute -->
+    <xs:attribute ref="xlink:href"/>
+
+    <!-- Mapped attribute group -->
+    <xs:attributeGroup ref="xlink:simpleAttrs"/>
+  </xs:complexType>
+</xs:element>
+----
+
+== Example
+
+=== Input Model
+
+[source]
+----
+Property: link
+  Type: ExternalReference
+  nilReasonAllowed: true
+
+Type: ExternalReference
+  MapEntry (attribute): xlink:href
+  MapEntry (attributeGroup): xlink:simpleAttrs
+----
+
+=== Configuration
+
+[source,xml]
+----
+<TypeMapEntry type="ExternalReference">
+  <attribute>xlink:href</attribute>
+  <attributeGroup>xlink:simpleAttrs</attributeGroup>
+</TypeMapEntry>
+----
+
+=== Output XSD
+
+[source,xml]
+----
+<xs:element name="link">
+  <xs:complexType>
+    <!-- nilReason added because property allows it -->
+    <xs:attribute name="nilReason" type="gml:NilReasonType"/>
+
+    <!-- Attribute from map entry -->
+    <xs:attribute ref="xlink:href"/>
+
+    <!-- Attribute group from map entry -->
+    <xs:attributeGroup ref="xlink:simpleAttrs"/>
+  </xs:complexType>
+</xs:element>
+
+<!-- Namespace imports -->
+<xs:import namespace="http://www.opengis.net/gml/3.2"
+           schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+<xs:import namespace="http://www.w3.org/1999/xlink"
+           schemaLocation="http://www.w3.org/1999/xlink.xsd"/>
+----
+
+== Related Rules
+
+* link:rule-xsd-prop-nillable.adoc[rule-xsd-prop-nillable] - Adds nilReason support
+* link:rule-xsd-prop-metadata.adoc[rule-xsd-prop-metadata] - Adds metadata attribute
+* link:rule-xsd-prop-soft-typed.adoc[rule-xsd-prop-soft-typed] - Adds name attribute
+* link:rule-xsd-prop-inlineOrByReference.adoc[rule-xsd-prop-inlineOrByReference] - Property encoding strategy
+
+== Notes
+
+* This rule handles types that consist only of attributes without element content
+* Commonly used for simple reference types (e.g., xlink references)
+* The anonymous complexType allows combining mapped attributes with additional attributes like nilReason
+* Both attribute and attributeGroup map entries can be used simultaneously
+* Namespaces are automatically imported when referenced

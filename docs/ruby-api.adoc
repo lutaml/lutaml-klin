@@ -1,0 +1,1131 @@
+= Ruby API
+
+== Purpose
+
+This document provides a comprehensive reference for using Lutaml-Klin
+programmatically in Ruby applications.
+
+Use this guide to:
+
+* Load and query UML-to-XSD mappings in your Ruby code
+* Build custom tools and workflows on top of Lutaml-Klin
+* Integrate Lutaml-Klin into larger Ruby applications
+* Extend Lutaml-Klin with custom functionality
+
+== Concepts
+
+=== Lutaml::Model serialization
+
+All Lutaml-Klin models inherit from `Lutaml::Model::Serializable`, providing:
+
+* **Automatic serialization** to YAML, JSON, and XML
+* **Type-safe deserialization** from these formats
+* **Validation** of required fields
+* **Structured access** to nested data
+
+Example:
+
+[source,ruby]
+----
+# Load from YAML
+mapping = SchemaMapping.from_yaml(File.read('mapping.yaml'))
+
+# Access data
+puts mapping.package_mappings.first.name
+
+# Convert to JSON
+json = mapping.to_json
+
+# Save as XML
+File.write('mapping.xml', mapping.to_xml)
+----
+
+=== Model object hierarchy
+
+Lutaml-Klin provides a complete object model for UML-XSD mappings:
+
+[source]
+----
+SchemaMapping              # Root container
+├── PackageMapping[]       # UML packages
+│   └── ClassMapping[]     # UML classes
+│       └── AttributeMapping[]  # UML attributes
+├── UmlClass               # UML class definitions
+│   ├── Attribute[]        # UML attributes
+│   └── Association[]      # UML associations
+├── ElementMapping         # XSD elements
+└── ComplexTypeMapping     # XSD complex types
+----
+
+All models are immutable after creation (no setters after initialization).
+
+=== Programmatic access patterns
+
+Common patterns for working with mappings:
+
+* **Loading**: Deserialize from YAML/JSON
+* **Querying**: Filter and search mappings
+* **Transforming**: Generate custom outputs
+* **Analyzing**: Compute statistics and metrics
+
+== Core API
+
+=== XmiNavigator
+
+Parse XMI files and extract UML models.
+
+==== Creating a navigator
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+navigator = Lutaml::Klin::XmiNavigator.new
+----
+
+==== Parsing XMI files
+
+[source,ruby]
+----
+# Parse an XMI file
+navigator.parse_file('/path/to/model.xmi')
+
+# Or parse from string
+xmi_content = File.read('/path/to/model.xmi')
+navigator.parse(xmi_content)
+----
+
+==== Accessing packages
+
+[source,ruby]
+----
+# Get all packages
+packages = navigator.packages
+# => Array<Lutaml::Klin::Models::Uml::Package>
+
+puts "Found #{packages.size} package(s)"
+
+# Find a specific package by name
+uro_package = navigator.find_package('uro')
+# => Lutaml::Klin::Models::Uml::Package or nil
+
+if uro_package
+  puts "Package: #{uro_package.name}"
+  puts "Namespace: #{uro_package.namespace}"
+  puts "ID: #{uro_package.id}"
+end
+----
+
+==== Accessing classes
+
+[source,ruby]
+----
+# Get all classes in a package
+classes = navigator.classes_in_package('uro')
+# => Array<Lutaml::Klin::Models::Uml::Class>
+
+puts "Found #{classes.size} class(es)"
+
+# Iterate through classes
+classes.each do |cls|
+  puts "Class: #{cls.name}"
+  puts "  Stereotype: #{cls.stereotype}"
+  puts "  Attributes: #{cls.attributes.size}"
+  puts "  Associations: #{cls.associations.size}"
+end
+----
+
+==== Complete example
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Parse XMI
+navigator = Lutaml::Klin::XmiNavigator.new
+navigator.parse_file('plateau-uro.xmi')
+
+# Get package
+package = navigator.find_package('uro')
+
+# Get classes
+classes = navigator.classes_in_package('uro')
+
+# Find FeatureType classes
+feature_types = classes.select do |cls|
+  cls.stereotype == 'FeatureType'
+end
+
+puts "FeatureType classes in URO package:"
+feature_types.each do |cls|
+  puts "  - #{cls.name}"
+
+  # Show attributes
+  cls.attributes.each do |attr|
+    puts "    * #{attr.name}: #{attr.type} [#{attr.multiplicity_min}..#{attr.multiplicity_max}]"
+  end
+end
+----
+
+=== ShapeChange::ConfigParser
+
+Parse ShapeChange XML configuration files.
+
+==== Parsing configuration
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+config = Lutaml::Klin::ShapeChange::ConfigParser.parse_file(
+  'ShapeChangeConfig_Plateau_uro.xml'
+)
+# => Lutaml::Klin::ShapeChange::Models::Config::ShapeChangeConfiguration
+----
+
+==== Accessing encoding rules
+
+[source,ruby]
+----
+# Get target configurations
+targets = config.target_configurations
+# => Array<TargetConfiguration>
+
+# Get encoding rules from first target
+encoding_rules = targets.first.encoding_rules
+# => Array<String>
+
+puts "Encoding rules:"
+encoding_rules.each do |rule|
+  puts "  - #{rule}"
+end
+----
+
+==== Accessing type mappings
+
+[source,ruby]
+----
+# Get type map entries
+target = config.target_configurations.first
+type_mappings = target.xsd_map_entries
+# => Array<XsdMapEntry>
+
+puts "Type mappings:"
+type_mappings.each do |entry|
+  puts "  #{entry.type} → #{entry.xml_type}"
+  puts "    Namespace: #{entry.xml_type_ns}"
+end
+----
+
+==== Accessing namespace configuration
+
+[source,ruby]
+----
+# Get XML namespaces
+namespaces = config.xml_namespaces
+# => Array<XmlNamespace>
+
+puts "Configured namespaces:"
+namespaces.each do |ns|
+  puts "  #{ns.nsabr} = #{ns.ns}"
+  puts "    Location: #{ns.location}"
+end
+----
+
+==== Accessing package information
+
+[source,ruby]
+----
+# Get package infos
+package_infos = config.package_infos
+# => Array<PackageInfo>
+
+package_infos.each do |info|
+  puts "Package: #{info.package_name}"
+  puts "  Namespace: #{info.ns}"
+  puts "  Version: #{info.version}"
+end
+----
+
+==== Complete example
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Parse configuration
+config = Lutaml::Klin::ShapeChange::ConfigParser.parse_file(
+  'ShapeChangeConfig_Plateau_uro.xml'
+)
+
+# Extract type conversion map
+type_map = {}
+config.target_configurations.each do |target|
+  target.xsd_map_entries.each do |entry|
+    type_map[entry.type] = {
+      xsd_type: entry.xml_type,
+      namespace: entry.xml_type_ns
+    }
+  end
+end
+
+# Display type conversions
+puts "UML to XSD Type Conversions:"
+type_map.each do |uml_type, conversion|
+  puts "  #{uml_type} → #{conversion[:xsd_type]}"
+end
+----
+
+=== MappingGenerator
+
+Generate UML-to-XSD mappings.
+
+==== Basic generation
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+generator = Lutaml::Klin::MappingGenerator.new
+
+mapping = generator.generate(
+  '/path/to/model.xmi',
+  '/path/to/config.xml'
+)
+# => Lutaml::Klin::Models::Mapping::SchemaMapping
+
+# Save to YAML
+File.write('mapping.yaml', mapping.to_yaml)
+----
+
+==== Generation with XSD validation
+
+[source,ruby]
+----
+# Generate with optional XSD path for type resolution
+mapping = generator.generate(
+  '/path/to/model.xmi',
+  '/path/to/config.xml',
+  '/path/to/xsd/schemas'  # Optional
+)
+
+# Check resolution status
+total = 0
+resolved = 0
+
+mapping.package_mappings.each do |pkg|
+  pkg.class_mappings.each do |cls|
+    cls.attribute_mappings.each do |attr|
+      total += 1
+      resolved += 1 if attr.resolution_status == :resolved
+    end
+  end
+end
+
+puts "Type resolution: #{resolved}/#{total} (#{(resolved * 100.0 / total).round(1)}%)"
+----
+
+==== Custom generation workflow
+
+[source,ruby]
+----
+# Create custom generator
+class MyGenerator < Lutaml::Klin::MappingGenerator
+  def map_attribute(uml_attr, type_mappings)
+    # Custom attribute mapping logic
+    result = super
+
+    # Add custom metadata
+    result.metadata = {
+      processed_at: Time.now,
+      custom_field: calculate_custom_value(uml_attr)
+    }
+
+    result
+  end
+end
+
+# Use custom generator
+generator = MyGenerator.new
+mapping = generator.generate('model.xmi', 'config.xml')
+----
+
+=== SchemaMapping
+
+Root model for UML-XSD mappings.
+
+==== Loading from YAML
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load from YAML file
+yaml_content = File.read('mapping.yaml')
+mapping = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(yaml_content)
+
+# Or directly from file
+mapping = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(
+  File.read('mapping.yaml')
+)
+----
+
+==== Loading from JSON
+
+[source,ruby]
+----
+# Load from JSON
+json_content = File.read('mapping.json')
+mapping = Lutaml::Klin::Models::Mapping::SchemaMapping.from_json(json_content)
+----
+
+==== Accessing package mappings
+
+[source,ruby]
+----
+# Get all package mappings
+package_mappings = mapping.package_mappings
+# => Array<PackageMapping>
+
+# Find specific package
+uro_pkg = package_mappings.find { |pkg| pkg.name == 'uro' }
+
+puts "Package: #{uro_pkg.name}"
+puts "Namespace: #{uro_pkg.namespace}"
+puts "Classes: #{uro_pkg.class_mappings.size}"
+----
+
+==== Accessing class mappings
+
+[source,ruby]
+----
+# Get all class mappings in a package
+class_mappings = uro_pkg.class_mappings
+# => Array<ClassMapping>
+
+# Find specific class
+building_cls = class_mappings.find do |cls|
+  cls.uml_class.name == 'Building'
+end
+
+# Access UML class info
+uml_class = building_cls.uml_class
+puts "UML Class: #{uml_class.name}"
+puts "Stereotype: #{uml_class.stereotype}"
+
+# Access XSD element info
+xsd_element = building_cls.xsd_element
+if xsd_element
+  puts "XSD Element: #{xsd_element.name}"
+  puts "XSD Type: #{xsd_element.type}"
+end
+
+# Access XSD complex type
+xsd_type = building_cls.xsd_complex_type
+if xsd_type
+  puts "Complex Type: #{xsd_type.name}"
+  puts "Base: #{xsd_type.base}"
+end
+----
+
+==== Accessing attribute mappings
+
+[source,ruby]
+----
+# Get attribute mappings
+attr_mappings = building_cls.attribute_mappings
+# => Array<AttributeMapping>
+
+attr_mappings.each do |attr_map|
+  uml_attr = attr_map.uml_attribute
+  xsd_elem = attr_map.xsd_element
+
+  puts "#{uml_attr.name} (#{uml_attr.type}) → #{xsd_elem.name} (#{xsd_elem.type})"
+  puts "  Resolution: #{attr_map.resolution_status}"
+end
+----
+
+==== Saving to different formats
+
+[source,ruby]
+----
+# Save to YAML
+File.write('output.yaml', mapping.to_yaml)
+
+# Save to JSON
+File.write('output.json', mapping.to_json)
+
+# Save to XML
+File.write('output.xml', mapping.to_xml)
+----
+
+== Querying and filtering
+
+=== Finding classes by stereotype
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+mapping = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(
+  File.read('mapping.yaml')
+)
+
+# Find all FeatureType classes
+feature_types = []
+mapping.package_mappings.each do |pkg|
+  pkg.class_mappings.each do |cls|
+    if cls.uml_class.stereotype == 'FeatureType'
+      feature_types << cls
+    end
+  end
+end
+
+puts "Found #{feature_types.size} FeatureType classes"
+----
+
+=== Finding classes with specific attributes
+
+[source,ruby]
+----
+# Find classes that have a 'gml_id' attribute
+classes_with_gml_id = []
+
+mapping.package_mappings.each do |pkg|
+  pkg.class_mappings.each do |cls|
+    has_gml_id = cls.uml_class.attributes.any? do |attr|
+      attr.name == 'gml_id'
+    end
+
+    classes_with_gml_id << cls if has_gml_id
+  end
+end
+
+puts "Classes with gml_id attribute:"
+classes_with_gml_id.each do |cls|
+  puts "  - #{cls.uml_class.name}"
+end
+----
+
+=== Finding unresolved types
+
+[source,ruby]
+----
+# Find all attributes with unresolved types
+unresolved = []
+
+mapping.package_mappings.each do |pkg|
+  pkg.class_mappings.each do |cls|
+    cls.attribute_mappings.each do |attr_map|
+      if attr_map.resolution_status == :unresolved
+        unresolved << {
+          class: cls.uml_class.name,
+          attribute: attr_map.uml_attribute.name,
+          type: attr_map.uml_attribute.type
+        }
+      end
+    end
+  end
+end
+
+puts "Unresolved types (#{unresolved.size}):"
+unresolved.each do |item|
+  puts "  #{item[:class]}.#{item[:attribute]}: #{item[:type]}"
+end
+----
+
+=== Filtering by namespace
+
+[source,ruby]
+----
+# Get all classes in a specific namespace
+gml_namespace = "http://www.opengis.net/gml/3.2"
+
+gml_classes = []
+mapping.package_mappings.each do |pkg|
+  if pkg.namespace == gml_namespace
+    gml_classes.concat(pkg.class_mappings)
+  end
+end
+
+puts "Classes in GML namespace: #{gml_classes.size}"
+----
+
+== Statistics and metrics
+
+=== Computing mapping statistics
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+mapping = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(
+  File.read('mapping.yaml')
+)
+
+# Initialize counters
+stats = {
+  packages: 0,
+  classes: 0,
+  attributes: 0,
+  associations: 0,
+  resolved: 0,
+  unresolved: 0,
+  stereotypes: Hash.new(0)
+}
+
+# Collect statistics
+mapping.package_mappings.each do |pkg|
+  stats[:packages] += 1
+
+  pkg.class_mappings.each do |cls|
+    stats[:classes] += 1
+    stats[:stereotypes][cls.uml_class.stereotype] += 1
+    stats[:associations] += cls.uml_class.associations.size
+
+    cls.attribute_mappings.each do |attr_map|
+      stats[:attributes] += 1
+
+      if attr_map.resolution_status == :resolved
+        stats[:resolved] += 1
+      else
+        stats[:unresolved] += 1
+      end
+    end
+  end
+end
+
+# Display statistics
+puts "Mapping Statistics:"
+puts "  Packages: #{stats[:packages]}"
+puts "  Classes: #{stats[:classes]}"
+puts "  Attributes: #{stats[:attributes]}"
+puts "  Associations: #{stats[:associations]}"
+puts "  Resolved types: #{stats[:resolved]}"
+puts "  Unresolved types: #{stats[:unresolved]}"
+puts "\nClasses by stereotype:"
+stats[:stereotypes].sort_by { |_, count| -count }.each do |stereotype, count|
+  puts "  #{stereotype}: #{count}"
+end
+----
+
+=== Analyzing type conversions
+
+[source,ruby]
+----
+# Collect all type conversions
+conversions = Hash.new { |h, k| h[k] = [] }
+
+mapping.package_mappings.each do |pkg|
+  pkg.class_mappings.each do |cls|
+    cls.attribute_mappings.each do |attr_map|
+      uml_type = attr_map.uml_attribute.type
+      xsd_type = attr_map.xsd_element.type
+
+      unless conversions[uml_type].include?(xsd_type)
+        conversions[uml_type] << xsd_type
+      end
+    end
+  end
+end
+
+# Display conversions
+puts "Type Conversions:"
+conversions.sort.each do |uml_type, xsd_types|
+  puts "  #{uml_type}:"
+  xsd_types.each do |xsd_type|
+    puts "    → #{xsd_type}"
+  end
+end
+----
+
+=== Generating summary report
+
+[source,ruby]
+----
+def generate_summary(mapping)
+  summary = []
+
+  summary << "UML-XSD Mapping Summary"
+  summary << "=" * 50
+  summary << ""
+
+  mapping.package_mappings.each do |pkg|
+    summary << "Package: #{pkg.name}"
+    summary << "  Namespace: #{pkg.namespace}"
+    summary << "  Classes: #{pkg.class_mappings.size}"
+
+    # Count attributes
+    attr_count = pkg.class_mappings.sum do |cls|
+      cls.attribute_mappings.size
+    end
+    summary << "  Attributes: #{attr_count}"
+    summary << ""
+  end
+
+  summary.join("\n")
+end
+
+puts generate_summary(mapping)
+----
+
+== Transforming mappings
+
+=== Converting to custom format
+
+[source,ruby]
+----
+# Convert mapping to custom hash structure
+def to_custom_format(mapping)
+  {
+    version: "1.0",
+    generated_at: Time.now.iso8601,
+    packages: mapping.package_mappings.map do |pkg|
+      {
+        name: pkg.name,
+        namespace: pkg.namespace,
+        classes: pkg.class_mappings.map do |cls|
+          {
+            uml_name: cls.uml_class.name,
+            xsd_type: cls.xsd_complex_type&.name,
+            attributes: cls.attribute_mappings.map do |attr|
+              {
+                name: attr.uml_attribute.name,
+                uml_type: attr.uml_attribute.type,
+                xsd_type: attr.xsd_element.type
+              }
+            end
+          }
+        end
+      }
+    end
+  }
+end
+
+custom = to_custom_format(mapping)
+File.write('custom.json', JSON.pretty_generate(custom))
+----
+
+=== Generating GraphML diagram
+
+[source,ruby]
+----
+# Generate GraphML for visualization
+def to_graphml(mapping)
+  nodes = []
+  edges = []
+
+  mapping.package_mappings.each do |pkg|
+    pkg.class_mappings.each do |cls|
+      # Add class node
+      nodes << {
+        id: cls.uml_class.id,
+        label: cls.uml_class.name,
+        type: cls.uml_class.stereotype
+      }
+
+      # Add association edges
+      cls.uml_class.associations.each do |assoc|
+        edges << {
+          source: cls.uml_class.id,
+          target: assoc.target_class,
+          label: assoc.name
+        }
+      end
+    end
+  end
+
+  # Build GraphML XML
+  # (Implementation details omitted for brevity)
+end
+----
+
+=== Generating Markdown documentation
+
+[source,ruby]
+----
+def to_markdown(mapping)
+  md = []
+
+  md << "# UML-XSD Mapping Documentation"
+  md << ""
+
+  mapping.package_mappings.each do |pkg|
+    md << "## Package: #{pkg.name}"
+    md << ""
+    md << "**Namespace:** `#{pkg.namespace}`"
+    md << ""
+
+    pkg.class_mappings.each do |cls|
+      md << "### #{cls.uml_class.name}"
+      md << ""
+      md << "**Stereotype:** #{cls.uml_class.stereotype}"
+      md << ""
+
+      if cls.attribute_mappings.any?
+        md << "**Attributes:**"
+        md << ""
+        md << "| UML Attribute | UML Type | XSD Element | XSD Type |"
+        md << "|---------------|----------|-------------|----------|"
+
+        cls.attribute_mappings.each do |attr|
+          md << "| #{attr.uml_attribute.name} | " \
+                "#{attr.uml_attribute.type} | " \
+                "#{attr.xsd_element.name} | " \
+                "#{attr.xsd_element.type} |"
+        end
+
+        md << ""
+      end
+    end
+  end
+
+  md.join("\n")
+end
+
+File.write('mapping-doc.md', to_markdown(mapping))
+----
+
+== Integration examples
+
+=== Using with lutaml-xsd (future)
+
+[source,ruby]
+----
+require 'lutaml/klin'
+require 'lutaml/xsd'
+
+# Generate mapping
+mapping = Lutaml::Klin::MappingGenerator.new.generate(
+  'model.xmi',
+  'config.xml'
+)
+
+# Create schema repository
+repo = Lutaml::Xsd::SchemaRepository.new
+repo.load_namespace_config(config.xml_namespaces)
+repo.load_schema_directory('/path/to/xsd/schemas')
+
+# Resolve unresolved types
+mapping.package_mappings.each do |pkg|
+  pkg.class_mappings.each do |cls|
+    cls.attribute_mappings.each do |attr|
+      next if attr.resolution_status == :resolved
+
+      # Parse namespaced type (e.g., "gml:CodeType")
+      if attr.uml_attribute.type =~ /^(\w+):(\w+)$/
+        prefix, local_name = $1, $2
+
+        # Resolve type
+        resolved = repo.resolve_type(
+          prefix: prefix,
+          type_name: local_name
+        )
+
+        if resolved
+          attr.xsd_element.type = local_name
+          attr.xsd_element.namespace = resolved.namespace
+          attr.resolution_status = :resolved
+        end
+      end
+    end
+  end
+end
+
+# Save updated mapping
+File.write('mapping-resolved.yaml', mapping.to_yaml)
+----
+
+=== Building a validation tool
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+class MappingValidator
+  def initialize(mapping_path, xsd_path)
+    @mapping = SchemaMapping.from_yaml(File.read(mapping_path))
+    @xsd_path = xsd_path
+  end
+
+  def validate
+    errors = []
+    warnings = []
+
+    @mapping.package_mappings.each do |pkg|
+      pkg.class_mappings.each do |cls|
+        # Check for missing XSD mapping
+        unless cls.xsd_element
+          errors << "Class #{cls.uml_class.name} has no XSD element"
+        end
+
+        # Check for unresolved types
+        cls.attribute_mappings.each do |attr|
+          if attr.resolution_status == :unresolved
+            warnings << "#{cls.uml_class.name}.#{attr.uml_attribute.name}: " \
+                        "unresolved type #{attr.uml_attribute.type}"
+          end
+        end
+      end
+    end
+
+    {
+      valid: errors.empty?,
+      errors: errors,
+      warnings: warnings
+    }
+  end
+end
+
+# Use validator
+validator = MappingValidator.new('mapping.yaml', '/path/to/xsd')
+result = validator.validate
+
+if result[:valid]
+  puts "✓ Mapping is valid"
+else
+  puts "✗ Mapping has errors:"
+  result[:errors].each { |e| puts "  - #{e}" }
+end
+
+if result[:warnings].any?
+  puts "⚠ Warnings:"
+  result[:warnings].each { |w| puts "  - #{w}" }
+end
+----
+
+=== Building a diff tool
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+class MappingDiff
+  def initialize(old_path, new_path)
+    @old = SchemaMapping.from_yaml(File.read(old_path))
+    @new = SchemaMapping.from_yaml(File.read(new_path))
+  end
+
+  def diff
+    changes = {
+      added_classes: [],
+      removed_classes: [],
+      modified_classes: []
+    }
+
+    old_classes = collect_classes(@old)
+    new_classes = collect_classes(@new)
+
+    # Find added classes
+    new_classes.each do |name, cls|
+      unless old_classes[name]
+        changes[:added_classes] << name
+      end
+    end
+
+    # Find removed classes
+    old_classes.each do |name, cls|
+      unless new_classes[name]
+        changes[:removed_classes] << name
+      end
+    end
+
+    # Find modified classes
+    old_classes.each do |name, old_cls|
+      if new_classes[name]
+        new_cls = new_classes[name]
+        if classes_differ?(old_cls, new_cls)
+          changes[:modified_classes] << name
+        end
+      end
+    end
+
+    changes
+  end
+
+  private
+
+  def collect_classes(mapping)
+    classes = {}
+    mapping.package_mappings.each do |pkg|
+      pkg.class_mappings.each do |cls|
+        classes[cls.uml_class.name] = cls
+      end
+    end
+    classes
+  end
+
+  def classes_differ?(old_cls, new_cls)
+    # Compare attribute counts
+    old_cls.attribute_mappings.size != new_cls.attribute_mappings.size
+  end
+end
+
+# Use diff tool
+diff = MappingDiff.new('old-mapping.yaml', 'new-mapping.yaml')
+changes = diff.diff
+
+puts "Changes:"
+puts "  Added: #{changes[:added_classes].size}"
+puts "  Removed: #{changes[:removed_classes].size}"
+puts "  Modified: #{changes[:modified_classes].size}"
+----
+
+== Error handling
+
+=== Handling parse errors
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+begin
+  mapping = SchemaMapping.from_yaml(File.read('mapping.yaml'))
+rescue Lutaml::Model::SerializeError => e
+  puts "Error parsing YAML: #{e.message}"
+  exit 1
+rescue => e
+  puts "Unexpected error: #{e.message}"
+  puts e.backtrace
+  exit 1
+end
+----
+
+=== Handling missing files
+
+[source,ruby]
+----
+def load_mapping(path)
+  unless File.exist?(path)
+    raise ArgumentError, "Mapping file not found: #{path}"
+  end
+
+  unless File.readable?(path)
+    raise ArgumentError, "Mapping file not readable: #{path}"
+  end
+
+  SchemaMapping.from_yaml(File.read(path))
+rescue Lutaml::Model::SerializeError => e
+  raise ArgumentError, "Invalid mapping file: #{e.message}"
+end
+
+begin
+  mapping = load_mapping('mapping.yaml')
+rescue ArgumentError => e
+  puts "Error: #{e.message}"
+  exit 1
+end
+----
+
+=== Validating mapping structure
+
+[source,ruby]
+----
+def validate_mapping(mapping)
+  errors = []
+
+  if mapping.package_mappings.empty?
+    errors << "No package mappings found"
+  end
+
+  mapping.package_mappings.each do |pkg|
+    if pkg.name.nil? || pkg.name.empty?
+      errors << "Package has no name"
+    end
+
+    if pkg.class_mappings.empty?
+      errors << "Package #{pkg.name} has no classes"
+    end
+  end
+
+  errors
+end
+
+errors = validate_mapping(mapping)
+if errors.any?
+  puts "Validation errors:"
+  errors.each { |e| puts "  - #{e}" }
+  exit 1
+end
+----
+
+== Best practices
+
+=== Use specific queries
+
+Instead of:
+
+[source,ruby]
+----
+# Bad: Iterate everything
+all_classes = []
+mapping.package_mappings.each do |pkg|
+  pkg.class_mappings.each do |cls|
+    all_classes << cls
+  end
+end
+----
+
+Do:
+
+[source,ruby]
+----
+# Good: Use targeted queries
+def find_classes(mapping, &block)
+  mapping.package_mappings.flat_map do |pkg|
+    pkg.class_mappings.select(&block)
+  end
+end
+
+feature_types = find_classes(mapping) do |cls|
+  cls.uml_class.stereotype == 'FeatureType'
+end
+----
+
+=== Cache expensive operations
+
+[source,ruby]
+----
+class MappingAnalyzer
+  def initialize(mapping)
+    @mapping = mapping
+    @class_index = nil
+  end
+
+  def class_index
+    @class_index ||= build_class_index
+  end
+
+  private
+
+  def build_class_index
+    index = {}
+    @mapping.package_mappings.each do |pkg|
+      pkg.class_mappings.each do |cls|
+        index[cls.uml_class.name] = cls
+      end
+    end
+    index
+  end
+end
+----
+
+=== Handle nil values gracefully
+
+[source,ruby]
+----
+# Safe navigation
+xsd_name = class_mapping.xsd_element&.name
+xsd_type = class_mapping.xsd_complex_type&.name
+
+# With defaults
+namespace = class_mapping.xsd_element&.namespace || "unknown"
+----
+
+== Relevant documents
+
+* link:../README.adoc[README.adoc] - Project overview
+* link:basic-usage.adoc[Basic Usage] - Getting started
+* link:architecture.adoc[Architecture] - System design
+* link:cli.adoc[Command Line Interface] - CLI reference
+* link:features/index.adoc[Features] - Feature documentation

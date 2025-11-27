@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ShapeChangeConfiguration
+    xmlns="http://www.interactive-instruments.de/ShapeChange/Configuration/1.1"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.interactive-instruments.de/ShapeChange/Configuration/1.1 http://shapechange.net/resources/schema/ShapeChangeConfiguration.xsd">
+
+  <!-- Include standard ShapeChange configurations -->
+  <xi:include href="StandardNamespaces.xml"/>
+  <xi:include href="StandardMapEntries.xml"/>
+  <xi:include href="StandardRules.xml"/>
+
+  <!-- Package Information -->
+  <input>
+    <packages>
+      <PackageInfo packageName="uro" ns="https://www.geospatial.jp/iur/uro/3.2"
+                   nsabr="uro" xsdDocument="urbanObject.xsd" version="3.2.1"/>
+      <PackageInfo packageName="urf" ns="https://www.geospatial.jp/iur/urf/3.2"
+                   nsabr="urf" xsdDocument="urbanFunction.xsd" version="3.2.1"/>
+    </packages>
+  </input>
+
+  <!-- Custom Encoding Rules -->
+  <rules>
+    <!-- PLATEAU custom rule with ADE hooks (X- prefix for custom non-ShapeChange rules) -->
+    <EncodingRule name="X-plateau" extends="citygml">
+      <rule name="rule-xsd-cls-plateau-ade-hooks"/>
+    </EncodingRule>
+  </rules>
+
+  <!-- Target Configuration -->
+  <targets>
+    <TargetXmlSchema mode="enabled"
+                     class="de.interactive_instruments.ShapeChange.Target.XmlSchema.XmlSchema">
+      <!-- Encoding rule is specified HERE in the config, not as CLI option -->
+      <targetParameter name="defaultEncodingRule" value="X-plateau"/>
+      <targetParameter name="outputDirectory" value="output"/>
+      <targetParameter name="sortedOutput" value="true"/>
+    </TargetXmlSchema>
+  </targets>
+</ShapeChangeConfiguration>

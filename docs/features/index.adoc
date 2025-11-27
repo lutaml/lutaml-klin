@@ -1,0 +1,327 @@
+= Features
+
+== Purpose
+
+This document provides an overview of all Lutaml-Klin features and links to
+detailed documentation for each feature.
+
+Use this guide to:
+
+* Discover all available features
+* Understand feature capabilities and use cases
+* Navigate to detailed feature documentation
+* Learn which features to use for specific tasks
+
+== Concepts
+
+=== Feature categories
+
+Lutaml-Klin features are organized into categories:
+
+* **Input Processing**: Parsing XMI and ShapeChange configuration
+* **Mapping Generation**: Creating UML-to-XSD mappings
+* **Output Generation**: YAML mappings and human-readable reports
+* **Validation**: Verifying mapping correctness
+* **Utilities**: Merging mappings and helper functions
+
+=== Feature maturity
+
+Features are classified by maturity level:
+
+* **Stable**: Production-ready, fully tested, documented
+* **Beta**: Functional but may have minor issues
+* **Experimental**: Early stage, API may change
+* **Planned**: Documented but not yet implemented
+
+== Available features
+
+=== XMI parsing
+
+**Status:** Stable
+
+**Purpose:** Parse UML models in XMI format to extract classes, attributes, and
+associations.
+
+**Use cases:**
+
+* Load UML models from modeling tools (Enterprise Architect, MagicDraw, etc.)
+* Extract package hierarchies and class structures
+* Analyze UML model content
+
+**Documentation:** link:xmi-parsing.adoc[XMI Parsing]
+
+**Key capabilities:**
+
+* Parse XMI 2.x format files
+* Extract packages with nested structure
+* Extract classes with stereotypes
+* Extract attributes with types and multiplicities
+* Extract associations between classes
+
+=== ShapeChange configuration parsing
+
+**Status:** Stable
+
+**Purpose:** Parse ShapeChange XML configuration files to extract encoding
+rules, type mappings, and namespace definitions.
+
+**Use cases:**
+
+* Load ShapeChange transformation rules
+* Extract type conversion mappings
+* Load namespace configuration
+* Parse package-specific settings
+
+**Documentation:** link:shapechange-config.adoc[ShapeChange Configuration]
+
+**Key capabilities:**
+
+* Parse ShapeChange XML configuration
+* Resolve XInclude references
+* Extract encoding rules
+* Extract type mappings (UML → XSD)
+* Extract XML namespace definitions
+* Parse package information
+
+=== Mapping generation
+
+**Status:** Stable
+
+**Purpose:** Generate YAML mappings showing how UML classes map to XSD elements.
+
+**Use cases:**
+
+* Create machine-readable mapping files
+* Document transformation logic
+* Support programmatic mapping queries
+* Enable mapping validation
+
+**Documentation:** link:mapping-generation.adoc[Mapping Generation]
+
+**Key capabilities:**
+
+* Generate complete SchemaMapping models
+* Map UML packages to XML namespaces
+* Map UML classes to XSD elements and complex types
+* Map UML attributes to XSD elements with type conversions
+* Serialize mappings to YAML/JSON/XML
+
+=== Human-readable reports
+
+**Status:** Stable
+
+**Purpose:** Generate text reports for manual review of UML-to-XSD
+transformations.
+
+**Use cases:**
+
+* Review transformation correctness
+* Share with domain experts
+* Document transformation decisions
+* Support manual validation
+
+**Documentation:** link:human-reports.adoc[Human-Readable Reports]
+
+**Key capabilities:**
+
+* Generate structured text reports
+* Show UML class details
+* Show XSD element and complex type details
+* Display attribute mappings with type conversions
+* Provide transformation summary
+
+=== Mapping validation
+
+**Status:** Beta
+
+**Purpose:** Validate mapping completeness and consistency against XSD schemas.
+
+**Use cases:**
+
+* Verify all UML classes are mapped
+* Check type conversion correctness
+* Validate multiplicity preservation
+* Ensure namespace consistency
+
+**Documentation:** link:validation.adoc[Validation]
+
+**Key capabilities:**
+
+* Validate mapping completeness
+* Check type conversions
+* Verify multiplicity preservation
+* Validate namespace consistency
+* Generate validation reports
+
+=== Mapping merging
+
+**Status:** Stable
+
+**Purpose:** Combine multiple YAML mapping files into a single mapping.
+
+**Use cases:**
+
+* Merge package-specific mappings
+* Combine mappings from different sources
+* Create comprehensive mapping files
+* Deduplicate encoding rules
+
+**Documentation:** link:merging.adoc[Merging Mappings]
+
+**Key capabilities:**
+
+* Merge multiple YAML files
+* Combine package mappings
+* Deduplicate encoding rules
+* Preserve namespace information
+
+=== Namespace resolution
+
+**Status:** Experimental
+
+**Purpose:** Resolve namespaced types (e.g., `gml:CodeType`) to full XSD
+definitions.
+
+**Use cases:**
+
+* Resolve types like `gml:CodeType`, `gml:MeasureType`
+* Complete type information for validation
+* Support cross-schema type references
+* Enable full type introspection
+
+**Documentation:** link:namespace-resolution.adoc[Namespace Resolution]
+
+**Key capabilities:**
+
+* Parse namespace prefixes (e.g., `gml:CodeType` → `gml` + `CodeType`)
+* Look up namespace URIs from configuration
+* Delegate to lutaml-xsd for schema loading
+* Resolve type definitions across schemas
+* Update mapping with resolved types
+
+NOTE: Full implementation requires lutaml-xsd gem integration (planned).
+
+== Feature comparison
+
+.Feature availability by command
+[cols="1,1,1,1,1",options="header"]
+|===
+|Feature |Generate |Report |Merge |Validate
+
+|XMI Parsing
+|✓
+|
+|
+|
+
+|Config Parsing
+|✓
+|
+|
+|
+
+|Mapping Generation
+|✓
+|
+|
+|
+
+|YAML Output
+|✓
+|
+|✓
+|
+
+|Text Reports
+|
+|✓
+|
+|
+
+|Validation
+|
+|
+|
+|✓
+
+|Namespace Resolution
+|✓ (experimental)
+|
+|
+|✓
+|===
+
+== Planned features
+
+=== Interactive web UI
+
+**Status:** Planned
+
+**Purpose:** Web-based interface for exploring mappings visually.
+
+**Planned capabilities:**
+
+* Browse packages and classes
+* View mapping details
+* Search and filter
+* Export to various formats
+
+=== Diff tool
+
+**Status:** Planned
+
+**Purpose:** Compare mappings across versions.
+
+**Planned capabilities:**
+
+* Compare two mapping files
+* Show added/removed/modified classes
+* Highlight attribute changes
+* Generate diff reports
+
+=== Reverse mapping
+
+**Status:** Planned
+
+**Purpose:** Generate UML from XSD schemas.
+
+**Planned capabilities:**
+
+* Parse XSD schemas
+* Generate UML model structure
+* Create reverse mapping documentation
+
+=== Custom transformation rules
+
+**Status:** Planned
+
+**Purpose:** User-defined transformation rules via plugin system.
+
+**Planned capabilities:**
+
+* Load custom transformation plugins
+* Apply user-defined type mappings
+* Support domain-specific transformations
+
+== Getting started
+
+For beginners:
+
+1. Start with link:../basic-usage.adoc[Basic Usage] guide
+2. Try link:xmi-parsing.adoc[XMI Parsing] to load your first model
+3. Use link:mapping-generation.adoc[Mapping Generation] to create mappings
+4. Generate link:human-reports.adoc[Human-Readable Reports] for review
+
+For advanced users:
+
+1. Explore link:namespace-resolution.adoc[Namespace Resolution] for complex types
+2. Learn link:validation.adoc[Validation] for quality assurance
+3. Use link:merging.adoc[Merging] for multi-package projects
+
+== Relevant documents
+
+* link:../README.adoc[README.adoc] - Project overview
+* link:../basic-usage.adoc[Basic Usage] - Getting started guide
+* link:../architecture.adoc[Architecture] - System design
+* link:../ruby-api.adoc[Ruby API] - Programmatic usage
+* link:../cli.adoc[CLI] - Command-line reference

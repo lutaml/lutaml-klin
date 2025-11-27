@@ -1,0 +1,170 @@
+lutaml-klin Component Architecture
+====================================
+
+┌──────────────────────────────────────────────────────────────────┐
+│                         CLI Layer (Thor)                          │
+│                                                                    │
+│  Commands: generate, merge, validate, report                     │
+└──────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                      Command Layer                                │
+│                                                                    │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │ Generate     │  │ Merge        │  │ Validate     │          │
+│  │ Command      │  │ Command      │  │ Command      │   ...    │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+└──────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                    Orchestration Layer                            │
+│                                                                    │
+│  ┌────────────────────────────────────────────────────────┐     │
+│  │          MappingGenerator (Main Orchestrator)          │     │
+│  │                                                          │     │
+│  │  Coordinates:                                           │     │
+│  │  - XMI Navigator                                        │     │
+│  │  - ShapeChange Config Parser                           │     │
+│  │  - XSD Analyzers                                        │     │
+│  │  - Type Override Mapping                               │     │
+│  └────────────────────────────────────────────────────────┘     │
+└──────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                      Processing Layer                             │
+│                                                                    │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │ XmiNavigator │  │ ConfigParser │  │ XsdAnalyzer  │          │
+│  │              │  │              │  │              │          │
+│  │ - Parse XMI  │  │ - Parse XML  │  │ - Parse XSD  │          │
+│  │ - Navigate   │  │ - XInclude   │  │ - Extract    │          │
+│  │   packages   │  │   resolution │  │   types      │          │
+│  │ - Extract    │  │ - Build      │  │ - Build      │          │
+│  │   classes    │  │   mappings   │  │   indexes    │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+└──────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                       Model Layer                                 │
+│                                                                    │
+│  UML Models          Config Models        XSD Models              │
+│  ┌──────────┐       ┌──────────┐        ┌──────────┐           │
+│  │ Package  │       │ Encoding │        │ Element  │           │
+│  │ Class    │       │ Rule     │        │ Complex  │           │
+│  │ Attribute│       │ XsdMap   │        │ Type     │           │
+│  │ Assoc    │       │ Entry    │        │ Simple   │           │
+│  └──────────┘       │ Namespace│        │ Type     │           │
+│                     └──────────┘        └──────────┘           │
+│                                                                    │
+│  Mapping Models (Output)                                          │
+│  ┌──────────────────────────────────────────┐                   │
+│  │ SchemaMapping                             │                   │
+│  │  ├─ PackageMapping                       │                   │
+│  │  │   ├─ ClassMapping                     │                   │
+│  │  │   │   └─ AttributeMapping             │                   │
+│  └──────────────────────────────────────────┘                   │
+└──────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                    Integration Layer                              │
+│                                                                    │
+│  ┌────────────────┐                  ┌────────────────┐          │
+│  │  lutaml-xmi    │                  │  lutaml-xsd    │          │
+│  │                │                  │                │          │
+│  │  XMI parsing   │                  │  Schema        │          │
+│  │  via lutaml    │                  │  Repository    │          │
+│  └────────────────┘                  │  (Future)      │          │
+│                                       └────────────────┘          │
+│  ┌────────────────┐                  ┌────────────────┐          │
+│  │  moxml         │                  │  YAML/JSON     │          │
+│  │                │                  │                │          │
+│  │  XML parsing   │                  │  Serialization │          │
+│  │  (Config, XSD) │                  │  (lutaml-model)│          │
+│  └────────────────┘                  └────────────────┘          │
+└──────────────────────────────────────────────────────────────────┘
+
+
+Data Flow Between Components
+==============================
+
+User Input (CLI)
+    │
+    ▼
+Command Object
+    │
+    ├─→ Load Type Overrides (YAML)
+    ├─→ Parse Config (XML via moxml)
+    ├─→ Parse XMI (via lutaml-xmi)
+    └─→ Parse XSD files (via moxml)
+    │
+    ▼
+MappingGenerator.new(
+  config: config,
+  xmi_navigator: navigator,
+  xsd_analyzers: analyzers,
+  type_overrides: overrides
+)
+    │
+    ▼
+For each UML Package:
+    │
+    ├─→ Extract UML Classes
+    │   │
+    │   └─→ For each Class:
+    │       │
+    │       ├─→ Find matching XSD Type
+    │       │
+    │       └─→ For each Attribute:
+    │           │
+    │           ├─→ Apply Type Override (if configured)
+    │           ├─→ Resolve via ShapeChange mapping
+    │           ├─→ Resolve namespace
+    │           └─→ Create AttributeMapping
+    │
+    ▼
+SchemaMapping (YAML Output)
+
+
+Component Responsibilities
+==========================
+
+CLI Layer:
+- Parse command-line arguments
+- Validate user inputs
+- Display help and errors
+- Coordinate command execution
+
+Command Layer:
+- Implement specific commands
+- Load and validate inputs
+- Coordinate processing components
+- Handle errors and output
+
+Orchestration Layer:
+- Coordinate multi-source mapping
+- Apply transformation rules
+- Manage type resolution
+- Build output structures
+
+Processing Layer:
+- Parse input formats (XMI, XML, XSD)
+- Navigate data structures
+- Extract relevant information
+- Build internal models
+
+Model Layer:
+- Represent UML structures
+- Represent XSD structures
+- Represent configuration
+- Represent mappings (output)
+
+Integration Layer:
+- Interface with external gems
+- Provide consistent APIs
+- Handle format conversions
+- Delegate specialized operations

@@ -1,0 +1,52 @@
+# Type Override Mapping Example
+#
+# This file demonstrates how to use type overrides to correct malformed
+# or non-standard type names in XMI files before type resolution.
+#
+# Common use cases:
+# 1. Fix double colon (::) instead of single colon (:) in namespace separators
+# 2. Correct typos in type names
+# 3. Normalize type references across different XMI sources
+#
+# Usage:
+#   lutaml-klin generate \
+#     --xmi model.xmi \
+#     --config config.xml \
+#     --package urf \
+#     --type-mapping type_overrides.yaml \
+#     --output mapping.yaml
+
+type_overrides:
+  # Fix XML Schema (xs) namespace - double colon to single colon
+  "xs::string": "xs:string"
+  "xs::integer": "xs:integer"
+  "xs::boolean": "xs:boolean"
+  "xs::double": "xs:double"
+  "xs::date": "xs:date"
+  "xs::dateTime": "xs:dateTime"
+  "xs::time": "xs:time"
+  "xs::anyURI": "xs:anyURI"
+  "xs::nonNegativeInteger": "xs:nonNegativeInteger"
+  "xs::gYear": "xs:gYear"
+  "xs::gYearMonth": "xs:gYearMonth"
+
+  # Fix GML namespace - double colon to single colon
+  "gml::CodeType": "gml:CodeType"
+  "gml::MeasureType": "gml:MeasureType"
+  "gml::LengthType": "gml:LengthType"
+  "gml::PointType": "gml:PointType"
+  "gml::MultiSurfaceType": "gml:MultiSurfaceType"
+  "gml::MultiCurveType": "gml:MultiCurveType"
+  "gml::DirectPositionType": "gml:DirectPositionType"
+  "gml::doubleList": "gml:doubleList"
+  "gml::StringOrRefType": "gml:StringOrRefType"
+
+  # Fix common typos
+  "CharString": "CharacterString"
+  "Intger": "Integer"
+  "Boolen": "Boolean"
+
+  # Normalize variations
+  "URI": "anyURI"
+  "String": "string"
+  "Int": "integer"

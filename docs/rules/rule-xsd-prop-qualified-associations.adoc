@@ -1,0 +1,257 @@
+= Rule: rule-xsd-prop-qualified-associations
+
+== Overview
+
+Adds qualifier attributes to association properties, allowing additional metadata to qualify the association relationship in XML Schema.
+
+== Priority
+
+Should-have (used for complex association semantics)
+
+== ShapeChange Documentation
+
+Source:: `/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/General_Conversion_Rules.adoc`
+
+Description::
+Association properties can have qualifiers that provide additional information about the association. These qualifiers are encoded as XML attributes on the property type.
+
+== Java Implementation
+
+Source:: [`XsdDocument.java:qualifiers, processQualifier`](lines 2458-2544)
+
+=== Algorithm
+
+The Java implementation processes qualifiers as follows:
+
+. Check if property matches [`rule-xsd-prop-qualified-associations`]
+. Check if property is not an attribute and is navigable
+. Get reverse property (for bidirectional associations)
+. If reverse property exists, get its qualifiers
+. For each qualifier:
+  * Create an attribute element
+  * Set attribute name from qualifier name
+  * Determine attribute type based on qualifier type:
+    ** If qualifier type is mapped: use mapped type
+    ** If qualifier type is enumeration: use enumeration type + "Type"
+    ** If qualifier type is code list/feature/object: use anyURI
+    ** If qualifier type is datatype/union: report error, use string
+    ** Otherwise: use string as fallback
+  * Add attribute to the property type
+
+=== Type Mapping Logic
+
+[source,java]
+----
+if (q.type == null) {
+    // No type specified, use string
+    addAttribute(e1, "type", "string");
+} else {
+    MapEntry me = options.typeMapEntry(q.type, encodingRule);
+    if (me != null && me.p2.equalsIgnoreCase("simple/simple")) {
+        // Mapped to simple type
+        addAttribute(e1, "type", me.p1);
+    } else if (ci.category() == ENUMERATION) {
+        // Enumeration type
+        addAttribute(e1, "type", ci.qname() + "Type");
+    } else if (ci.category() == CODELIST || FEATURE || OBJECT) {
+        // Complex types: use URI reference
+        addAttribute(e1, "type", "anyURI");
+    } else {
+        // Unsupported, use string
+        addAttribute(e1, "type", "string");
+    }
+}
+----
+
+== Our Implementation
+
+Type:: Processor Class
+File:: [`lib/lutaml/klin/shapechange/rule_processors/property_rules/qualified_associations_processor.rb`]
+Spec:: [`spec/lutaml/klin/shapechange/rule_processors/property_rules/qualified_associations_processor_spec.rb`]
+
+=== Design Principles
+
+. Process qualifiers from reverse property
+. Map qualifier types appropriately
+. Use anyURI for complex type references
+. Defensive programming for missing types
+
+=== Implementation Details
+
+The [`QualifiedAssociationsProcessor`] class extends [`BaseRuleProcessor`] and:
+
+. Checks if property is association (not attribute)
+. Gets reverse property from bidirectional association
+. Extracts qualifiers from reverse property
+. For each qualifier, creates attribute with appropriate type
+. Handles type mapping according to qualifier type category
+
+== Test Cases
+
+=== Test Case 1: Simple Qualifier (String Type)
+
+Input UML::
+[source]
+----
+association RoadConnection
+  class Road
+    property connectedTo: Road [0..*]
+  class Road (reverse)
+    property connections: Road [0..*] {qualifier: role: String}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="connectedTo">
+  <complexType>
+    <sequence minOccurs="0"/>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attribute name="role" type="string"/>
+  </complexType>
+</element>
+----
+
+=== Test Case 2: Enumeration Qualifier
+
+Input UML::
+[source]
+----
+enum ConnectionType
+  values: primary, secondary
+
+association Connection
+  class Feature
+    property related: Feature [0..*]
+  class Feature (reverse)
+    property relations: Feature [0..*] {qualifier: type: ConnectionType}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="related">
+  <complexType>
+    <sequence minOccurs="0"/>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attribute name="type" type="ConnectionTypeType"/>
+  </complexType>
+</element>
+----
+
+=== Test Case 3: Code List Qualifier (anyURI)
+
+Input UML::
+[source]
+----
+codelist Category
+  values: A, B, C
+
+association Classified
+  class Item
+    property relatedItems: Item [0..*]
+  class Item (reverse)
+    property items: Item [0..*] {qualifier: category: Category}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="relatedItems">
+  <complexType>
+    <sequence minOccurs="0"/>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attribute name="category" type="anyURI"/>
+  </complexType>
+</element>
+----
+
+=== Test Case 4: Multiple Qualifiers
+
+Input UML::
+[source]
+----
+association MultiQualified
+  class Node
+    property neighbors: Node [0..*]
+  class Node (reverse)
+    property nodes: Node [0..*] {
+      qualifier: distance: Real
+      qualifier: direction: String
+    }
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="neighbors">
+  <complexType>
+    <sequence minOccurs="0"/>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attribute name="distance" type="double"/>
+    <attribute name="direction" type="string"/>
+  </complexType>
+</element>
+----
+
+=== Test Case 5: Qualifier Without Type (Fallback to String)
+
+Input UML::
+[source]
+----
+association Tagged
+  class Object
+    property related: Object [0..*]
+  class Object (reverse)
+    property objects: Object [0..*] {qualifier: tag}
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="related">
+  <complexType>
+    <sequence minOccurs="0"/>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attribute name="tag" type="string"/>
+  </complexType>
+</element>
+----
+
+== Implementation Status
+
+* [x] Documentation written
+* [ ] Java code analyzed
+* [ ] Processor implemented
+* [ ] Spec written
+* [ ] Integrated
+* [ ] Committed
+
+== Dependencies
+
+Depends on::
+* Property type generation
+* Association handling
+* Type mapping configuration
+
+Used by::
+* Complex association encoding patterns
+
+Related rules::
+* [`rule-xsd-prop-inlineOrByReference`]: Works with qualified associations
+* [`rule-xsd-rel-association-classes`]: Alternative association encoding
+
+== Notes
+
+* Qualifiers are read from the **reverse property** of bidirectional associations
+* Qualifier attributes are added to the anonymous property type
+* Complex types (code lists, features, objects) use anyURI for reference
+* If qualifier has no type, defaults to string
+* Qualifiers only apply to association properties (not attributes)
+* Typically used with byReference encoding
+
+== References
+
+* ShapeChange documentation: Qualified Associations
+* UML 2.5 specification: Association qualifiers
+* GML encoding patterns for qualified associations

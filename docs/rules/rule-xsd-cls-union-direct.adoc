@@ -1,0 +1,237 @@
+= Rule: rule-xsd-cls-union-direct
+
+== Overview
+
+A union with exactly one navigable property (that is not implemented by nilReason) is converted directly: the property that has the union type receives the value type of the union's single property as its type, becomes nillable, and receives a nilReason attribute.
+
+== Priority
+
+Must-have (used by PLATEAU for direct union encoding)
+
+== ShapeChange Documentation
+
+Source:: `/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/Non_Standard_Conversion_Rules.adoc` (lines 603-615)
+
+Description::
+A union with two properties and where one property has a tagged value [`gmlImplementedByNilReason`] set to [`true`] is converted as follows under this conversion rule:
+
+A property that has the union type as its value receives the value type of the property in the union that is not implemented by nil reason as its type.
+
+The property element is made nillable and receives a nilReason attribute.
+
+== Java Implementation
+
+Source:: [`XsdDocument.java:mapPropertyType`](lines 2880-2921)
+
+=== Algorithm
+
+The Java implementation follows this process:
+
+. Check if value type is a union and matches [`rule-xsd-cls-union-direct`]
+. Check if the union class has method [`isUnionDirect()`] returning true
+. Iterate through union's properties to find the one that:
+  * Is navigable
+  * Is not a restriction
+  * Is not implemented by nilReason
+. If exactly one such property is found:
+  * Set property element to be nillable
+  * Map the union property's type as the property element's type
+  * If union has nilReason flag, propagate it to the union property
+  * Calculate multiplicity by combining both properties' multiplicities
+  * Return true to indicate multiplicity was already set
+. If no navigable property or multiple properties found: Report error
+
+=== Implementation Logic
+
+[source,java]
+----
+if (ci.isUnionDirect() && ci.matches("rule-xsd-cls-union-direct")) {
+
+    for (PropertyInfo pi2 : ci.properties().values()) {
+
+        if (pi2.isNavigable() && !pi2.isRestriction() &&
+            !pi2.implementedByNilReason()) {
+
+            if (ci.hasNilReason())
+                pi2.nilReasonAllowed(true);
+            addAttribute(e, "nillable", "true");
+            mapPropertyType(cibase, pi2, e, false, schDoc);
+
+            // determine the multiplicity to use, based upon
+            // the information from both properties (propi & pi2)
+
+            int minOccurs = min(propi.cardinality().minOccurs,
+                               pi2.cardinality().minOccurs);
+
+            int maxOccurs;
+            if (pi2MaxOccurs == MAX_VALUE || propiMaxOccurs == MAX_VALUE) {
+                maxOccurs = MAX_VALUE;
+            } else {
+                maxOccurs = pi2MaxOccurs * propiMaxOccurs;
+            }
+
+            Multiplicity m = new Multiplicity(minOccurs, maxOccurs);
+            addMinMaxOccurs(e, m);
+
+            return true;
+        }
+    }
+    // Error: Union has wrong number of navigable properties
+    result.addError(this, 129, ci.name(), pName);
+}
+----
+
+== Our Implementation
+
+Type:: Processor Class
+File:: [`lib/lutaml/klin/shapechange/rule_processors/class_rules/union_direct_processor.rb`]
+Spec:: [`spec/lutaml/klin/shapechange/rule_processors/class_rules/union_direct_processor_spec.rb`]
+
+=== Design Principles
+
+. Direct type substitution for single-property unions
+. Multiplicity combination from both properties
+. nilReason propagation from union to property
+. Clear error reporting for invalid unions
+
+=== Implementation Details
+
+The [`UnionDirectProcessor`] class extends [`BaseRuleProcessor`] and:
+
+. Validates that the union class has [`isUnionDirect()`] or equivalent flag
+. Finds the single navigable, non-nilReason property
+. Maps that property's type directly to the parent property
+. Sets nillable="true" on the parent property element
+. Combines multiplicities from both the parent property and union property
+. Reports error if union doesn't have exactly one qualifying property
+
+== Test Cases
+
+=== Test Case 1: Direct union with single property
+
+Input UML::
+[source]
+----
+«union» MeasureOrNilReason
+  property measure: Measure [1]
+  property nilReason: NilReasonType [1] {implementedByNilReason=true}
+
+class Building
+  property height: MeasureOrNilReason [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="height" type="MeasureType" nillable="true">
+  <!-- Direct type from union's navigable property -->
+  <!-- nilReason handled by nillable attribute -->
+</element>
+----
+
+=== Test Case 2: Direct union with multiplicity combination
+
+Input UML::
+[source]
+----
+«union» OptionalMeasure
+  property value: Measure [0..1]
+  property nil: NilReasonType [1] {implementedByNilReason=true}
+
+class Feature
+  property measurement: OptionalMeasure [0..*]
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="measurement" type="MeasureType" nillable="true"
+         minOccurs="0" maxOccurs="unbounded"/>
+<!-- Multiplicity: min(0,0)=0, max(unbounded,1)=unbounded -->
+----
+
+=== Test Case 3: Direct union with nilReason allowed
+
+Input UML::
+[source]
+----
+«union» GeometryValue {hasNilReason=true}
+  property geometry: GM_Object [1]
+  property nil: NilReasonType [1] {implementedByNilReason=true}
+
+class SpatialFeature
+  property shape: GeometryValue [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<element name="shape" type="GM_ObjectType" nillable="true">
+  <!-- nilReason propagated from union to geometry property -->
+</element>
+----
+
+=== Test Case 4: Invalid union (no navigable properties)
+
+Input UML::
+[source]
+----
+«union» InvalidUnion
+  property option1: Type1 [1] {implementedByNilReason=true}
+  property option2: Type2 [1] {implementedByNilReason=true}
+
+class Feature
+  property value: InvalidUnion [1]
+----
+
+Expected::
+Error reported - Union has no navigable property that is not implemented by nilReason
+
+=== Test Case 5: Invalid union (multiple navigable properties)
+
+Input UML::
+[source]
+----
+«union» InvalidUnion
+  property option1: Type1 [1]
+  property option2: Type2 [1]
+
+class Feature
+  property value: InvalidUnion [1]
+----
+
+Expected::
+Error reported - Union has more than one navigable property
+
+== Implementation Status
+
+* [x] Documentation read
+* [x] Java code analyzed
+* [ ] Processor implemented
+* [ ] Spec written
+* [ ] Integrated
+* [ ] Committed
+
+== Dependencies
+
+Depends on::
+* [`rule-xsd-cls-type`]: Base type generation
+* Property type mapping infrastructure
+
+Related rules::
+* [`rule-xsd-cls-union-as-choice`]: Alternative union encoding (mutually exclusive)
+* [`rule-xsd-prop-nillable`]: Sets nillable attribute
+
+== Notes
+
+* Only applies to unions with exactly one navigable, non-nilReason property
+* Multiplicity calculation: min = min of both, max = product of both (or unbounded)
+* The union type is "flattened" - not represented as a separate type
+* nilReason implementation allows nil values without explicit union structure
+* If union has [`hasNilReason`] flag, it's propagated to the single property
+
+== References
+
+* ShapeChange documentation: Non-Standard Conversion Rules
+* XML Schema Part 1: Structures - nillable elements
+* GML 3.2: nilReason pattern for optional values

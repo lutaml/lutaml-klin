@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Data Test</title>
+</head>
+<body>
+  <h1>Embedded Data Test</h1>
+  <div id="output"></div>
+
+  <script>
+    // Check if data exists
+    const output = document.getElementById('output');
+
+    if (window.MAPPING_DATA) {
+      output.innerHTML = `
+        <p>✓ MAPPING_DATA exists</p>
+        <p>Packages: ${window.MAPPING_DATA.packages ? window.MAPPING_DATA.packages.length : 0}</p>
+        <pre>${JSON.stringify(window.MAPPING_DATA, null, 2)}</pre>
+      `;
+    } else {
+      output.innerHTML = '<p style="color: red;">✗ MAPPING_DATA not found</p>';
+    }
+  </script>
+</body>
+</html>

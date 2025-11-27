@@ -1,0 +1,218 @@
+= rule-xsd-cls-enum-supertypes
+
+== Purpose
+
+Includes enumeration values from supertypes when generating enumeration type definitions in XML Schema.
+
+== Background
+
+In UML models, enumerations can inherit from other enumerations, creating a hierarchy of enumeration values. When this rule is active:
+
+* All enumeration values from supertype enumerations are included
+* Values are collected recursively up the inheritance chain
+* Supertypes are added first, maintaining inheritance order
+* Results in a flattened enumeration with all values
+
+== Implementation
+
+Based on `XsdDocument.java:pAnonymousEnumeration()` lines 1785-1804.
+
+=== Algorithm
+
+When generating an enumeration type:
+
+1. Start with a list containing the current enumeration class
+2. If rule is active, traverse supertype chain
+3. For each supertype that is an enumeration or code list:
+   - Add to list (at beginning to maintain order)
+   - Continue traversing its supertypes
+4. Process all classes in order, extracting enumeration values
+5. Generate xs:enumeration facets for all values
+
+=== Syntax Definition
+
+[source,ruby]
+----
+# Enumeration value collection with supertypes
+def collect_enumeration_values(enumeration_class)
+  classes = [enumeration_class] <1>
+
+  if enumeration_class.matches?("rule-xsd-cls-enum-supertypes") <2>
+    # Traverse supertypes
+    tasks = [enumeration_class]
+    while tasks.any?
+      current = tasks.shift
+
+      current.supertypes&.each do |supertype_id| <3>
+        supertype = model.class_by_id(supertype_id)
+
+        if supertype && is_enum_or_codelist?(supertype) <4>
+          tasks << supertype
+          classes.unshift(supertype) <5>
+        end
+      end
+    end
+  end
+
+  # Collect all enumeration values
+  values = []
+  classes.each do |cls| <6>
+    cls.properties.each do |property|
+      values << property.name <7>
+    end
+  end
+
+  values
+end
+----
+<1> Start with current class
+<2> Check if rule is active
+<3> Iterate through supertypes
+<4> Only process enumeration/codelist supertypes
+<5> Add supertypes at beginning (inheritance order)
+<6> Process all classes in order
+<7> Collect enumeration values
+
+Where,
+
+`matches?(rule)`:: Rule is active for this class
+`supertypes`:: Set of supertype IDs
+`is_enum_or_codelist?`:: Category is enumeration or code list
+`unshift`:: Adds to beginning of list
+`properties`:: Enumeration literals (represented as properties)
+
+== Examples
+
+=== Example 1: Enumeration with Supertype
+
+.Enumeration hierarchy
+[source,ruby]
+----
+class BaseColorCode < Lutaml::Model::Serializable
+  attribute :red, :string
+  attribute :green, :string
+  attribute :blue, :string
+end
+
+class ExtendedColorCode < BaseColorCode <1>
+  attribute :yellow, :string
+  attribute :purple, :string
+end
+----
+<1> Extends BaseColorCode
+
+.Generated XML Schema (with rule active)
+[source,xml]
+----
+<simpleType name="ExtendedColorCodeType">
+  <restriction base="string">
+    <!-- Values from supertype first --> <!--1-->
+    <enumeration value="red"/>
+    <enumeration value="green"/>
+    <enumeration value="blue"/>
+    <!-- Then values from current class --> <!--2-->
+    <enumeration value="yellow"/>
+    <enumeration value="purple"/>
+  </restriction>
+</simpleType>
+----
+<1> Supertype values included first
+<2> Current class values follow
+
+=== Example 2: Multiple Inheritance Levels
+
+.Deep enumeration hierarchy
+[source,ruby]
+----
+class PrimaryColors < Lutaml::Model::Serializable
+  attribute :red, :string
+  attribute :blue, :string
+  attribute :yellow, :string
+end
+
+class SecondaryColors < PrimaryColors
+  attribute :green, :string
+  attribute :orange, :string
+  attribute :purple, :string
+end
+
+class AllColors < SecondaryColors <1>
+  attribute :black, :string
+  attribute :white, :string
+end
+----
+<1> Inherits from SecondaryColors → PrimaryColors
+
+.Generated XML Schema
+[source,xml]
+----
+<simpleType name="AllColorsType">
+  <restriction base="string">
+    <!-- From PrimaryColors (top of hierarchy) --> <!--1-->
+    <enumeration value="red"/>
+    <enumeration value="blue"/>
+    <enumeration value="yellow"/>
+    <!-- From SecondaryColors (middle) --> <!--2-->
+    <enumeration value="green"/>
+    <enumeration value="orange"/>
+    <enumeration value="purple"/>
+    <!-- From AllColors (current) --> <!--3-->
+    <enumeration value="black"/>
+    <enumeration value="white"/>
+  </restriction>
+</simpleType>
+----
+<1> Top-level supertype values
+<2> Intermediate supertype values
+<3> Current class values
+
+=== Example 3: Without Rule
+
+.Generated XML Schema (rule inactive)
+[source,xml]
+----
+<simpleType name="ExtendedColorCodeType">
+  <restriction base="string">
+    <!-- Only current class values --> <!--1-->
+    <enumeration value="yellow"/>
+    <enumeration value="purple"/>
+  </restriction>
+</simpleType>
+----
+<1> Supertype values NOT included
+
+== Configuration
+
+=== When This Rule Applies
+
+* Rule is active in encoding rules
+* Class is an enumeration or code list
+* Class has supertypes that are also enumerations or code lists
+
+=== Processing Order
+
+1. **Collect supertypes**: Traverse inheritance chain recursively
+2. **Order classes**: Supertypes first (root to leaf)
+3. **Extract values**: From each class in order
+4. **Generate facets**: Create xs:enumeration for each value
+
+=== Supertype Filtering
+
+Only supertypes with these categories are processed:
+
+* `Options.ENUMERATION`
+* `Options.CODELIST`
+
+Other supertype categories are ignored.
+
+=== Related Rules
+
+* `rule-xsd-cls-enum-subtypes`: Include values from subtypes (less common)
+* `rule-xsd-cls-local-enumeration`: Generate local enumeration types
+* `rule-xsd-cls-codelist-asDictionary`: Code list as dictionary
+
+== References
+
+* ShapeChange: `XsdDocument.java` lines 1785-1804 (`pAnonymousEnumeration()`)
+* UML 2.5: Section 10.4 (Enumerations)
+* XML Schema Part 2: Section 4.3.5 (enumeration facet)

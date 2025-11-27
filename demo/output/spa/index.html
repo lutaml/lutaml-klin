@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UML-XSD Mapping Browser</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- Embedded Data - No CORS issues with file:// protocol -->
+  <script id="embedded-data">
+    // Data will be injected here by SPA generator
+    window.MAPPING_DATA = %{MAPPINGS_JSON};
+    window.SEARCH_INDEX = %{SEARCH_INDEX_JSON};
+    window.STATISTICS = %{STATISTICS_JSON};
+  </script>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>📋 UML-XSD Mapping Browser</h1>
+      <div class="search-container">
+        <input type="text" id="search" placeholder="Search packages, classes, attributes..." autocomplete="off" aria-label="Search">
+        <div id="search-results" class="search-results hidden" role="listbox" aria-label="Search results"></div>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar">
+        <section>
+          <h2>📦 Packages</h2>
+          <div id="package-tree" role="tree"></div>
+        </section>
+
+        <section>
+          <h2>🔍 Filters</h2>
+          <div class="filters">
+            <label>
+              <input type="checkbox" id="filter-resolved" checked aria-label="Show resolved items">
+              <span class="badge-resolved">✓</span> Resolved
+            </label>
+            <label>
+              <input type="checkbox" id="filter-partial" checked aria-label="Show partially resolved items">
+              <span class="badge-partial">⚠</span> Partial
+            </label>
+            <label>
+              <input type="checkbox" id="filter-unresolved" checked aria-label="Show unresolved items">
+              <span class="badge-unresolved">✗</span> Unresolved
+            </label>
+          </div>
+        </section>
+
+        <section>
+          <h2>📊 Statistics</h2>
+          <div id="statistics"></div>
+        </section>
+      </aside>
+
+      <main class="content">
+        <nav id="breadcrumb" aria-label="Breadcrumb"></nav>
+        <div id="details">
+          <div class="welcome">
+            <h2>Welcome to UML-XSD Mapping Browser</h2>
+            <p>Select a package or class from the tree on the left to view mapping details.</p>
+            <p>Use the search bar above to quickly find specific elements.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

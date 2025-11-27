@@ -1,0 +1,118 @@
+= rule-xsd-cls-no-gml-types
+
+== Purpose
+
+Omits GML-specific type elements and attribute groups, using simpler xlink-based references instead.
+
+This enables encoding schemas that do not depend on GML namespaces, useful for non-GML applications or simplified schemas.
+
+== Applies To
+
+* Classes
+* Properties
+
+== Algorithm
+
+When this rule is enabled for a class:
+
+1. **For substitution groups**: Return `null` instead of GML substitution group
+   - No `gml:AbstractFeature`, `gml:AbstractGML`, etc.
+
+2. **For base types**: Return `null` instead of GML base type
+   - No `gml:AbstractFeatureType`, `gml:AbstractGMLType`, etc.
+
+3. **For property types**: Use `xlink:simpleAttrs` instead of `gml:AssociationAttributeGroup`
+   - Simpler attribute group without GML ownership attributes
+
+4. **For by-reference properties**: Use xlink attributes only
+   - No `gml:AssociationAttributeGroup`
+   - No `gml:OwnershipAttributeGroup`
+
+== Configuration
+
+No additional parameters required beyond enabling the rule.
+
+== Example Output
+
+Without this rule (GML-based):
+[source,xml]
+----
+<xs:element name="Building"
+            type="bldg:BuildingType"
+            substitutionGroup="gml:AbstractFeature"/>
+
+<xs:complexType name="BuildingType">
+  <xs:complexContent>
+    <xs:extension base="gml:AbstractFeatureType">
+      <xs:sequence>
+        <xs:element name="height" type="gml:MeasureType"/>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="BuildingPropertyType">
+  <xs:sequence minOccurs="0">
+    <xs:element ref="bldg:Building"/>
+  </xs:sequence>
+  <xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+  <xs:attributeGroup ref="gml:OwnershipAttributeGroup"/>
+</xs:complexType>
+----
+
+With this rule (xlink-based):
+[source,xml]
+----
+<xs:element name="Building" type="bldg:BuildingType"/>
+
+<xs:complexType name="BuildingType">
+  <xs:sequence>
+    <xs:element name="height" type="gml:MeasureType"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="BuildingPropertyType">
+  <xs:sequence minOccurs="0">
+    <xs:element ref="bldg:Building"/>
+  </xs:sequence>
+  <xs:attributeGroup ref="xlink:simpleAttrs"/>
+</xs:complexType>
+----
+
+== Java Implementation Reference
+
+See `XsdDocument.java` multiple locations:
+- Lines 697-698: `defaultSubstitutionGroup` returns null
+- Lines 751-752: `defaultBaseType` returns null
+- Lines 1220-1225: Uses `xlink:simpleAttrs` instead of `gml:AssociationAttributeGroup`
+- Lines 3991-4001: By-reference properties use xlink
+
+== Use Cases
+
+* **Non-GML schemas**: Schemas not based on GML architecture
+* **Simplified encoding**: Reduce complexity by omitting GML-specific constructs
+* **Legacy compatibility**: Integration with systems that don't support GML
+* **Standalone schemas**: Self-contained schemas without GML dependencies
+
+== Impact
+
+When this rule is enabled:
+
+1. **No GML inheritance**: Classes don't inherit from GML abstract types
+2. **No GML attributes**: Properties don't use GML association/ownership attributes
+3. **Simplified structure**: Flatter type hierarchy without GML layers
+4. **XLink only**: Uses standard XLink attributes for references
+
+== Related Rules
+
+* `rule-xsd-cls-standard-gml-property-types` - Standard GML encoding (opposite)
+* `rule-xsd-prop-inlineOrByReference` - Controls reference encoding
+* `rule-xsd-cls-standard-swe-property-types` - SWE Common encoding (alternative)
+
+== Notes
+
+- This rule fundamentally changes the schema structure
+- Classes lose GML-based inheritance and identity mechanisms
+- Property types use simplified xlink-based references
+- Recommended when GML dependencies are not desired
+- May require corresponding changes in application code

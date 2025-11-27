@@ -1,0 +1,671 @@
+= Lutaml-Klin Examples
+
+This document provides concrete examples of using Lutaml-Klin with the PLATEAU
+URO (Urban Object) package, showing both YAML mapping outputs and human-readable
+transformation reports.
+
+== Example 1: Generating YAML Mappings
+
+=== Command
+
+[source,shell]
+----
+lutaml-klin generate \
+  --xmi /path/to/plateau-uro.xmi \
+  --config /path/to/ShapeChangeConfig_Plateau_uro.xml \
+  --output uro-mappings.yaml \
+  --verbose
+----
+
+=== Output (YAML Mapping)
+
+[source,yaml]
+----
+---
+schema_mapping:
+  package_mappings:
+  - name: uro
+    namespace: http://www.opengis.net/citygml/ext/uro/2.0
+    class_mappings:
+    - uml_class:
+        name: Building
+        id: EAID_12345
+        stereotype: FeatureType
+        attributes:
+        - name: buildingID
+          type: CharacterString
+          multiplicity: 0..1
+          visibility: public
+        - name: buildingStructureType
+          type: Code
+          multiplicity: 0..1
+          visibility: public
+        - name: buildingRoofEdgeType
+          type: Code
+          multiplicity: 0..1
+          visibility: public
+        - name: buildingFootprintArea
+          type: Measure
+          multiplicity: 0..1
+          visibility: public
+        associations:
+        - name: outerBuildingInstallation
+          target_class: BuildingInstallation
+          multiplicity: 0..*
+          navigable: true
+      xsd_element:
+        name: Building
+        type: urn:BuildingType
+        namespace: http://www.opengis.net/citygml/ext/uro/2.0
+      xsd_complex_type:
+        name: BuildingType
+        base: gml:AbstractFeatureType
+        namespace: http://www.opengis.net/citygml/ext/uro/2.0
+        elements:
+        - name: buildingID
+          type: string
+          namespace: http://www.w3.org/2001/XMLSchema
+          min_occurs: 0
+          max_occurs: '1'
+        - name: buildingStructureType
+          type: CodeType
+          namespace: http://www.opengis.net/gml/3.2
+          min_occurs: 0
+          max_occurs: '1'
+        - name: buildingRoofEdgeType
+          type: CodeType
+          namespace: http://www.opengis.net/gml/3.2
+          min_occurs: 0
+          max_occurs: '1'
+        - name: buildingFootprintArea
+          type: MeasureType
+          namespace: http://www.opengis.net/gml/3.2
+          min_occurs: 0
+          max_occurs: '1'
+      attribute_mappings:
+      - uml_attribute:
+          name: buildingID
+          type: CharacterString
+          multiplicity: 0..1
+        xsd_element:
+          name: buildingID
+          type: string
+          namespace: http://www.w3.org/2001/XMLSchema
+      - uml_attribute:
+          name: buildingStructureType
+          type: Code
+          multiplicity: 0..1
+        xsd_element:
+          name: buildingStructureType
+          type: CodeType
+          namespace: http://www.opengis.net/gml/3.2
+      - uml_attribute:
+          name: buildingRoofEdgeType
+          type: Code
+          multiplicity: 0..1
+        xsd_element:
+          name: buildingRoofEdgeType
+          type: CodeType
+          namespace: http://www.opengis.net/gml/3.2
+      - uml_attribute:
+          name: buildingFootprintArea
+          type: Measure
+          multiplicity: 0..1
+        xsd_element:
+          name: buildingFootprintArea
+          type: MeasureType
+          namespace: http://www.opengis.net/gml/3.2
+    - uml_class:
+        name: BuildingInstallation
+        id: EAID_67890
+        stereotype: FeatureType
+        attributes:
+        - name: class
+          type: Code
+          multiplicity: 0..1
+          visibility: public
+        - name: function
+          type: Code
+          multiplicity: 0..*
+          visibility: public
+        associations: []
+      xsd_element:
+        name: BuildingInstallation
+        type: urn:BuildingInstallationType
+        namespace: http://www.opengis.net/citygml/ext/uro/2.0
+      xsd_complex_type:
+        name: BuildingInstallationType
+        base: gml:AbstractFeatureType
+        namespace: http://www.opengis.net/citygml/ext/uro/2.0
+        elements:
+        - name: class
+          type: CodeType
+          namespace: http://www.opengis.net/gml/3.2
+          min_occurs: 0
+          max_occurs: '1'
+        - name: function
+          type: CodeType
+          namespace: http://www.opengis.net/gml/3.2
+          min_occurs: 0
+          max_occurs: unbounded
+      attribute_mappings:
+      - uml_attribute:
+          name: class
+          type: Code
+          multiplicity: 0..1
+        xsd_element:
+          name: class
+          type: CodeType
+          namespace: http://www.opengis.net/gml/3.2
+      - uml_attribute:
+          name: function
+          type: Code
+          multiplicity: 0..*
+        xsd_element:
+          name: function
+          type: CodeType
+          namespace: http://www.opengis.net/gml/3.2
+  encoding_rules:
+  - name: iso19136_2007
+    extends_encoding_rule: ''
+  - name: iso19136_2007_ShapeChange_1_0_0
+    extends_encoding_rule: iso19136_2007
+----
+
+== Example 2: Generating Transformation Report
+
+=== Command
+
+[source,shell]
+----
+lutaml-klin report \
+  --mapping uro-mappings.yaml \
+  --output uro-transformation-report.txt \
+  --verbose
+----
+
+=== Output (Text Report)
+
+[source,text]
+----
+==================================================
+UML to XSD Transformation Investigation Report
+==================================================
+Generated: 2025-10-23 06:00:00 +0800
+
+Package: uro
+Namespace: http://www.opengis.net/citygml/ext/uro/2.0
+==================================================
+
+Class: Building
+--------------------------------------------------
+
+UML Information:
+  Name: Building
+  ID: EAID_12345
+  Stereotype: FeatureType
+  Attributes:
+    - buildingID: CharacterString [0..1]
+    - buildingStructureType: Code [0..1]
+    - buildingRoofEdgeType: Code [0..1]
+    - buildingFootprintArea: Measure [0..1]
+  Associations:
+    - outerBuildingInstallation: BuildingInstallation [0..*]
+
+XSD Element:
+  Name: Building
+  Type: urn:BuildingType
+  Namespace: http://www.opengis.net/citygml/ext/uro/2.0
+
+XSD Complex Type:
+  Name: BuildingType
+  Base: gml:AbstractFeatureType
+  Namespace: http://www.opengis.net/citygml/ext/uro/2.0
+  Elements:
+    - buildingID: string [0..1]
+    - buildingStructureType: gml:CodeType [0..1]
+    - buildingRoofEdgeType: gml:CodeType [0..1]
+    - buildingFootprintArea: gml:MeasureType [0..1]
+
+Attribute Mappings:
+  buildingID (CharacterString) → buildingID (string)
+  buildingStructureType (Code) → buildingStructureType (gml:CodeType)
+  buildingRoofEdgeType (Code) → buildingRoofEdgeType (gml:CodeType)
+  buildingFootprintArea (Measure) → buildingFootprintArea (gml:MeasureType)
+
+==================================================
+
+Class: BuildingInstallation
+--------------------------------------------------
+
+UML Information:
+  Name: BuildingInstallation
+  ID: EAID_67890
+  Stereotype: FeatureType
+  Attributes:
+    - class: Code [0..1]
+    - function: Code [0..*]
+  Associations: none
+
+XSD Element:
+  Name: BuildingInstallation
+  Type: urn:BuildingInstallationType
+  Namespace: http://www.opengis.net/citygml/ext/uro/2.0
+
+XSD Complex Type:
+  Name: BuildingInstallationType
+  Base: gml:AbstractFeatureType
+  Namespace: http://www.opengis.net/citygml/ext/uro/2.0
+  Elements:
+    - class: gml:CodeType [0..1]
+    - function: gml:CodeType [0..unbounded]
+
+Attribute Mappings:
+  class (Code) → class (gml:CodeType)
+  function (Code [0..*]) → function (gml:CodeType [0..unbounded])
+
+==================================================
+
+Summary
+==================================================
+Total Classes Mapped: 2
+Total Attributes Mapped: 6
+Encoding Rules Applied: iso19136_2007_ShapeChange_1_0_0
+
+==================================================
+End of Report
+==================================================
+----
+
+== Example 3: Merging Multiple Mappings
+
+=== Scenario
+
+You have three separate mapping files for different PLATEAU packages:
+
+* `uro-mappings.yaml` (Urban Object package)
+* `bldg-mappings.yaml` (Building package)
+* `tran-mappings.yaml` (Transportation package)
+
+=== Command
+
+[source,shell]
+----
+lutaml-klin merge \
+  --inputs uro-mappings.yaml,bldg-mappings.yaml,tran-mappings.yaml \
+  --output complete-plateau-mappings.yaml \
+  --verbose
+----
+
+=== Output Structure
+
+[source,yaml]
+----
+---
+schema_mapping:
+  package_mappings:
+  - name: uro
+    namespace: http://www.opengis.net/citygml/ext/uro/2.0
+    class_mappings:
+      # ... 174 classes from uro-mappings.yaml
+  - name: bldg
+    namespace: http://www.opengis.net/citygml/building/2.0
+    class_mappings:
+      # ... classes from bldg-mappings.yaml
+  - name: tran
+    namespace: http://www.opengis.net/citygml/transportation/2.0
+    class_mappings:
+      # ... classes from tran-mappings.yaml
+  encoding_rules:
+  - name: iso19136_2007
+    extends_encoding_rule: ''
+  - name: iso19136_2007_ShapeChange_1_0_0
+    extends_encoding_rule: iso19136_2007
+----
+
+== Example 4: Programmatic Usage in Ruby
+
+=== Loading and Querying Mappings
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+# Load the generated mapping
+mapping = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(
+  File.read('uro-mappings.yaml')
+)
+
+# Find a specific package
+uro_package = mapping.package_mappings.find { |pkg| pkg.name == 'uro' }
+
+puts "Package: #{uro_package.name}"
+puts "Namespace: #{uro_package.namespace}"
+puts "Number of classes: #{uro_package.class_mappings.size}"
+
+# Find a specific class mapping
+building = uro_package.class_mappings.find do |cls|
+  cls.uml_class.name == 'Building'
+end
+
+puts "\nBuilding class mapping:"
+puts "  UML name: #{building.uml_class.name}"
+puts "  UML stereotype: #{building.uml_class.stereotype}"
+puts "  XSD element: #{building.xsd_element&.name}"
+puts "  XSD type: #{building.xsd_complex_type&.name}"
+
+# Iterate through attributes
+puts "\nAttribute mappings:"
+building.attribute_mappings.each do |attr_map|
+  uml_attr = attr_map.uml_attribute
+  xsd_elem = attr_map.xsd_element
+
+  puts "  #{uml_attr.name} (#{uml_attr.type}) → " \
+       "#{xsd_elem.name} (#{xsd_elem.type})"
+end
+
+# Find all FeatureType classes
+feature_types = uro_package.class_mappings.select do |cls|
+  cls.uml_class.stereotype == 'FeatureType'
+end
+
+puts "\nFeatureType classes (#{feature_types.size}):"
+feature_types.each do |cls|
+  puts "  - #{cls.uml_class.name}"
+end
+----
+
+=== Expected Output
+
+[source,text]
+----
+Package: uro
+Namespace: http://www.opengis.net/citygml/ext/uro/2.0
+Number of classes: 174
+
+Building class mapping:
+  UML name: Building
+  UML stereotype: FeatureType
+  XSD element: Building
+  XSD type: BuildingType
+
+Attribute mappings:
+  buildingID (CharacterString) → buildingID (string)
+  buildingStructureType (Code) → buildingStructureType (gml:CodeType)
+  buildingRoofEdgeType (Code) → buildingRoofEdgeType (gml:CodeType)
+  buildingFootprintArea (Measure) → buildingFootprintArea (gml:MeasureType)
+
+FeatureType classes (58):
+  - Building
+  - BuildingInstallation
+  - BuildingPart
+  - RoadSection
+  - TrafficArea
+  - ...
+----
+
+== Example 5: Type Mapping Analysis
+
+=== Finding All Type Conversions
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+mapping = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(
+  File.read('uro-mappings.yaml')
+)
+
+# Collect all unique type conversions
+type_conversions = {}
+
+mapping.package_mappings.each do |package|
+  package.class_mappings.each do |class_mapping|
+    class_mapping.attribute_mappings.each do |attr_mapping|
+      uml_type = attr_mapping.uml_attribute.type
+      xsd_type = attr_mapping.xsd_element.type
+
+      type_conversions[uml_type] ||= []
+      type_conversions[uml_type] << xsd_type unless type_conversions[uml_type].include?(xsd_type)
+    end
+  end
+end
+
+# Display results
+puts "UML Type → XSD Type Conversions:"
+puts "=" * 50
+type_conversions.sort.each do |uml_type, xsd_types|
+  puts "#{uml_type}:"
+  xsd_types.each do |xsd_type|
+    puts "  → #{xsd_type}"
+  end
+end
+----
+
+=== Expected Output
+
+[source,text]
+----
+UML Type → XSD Type Conversions:
+==================================================
+CharacterString:
+  → string
+Code:
+  → gml:CodeType
+Date:
+  → date
+DateTime:
+  → dateTime
+Integer:
+  → integer
+Measure:
+  → gml:MeasureType
+Real:
+  → double
+URI:
+  → anyURI
+gYear:
+  → gYear
+----
+
+== Example 6: Validation Workflow
+
+=== Command
+
+[source,shell]
+----
+lutaml-klin validate \
+  --mapping uro-mappings.yaml \
+  --xsd /path/to/schemas/uro/ \
+  --verbose
+----
+
+=== Expected Output (Successful Validation)
+
+[source,text]
+----
+Validating mapping: uro-mappings.yaml
+Against XSD schemas in: /path/to/schemas/uro/
+
+Checking package: uro (174 classes)
+  ✓ Building: All 4 attributes mapped correctly
+  ✓ BuildingInstallation: All 2 attributes mapped correctly
+  ✓ BuildingPart: All 3 attributes mapped correctly
+  ... (171 more classes)
+
+Type Conversion Validation:
+  ✓ CharacterString → string (42 instances)
+  ✓ Code → gml:CodeType (89 instances)
+  ✓ Measure → gml:MeasureType (15 instances)
+  ... (7 more type mappings)
+
+Multiplicity Validation:
+  ✓ All multiplicities preserved correctly
+  ⚠ 3 unbounded multiplicities found (acceptable for GML)
+
+Namespace Validation:
+  ✓ Package namespace matches XSD targetNamespace
+  ✓ All element references use correct namespaces
+
+==================================================
+Validation Summary
+==================================================
+Total classes validated: 174
+Total attributes validated: 523
+Errors: 0
+Warnings: 3
+Status: PASSED
+
+Warnings:
+  ⚠ BuildingInstallation.function: Unbounded multiplicity (acceptable)
+  ⚠ RoadSection.lanes: Unbounded multiplicity (acceptable)
+  ⚠ TrafficArea.surfaceMaterial: Unbounded multiplicity (acceptable)
+
+==================================================
+Validation complete at: 2025-10-23 06:00:00 +0800
+==================================================
+----
+
+== Example 7: Working with Complex Inheritance
+
+=== UML Model
+
+[source]
+----
+AbstractBuilding (abstract, FeatureType)
+  ├── attributes:
+  │     - clazz: Code [0..1]
+  │     - function: Code [0..*]
+  │
+  └── Building (inherits from AbstractBuilding)
+        └── attributes:
+              - measuredHeight: Measure [0..1]
+              - storeysAboveGround: Integer [0..1]
+----
+
+=== Generated YAML Mapping
+
+[source,yaml]
+----
+- uml_class:
+    name: AbstractBuilding
+    stereotype: FeatureType
+    attributes:
+    - name: clazz
+      type: Code
+      multiplicity: 0..1
+    - name: function
+      type: Code
+      multiplicity: 0..*
+  xsd_complex_type:
+    name: AbstractBuildingType
+    base: gml:AbstractFeatureType
+    elements:
+    - name: clazz
+      type: CodeType
+      namespace: http://www.opengis.net/gml/3.2
+    - name: function
+      type: CodeType
+      namespace: http://www.opengis.net/gml/3.2
+      max_occurs: unbounded
+
+- uml_class:
+    name: Building
+    stereotype: FeatureType
+    attributes:
+    - name: measuredHeight
+      type: Measure
+      multiplicity: 0..1
+    - name: storeysAboveGround
+      type: Integer
+      multiplicity: 0..1
+  xsd_complex_type:
+    name: BuildingType
+    base: urn:AbstractBuildingType
+    elements:
+    - name: measuredHeight
+      type: MeasureType
+      namespace: http://www.opengis.net/gml/3.2
+    - name: storeysAboveGround
+      type: integer
+      namespace: http://www.w3.org/2001/XMLSchema
+----
+
+== Example 8: Statistics and Metrics
+
+=== Generating Mapping Statistics
+
+[source,ruby]
+----
+require 'lutaml/klin'
+
+mapping = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(
+  File.read('uro-mappings.yaml')
+)
+
+# Calculate statistics
+stats = {
+  packages: mapping.package_mappings.size,
+  classes: 0,
+  attributes: 0,
+  associations: 0,
+  stereotypes: Hash.new(0)
+}
+
+mapping.package_mappings.each do |package|
+  stats[:classes] += package.class_mappings.size
+
+  package.class_mappings.each do |class_mapping|
+    stats[:attributes] += class_mapping.attribute_mappings.size
+    stats[:associations] += class_mapping.uml_class.associations.size
+    stats[:stereotypes][class_mapping.uml_class.stereotype] += 1
+  end
+end
+
+# Display results
+puts "Mapping Statistics for PLATEAU URO"
+puts "=" * 50
+puts "Packages: #{stats[:packages]}"
+puts "Classes: #{stats[:classes]}"
+puts "Attributes: #{stats[:attributes]}"
+puts "Associations: #{stats[:associations]}"
+puts "\nClasses by Stereotype:"
+stats[:stereotypes].sort_by { |_, count| -count }.each do |stereotype, count|
+  puts "  #{stereotype}: #{count}"
+end
+----
+
+=== Expected Output
+
+[source,text]
+----
+Mapping Statistics for PLATEAU URO
+==================================================
+Packages: 1
+Classes: 174
+Attributes: 523
+Associations: 145
+
+Classes by Stereotype:
+  FeatureType: 58
+  DataType: 89
+  CodeList: 15
+  Enumeration: 12
+==================================================
+----
+
+== Conclusion
+
+These examples demonstrate the complete workflow for working with Lutaml-Klin:
+
+1. Generate YAML mappings from XMI and ShapeChange config
+2. Create human-readable transformation reports
+3. Merge multiple mappings
+4. Programmatically query and analyze mappings
+5. Validate mappings against XSD schemas
+
+For more information, see:
+
+* link:README.adoc[README.adoc] - User guide and command reference
+* link:ARCHITECTURE.adoc[ARCHITECTURE.adoc] - Technical architecture details
+* link:STATUS.md[STATUS.md] - Project status and metrics

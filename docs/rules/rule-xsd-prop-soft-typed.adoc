@@ -1,0 +1,125 @@
+= rule-xsd-prop-soft-typed
+
+== General
+
+The `rule-xsd-prop-soft-typed` adds a name attribute to property types for dynamically typed properties, commonly used in SWE Common schemas.
+
+This rule enables runtime type specification, supporting flexible and extensible data structures.
+
+== Purpose
+
+Soft-typed properties enable:
+
+* Runtime specification of actual data type
+* Flexible schema extensibility
+* Dynamic typing capabilities
+* Compliance with SWE Common patterns
+
+== ShapeChange Algorithm
+
+Based on [`XsdDocument.java`](../../reference/shapechange-sources/de/interactive_instruments/ShapeChange/Target/XmlSchema/XsdDocument.java) lines 4225-4231:
+
+.Key implementation points
+[source,java]
+----
+if (propi.matches("rule-xsd-prop-soft-typed")) {
+    String s = propi.taggedValue("soft-typed");
+    if ("true".equalsIgnoreCase(s)) {
+        Element e4 = document.createElementNS(Options.W3C_XML_SCHEMA, "attribute");
+        typeOrExtension.appendChild(e4);
+        addName(e4);  // Calls addName which adds name="name", type="NCName", use="required"
+    }
+}
+----
+
+.addName implementation (lines 3957-3961)
+[source,java]
+----
+private void addName(Element e) {
+    addAttribute(e, "name", "name");
+    addAttribute(e, "type", "NCName");
+    addAttribute(e, "use", "required");
+}
+----
+
+== Algorithm Steps
+
+. Check if property has tagged value `soft-typed = "true"`
+. Create xs:attribute element
+. Set name="name"
+. Set type="NCName"
+. Set use="required"
+. Append to property type element
+
+== Implementation
+
+The Ruby implementation:
+
+[source,ruby]
+----
+def apply_rule(property, context)
+  return unless soft_typed?(property)
+
+  # Find appropriate parent element
+  parent_element = determine_parent_element(context)
+  return unless parent_element
+
+  add_name_attribute(parent_element, context)
+end
+
+def soft_typed?(property)
+  return false unless property.respond_to?(:tags)
+
+  tags = property.tags rescue []
+  return false unless tags
+
+  tag = tags.find { |t| t.name == "soft-typed" }
+  return false unless tag
+  return false unless tag.respond_to?(:value)
+
+  tag.value&.downcase == "true"
+end
+
+def add_name_attribute(parent, context)
+  xsd_doc = context[:xsd_document]
+
+  # Create xs:attribute element
+  name_attr = xsd_doc.create_element("attribute")
+  xsd_doc.add_attribute(name_attr, "name", "name")
+  xsd_doc.add_attribute(name_attr, "type", "NCName")
+  xsd_doc.add_attribute(name_attr, "use", "required")
+
+  parent.add_child(name_attr)
+end
+----
+
+== Usage Example
+
+.Soft-typed property with name attribute
+====
+Given a property with tagged value `soft-typed = "true"`:
+
+[source,xml]
+----
+<xs:element name="field">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="swe:AbstractDataComponentType">
+        <xs:attribute name="name" type="NCName" use="required"/> <!--1-->
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+----
+<1> Name attribute added for runtime type specification
+====
+
+== Test Cases
+
+The implementation includes tests for:
+
+. Property with soft-typed="true"
+. Property without soft-typed tag (no attribute)
+. Property with soft-typed="false" (no attribute)
+. Correct attribute structure (name, type, use)
+. Integration with SWE Common encoding

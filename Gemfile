@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 source "https://rubygems.org"
 
 gemspec
 
-gem "lutaml-model", path: "../lutaml-model"
+gem "canon", path: "../canon"
 gem "lutaml", path: "../lutaml"
+gem "lutaml-model", path: "../lutaml-model"
 gem "lutaml-xsd", path: "../lutaml-xsd"
 gem "moxml", path: "../moxml"
-gem "canon", path: "../canon"
 gem "nokogiri"
 gem "rake"
 gem "rspec"

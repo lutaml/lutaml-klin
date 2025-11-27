@@ -1,0 +1,248 @@
+= Rule: rule-xsd-cls-adehook
+
+== Overview
+
+Generates abstract ADE (Application Domain Extension) hook elements that allow schema extensions without modifying the base schema.
+
+== Priority
+
+Must-have (generates hook elements for extension points)
+
+== ShapeChange Documentation
+
+Source:: `/Users/mulgogi/src/external/ShapeChange/shapechange-app/src/docs/asciidoc/targets/xml schema/General_Conversion_Rules.adoc`
+
+Description::
+ADE hooks are abstract elements that serve as extension points in GML application schemas, allowing additional properties to be added through substitution groups without modifying the original schema.
+
+== Java Implementation
+
+Source:: [`XsdDocument.java:processLocalProperties`](lines 1960-1981)
+
+=== Algorithm
+
+The Java implementation follows this process:
+
+. Check if class matches [`rule-xsd-cls-adehook`]
+. Construct element name: `"AbstractGenericApplicationPropertyOf" + ci.name()`
+. Add property reference to the sequence/choice container:
+  * Create `<element>` with ref to hook element
+  * Set `minOccurs="0"` and `maxOccurs="unbounded"`
+. Add global hook element definition:
+  * Create `<element>` with constructed name
+  * Set `type="anyType"`
+  * Set `abstract="true"`
+. Record in encoding infos if enabled
+
+=== Implementation Logic
+
+[source,java]
+----
+if (ci.matches("rule-xsd-cls-adehook")) {
+    // Name of the ADE hook
+    String elementName = "AbstractGenericApplicationPropertyOf" + ci.name();
+
+    // add property
+    Element e1 = document.createElementNS(Options.W3C_XML_SCHEMA, "element");
+    addAttribute(e1, "ref", elementName);
+    addMinMaxOccurs(e1, new Multiplicity("0..*"));
+    sequenceOrChoice.appendChild(e1);
+
+    // add element
+    Element e4 = document.createElementNS(Options.W3C_XML_SCHEMA, "element");
+    document.getDocumentElement().appendChild(e4);
+    addAttribute(e4, "name", elementName);
+    addAttribute(e4, "type", "anyType");
+    addAttribute(e4, "abstract", "true");
+}
+----
+
+== Our Implementation
+
+Type:: Processor Class
+File:: [`lib/lutaml/klin/shapechange/rule_processors/class_rules/ade_hook_processor.rb`]
+Spec:: [`spec/lutaml/klin/shapechange/rule_processors/class_rules/ade_hook_processor_spec.rb`]
+
+=== Design Principles
+
+. Enables schema extensibility without modification
+. Clear naming convention for hook elements
+. Abstract elements prevent direct instantiation
+. Flexible extension through substitution groups
+
+=== Implementation Details
+
+The [`AdeHookProcessor`] class extends [`BaseRuleProcessor`] and:
+
+. Constructs hook element name from class name
+. Creates property reference with unbounded multiplicity
+. Generates global abstract hook element
+. Adds to encoding infos for documentation
+
+== Test Cases
+
+=== Test Case 1: Simple ADE Hook
+
+Input UML::
+[source]
+----
+«featureType» Building {adehook}
+  property name: String [1]
+  property height: Measure [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<complexType name="BuildingType">
+  <complexContent>
+    <extension base="gml:AbstractFeatureType">
+      <sequence>
+        <element name="name" type="string"/>
+        <element name="height" type="MeasureType"/>
+        <element ref="AbstractGenericApplicationPropertyOfBuilding"
+                 minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </extension>
+  </complexContent>
+</complexType>
+
+<element name="AbstractGenericApplicationPropertyOfBuilding"
+         type="anyType" abstract="true"/>
+----
+
+=== Test Case 2: Multiple Classes with ADE Hooks
+
+Input UML::
+[source]
+----
+«featureType» City {adehook}
+  property population: Integer [1]
+
+«featureType» Road {adehook}
+  property length: Measure [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<!-- City hook -->
+<element ref="AbstractGenericApplicationPropertyOfCity"
+         minOccurs="0" maxOccurs="unbounded"/>
+<element name="AbstractGenericApplicationPropertyOfCity"
+         type="anyType" abstract="true"/>
+
+<!-- Road hook -->
+<element ref="AbstractGenericApplicationPropertyOfRoad"
+         minOccurs="0" maxOccurs="unbounded"/>
+<element name="AbstractGenericApplicationPropertyOfRoad"
+         type="anyType" abstract="true"/>
+----
+
+=== Test Case 3: Class without ADE Hook
+
+Input UML::
+[source]
+----
+«featureType» Building
+  property name: String [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<complexType name="BuildingType">
+  <complexContent>
+    <extension base="gml:AbstractFeatureType">
+      <sequence>
+        <element name="name" type="string"/>
+        <!-- No ADE hook element -->
+      </sequence>
+    </extension>
+  </complexContent>
+</complexType>
+<!-- No global hook element -->
+----
+
+=== Test Case 4: ADE Hook Usage (Extension Schema)
+
+Input UML (Extension)::
+[source]
+----
+«featureType» ExtendedBuilding
+  property customField: String [1]
+    {substitutionGroup = "AbstractGenericApplicationPropertyOfBuilding"}
+----
+
+Expected XSD (Extension)::
+[source,xml]
+----
+<element name="customField" type="string"
+         substitutionGroup="base:AbstractGenericApplicationPropertyOfBuilding"/>
+----
+
+=== Test Case 5: Datatype with ADE Hook
+
+Input UML::
+[source]
+----
+«dataType» Address {adehook}
+  property street: String [1]
+  property city: String [1]
+----
+
+Expected XSD::
+[source,xml]
+----
+<complexType name="AddressType">
+  <sequence>
+    <element name="street" type="string"/>
+    <element name="city" type="string"/>
+    <element ref="AbstractGenericApplicationPropertyOfAddress"
+             minOccurs="0" maxOccurs="unbounded"/>
+  </sequence>
+</complexType>
+
+<element name="AbstractGenericApplicationPropertyOfAddress"
+         type="anyType" abstract="true"/>
+----
+
+== Implementation Status
+
+* [ ] Documentation read
+* [ ] Java code analyzed
+* [ ] Processor implemented
+* [ ] Spec written
+* [ ] Integrated
+* [ ] Committed
+
+== Dependencies
+
+Depends on::
+* Class processing in complexType generation
+* Sequence/choice container elements
+
+Used by::
+* Extension schemas that add custom properties
+* PLATEAU ADE modules
+
+Related rules::
+* [`rule-xsd-cls-sequence`]: Provides container for hook reference
+* Substitution group mechanism
+
+== Notes
+
+* Hook elements are always abstract (cannot be instantiated directly)
+* Naming pattern: `AbstractGenericApplicationPropertyOf{ClassName}`
+* Multiplicity is always `0..*` (optional, unbounded)
+* Hook reference appears at end of property sequence
+* Extensions use `substitutionGroup` to add custom properties
+* Type is always `anyType` allowing any content
+* Critical for CityGML and PLATEAU extensions
+
+== References
+
+* ShapeChange documentation: General Conversion Rules
+* CityGML specification: ADE mechanism
+* XML Schema substitution groups
+* GML application schema extension patterns

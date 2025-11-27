@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PLATEAU UML-to-XSD Mapping Report</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px 20px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    h1 { font-size: 2.5em; margin-bottom: 10px; }
+    .meta-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .meta-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .meta-label { font-size: 0.9em; color: #666; margin-bottom: 5px; }
+    .meta-value { font-size: 1.8em; font-weight: bold; color: #667eea; }
+    .resolution-bar {
+      height: 30px;
+      background: #e0e0e0;
+      border-radius: 15px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .resolution-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .package-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .package-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .package-name {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+    .package-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #333;
+    }
+    .stat-label {
+      font-size: 0.8em;
+      color: #666;
+      margin-top: 5px;
+    }
+    .unresolved-badge {
+      background: #ff9800;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: #666;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏗️ PLATEAU UML-to-XSD Mapping Report</h1>
+      <p>Comprehensive analysis of UML model to XSD schema mappings</p>
+      <p style="margin-top: 10px; opacity: 0.9;">
+        Generated: 2025-10-23T08:25:43+08:00
+      </p>
+    </header>
+
+    <div class="meta-info">
+      <div class="meta-card">
+        <div class="meta-label">Total Packages</div>
+        <div class="meta-value">22</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-label">Total Attributes</div>
+        <div class="meta-value">2223</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-label">Resolved Attributes</div>
+        <div class="meta-value">132</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-label">Unresolved Attributes</div>
+        <div class="meta-value" style="color: #ff9800;">2091</div>
+      </div>
+    </div>
+
+    <div class="meta-card">
+      <div class="meta-label">Resolution Rate</div>
+      <div class="resolution-bar">
+        <div class="resolution-fill" style="width: 5.94%">
+          5.94%
+        </div>
+      </div>
+    </div>
+
+    <h2 style="margin-top: 40px; margin-bottom: 20px; color: #333;">📦 Packages</h2>
+    <div class="packages-grid">
+<a href="package__________.html" class="package-card">
+  <div class="package-name">アピアランスモデル</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">3</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">1</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        0.0%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>1 Unresolved</span></div>
+</a>
+<a href="package________.html" class="package-card">
+  <div class="package-name">都市計画データ</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">1</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">0</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        0%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  
+</a>
+<a href="package____.html" class="package-card">
+  <div class="package-name">位置図</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">3</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">0</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        0%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  
+</a>
+<a href="package_urf.html" class="package-card">
+  <div class="package-name">urf</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">161</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">536</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        0.6%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>533 Unresolved</span></div>
+</a>
+<a href="package_uro.html" class="package-card">
+  <div class="package-name">uro</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">174</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">961</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        3.1%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>931 Unresolved</span></div>
+</a>
+<a href="package_urt.html" class="package-card">
+  <div class="package-name">urt</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">28</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">151</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        0.0%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>151 Unresolved</span></div>
+</a>
+<a href="package_urg.html" class="package-card">
+  <div class="package-name">urg</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">26</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">95</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        0.0%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>95 Unresolved</span></div>
+</a>
+<a href="package_brid.html" class="package-card">
+  <div class="package-name">brid</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">21</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">77</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        14.3%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>66 Unresolved</span></div>
+</a>
+<a href="package_core.html" class="package-card">
+  <div class="package-name">core</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">14</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">27</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        3.7%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>26 Unresolved</span></div>
+</a>
+<a href="package_frn.html" class="package-card">
+  <div class="package-name">frn</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">4</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">18</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        38.9%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>11 Unresolved</span></div>
+</a>
+<a href="package_grp.html" class="package-card">
+  <div class="package-name">grp</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">1</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">8</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        37.5%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>5 Unresolved</span></div>
+</a>
+<a href="package_luse.html" class="package-card">
+  <div class="package-name">luse</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">1</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">12</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        66.7%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>4 Unresolved</span></div>
+</a>
+<a href="package_tun.html" class="package-card">
+  <div class="package-name">tun</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">22</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">74</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        14.9%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>63 Unresolved</span></div>
+</a>
+<a href="package_veg.html" class="package-card">
+  <div class="package-name">veg</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">3</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">33</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        21.2%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>26 Unresolved</span></div>
+</a>
+<a href="package_wtr.html" class="package-card">
+  <div class="package-name">wtr</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">7</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">19</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        42.1%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>11 Unresolved</span></div>
+</a>
+<a href="package_app.html" class="package-card">
+  <div class="package-name">app</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">15</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">29</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        0.0%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>29 Unresolved</span></div>
+</a>
+<a href="package_bldg.html" class="package-card">
+  <div class="package-name">bldg</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">20</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">82</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        30.5%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>57 Unresolved</span></div>
+</a>
+<a href="package_dem.html" class="package-card">
+  <div class="package-name">dem</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">5</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">11</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        27.3%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>8 Unresolved</span></div>
+</a>
+<a href="package_gen.html" class="package-card">
+  <div class="package-name">gen</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">9</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">21</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        0.0%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>21 Unresolved</span></div>
+</a>
+<a href="package_tran.html" class="package-card">
+  <div class="package-name">tran</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">12</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">35</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        40.0%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>21 Unresolved</span></div>
+</a>
+<a href="package_gml.html" class="package-card">
+  <div class="package-name">gml</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">47</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">33</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        3.0%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  <div style='margin-top: 10px;'><span class='unresolved-badge'>32 Unresolved</span></div>
+</a>
+<a href="package_xs.html" class="package-card">
+  <div class="package-name">xs</div>
+  <div class="package-stats">
+    <div class="stat">
+      <div class="stat-value">11</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">0</div>
+      <div class="stat-label">Attributes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">
+        0%
+      </div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+  
+</a>
+    </div>
+
+    <footer>
+      <p>Generated by lutaml-klin | XMI: 20251010-242.xmi</p>
+    </footer>
+  </div>
+</body>
+</html>

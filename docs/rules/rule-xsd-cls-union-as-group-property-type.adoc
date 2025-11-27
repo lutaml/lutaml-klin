@@ -1,0 +1,126 @@
+= rule-xsd-cls-union-as-group-property-type
+
+== Purpose
+
+Encodes union types as XML Schema groups with choice semantics in property types.
+
+This provides an alternative to standard property type encoding for unions.
+
+== Applies To
+
+* Union classes
+* Properties with union types
+
+== Algorithm
+
+When this rule is enabled for a union class:
+
+1. **Generate group**: Create `xs:group` with `xs:choice` for union properties
+   ```xml
+   <xs:group name="{UnionName}Group">
+     <xs:choice>
+       <!-- union option elements -->
+     </xs:choice>
+   </xs:group>
+   ```
+
+2. **Property type structure**: Include group reference in property type
+   ```xml
+   <xs:complexType name="{UnionName}PropertyType">
+     <xs:sequence minOccurs="0">
+       <xs:group ref="prefix:UnionGroup"/>
+     </xs:sequence>
+     <xs:attributeGroup ref="swe:AssociationAttributeGroup"/>
+   </xs:complexType>
+   ```
+
+3. **For SWE Common**: Works with `rule-xsd-cls-standard-swe-property-types`
+
+== Configuration
+
+No additional parameters required beyond enabling the rule.
+
+== Example Output
+
+For a union with multiple options:
+[source,xml]
+----
+<xs:group name="ValueGroup">
+  <xs:choice>
+    <xs:element ref="swe:Quantity"/>
+    <xs:element ref="swe:Boolean"/>
+    <xs:element ref="swe:Text"/>
+  </xs:choice>
+</xs:group>
+
+<xs:complexType name="ValuePropertyType">
+  <xs:sequence minOccurs="0">
+    <xs:group ref="swe:ValueGroup"/>
+  </xs:sequence>
+  <xs:attributeGroup ref="swe:AssociationAttributeGroup"/>
+</xs:complexType>
+----
+
+== Java Implementation Reference
+
+See `XsdDocument.java`:
+- Lines 1079-1080: Check `rule-xsd-cls-union-as-group-property-type` in `pGroup()`
+- Lines 1070-1095: Generate group element with choice
+- Line 1337: Reference group in property type
+
+== Usage Pattern
+
+Typically used when:
+- Union represents value type choices
+- Need group reusability across schema
+- SWE Common encoding pattern preferred
+- Choice semantics over union semantics
+
+== Group Structure
+
+The generated group:
+1. Contains `xs:choice` element
+2. Lists all union option elements as references
+3. Can be referenced multiple times
+4. Provides reusable choice pattern
+
+== Use Cases
+
+* **SWE Common values**: Value type unions in SWE
+* **Polymorphic data**: Multiple data type options
+* **Reusable choices**: Shared choice groups
+* **Type flexibility**: Flexible property values
+
+== Comparison with Other Union Rules
+
+[cols="1,2,2",options="header"]
+|===
+|Rule |Structure |Use Case
+
+|`rule-xsd-cls-union-as-choice`
+|Direct `xs:choice` in complexType
+|Standard GML unions
+
+|`rule-xsd-cls-union-as-group-property-type`
+|`xs:group` with `xs:choice`, referenced in property type
+|SWE Common unions, reusable patterns
+
+|`rule-xsd-cls-union-omitUnionsRepresentingFeatureTypeSets`
+|`gml:ReferenceType` with target elements
+|Feature type sets
+|===
+
+## Related Rules
+
+* `rule-xsd-cls-union-as-choice` - Alternative union encoding
+* `rule-xsd-cls-union-asGroup` - Group without property type
+* `rule-xsd-cls-standard-swe-property-types` - SWE property types
+* `rule-xsd-cls-union-omitUnionsRepresentingFeatureTypeSets` - Feature set encoding
+
+== Notes
+
+- Creates both group and property type
+- Property type includes sequence with group reference
+- Works with SWE `AssociationAttributeGroup`
+- Provides reusability through group references
+- Part of SWE Common encoding patterns
