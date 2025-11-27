@@ -178,19 +178,19 @@ module Lutaml
           template_html = File.read(File.join(TEMPLATE_DIR, "index.html"))
 
           # Inject data based on mode
-          if options[:data_mode] == :embedded
+          html_with_data = if options[:data_mode] == :embedded
             # Embedded mode - inject JSON directly into HTML
-            html_with_data = template_html
+            template_html
                              .gsub("%<MAPPINGS_JSON>s", JSON.generate(data_files[:mappings]))
                              .gsub("%<SEARCH_INDEX_JSON>s", JSON.generate(data_files[:search_index]))
                              .gsub("%<STATISTICS_JSON>s", JSON.generate(data_files[:statistics]))
           else
             # Linked mode - use empty placeholders, load from files
-            html_with_data = template_html
+            template_html
                              .gsub("%<MAPPINGS_JSON>s", "{}")
                              .gsub("%<SEARCH_INDEX_JSON>s", "{}")
                              .gsub("%<STATISTICS_JSON>s", "{}")
-          end
+                           end
 
           # Write HTML
           File.write(File.join(output_path, "index.html"), html_with_data)

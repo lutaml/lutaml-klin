@@ -1960,3 +1960,52 @@ This gem is available as open source under the terms of the MIT License.
 
 Bug reports and pull requests are welcome on GitHub at
 https://github.com/lutaml/lutaml-klin.
+
+== YAML Mapping Output
+
+When generating XSD schemas, lutaml-klin automatically creates YAML mapping files that document the complete UML→XSD transformation.
+
+=== Overview
+
+Each mapping file contains package metadata, class mappings, attribute mappings, transformation rules applied, and statistics.
+
+=== Usage
+
+[source,bash]
+----
+# Generate XSD with mapping (default)
+lutaml-klin xsd \
+  --lur model.lur \
+  --config config.xml \
+  --packages uro \
+  --output out/
+
+# Disable mapping generation
+lutaml-klin xsd \
+  --lur model.lur \
+  --config config.xml \
+  --packages uro \
+  --output out/ \
+  --no-generate-mapping
+----
+
+Output: `out/urbanObject.xsd` and `out/urbanObject_mapping.yaml`
+
+=== Example YAML
+
+[source,yaml]
+----
+version: "1.0"
+package_mappings:
+  - uml_package_name: "uro"
+    xsd_namespace: "https://www.geospatial.jp/iur/uro/3.2"
+    class_mappings:
+      - uml_name: "Building"
+        xsd_element_name: "Building"
+        xsd_type_name: "BuildingType"
+        attribute_mappings:
+          - uml_name: "class"
+            xsd_name: "class"
+            xsd_type: "gml:CodeType"
+----
+

@@ -12,7 +12,7 @@ ref_xsd = "spec/fixtures/shapechange/urbanObject.xsd"
 our_doc = File.open(our_xsd) { |f| Nokogiri::XML(f) }
 ref_doc = File.open(ref_xsd) { |f| Nokogiri::XML(f) }
 
-ns = { 'xs' => 'http://www.w3.org/2001/XMLSchema' }
+ns = { "xs" => "http://www.w3.org/2001/XMLSchema" }
 
 # Extract elements with substitutionGroup from both files
 our_elements_with_subst = our_doc.xpath("//xs:schema/xs:element[@substitutionGroup]", ns).map do |el|

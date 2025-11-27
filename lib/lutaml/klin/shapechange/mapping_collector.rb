@@ -18,8 +18,7 @@ module Lutaml
       # - MECE: Each transformation aspect tracked once
       # - OOP: Proper encapsulation and composition
       class MappingCollector
-        attr_reader :package_name, :package_namespace, :package_prefix
-        attr_reader :config, :lur_path, :config_path
+        attr_reader :package_name, :package_namespace, :package_prefix, :config, :lur_path, :config_path
 
         def initialize(
           package_name:,
@@ -132,9 +131,7 @@ module Lutaml
         # Get current class being processed (for attribute mappings)
         #
         # @return [ClassMapping, nil] Current class or nil
-        def current_class_mapping
-          @current_class_mapping
-        end
+        attr_reader :current_class_mapping
 
         # Generate statistics for this package
         #
@@ -220,7 +217,12 @@ module Lutaml
           mapping.uml_name = uml_class.name
           mapping.uml_qualified_name = uml_class.xmi_id || uml_class.name
           mapping.uml_stereotype = uml_class.stereotype
-          mapping.uml_documentation = uml_class.documentation
+          
+          # Get documentation if available
+          mapping.uml_documentation = if uml_class.respond_to?(:documentation)
+                                        uml_class.documentation
+                                      end
+          
           mapping.stereotypes = [uml_class.stereotype].compact
 
           mapping.xsd_element_name = xsd_element_name
@@ -250,8 +252,16 @@ module Lutaml
         )
           mapping = Mapping::AttributeMapping.new
           mapping.uml_name = uml_attribute.name
-          mapping.uml_type = uml_attribute.type&.name || uml_attribute.type.to_s
-          mapping.uml_documentation = uml_attribute.documentation
+          mapping.uml_type = if uml_attribute.type.respond_to?(:name)
+                               uml_attribute.type.name
+                             else
+                               uml_attribute.type.to_s
+                             end
+          
+          # Get documentation if available
+          mapping.uml_documentation = if uml_attribute.respond_to?(:documentation)
+                                        uml_attribute.documentation
+                                      end
 
           # Extract multiplicity from UML attribute
           if uml_attribute.respond_to?(:cardinality)
@@ -296,7 +306,7 @@ module Lutaml
           metadata[:stereotype] = uml_class.stereotype if uml_class
           metadata[:substitution_group] = context[:substitution_group] if context[:substitution_group]
           metadata[:base_type] = context[:base_type] if context[:base_type]
-          info.set_metadata(metadata) unless metadata.empty?
+          info.metadata_hash = metadata unless metadata.empty?
 
           info
         end
@@ -305,12 +315,24 @@ module Lutaml
         def format_multiplicity(cardinality)
           return "0..1" unless cardinality
 
-          min = cardinality["min"] || cardinality[:min] || 0
-          max = cardinality["max"] || cardinality[:max]
+          # Handle both hash-like and object-like cardinality
+          min = if cardinality.respond_to?(:min)
+                  cardinality.min
+                elsif cardinality.respond_to?(:[])
+                  cardinality["min"] || cardinality[:min]
+                else
+                  0
+                end
+
+          max = if cardinality.respond_to?(:max)
+                  cardinality.max
+                elsif cardinality.respond_to?(:[])
+                  cardinality["max"] || cardinality[:max]
+                end
 
           if max.nil? || max == -1 || max == "*"
             "#{min}..*"
-          elsif min == max
+          elsif min.to_s == max.to_s
             min.to_s
           else
             "#{min}..#{max}"

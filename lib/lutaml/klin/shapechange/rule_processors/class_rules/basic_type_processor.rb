@@ -111,6 +111,9 @@ module Lutaml
                   end
                 end
               end
+
+              # Record mapping if collector present
+              record_basic_type_mapping(uml_class, context, is_list: true) if context[:mapping_collector]
             end
 
             def create_faceted_basic_type(uml_class, xsd_doc, context)
@@ -151,6 +154,9 @@ module Lutaml
                   uml_class, xsd_doc, context, base_type
                 )
               end
+
+              # Record mapping if collector present
+              record_basic_type_mapping(uml_class, context, base_type: base_type) if context[:mapping_collector]
             end
 
             def create_simple_type_with_facets(uml_class, xsd_doc, context,
@@ -354,6 +360,26 @@ module Lutaml
               else
                 "#{uml_class.name}Type"
               end
+            end
+
+            # Record basic type mapping to collector
+            def record_basic_type_mapping(uml_class, context, is_list: false, base_type: nil)
+              collector = context[:mapping_collector]
+              return unless collector
+
+              type_name_val = type_name(uml_class, context)
+
+              collector.record_class_mapping(
+                uml_class: uml_class,
+                xsd_type_name: type_name_val,
+                rules_applied: [RULE_ID],
+                context: {
+                  encoding_rule: context[:config]&.target_config&.dig(:default_encoding_rule),
+                  is_basic_type: true,
+                  is_list_type: is_list,
+                  base_type: base_type
+                }
+              )
             end
           end
         end

@@ -28,7 +28,7 @@ RSpec.describe Lutaml::Klin::Application::ProcessingWorkflow do
     end
 
     it "creates workflow with progress callback" do
-      callback = ->(stage, msg) { }
+      callback = ->(stage, msg) {}
       workflow = described_class.new(progress_callback: callback)
       expect(workflow.progress_callback).to eq(callback)
     end
@@ -119,7 +119,7 @@ RSpec.describe Lutaml::Klin::Application::ProcessingWorkflow do
     context "with progress callback" do
       it "reports progress to callback" do
         stages = []
-        callback = ->(stage, msg) { stages << stage }
+        callback = ->(stage, _msg) { stages << stage }
         workflow = described_class.new(progress_callback: callback)
 
         workflow.execute(
@@ -139,10 +139,10 @@ RSpec.describe Lutaml::Klin::Application::ProcessingWorkflow do
     context "with package filtering" do
       it "filters packages by pattern" do
         allow(mock_uml_repo).to receive(:all_packages).and_return([
-          create_mock_uml_package("Package1", "ModelRoot::Package1"),
-          create_mock_uml_package("Package2", "ModelRoot::Package2"),
-          create_mock_uml_package("Other", "ModelRoot::Other")
-        ])
+                                                                    create_mock_uml_package("Package1", "ModelRoot::Package1"),
+                                                                    create_mock_uml_package("Package2", "ModelRoot::Package2"),
+                                                                    create_mock_uml_package("Other", "ModelRoot::Other")
+                                                                  ])
         allow(mock_uml_repo).to receive(:classes_in_package).and_return([mock_class])
 
         result = workflow.execute(
@@ -186,7 +186,7 @@ RSpec.describe Lutaml::Klin::Application::ProcessingWorkflow do
           lxr_path: lxr_path,
           config_path: config_path,
           output_path: output_path,
-          generate_mappings: true,  # Changed to true to just use the repository
+          generate_mappings: true, # Changed to true to just use the repository
           validate: false,
           generate_spa: false
         )
@@ -306,7 +306,7 @@ RSpec.describe Lutaml::Klin::Application::ProcessingWorkflow do
     context "with verbose mode" do
       it "provides detailed progress information" do
         messages = []
-        callback = ->(stage, msg) { messages << msg }
+        callback = ->(_stage, msg) { messages << msg }
         workflow = described_class.new(progress_callback: callback)
 
         workflow.execute(

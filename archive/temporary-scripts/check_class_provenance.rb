@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative 'lib/lutaml/klin/repositories/uml_repository_adapter'
+require_relative "lib/lutaml/klin/repositories/uml_repository_adapter"
 
 adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(
-  'spec/fixtures/packages/plateau_all.lur'
+  "spec/fixtures/packages/plateau_all.lur"
 )
 
-full_path = 'ModelRoot::Conceptual Models::i-UR::Urban Planning ADE 3.1::urf'
+full_path = "ModelRoot::Conceptual Models::i-UR::Urban Planning ADE 3.1::urf"
 our_classes = adapter.classes_in_package(full_path, recursive: false)
 
 # Get reference types
@@ -15,9 +15,9 @@ reference_types = `grep 'name="[A-Z][^"]*Type"' examples/i-ur/urbanFunction.xsd 
 reference_elements = `grep '<xs:element name="[A-Z]' examples/i-ur/urbanFunction.xsd | grep -o 'name="[^"]*"' | sed 's/name="//;s/"//' | sort -u`.split("\n")
 
 # Separate classes
-wrong_classes = our_classes.select do |c|
+wrong_classes = our_classes.reject do |c|
   type_name = "#{c.name}Type"
-  !(reference_types.include?(type_name) || reference_elements.include?(c.name))
+  reference_types.include?(type_name) || reference_elements.include?(c.name)
 end
 
 correct_classes = our_classes.select do |c|
@@ -25,9 +25,9 @@ correct_classes = our_classes.select do |c|
   reference_types.include?(type_name) || reference_elements.include?(c.name)
 end
 
-puts "="*70
+puts "=" * 70
 puts "Checking class attributes for filtering clues"
-puts "="*70
+puts "=" * 70
 
 # Check all available attributes on classes
 puts "\nAvailable methods on UML Class object:"
@@ -39,9 +39,9 @@ end
 puts relevant.take(20).join(", ")
 
 # Check specific attributes
-puts "\n" + "="*70
+puts "\n" + "=" * 70
 puts "Checking specific attributes on WRONG classes:"
-puts "="*70
+puts "=" * 70
 
 wrong_classes.first(5).each do |c|
   puts "\n#{c.name}:"
@@ -60,9 +60,9 @@ wrong_classes.first(5).each do |c|
   end
 end
 
-puts "\n" + "="*70
+puts "\n" + "=" * 70
 puts "Checking specific attributes on CORRECT classes:"
-puts "="*70
+puts "=" * 70
 
 correct_classes.first(5).each do |c|
   puts "\n#{c.name}:"
@@ -76,9 +76,9 @@ correct_classes.first(5).each do |c|
 end
 
 # Check if classes have relationships
-puts "\n" + "="*70
+puts "\n" + "=" * 70
 puts "Inheritance check:"
-puts "="*70
+puts "=" * 70
 
 puts "\nWRONG classes with generalization:"
 wrong_classes.select { |c| c.respond_to?(:generalization) && c.generalization }.take(5).each do |c|
@@ -91,9 +91,9 @@ correct_classes.select { |c| c.respond_to?(:generalization) && c.generalization 
 end
 
 # Summary
-puts "\n" + "="*70
+puts "\n" + "=" * 70
 puts "HYPOTHESIS:"
-puts "="*70
+puts "=" * 70
 puts "The 51 'wrong' classes exist in the UML package but ShapeChange"
 puts "excludes them from XSD generation. Possible reasons:"
 puts ""

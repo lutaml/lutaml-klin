@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-if ENV['COVERAGE']
-  require 'simplecov'
+if ENV["COVERAGE"]
+  require "simplecov"
   SimpleCov.start do
-    add_filter '/spec/'
-    add_filter '/vendor/'
+    add_filter "/spec/"
+    add_filter "/vendor/"
     enable_coverage :branch
     minimum_coverage line: 85, branch: 80
   end
@@ -13,7 +13,7 @@ end
 require "lutaml/klin"
 
 # Load support files
-Dir[File.join(__dir__, "support", "**", "*.rb")].each { |f| require f }
+Dir[File.join(__dir__, "support", "**", "*.rb")].sort.each { |f| require f }
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

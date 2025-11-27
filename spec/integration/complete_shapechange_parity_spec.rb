@@ -328,11 +328,10 @@ RSpec.describe "Complete ShapeChange Parity Validation", type: :integration do
 
     # Scan all type attributes for prefixes
     doc.xpath(".//@type").each do |attr|
-      if attr.value.include?(":")
-        prefix = attr.value.split(":").first
-        # Exclude "xs" prefix since we use default namespace
-        prefixes << prefix unless prefix == "xs"
-      end
+      next unless attr.value.include?(":")
+      prefix = attr.value.split(":").first
+      # Exclude "xs" prefix since we use default namespace
+      prefixes << prefix unless prefix == "xs"
     end
 
     # Scan all ref attributes

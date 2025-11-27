@@ -202,7 +202,7 @@ RSpec.describe "PLATEAU XSD Output Generation", type: :integration do
           "#{File.basename(file)} missing XML Schema namespace"
         expect(content).to include('elementFormDefault="qualified"'),
           "#{File.basename(file)} missing elementFormDefault"
-        expect(content).to include('targetNamespace='),
+        expect(content).to include("targetNamespace="),
           "#{File.basename(file)} missing targetNamespace"
       end
     end

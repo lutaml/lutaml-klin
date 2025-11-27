@@ -1,14 +1,14 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'nokogiri'
-require 'set'
+require "nokogiri"
+require "set"
 
 # XSD Content Validation Script
 # Compares two XSD files for content-level parity beyond just structural counts
 
 class XsdContentValidator
-  XS_NS = 'http://www.w3.org/2001/XMLSchema'
+  XS_NS = "http://www.w3.org/2001/XMLSchema"
 
   def initialize(our_file, ref_file)
     @our_file = our_file
@@ -99,39 +99,39 @@ class XsdContentValidator
   end
 
   def extract_elements(doc)
-    doc.xpath("/xs:schema/xs:element[@name]", 'xs' => XS_NS).map do |elem|
+    doc.xpath("/xs:schema/xs:element[@name]", "xs" => XS_NS).map do |elem|
       {
-        name: elem['name'],
-        type: elem['type'],
-        substitutionGroup: elem['substitutionGroup'],
-        abstract: elem['abstract']
+        name: elem["name"],
+        type: elem["type"],
+        substitutionGroup: elem["substitutionGroup"],
+        abstract: elem["abstract"]
       }
     end
   end
 
   def extract_complex_types(doc)
-    doc.xpath("/xs:schema/xs:complexType[@name]", 'xs' => XS_NS).map do |type|
+    doc.xpath("/xs:schema/xs:complexType[@name]", "xs" => XS_NS).map do |type|
       {
-        name: type['name'],
-        abstract: type['abstract'],
-        has_extension: !type.xpath(".//xs:extension", 'xs' => XS_NS).empty?,
-        base_type: type.xpath(".//xs:extension/@base", 'xs' => XS_NS).first&.value
+        name: type["name"],
+        abstract: type["abstract"],
+        has_extension: !type.xpath(".//xs:extension", "xs" => XS_NS).empty?,
+        base_type: type.xpath(".//xs:extension/@base", "xs" => XS_NS).first&.value
       }
     end
   end
 
   def extract_simple_types(doc)
-    doc.xpath("/xs:schema/xs:simpleType[@name]", 'xs' => XS_NS).map do |type|
+    doc.xpath("/xs:schema/xs:simpleType[@name]", "xs" => XS_NS).map do |type|
       {
-        name: type['name']
+        name: type["name"]
       }
     end
   end
 
   def extract_attribute_groups(doc)
-    doc.xpath("/xs:schema/xs:attributeGroup[@name]", 'xs' => XS_NS).map do |group|
+    doc.xpath("/xs:schema/xs:attributeGroup[@name]", "xs" => XS_NS).map do |group|
       {
-        name: group['name']
+        name: group["name"]
       }
     end
   end
@@ -139,14 +139,14 @@ class XsdContentValidator
   def extract_namespaces(doc)
     namespaces = {}
     doc.root.namespace_definitions.each do |ns|
-      namespaces[ns.prefix || 'default'] = ns.href
+      namespaces[ns.prefix || "default"] = ns.href
     end
     namespaces
   end
 
   def check_sets(category, ours, refs)
-    our_names = ours.map { |item| item[:name] }.to_set
-    ref_names = refs.map { |item| item[:name] }.to_set
+    our_names = ours.to_set { |item| item[:name] }
+    ref_names = refs.to_set { |item| item[:name] }
 
     our_only = our_names - ref_names
     ref_only = ref_names - our_names
@@ -214,14 +214,13 @@ class XsdContentValidator
       ref_type = ref_map[name]
       next unless ref_type
 
-      if our_type[:base_type] != ref_type[:base_type]
-        mismatches << {
-          name: name,
-          field: 'base_type',
-          ours: our_type[:base_type],
-          ref: ref_type[:base_type]
-        }
-      end
+      next unless our_type[:base_type] != ref_type[:base_type]
+      mismatches << {
+        name: name,
+        field: "base_type",
+        ours: our_type[:base_type],
+        ref: ref_type[:base_type]
+      }
     end
 
     if mismatches.empty?

@@ -11,9 +11,9 @@ module ApplicationTestHelpers
       allow(repo).to receive(:enums_in_package).and_return([])
       allow(repo).to receive(:all_packages).and_return([])
       allow(repo).to receive(:statistics).and_return({
-        total_packages: 0,
+                                                       total_packages: 0,
         total_classes: 0
-      })
+                                                     })
     end
   end
 
@@ -23,9 +23,9 @@ module ApplicationTestHelpers
       allow(repo).to receive(:resolve_type).and_return(nil)
       allow(repo).to receive(:all_namespaces).and_return([])
       allow(repo).to receive(:statistics).and_return({
-        total_types: 0,
+                                                       total_types: 0,
         total_elements: 0
-      })
+                                                     })
     end
   end
 

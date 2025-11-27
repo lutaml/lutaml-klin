@@ -26,8 +26,7 @@ module Lutaml
       # Coordinates UML loading, transformation, and XSD creation
       # Single Responsibility: Orchestrate XSD generation workflow
       class XsdGenerator
-        attr_reader :uml_repository, :config, :rule_registry
-        attr_reader :lur_path, :config_path, :generate_mapping
+        attr_reader :uml_repository, :config, :rule_registry, :lur_path, :config_path, :generate_mapping
 
         def initialize(uml_repository, config, lur_path: nil, config_path: nil, generate_mapping: true)
           @uml_repository = uml_repository
@@ -198,7 +197,7 @@ module Lutaml
           # Write YAML mapping file if collector present
           mapping_filepath = nil
           if mapping_collector
-            mapping_filename = filename.sub('.xsd', '_mapping.yaml')
+            mapping_filename = filename.sub(".xsd", "_mapping.yaml")
             mapping_filepath = File.join(package_output_dir, mapping_filename)
             File.write(mapping_filepath, mapping_collector.to_yaml)
           end
@@ -242,7 +241,7 @@ module Lutaml
 
           # Filter 1: rule-xsd-all-notEncoded
           # Skip classes with notEncoded=true tagged value
-          if rule_checker.rule_enabled?('rule-xsd-all-notEncoded')
+          if rule_checker.rule_enabled?("rule-xsd-all-notEncoded")
             filtered = filtered.reject do |uml_class|
               has_not_encoded_tag?(uml_class)
             end
@@ -250,13 +249,13 @@ module Lutaml
 
           # Filter 2: rule-xsd-cls-suppress
           # Skip classes with stereotype «suppress»
-          if rule_checker.rule_enabled?('rule-xsd-cls-suppress')
+          if rule_checker.rule_enabled?("rule-xsd-cls-suppress")
             filtered = filtered.reject do |uml_class|
               has_suppress_stereotype?(uml_class)
             end
           end
 
-          puts "  Classes after filtering: #{filtered.size} (from #{classes.size})" if ENV['VERBOSE']
+          puts "  Classes after filtering: #{filtered.size} (from #{classes.size})" if ENV["VERBOSE"]
 
           filtered
         end
@@ -266,10 +265,10 @@ module Lutaml
 
           tagged_values = uml_class.tagged_values || []
           tagged_values.any? do |tv|
-            (tv.respond_to?(:tag) && tv.tag == 'notEncoded' &&
-             tv.respond_to?(:value) && tv.value.to_s.downcase == 'true') ||
-            (tv.is_a?(Hash) && tv[:tag] == 'notEncoded' &&
-             tv[:value].to_s.downcase == 'true')
+            (tv.respond_to?(:tag) && tv.tag == "notEncoded" &&
+             tv.respond_to?(:value) && tv.value.to_s.downcase == "true") ||
+              (tv.is_a?(Hash) && tv[:tag] == "notEncoded" &&
+               tv[:value].to_s.downcase == "true")
           end
         end
 
@@ -277,7 +276,7 @@ module Lutaml
           return false unless uml_class.respond_to?(:stereotype)
 
           stereotypes = Array(uml_class.stereotype)
-          stereotypes.any? { |st| st.to_s.downcase == 'suppress' }
+          stereotypes.any? { |st| st.to_s.downcase == "suppress" }
         end
 
         def belongs_to_package?(uml_class, package_name)

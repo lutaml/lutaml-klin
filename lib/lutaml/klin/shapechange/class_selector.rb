@@ -25,12 +25,12 @@ module Lutaml
           # Get ALL classes from UML repository for this package
           # This is the key difference from ReferenceClasses hack:
           # We trust the UML model, not hardcoded lists
-          classes = uml_repository.classes_in_package(package_name)
+          uml_repository.classes_in_package(package_name)
 
           # ShapeChange applies name and stereotype filters here,
           # but for now we return all classes from selected schemas
           # Future: Add namePattern and stereotypePattern support
-          classes
+          
         end
 
         # Alternative method that accepts config directly

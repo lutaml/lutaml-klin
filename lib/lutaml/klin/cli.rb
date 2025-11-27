@@ -399,12 +399,23 @@ module Lutaml
         This command reads a UML model from a LUR package and generates
         XSD schema files according to ShapeChange configuration.
 
+        By default, a YAML mapping file is generated alongside each XSD file.
+        Use --no-generate-mapping to disable this feature.
+
         Example:
           lutaml-klin xsd \\
             --lur packages/plateau_all.lur \\
             --config ShapeChangeConfig_Plateau_urf.xml \\
             --packages "uro,urf" \\
             --output schemas/
+
+          # Disable YAML mapping generation
+          lutaml-klin xsd \\
+            --lur packages/plateau_all.lur \\
+            --config ShapeChangeConfig_Plateau_urf.xml \\
+            --packages "uro" \\
+            --output schemas/ \\
+            --no-generate-mapping
       DESC
       option :lur, required: true, desc: "Path to LUR package file"
       option :config, required: true,
@@ -412,6 +423,8 @@ module Lutaml
       option :packages,
              desc: "Package names to process (comma-separated, default: all)"
       option :output, default: "schemas", desc: "Output directory for XSD files"
+      option :generate_mapping, type: :boolean, default: true,
+                                desc: "Generate YAML mapping file alongside XSD (default: true)"
       def xsd
         Commands::XsdGenerateCommand.new(options).run
       end

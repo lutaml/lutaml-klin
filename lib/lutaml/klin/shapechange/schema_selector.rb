@@ -21,7 +21,7 @@ module Lutaml
           return [] unless app_schema_name
 
           # appSchemaName can be comma-separated list
-          app_schema_name.split(',').map(&:strip)
+          app_schema_name.split(",").map(&:strip)
         end
 
         # Check if a schema (package) is selected for processing

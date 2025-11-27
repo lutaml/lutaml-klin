@@ -31,7 +31,10 @@ module Lutaml
           # Create generator
           generator = Shapechange::XsdGenerator.new(
             lur_adapter.repository,
-            config
+            config,
+            lur_path: @options[:lur],
+            config_path: @options[:config],
+            generate_mapping: @options.fetch(:generate_mapping, true)
           )
 
           # Parse packages
@@ -54,6 +57,9 @@ module Lutaml
           puts "Generated #{results.size} XSD file(s):"
           results.each do |r|
             puts "  ✓ #{r[:file]}"
+            if r[:mapping_file]
+              puts "  ✓ #{r[:mapping_file]}"
+            end
             puts "    Namespace: #{r[:namespace]}"
             puts "    Classes: #{r[:classes_processed]}"
             puts ""

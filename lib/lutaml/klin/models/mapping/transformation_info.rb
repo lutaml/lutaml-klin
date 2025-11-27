@@ -40,14 +40,14 @@ module Lutaml
         # Set metadata hash
         #
         # @param data [Hash] Metadata to store
-        def set_metadata(data)
+        def metadata_hash=(data)
           self.metadata = data.to_yaml
         end
 
         # Get metadata as hash
         #
         # @return [Hash] Metadata
-        def get_metadata
+        def metadata_hash
           return {} unless metadata
 
           YAML.safe_load(metadata, permitted_classes: [Symbol])

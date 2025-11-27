@@ -145,7 +145,7 @@ RSpec.describe Lutaml::Klin::Application::MappingWorkflow do
     context "with verbose mode" do
       it "calls progress callback" do
         called = false
-        callback = ->(stage, msg) { called = true }
+        callback = ->(_stage, _msg) { called = true }
 
         workflow.generate_mapping_for_package(
           package_path,
@@ -234,7 +234,7 @@ RSpec.describe Lutaml::Klin::Application::MappingWorkflow do
     let(:output_path) { "test_output.yaml" }
 
     after do
-      File.delete(output_path) if File.exist?(output_path)
+      FileUtils.rm_f(output_path)
     end
 
     it "saves mapping to YAML file" do

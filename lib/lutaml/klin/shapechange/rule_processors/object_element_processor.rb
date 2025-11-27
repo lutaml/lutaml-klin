@@ -89,7 +89,7 @@ module Lutaml
               context: {
                 encoding_rule: context[:config]&.target_config&.dig(:default_encoding_rule),
                 is_abstract: attrs[:abstract] == "true",
-                is_substitutable: attrs[:substitutionGroup].present?,
+                is_substitutable: !attrs[:substitutionGroup].nil? && !attrs[:substitutionGroup].to_s.empty?,
                 substitution_group: attrs[:substitutionGroup]
               }
             )

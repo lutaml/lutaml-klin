@@ -33,6 +33,9 @@ module Lutaml
 
             # Add enumeration values from class properties/values
             add_enumeration_values(uml_class, restriction, xsd_doc)
+
+            # Record mapping if collector present
+            record_enumeration_mapping(uml_class, context) if context[:mapping_collector]
           end
 
           private
@@ -80,6 +83,25 @@ module Lutaml
             else
               value.to_s
             end
+          end
+
+          # Record enumeration mapping to collector
+          def record_enumeration_mapping(uml_enum, context)
+            collector = context[:mapping_collector]
+            return unless collector
+
+            xsd_doc = context[:xsd_document]
+            type_name = type_name(uml_enum, xsd_doc)
+
+            collector.record_class_mapping(
+              uml_class: uml_enum,
+              xsd_type_name: type_name,
+              rules_applied: [RULE_ID],
+              context: {
+                encoding_rule: context[:config]&.target_config&.dig(:default_encoding_rule),
+                is_enumeration: true
+              }
+            )
           end
         end
       end

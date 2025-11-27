@@ -70,7 +70,7 @@ module Lutaml
             prop_element["name"] = prop_name
 
             # Check if we should embed an anonymous property type
-            if context[:embed_property_type]
+            xsd_type = if context[:embed_property_type]
               # Generate anonymous property type inline
               create_anonymous_property_type(
                 prop_element,
@@ -78,34 +78,51 @@ module Lutaml
                 context
               )
 
+              mode = context[:encoding_mode] || "standard"
               if ENV["VERBOSE"]
-                mode = context[:encoding_mode] || "standard"
                 puts "      Using anonymous type (#{mode})"
               end
+
+              # For mapping, record as anonymous type with mode
+              "anonymous_#{mode}_type"
             else
               # Use standard PropertyType reference
-              xsd_type = resolve_property_type(attribute, context)
+              resolved_type = resolve_property_type(attribute, context)
 
               # Skip if we couldn't resolve the type
-              unless xsd_type
+              unless resolved_type
                 if ENV["VERBOSE"]
                   puts "      SKIPPED: Could not resolve type for #{attribute.name}"
                 end
                 return
               end
 
-              prop_element["type"] = xsd_type
+              prop_element["type"] = resolved_type
 
               if ENV["VERBOSE"]
-                puts "      Using type: #{xsd_type}"
+                puts "      Using type: #{resolved_type}"
               end
+
+              resolved_type
             end
 
             # Add multiplicity
-            add_multiplicity(prop_element, attribute)
+            min_occurs, max_occurs = add_multiplicity(prop_element, attribute)
 
             # Add to sequence
             sequence.add_child(prop_element)
+
+            # Record mapping if collector present
+            if context[:mapping_collector]
+              record_property_mapping(
+                attribute,
+                prop_name,
+                xsd_type,
+                min_occurs,
+                max_occurs,
+                context
+              )
+            end
           end
 
           # Create anonymous property type inline within the property element
@@ -322,7 +339,7 @@ module Lutaml
           def add_multiplicity(element, attribute)
             # Get multiplicity from attribute's cardinality
             cardinality = attribute.cardinality
-            return unless cardinality
+            return ["1", "1"] unless cardinality
 
             min = cardinality.min&.to_i || 1
             max = cardinality.max || "1"
@@ -331,11 +348,17 @@ module Lutaml
             element["minOccurs"] = min.to_s unless min == 1
 
             # Set maxOccurs (only if different from default 1)
-            if ["*", "-1"].include?(max)
-              element["maxOccurs"] = "unbounded"
-            elsif max.to_i > 1
-              element["maxOccurs"] = max.to_s
-            end
+            max_occurs = if ["*", "-1"].include?(max)
+                          element["maxOccurs"] = "unbounded"
+                          "unbounded"
+                        elsif max.to_i > 1
+                          element["maxOccurs"] = max.to_s
+                          max.to_s
+                        else
+                          "1"
+                        end
+
+            [min.to_s, max_occurs]
           end
 
           # Resolve target element reference for property
@@ -451,6 +474,50 @@ module Lutaml
 
             # Skip if type is from a different package
             type_package && current_package && type_package != current_package
+          end
+
+          # Record attribute mapping to collector
+          def record_property_mapping(uml_attribute, xsd_property_name, xsd_type, min_occurs, max_occurs, context)
+            collector = context[:mapping_collector]
+            return unless collector
+
+            # Get UML type name (handle both object and string)
+            uml_type_name = if uml_attribute.type.respond_to?(:name)
+                              uml_attribute.type.name
+                            else
+                              uml_attribute.type.to_s
+                            end
+
+            # Extract type mapping info
+            type_mapping_info = {
+              source: determine_type_source(xsd_type, context),
+              description: "#{uml_type_name} → #{xsd_type}"
+            }
+
+            collector.record_attribute_mapping(
+              uml_attribute: uml_attribute,
+              xsd_property_name: xsd_property_name,
+              xsd_property_type: xsd_type,
+              xsd_min_occurs: min_occurs,
+              xsd_max_occurs: max_occurs,
+              type_mapping_info: type_mapping_info,
+              rules_applied: [RULE_ID],
+              context: {
+                encoding_rule: context[:config]&.target_config&.dig(:default_encoding_rule)
+              }
+            )
+          end
+
+          # Determine the source of type mapping
+          def determine_type_source(xsd_type, context)
+            # Check if from XsdMapEntry (GML/XS namespaced types)
+            return "XsdMapEntry" if xsd_type.to_s.include?("gml:") || xsd_type.to_s.include?("xs:")
+
+            # Check if from basic types
+            return "BasicType" if %w[string integer boolean].include?(xsd_type.to_s)
+
+            # Otherwise from schema
+            "SchemaRepository"
           end
         end
       end
