@@ -180,16 +180,16 @@ RSpec.describe "Special Type Processors" do
         xml = xsd_doc.to_xml
 
         # Verify all three types are present
-        expect(xml.scan(/<simpleType name="UsageCode/).size).to eq(3)
+        expect(xml.scan('<simpleType name="UsageCode').size).to eq(3)
 
         # Verify the main union type
-        expect(xml).to match(/<simpleType name="UsageCodeType">.*?<union.*?>.*?<\/simpleType>/m)
+        expect(xml).to match(%r{<simpleType name="UsageCodeType">.*?<union.*?>.*?</simpleType>}m)
 
         # Verify enumeration type
-        expect(xml).to match(/<simpleType name="UsageCodeEnumerationType">.*?<restriction.*?>.*?<\/restriction>.*?<\/simpleType>/m)
+        expect(xml).to match(%r{<simpleType name="UsageCodeEnumerationType">.*?<restriction.*?>.*?</restriction>.*?</simpleType>}m)
 
         # Verify other type
-        expect(xml).to match(/<simpleType name="UsageCodeOtherType">.*?<pattern.*?>.*?<\/simpleType>/m)
+        expect(xml).to match(%r{<simpleType name="UsageCodeOtherType">.*?<pattern.*?>.*?</simpleType>}m)
       end
     end
 
@@ -232,11 +232,15 @@ RSpec.describe "Special Type Processors" do
 
   describe "Integration between processors" do
     let(:enum_processor) do
-      Lutaml::Klin::Shapechange::RuleProcessors::EnumerationProcessor.new(rule_checker, config)
+      Lutaml::Klin::Shapechange::RuleProcessors::EnumerationProcessor.new(
+        rule_checker, config
+      )
     end
 
     let(:codelist_processor) do
-      Lutaml::Klin::Shapechange::RuleProcessors::CodeListProcessor.new(rule_checker, config)
+      Lutaml::Klin::Shapechange::RuleProcessors::CodeListProcessor.new(
+        rule_checker, config
+      )
     end
 
     it "can process both enumerations and code lists in the same document" do
@@ -272,7 +276,8 @@ RSpec.describe "Special Type Processors" do
       enum_processor.process(enum_class, context.merge(uml_class: enum_class))
 
       # Process code list
-      codelist_processor.process(codelist_class, context.merge(uml_class: codelist_class))
+      codelist_processor.process(codelist_class,
+                                 context.merge(uml_class: codelist_class))
 
       xml = xsd_doc.to_xml
 

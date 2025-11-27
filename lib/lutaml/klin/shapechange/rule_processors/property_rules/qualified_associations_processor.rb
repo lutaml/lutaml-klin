@@ -101,7 +101,9 @@ module Lutaml
               xsd_doc.add_attribute(attr_element, "type", qualifier_type)
 
               # Append to property type element
-              element.appendChild(attr_element) if element.respond_to?(:appendChild)
+              return unless element.respond_to?(:appendChild)
+
+              element.appendChild(attr_element)
             end
 
             def get_qualifier_name(qualifier)

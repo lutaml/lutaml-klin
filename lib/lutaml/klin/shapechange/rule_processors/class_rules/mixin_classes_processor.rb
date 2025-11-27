@@ -35,7 +35,7 @@ module Lutaml
 
             private
 
-            def use_groups?(uml_class)
+            def use_groups?(_uml_class)
               # Check if rule-xsd-cls-mixin-classes-as-group applies
               # For now, we only handle inline properties (not groups)
               false
@@ -154,7 +154,7 @@ module Lutaml
               end
             end
 
-            def add_property_to_sequence(property, sequence_element, context)
+            def add_property_to_sequence(property, _sequence_element, context)
               # This would typically call the property processor
               # to create the appropriate element
               # For now, we mark that mixin properties need processing

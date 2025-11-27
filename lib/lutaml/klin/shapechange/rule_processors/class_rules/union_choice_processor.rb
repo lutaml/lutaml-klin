@@ -31,12 +31,13 @@ module Lutaml
               return unless container
 
               # Determine if we should create a choice element
-              choice_element = determine_choice_element(uml_class, xsd_doc, context)
+              choice_element = determine_choice_element(uml_class, xsd_doc,
+                                                        context)
 
               # Add choice to container if generated
-              if choice_element
-                context[:choice_element] = choice_element
-              end
+              return unless choice_element
+
+              context[:choice_element] = choice_element
             end
 
             private
@@ -45,7 +46,7 @@ module Lutaml
               # Check if this is a union type
               # In UML, check stereotype or category
               return true if uml_class.respond_to?(:stereotype) &&
-                           uml_class.stereotype("union")
+                             uml_class.stereotype("union")
 
               # Check category if available
               if uml_class.respond_to?(:category)
@@ -64,12 +65,12 @@ module Lutaml
               properties_count = count_properties(uml_class)
 
               # Apply algorithm from XsdDocument.java lines 903-936
-              if cibase.nil? && properties_count > 0
+              if cibase.nil? && properties_count.positive?
                 # Case 1: Union has no supertype and has properties
                 # Create a <choice> element
                 create_choice_element(xsd_doc)
 
-              elsif cibase && properties_count > 0 && count_properties(cibase) > 0
+              elsif cibase && properties_count.positive? && count_properties(cibase).positive?
                 # Case 2: Both supertype and subtype unions have properties
                 # This is an error condition
                 log_union_inheritance_error(uml_class, cibase)
@@ -82,28 +83,26 @@ module Lutaml
               end
             end
 
-            def find_union_supertype(uml_class, context)
+            def find_union_supertype(uml_class, _context)
               return nil unless uml_class.respond_to?(:generalizations)
 
               generalizations = begin
-                                  uml_class.generalizations
-                                rescue
-                                  nil
-                                end
+                uml_class.generalizations
+              rescue StandardError
+                nil
+              end
               return nil unless generalizations
 
               # Find first supertype that is also a union
               generalizations.each do |gen|
                 supertype = begin
-                             gen.general
-                           rescue
-                             nil
-                           end
+                  gen.general
+                rescue StandardError
+                  nil
+                end
                 next unless supertype
 
-                if union_class?(supertype)
-                  return supertype
-                end
+                return supertype if union_class?(supertype)
               end
 
               nil

@@ -29,7 +29,7 @@ module Lutaml
           # @param model_element [Object] The model element
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [Boolean] true if documentation should be suppressed
-          def self.applies_to?(model_element, config)
+          def self.applies_to?(_model_element, config)
             config.rule_enabled?(RULE_NAME)
           end
 
@@ -49,9 +49,12 @@ module Lutaml
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @param documentation_text [String, nil] The documentation text
           # @return [Boolean] true if documentation was added, false if suppressed
-          def self.add_documentation(annotation_builder, model_element, config, documentation_text)
+          def self.add_documentation(annotation_builder, model_element, config,
+                                     documentation_text)
             return false if applies_to?(model_element, config)
-            return false if documentation_text.nil? || documentation_text.strip.empty?
+            if documentation_text.nil? || documentation_text.strip.empty?
+              return false
+            end
 
             # Documentation allowed - add it
             annotation_builder.add_documentation(documentation_text)

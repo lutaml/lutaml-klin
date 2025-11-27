@@ -90,7 +90,7 @@ module Lutaml
         def display_header
           return unless options[:verbose]
 
-          puts "\n" + "=" * 70
+          puts "\n#{'=' * 70}"
           puts "  LUTAML-KLIN: UML-to-XSD Mapping Processor"
           puts "=" * 70
           puts ""
@@ -125,7 +125,7 @@ module Lutaml
         # @param result [Domain::ProcessingResult] Processing result
         # @return [void]
         def display_summary(result)
-          puts "\n" + "=" * 70
+          puts "\n#{'=' * 70}"
           puts "  PROCESSING SUMMARY"
           puts "=" * 70
           puts ""
@@ -194,7 +194,7 @@ module Lutaml
         # @param error [Exception] The error that occurred
         # @return [void]
         def display_error(error)
-          puts "\n" + "=" * 70
+          puts "\n#{'=' * 70}"
           puts "  ❌  ERROR"
           puts "=" * 70
           puts ""

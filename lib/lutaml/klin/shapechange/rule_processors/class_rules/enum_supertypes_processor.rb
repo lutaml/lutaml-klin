@@ -142,7 +142,7 @@ module Lutaml
               return false unless category
 
               cat_str = category.to_s.downcase
-              cat_str == "enumeration" || cat_str == "codelist"
+              %w[enumeration codelist].include?(cat_str)
             rescue StandardError
               false
             end
@@ -175,6 +175,7 @@ module Lutaml
             # @return [String] Property name
             def get_property_name(property)
               return property.name if property.respond_to?(:name)
+
               "unknown"
             rescue StandardError
               "unknown"

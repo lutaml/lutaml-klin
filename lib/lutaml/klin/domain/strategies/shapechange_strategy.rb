@@ -80,7 +80,7 @@ module Lutaml
                 metadata: {
                   original_type: uml_element.type,
                   normalized_type: normalized_type,
-                  strategy: name,
+                  strategy: name
                 }
               )
             end
@@ -94,7 +94,7 @@ module Lutaml
                   original_type: uml_element.type,
                   normalized_type: normalized_type,
                   mapping: mapping,
-                  strategy: name,
+                  strategy: name
                 }
               )
             end
@@ -103,8 +103,8 @@ module Lutaml
             normalized_xml_type = normalize_type_name(xml_type.strip)
 
             # Extract prefix and local name from xml_type
-            if normalized_xml_type.include?(':')
-              prefix, local_name = normalized_xml_type.split(':', 2)
+            if normalized_xml_type.include?(":")
+              prefix, local_name = normalized_xml_type.split(":", 2)
             else
               prefix = nil
               local_name = normalized_xml_type
@@ -112,12 +112,12 @@ module Lutaml
 
             # Resolve namespace from ShapeChange config
             namespace = if prefix
-              # Find namespace by prefix in xml_namespaces
-              xml_ns = context.shapechange_config.xml_namespaces.find do |ns|
-                ns.nsabr&.strip == prefix
-              end
-              xml_ns&.ns&.strip
-            end
+                          # Find namespace by prefix in xml_namespaces
+                          xml_ns = context.shapechange_config.xml_namespaces.find do |ns|
+                            ns.nsabr&.strip == prefix
+                          end
+                          xml_ns&.ns&.strip
+                        end
 
             # Return success with ShapeChange-provided mapping
             ResolutionResult.resolved(
@@ -131,7 +131,7 @@ module Lutaml
                 xml_type: xml_type,
                 normalized_xml_type: normalized_xml_type,
                 mapping_source: "ShapeChange",
-                prefix: prefix,
+                prefix: prefix
               }
             )
           rescue StandardError => e
@@ -141,7 +141,7 @@ module Lutaml
                 original_type: uml_element.type,
                 normalized_type: normalized_type,
                 exception: e.class.name,
-                strategy: name,
+                strategy: name
               }
             )
           end
@@ -171,9 +171,7 @@ module Lutaml
             end
 
             # Handle object-like mappings
-            if mapping.respond_to?(:xml_type)
-              return mapping.xml_type
-            end
+            return mapping.xml_type if mapping.respond_to?(:xml_type)
 
             nil
           end

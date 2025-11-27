@@ -94,7 +94,7 @@ module Lutaml
 
           # Combine into final dependency graph
           all_type_names = (schema.complex_types + schema.simple_types)
-            .map(&:qualified_name)
+                           .map(&:qualified_name)
 
           all_type_names.each_with_object({}) do |type_name, hash|
             hash[type_name] = {
@@ -140,11 +140,11 @@ module Lutaml
               "prefix" => schema_info.prefix,
               "schema_id" => schema_info.id,
               "elements" => find_by_namespace(schema.elements, ns)
-                .map(&:name),
+                        .map(&:name),
               "complex_types" => find_by_namespace(schema.complex_types, ns)
-                .map(&:name),
+                        .map(&:name),
               "simple_types" => find_by_namespace(schema.simple_types, ns)
-                .map(&:name)
+                        .map(&:name)
             }
           end
 
@@ -200,27 +200,23 @@ module Lutaml
           required << type.base_type if type.base_type
 
           # Extract types from elements
-          if type.elements
-            type.elements.each do |elem|
-              elem_type = if elem.is_a?(Hash)
-                            elem["type"]
-                          else
-                            elem.type
-                          end
-              required << elem_type if elem_type
-            end
+          type.elements&.each do |elem|
+            elem_type = if elem.is_a?(Hash)
+                          elem["type"]
+                        else
+                          elem.type
+                        end
+            required << elem_type if elem_type
           end
 
           # Extract types from attributes
-          if type.attributes
-            type.attributes.each do |attr|
-              attr_type = if attr.is_a?(Hash)
-                            attr["type"]
-                          else
-                            attr.type
-                          end
-              required << attr_type if attr_type
-            end
+          type.attributes&.each do |attr|
+            attr_type = if attr.is_a?(Hash)
+                          attr["type"]
+                        else
+                          attr.type
+                        end
+            required << attr_type if attr_type
           end
 
           required.compact.uniq

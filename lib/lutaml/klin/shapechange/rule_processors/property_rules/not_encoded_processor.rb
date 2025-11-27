@@ -25,7 +25,7 @@ module Lutaml
             # @param property [Object] The UML property
             # @param context [Hash] Processing context
             # @return [Hash] Processing result
-            def process(property, context = {})
+            def process(property, _context = {})
               encoding_rule = get_encoding_rule(property, "xsd")
               is_not_encoded = is_not_encoded?(encoding_rule)
 
@@ -111,7 +111,7 @@ module Lutaml
             #
             # @param property [Object] The property
             # @return [Boolean] Always true
-            def applies_to?(property)
+            def applies_to?(_property)
               true
             end
           end

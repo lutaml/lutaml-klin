@@ -28,7 +28,7 @@ RSpec.describe Lutaml::Klin::Lxr::AutoBuilder do
   after do
     temp_config.close
     temp_config.unlink
-    FileUtils.rm_rf(temp_dir) if Dir.exist?(temp_dir)
+    FileUtils.rm_rf(temp_dir)
   end
 
   before do
@@ -124,10 +124,10 @@ RSpec.describe Lutaml::Klin::Lxr::AutoBuilder do
         allow_any_instance_of(Lutaml::Klin::Lxr::PackageBuilder)
           .to receive(:build)
           .and_return({
-            success: true,
-            output_path: temp_lxr_path,
-            messages: ["Build successful"]
-          })
+                        success: true,
+                        output_path: temp_lxr_path,
+                        messages: ["Build successful"]
+                      })
 
         # Mock caching
         allow(mock_cache_manager).to receive(:cache_lxr)
@@ -174,10 +174,10 @@ RSpec.describe Lutaml::Klin::Lxr::AutoBuilder do
         File.write(temp_lxr_path, "lxr content")
 
         allow(mock_builder).to receive(:build).and_return({
-          success: true,
-          output_path: temp_lxr_path,
-          messages: ["Build successful"]
-        })
+                                                            success: true,
+                                                            output_path: temp_lxr_path,
+                                                            messages: ["Build successful"]
+                                                          })
 
         # Mock caching
         allow(mock_cache_manager).to receive(:cache_lxr)
@@ -224,9 +224,9 @@ RSpec.describe Lutaml::Klin::Lxr::AutoBuilder do
         allow(Lutaml::Klin::Lxr::PackageBuilder).to receive(:new)
           .and_return(mock_builder)
         allow(mock_builder).to receive(:build).and_return({
-          success: false,
-          messages: ["Build failed: missing XSD files"]
-        })
+                                                            success: false,
+                                                            messages: ["Build failed: missing XSD files"]
+                                                          })
       end
 
       it "raises AutoLxrError" do

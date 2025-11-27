@@ -22,7 +22,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::InlineO
         double(
           "Property",
           name: "capital",
-          respond_to?: ->(method) { [:inline_or_by_reference].include?(method) },
+          respond_to?: lambda { |method|
+            [:inline_or_by_reference].include?(method)
+          },
           inline_or_by_reference: "byreference"
         )
       end
@@ -46,10 +48,10 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::InlineO
         double(
           "Property",
           name: "location",
-          respond_to?: ->(method) do
-            [:inline_or_by_reference, :nil_reason_allowed?,
-             :voidable?, :aggregation?, :composition?,
-             :metadata?, :qualifiers, :property_metadata?, :tags, :type].include?(method)
+          respond_to?: lambda do |method|
+            %i[inline_or_by_reference nil_reason_allowed?
+               voidable? aggregation? composition?
+               metadata? qualifiers property_metadata? tags type].include?(method)
           end,
           inline_or_by_reference: "inline",
           nil_reason_allowed?: false,
@@ -82,10 +84,10 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::InlineO
         double(
           "Property",
           name: "admin",
-          respond_to?: ->(method) do
-            [:inline_or_by_reference, :nil_reason_allowed?,
-             :voidable?, :aggregation?, :composition?,
-             :metadata?, :qualifiers, :property_metadata?, :tags, :type].include?(method)
+          respond_to?: lambda do |method|
+            %i[inline_or_by_reference nil_reason_allowed?
+               voidable? aggregation? composition?
+               metadata? qualifiers property_metadata? tags type].include?(method)
           end,
           inline_or_by_reference: nil,
           nil_reason_allowed?: false,
@@ -118,10 +120,10 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::InlineO
         double(
           "Property",
           name: "description",
-          respond_to?: ->(method) do
-            [:inline_or_by_reference, :nil_reason_allowed?,
-             :voidable?, :aggregation?, :composition?,
-             :metadata?, :qualifiers, :property_metadata?, :tags, :type].include?(method)
+          respond_to?: lambda do |method|
+            %i[inline_or_by_reference nil_reason_allowed?
+               voidable? aggregation? composition?
+               metadata? qualifiers property_metadata? tags type].include?(method)
           end,
           inline_or_by_reference: "inline",
           nil_reason_allowed?: true,
@@ -151,12 +153,15 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::InlineO
     end
 
     context "when processing inline aggregation in GML 3.2" do
-      let(:type_info) { double("TypeInfo", id: "feature-123", name: "Building") }
+      let(:type_info) do
+        double("TypeInfo", id: "feature-123", name: "Building")
+      end
       let(:value_class) do
         double(
           "ValueClass",
-          respond_to?: ->(method) do
-            [:category, :include_by_value_property_type?, :include_property_type?].include?(method)
+          respond_to?: lambda do |method|
+            %i[category include_by_value_property_type?
+               include_property_type?].include?(method)
           end,
           category: "FEATURE",
           include_by_value_property_type?: false,
@@ -168,11 +173,11 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::InlineO
         double(
           "Property",
           name: "buildings",
-          respond_to?: ->(method) do
-            [:inline_or_by_reference, :nil_reason_allowed?,
-             :voidable?, :aggregation?, :composition?,
-             :metadata?, :qualifiers, :property_metadata?,
-             :tags, :type].include?(method)
+          respond_to?: lambda do |method|
+            %i[inline_or_by_reference nil_reason_allowed?
+               voidable? aggregation? composition?
+               metadata? qualifiers property_metadata?
+               tags type].include?(method)
           end,
           inline_or_by_reference: "inline",
           nil_reason_allowed?: false,
@@ -217,10 +222,10 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::InlineO
         double(
           "Property",
           name: "measurement",
-          respond_to?: ->(method) do
-            [:inline_or_by_reference, :nil_reason_allowed?,
-             :voidable?, :aggregation?, :composition?,
-             :metadata?, :qualifiers, :property_metadata?, :tags, :type].include?(method)
+          respond_to?: lambda do |method|
+            %i[inline_or_by_reference nil_reason_allowed?
+               voidable? aggregation? composition?
+               metadata? qualifiers property_metadata? tags type].include?(method)
           end,
           inline_or_by_reference: "inline",
           nil_reason_allowed?: false,

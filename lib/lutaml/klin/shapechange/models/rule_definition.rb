@@ -12,7 +12,7 @@ module Lutaml
         attribute :scope, :string           # "class", "property", "package", "all"
         attribute :category, :string        # "required", "optional"
         attribute :description, :string
-        attribute :applies_to, :string, collection: true  # ["FeatureType", "DataType"]
+        attribute :applies_to, :string, collection: true # ["FeatureType", "DataType"]
 
         yaml do
           map "id", to: :id

@@ -30,7 +30,7 @@ module Lutaml
             # @param uml_class [Lutaml::Uml::Class] The class to process
             # @param context [Hash] Processing context
             # @return [Hash] Processing result with property type info
-            def process(uml_class, context = {})
+            def process(uml_class, _context = {})
               return default_result unless applies_to?(uml_class)
 
               {
@@ -73,7 +73,9 @@ module Lutaml
             # @return [Boolean] True if flag is set
             def include_by_value_property_type?(uml_class)
               # Check for tagged value or flag
-              tag_value = uml_class.tagged_values&.fetch("includeByValuePropertyType", nil)
+              tag_value = uml_class.tagged_values&.fetch(
+                "includeByValuePropertyType", nil
+              )
               return false if tag_value&.downcase == "false"
               return true if tag_value&.downcase == "true"
 
@@ -86,11 +88,12 @@ module Lutaml
             # @param uml_class [Lutaml::Uml::Class] The class
             # @return [String] Qualified name
             def qualified_name(uml_class)
-              if uml_class.package&.xmlns
-                "#{uml_class.package.xmlns}:#{uml_class.name}"
-              else
-                uml_class.name
-              end
+              # TODO: Get xmlns from ShapeChange config's PackageInfo instead of uml_class.package
+              # if uml_class.package&.xmlns
+              #   "#{uml_class.package.xmlns}:#{uml_class.name}"
+              # else
+              uml_class.name
+              # end
             end
 
             # Default result when rule doesn't apply

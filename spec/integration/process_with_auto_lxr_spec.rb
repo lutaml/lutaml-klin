@@ -10,7 +10,9 @@ RSpec.describe "Process command with auto-LXR", type: :integration do
   let(:cache_dir) { File.join(temp_dir, "cache") }
   let(:output_dir) { File.join(temp_dir, "output") }
 
-  let(:shapechange_config_path) { File.join(temp_dir, "shapechange_config.xml") }
+  let(:shapechange_config_path) do
+    File.join(temp_dir, "shapechange_config.xml")
+  end
   let(:lur_package_path) { File.join(temp_dir, "test.lur") }
 
   # Minimal ShapeChange configuration
@@ -45,7 +47,7 @@ RSpec.describe "Process command with auto-LXR", type: :integration do
   end
 
   after do
-    FileUtils.rm_rf(temp_dir) if Dir.exist?(temp_dir)
+    FileUtils.rm_rf(temp_dir)
   end
 
   describe "CLI validation" do
@@ -83,19 +85,19 @@ RSpec.describe "Process command with auto-LXR", type: :integration do
       # Should not raise with --config
       expect do
         cli.send(:validate_process_options, {
-          lur: lur_package_path,
-          lxr: "test.lxr",
-          config: shapechange_config_path
-        })
+                   lur: lur_package_path,
+                   lxr: "test.lxr",
+                   config: shapechange_config_path
+                 })
       end.not_to raise_error
 
       # Should not raise with --shapechange
       expect do
         cli.send(:validate_process_options, {
-          lur: lur_package_path,
-          lxr: "test.lxr",
-          shapechange: shapechange_config_path
-        })
+                   lur: lur_package_path,
+                   lxr: "test.lxr",
+                   shapechange: shapechange_config_path
+                 })
       end.not_to raise_error
     end
   end

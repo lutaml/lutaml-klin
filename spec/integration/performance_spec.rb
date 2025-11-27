@@ -94,7 +94,7 @@ RSpec.describe "Performance Integration", :integration do
         "http://www.opengis.net/gml/3.2",
         "http://example.org/ns1",
         "http://example.org/ns2",
-        "http://example.org/ns3",
+        "http://example.org/ns3"
       ]
 
       types = []
@@ -175,7 +175,7 @@ RSpec.describe "Performance Integration", :integration do
       strategies = [
         Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy.new,
         Lutaml::Klin::Domain::Strategies::ShapeChangeMappingStrategy.new,
-        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new,
+        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new
       ]
       Lutaml::Klin::Domain::ResolutionEngine.new(strategies)
     end

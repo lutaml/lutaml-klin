@@ -52,7 +52,8 @@ module Lutaml
           # @param attribute_name [String] the name of the attribute
           # @param fuzzy [Boolean] whether to enable fuzzy matching
           # @return [LookupResult] the lookup result
-          def find_xsd_for_uml_attribute(uml_class_qname, attribute_name, fuzzy: false)
+          def find_xsd_for_uml_attribute(uml_class_qname, attribute_name,
+                                         fuzzy: false)
             matches = []
             key = "#{uml_class_qname}::#{attribute_name}"
 
@@ -62,7 +63,8 @@ module Lutaml
               matches << format_attribute_match(attr_mapping, uml_class_qname)
             elsif fuzzy
               # Fuzzy matching
-              matches = fuzzy_match_uml_attribute(uml_class_qname, attribute_name)
+              matches = fuzzy_match_uml_attribute(uml_class_qname,
+                                                  attribute_name)
             end
 
             LookupResult.new(
@@ -151,7 +153,8 @@ module Lutaml
               # Likely XSD qualified name (namespace:localName)
               # Try both type and element lookups
               type_result = find_uml_for_xsd_type(identifier, fuzzy: fuzzy)
-              element_result = find_uml_for_xsd_element(identifier, fuzzy: fuzzy)
+              element_result = find_uml_for_xsd_element(identifier,
+                                                        fuzzy: fuzzy)
 
               # Return the result with matches
               if type_result.found? && element_result.found?
@@ -195,7 +198,8 @@ module Lutaml
               package.class_mappings.each do |class_mapping|
                 # Index UML class → XSD type
                 if class_mapping.uml_qualified_name
-                  index[:uml_class][class_mapping.uml_qualified_name] = class_mapping
+                  index[:uml_class][class_mapping.uml_qualified_name] =
+                    class_mapping
                 end
 
                 # Index XSD type → UML class (multiple classes can map to same XSD type)
@@ -215,14 +219,14 @@ module Lutaml
                   end
 
                   # Index XSD element → UML attribute
-                  if attr.xsd_name
-                    xsd_key = build_xsd_element_key(attr)
-                    index[:xsd_element][xsd_key] ||= []
-                    index[:xsd_element][xsd_key] << {
-                      class_qname: class_mapping.uml_qualified_name,
-                      attribute: attr
-                    }
-                  end
+                  next unless attr.xsd_name
+
+                  xsd_key = build_xsd_element_key(attr)
+                  index[:xsd_element][xsd_key] ||= []
+                  index[:xsd_element][xsd_key] << {
+                    class_qname: class_mapping.uml_qualified_name,
+                    attribute: attr
+                  }
                 end
               end
             end
@@ -292,11 +296,12 @@ module Lutaml
             query_lower = query.downcase
 
             @index[:uml_class].each do |qname, class_mapping|
-              if qname.downcase.include?(query_lower)
-                matches << format_class_match(class_mapping).merge(
-                  match_quality: calculate_match_quality(query_lower, qname.downcase)
-                )
-              end
+              next unless qname.downcase.include?(query_lower)
+
+              matches << format_class_match(class_mapping).merge(
+                match_quality: calculate_match_quality(query_lower,
+                                                       qname.downcase)
+              )
             end
 
             # Sort by match quality
@@ -314,13 +319,17 @@ module Lutaml
             attr_lower = attr_name.downcase
 
             @index[:uml_attr].each do |key, attr_mapping|
-              if key.downcase.include?(class_lower) && key.downcase.include?(attr_lower)
-                parts = key.split("::")
-                match_class_qname = parts[0..-2].join("::")
-                matches << format_attribute_match(attr_mapping, match_class_qname).merge(
-                  match_quality: calculate_match_quality(attr_lower, key.downcase)
-                )
+              unless key.downcase.include?(class_lower) && key.downcase.include?(attr_lower)
+                next
               end
+
+              parts = key.split("::")
+              match_class_qname = parts[0..-2].join("::")
+              matches << format_attribute_match(attr_mapping,
+                                                match_class_qname).merge(
+                                                  match_quality: calculate_match_quality(attr_lower,
+                                                                                         key.downcase)
+                                                )
             end
 
             matches.sort_by { |m| -m[:match_quality] }
@@ -335,13 +344,14 @@ module Lutaml
             query_lower = query.downcase
 
             @index[:xsd_type].each do |type_qname, class_mappings|
-              if type_qname.downcase.include?(query_lower)
-                quality = calculate_match_quality(query_lower, type_qname.downcase)
-                class_mappings.each do |class_mapping|
-                  matches << format_class_match(class_mapping).merge(
-                    match_quality: quality
-                  )
-                end
+              next unless type_qname.downcase.include?(query_lower)
+
+              quality = calculate_match_quality(query_lower,
+                                                type_qname.downcase)
+              class_mappings.each do |class_mapping|
+                matches << format_class_match(class_mapping).merge(
+                  match_quality: quality
+                )
               end
             end
 
@@ -357,14 +367,15 @@ module Lutaml
             query_lower = query.downcase
 
             @index[:xsd_element].each do |element_qname, attr_infos|
-              if element_qname.downcase.include?(query_lower)
-                quality = calculate_match_quality(query_lower, element_qname.downcase)
-                attr_infos.each do |attr_info|
-                  matches << format_attribute_match(
-                    attr_info[:attribute],
-                    attr_info[:class_qname]
-                  ).merge(match_quality: quality)
-                end
+              next unless element_qname.downcase.include?(query_lower)
+
+              quality = calculate_match_quality(query_lower,
+                                                element_qname.downcase)
+              attr_infos.each do |attr_info|
+                matches << format_attribute_match(
+                  attr_info[:attribute],
+                  attr_info[:class_qname]
+                ).merge(match_quality: quality)
               end
             end
 

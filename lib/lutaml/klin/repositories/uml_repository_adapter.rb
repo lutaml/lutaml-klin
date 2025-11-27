@@ -28,7 +28,8 @@ module Lutaml
         def initialize(lur_path)
           @repository = Lutaml::UmlRepository::Repository.from_package(lur_path)
         rescue Errno::ENOENT => e
-          raise Errno::ENOENT, "LUR package not found: #{lur_path} - #{e.message}"
+          raise Errno::ENOENT,
+                "LUR package not found: #{lur_path} - #{e.message}"
         rescue StandardError => e
           raise "Failed to load LUR package '#{lur_path}': #{e.message}"
         end

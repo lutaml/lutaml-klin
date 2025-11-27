@@ -68,7 +68,7 @@ module Lutaml
                 error: "UML class not found for type: #{uml_element.type}",
                 metadata: {
                   original_type: uml_element.type,
-                  strategy: name,
+                  strategy: name
                 }
               )
             end
@@ -87,12 +87,13 @@ module Lutaml
               metadata: {
                 uml_class_found: true,
                 uml_class_name: uml_class.name,
-                class_category: uml_class.respond_to?(:stereotype) ?
-                  uml_class.stereotype : nil,
+                class_category: if uml_class.respond_to?(:stereotype)
+                                  uml_class.stereotype
+                                end,
                 xsd_property_type: property_type_name,
                 xsd_namespace: namespace,
                 naming_rule: "rule-xsd-all-naming-gml",
-                strategy: name,
+                strategy: name
               }
             )
           rescue StandardError => e
@@ -101,7 +102,7 @@ module Lutaml
               metadata: {
                 original_type: uml_element.type,
                 exception: e.class.name,
-                strategy: name,
+                strategy: name
               }
             )
           end
@@ -130,10 +131,10 @@ module Lutaml
 
             # Remove namespace prefix if present
             local_name = if normalized.include?(":")
-              normalized.split(":", 2).last
-            else
-              normalized
-            end
+                           normalized.split(":", 2).last
+                         else
+                           normalized
+                         end
 
             # Try to find in UML repository
             context.uml_repository.find_class(local_name)
@@ -177,10 +178,10 @@ module Lutaml
           def determine_namespace(uml_class, context)
             # Try to get package name from qualified_name
             package_path = if uml_class.respond_to?(:qualified_name)
-                            uml_class.qualified_name
-                          elsif uml_class.respond_to?(:full_name)
-                            uml_class.full_name
-                          end
+                             uml_class.qualified_name
+                           elsif uml_class.respond_to?(:full_name)
+                             uml_class.full_name
+                           end
 
             return nil unless package_path
 

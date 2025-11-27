@@ -69,7 +69,9 @@ module Lutaml
             # @return [Boolean] True if inline-only
             def inline_only?(property, context)
               inline_or_by_ref = context[:inline_or_by_reference] ||
-                                 property.tagged_values&.fetch("inlineOrByReference", nil)
+                                 property.tagged_values&.fetch(
+                                   "inlineOrByReference", nil
+                                 )
 
               inline_or_by_ref&.downcase == "inline"
             end
@@ -88,7 +90,7 @@ module Lutaml
             # @return [String, Integer] Maximum occurrences
             def extract_max_occurs(property)
               upper = property.upper_value&.value
-              upper == -1 || upper == "*" ? "unbounded" : upper || 1
+              [-1, "*"].include?(upper) ? "unbounded" : upper || 1
             end
 
             # Default result when rule doesn't apply

@@ -27,8 +27,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::UnionChoic
           name: "GeometryValue",
           stereotype: ->(name) { name == "union" },
           category: "union",
-          respond_to?: ->(method) do
-            [:stereotype, :category, :attributes, :generalizations].include?(method)
+          respond_to?: lambda do |method|
+            %i[stereotype category attributes
+               generalizations].include?(method)
           end,
           attributes: [attr1, attr2],
           generalizations: []
@@ -60,8 +61,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::UnionChoic
           name: "EmptyUnion",
           stereotype: ->(name) { name == "union" },
           category: "union",
-          respond_to?: ->(method) do
-            [:stereotype, :category, :attributes, :generalizations].include?(method)
+          respond_to?: lambda do |method|
+            %i[stereotype category attributes
+               generalizations].include?(method)
           end,
           attributes: [],
           generalizations: []
@@ -84,14 +86,18 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::UnionChoic
     end
 
     context "when processing a union subtype without own properties" do
-      let(:supertype_attr) { double("Attribute", name: "option1", navigable?: true) }
+      let(:supertype_attr) do
+        double("Attribute", name: "option1", navigable?: true)
+      end
       let(:supertype) do
         double(
           "Supertype",
           name: "BaseUnion",
           stereotype: ->(name) { name == "union" },
           category: "union",
-          respond_to?: ->(method) { [:stereotype, :category, :attributes].include?(method) },
+          respond_to?: lambda { |method|
+            %i[stereotype category attributes].include?(method)
+          },
           attributes: [supertype_attr]
         )
       end
@@ -102,8 +108,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::UnionChoic
           name: "DerivedUnion",
           stereotype: ->(name) { name == "union" },
           category: "union",
-          respond_to?: ->(method) do
-            [:stereotype, :category, :attributes, :generalizations].include?(method)
+          respond_to?: lambda do |method|
+            %i[stereotype category attributes
+               generalizations].include?(method)
           end,
           attributes: [],
           generalizations: [generalization]
@@ -126,27 +133,34 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::UnionChoic
     end
 
     context "when processing conflicting union subtypes" do
-      let(:supertype_attr) { double("Attribute", name: "option1", navigable?: true) }
+      let(:supertype_attr) do
+        double("Attribute", name: "option1", navigable?: true)
+      end
       let(:supertype) do
         double(
           "Supertype",
           name: "BaseUnion",
           stereotype: ->(name) { name == "union" },
           category: "union",
-          respond_to?: ->(method) { [:stereotype, :category, :attributes].include?(method) },
+          respond_to?: lambda { |method|
+            %i[stereotype category attributes].include?(method)
+          },
           attributes: [supertype_attr]
         )
       end
       let(:generalization) { double("Generalization", general: supertype) }
-      let(:subtype_attr) { double("Attribute", name: "option3", navigable?: true) }
+      let(:subtype_attr) do
+        double("Attribute", name: "option3", navigable?: true)
+      end
       let(:uml_class) do
         double(
           "UmlClass",
           name: "SpecializedUnion",
           stereotype: ->(name) { name == "union" },
           category: "union",
-          respond_to?: ->(method) do
-            [:stereotype, :category, :attributes, :generalizations].include?(method)
+          respond_to?: lambda do |method|
+            %i[stereotype category attributes
+               generalizations].include?(method)
           end,
           attributes: [subtype_attr],
           generalizations: [generalization]
@@ -173,9 +187,10 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::UnionChoic
         double(
           "UmlClass",
           name: "RegularClass",
-          stereotype: ->(name) { false },
-          respond_to?: ->(method) do
-            [:stereotype, :category, :generalizations, :attributes].include?(method)
+          stereotype: ->(_name) { false },
+          respond_to?: lambda do |method|
+            %i[stereotype category generalizations
+               attributes].include?(method)
           end,
           category: "datatype",
           generalizations: [],
@@ -206,8 +221,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::UnionChoic
           name: "TestUnion",
           stereotype: ->(name) { name == "union" },
           category: "union",
-          respond_to?: ->(method) do
-            [:stereotype, :category, :attributes, :generalizations].include?(method)
+          respond_to?: lambda do |method|
+            %i[stereotype category attributes
+               generalizations].include?(method)
           end,
           attributes: [attr1],
           generalizations: []

@@ -165,9 +165,11 @@ module Lutaml
         # Perform lookup based on direction
         result = case options[:direction].downcase
                  when "uml-to-xsd"
-                   workflow.lookup_uml_to_xsd(identifier, type: lookup_type, fuzzy: options[:fuzzy])
+                   workflow.lookup_uml_to_xsd(identifier, type: lookup_type,
+                                                          fuzzy: options[:fuzzy])
                  when "xsd-to-uml"
-                   workflow.lookup_xsd_to_uml(identifier, type: lookup_type, fuzzy: options[:fuzzy])
+                   workflow.lookup_xsd_to_uml(identifier, type: lookup_type,
+                                                          fuzzy: options[:fuzzy])
                  else
                    workflow.auto_lookup(identifier, fuzzy: options[:fuzzy])
                  end
@@ -307,18 +309,29 @@ module Lutaml
       DESC
       option :lur, required: true, desc: "Path to LUR package file (.lur)"
       option :lxr, desc: "Path to LXR package file (.lxr)"
-      option :shapechange, desc: "Path to ShapeChange config (for auto-LXR or process)"
-      option :config, desc: "Path to ShapeChange configuration XML (legacy alias for --shapechange)"
-      option :auto_lxr, type: :boolean, default: false, desc: "Automatically create LXR from ShapeChange config"
-      option :lxr_cache_dir, desc: "Directory for cached LXR packages (default: .lutaml-klin/cache)"
-      option :force_rebuild, type: :boolean, default: false, desc: "Force rebuild of LXR even if cached"
-      option :packages, default: "**", desc: "Package filter pattern (e.g., 'i-UR::**')"
-      option :output, default: "_site", desc: "Output directory path (default: _site)"
+      option :shapechange,
+             desc: "Path to ShapeChange config (for auto-LXR or process)"
+      option :config,
+             desc: "Path to ShapeChange configuration XML (legacy alias for --shapechange)"
+      option :auto_lxr, type: :boolean, default: false,
+                        desc: "Automatically create LXR from ShapeChange config"
+      option :lxr_cache_dir,
+             desc: "Directory for cached LXR packages (default: .lutaml-klin/cache)"
+      option :force_rebuild, type: :boolean, default: false,
+                             desc: "Force rebuild of LXR even if cached"
+      option :packages, default: "**",
+                        desc: "Package filter pattern (e.g., 'i-UR::**')"
+      option :output, default: "_site",
+                      desc: "Output directory path (default: _site)"
       option :type_overrides, desc: "Path to type override YAML file"
-      option :generate_mappings, type: :boolean, default: true, desc: "Generate YAML mappings"
-      option :generate_spa, type: :boolean, default: true, desc: "Generate SPA website"
-      option :spa_data_mode, default: "embedded", desc: "SPA data mode: embedded or linked"
-      option :validate, type: :boolean, default: true, desc: "Generate validation reports"
+      option :generate_mappings, type: :boolean, default: true,
+                                 desc: "Generate YAML mappings"
+      option :generate_spa, type: :boolean, default: true,
+                            desc: "Generate SPA website"
+      option :spa_data_mode, default: "embedded",
+                             desc: "SPA data mode: embedded or linked"
+      option :validate, type: :boolean, default: true,
+                        desc: "Generate validation reports"
       def process
         # Validate options
         validate_process_options
@@ -345,7 +358,7 @@ module Lutaml
         # Run process command
         command = Commands::ProcessCommand.new(options)
         command.run
-      rescue => e
+      rescue StandardError => e
         say "Error: #{e.message}", :red
         say e.backtrace.first(5).join("\n") if options[:verbose]
         exit 1
@@ -359,12 +372,14 @@ module Lutaml
           # Auto-LXR mode requires ShapeChange config
           config_path = options[:shapechange] || options[:config]
           unless config_path
-            raise ArgumentError, "--shapechange (or --config) is required when using --auto-lxr"
+            raise ArgumentError,
+                  "--shapechange (or --config) is required when using --auto-lxr"
           end
         else
           # Manual mode requires LXR package
           unless options[:lxr]
-            raise ArgumentError, "--lxr is required (or use --auto-lxr with --shapechange)"
+            raise ArgumentError,
+                  "--lxr is required (or use --auto-lxr with --shapechange)"
           end
 
           # Also need config for ProcessCommand
@@ -392,14 +407,17 @@ module Lutaml
             --output schemas/
       DESC
       option :lur, required: true, desc: "Path to LUR package file"
-      option :config, required: true, desc: "Path to ShapeChange configuration XML"
-      option :packages, desc: "Package names to process (comma-separated, default: all)"
+      option :config, required: true,
+                      desc: "Path to ShapeChange configuration XML"
+      option :packages,
+             desc: "Package names to process (comma-separated, default: all)"
       option :output, default: "schemas", desc: "Output directory for XSD files"
       def xsd
         Commands::XsdGenerateCommand.new(options).run
       end
 
-      desc "create-lxr OUTPUT_PATH", "Create LXR package from ShapeChange config or XSD files"
+      desc "create-lxr OUTPUT_PATH",
+           "Create LXR package from ShapeChange config or XSD files"
       long_desc <<~DESC
         Create an LXR (LutaML XSD Repository) package from either:
         - ShapeChange configuration file (extracts XSD locations and namespaces)
@@ -427,13 +445,13 @@ module Lutaml
       option :namespaces, type: :string,
                           desc: "YAML file with namespace mappings"
       option :xsd_mode, type: :string, default: "include_all",
-                        enum: ["include_all", "allow_external"],
+                        enum: %w[include_all allow_external],
                         desc: "XSD bundling mode"
       option :resolution_mode, type: :string, default: "resolved",
-                               enum: ["resolved", "bare"],
+                               enum: %w[resolved bare],
                                desc: "Resolution mode"
       option :format, type: :string, default: "marshal",
-                      enum: ["marshal", "json", "yaml", "parse"],
+                      enum: %w[marshal json yaml parse],
                       desc: "Serialization format"
       option :name, type: :string,
                     desc: "Package name"
@@ -446,12 +464,13 @@ module Lutaml
       def create_lxr(output_path)
         command = Commands::CreateLxrCommand.new(options.merge(output: output_path))
         command.run
-      rescue => e
+      rescue StandardError => e
         say "Error: #{e.message}", :red
         exit 1
       end
 
-      desc "spa OUTPUT", "Generate interactive HTML documentation from LXR package"
+      desc "spa OUTPUT",
+           "Generate interactive HTML documentation from LXR package"
       long_desc <<~DESC
         Generate an Enhanced HTML Single Page Application (SPA) for XSD schema documentation.
 
@@ -483,10 +502,10 @@ module Lutaml
       option :yaml, type: :string,
                     desc: "Path to YAML mapping file (adds UML traceability)"
       option :mode, type: :string, default: "multi-file",
-                    enum: ["multi-file", "embedded"],
+                    enum: %w[multi-file embedded],
                     desc: "Output mode: multi-file or embedded"
       option :theme, type: :string, default: "default",
-                     enum: ["default", "dark", "plateau"],
+                     enum: %w[default dark plateau],
                      desc: "UI theme"
       option :title, type: :string,
                      desc: "Custom website title"
@@ -499,7 +518,7 @@ module Lutaml
       def spa(output_path)
         command = Commands::SpaCommand.new(options.merge(output: output_path))
         command.run
-      rescue => e
+      rescue StandardError => e
         say "Error: #{e.message}", :red
         say e.backtrace.first, :red if options[:verbose]
         exit 1

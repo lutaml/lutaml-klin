@@ -42,7 +42,10 @@ module Lutaml
               # Parent class reference
               parent_name = uml_class.generalization.general.name ||
                             uml_class.generalization.general_name
-              attrs[:substitutionGroup] = "#{context[:prefix]}:#{parent_name}" if parent_name
+              if parent_name
+                attrs[:substitutionGroup] =
+                  "#{context[:prefix]}:#{parent_name}"
+              end
             elsif should_use_gml_substitution?(uml_class)
               # Use GML base types for stereotyped classes
               attrs[:substitutionGroup] = gml_substitution_group(uml_class)
@@ -67,8 +70,6 @@ module Lutaml
               "gml:AbstractFeature"
             elsif stereotypes.include?("ObjectType") || stereotypes.include?("objecttype")
               "gml:AbstractGML"
-            else
-              nil
             end
           end
         end

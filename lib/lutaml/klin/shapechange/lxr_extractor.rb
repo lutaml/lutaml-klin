@@ -47,7 +47,7 @@ module Lutaml
 
           # Extract from XmlNamespace location attributes
           config.xml_namespaces.each do |namespace|
-            if namespace.location&.strip&.end_with?('.xsd')
+            if namespace.location&.strip&.end_with?(".xsd")
               xsd_files << namespace.location.strip
             end
           end
@@ -63,22 +63,22 @@ module Lutaml
 
           # From PackageInfo elements
           config.package_infos.each do |package|
-            if package.nsabr&.strip && package.ns&.strip
-              mappings << {
-                prefix: package.nsabr.strip,
-                uri: package.ns.strip
-              }
-            end
+            next unless package.nsabr&.strip && package.ns&.strip
+
+            mappings << {
+              prefix: package.nsabr.strip,
+              uri: package.ns.strip
+            }
           end
 
           # From XmlNamespace elements
           config.xml_namespaces.each do |namespace|
-            if namespace.nsabr&.strip && namespace.ns&.strip
-              mappings << {
-                prefix: namespace.nsabr.strip,
-                uri: namespace.ns.strip
-              }
-            end
+            next unless namespace.nsabr&.strip && namespace.ns&.strip
+
+            mappings << {
+              prefix: namespace.nsabr.strip,
+              uri: namespace.ns.strip
+            }
           end
 
           # Deduplicate by URI (keep first occurrence)
@@ -118,15 +118,17 @@ module Lutaml
 
           # From XmlNamespace locations (create mappings from remote to local)
           config.xml_namespaces.each do |namespace|
-            if namespace.location&.strip&.end_with?('.xsd') && namespace.nsabr&.strip
-              local_path = build_local_schema_path(namespace.nsabr.strip)
-              remote_location = namespace.location.strip
-
-              mappings << {
-                from: remote_location,
-                to: local_path
-              }
+            unless namespace.location&.strip&.end_with?(".xsd") && namespace.nsabr&.strip
+              next
             end
+
+            local_path = build_local_schema_path(namespace.nsabr.strip)
+            remote_location = namespace.location.strip
+
+            mappings << {
+              from: remote_location,
+              to: local_path
+            }
           end
 
           mappings.compact
@@ -142,7 +144,7 @@ module Lutaml
           filename = File.basename(path.strip)
 
           # Create relative path structure for LXR packages
-          if filename.end_with?('.xsd')
+          if filename.end_with?(".xsd")
             "reference-docs/xsd/#{filename}"
           else
             path
@@ -154,11 +156,11 @@ module Lutaml
         # @return [String] local schema path
         def build_local_schema_path(prefix)
           case prefix
-          when 'gml'
+          when "gml"
             "reference-docs/xsd/gml/#{prefix}.xsd"
-          when 'urf', 'uro'
+          when "urf", "uro"
             "reference-docs/xsd/i-ur/#{prefix}.xsd"
-          when 'citygml'
+          when "citygml"
             "reference-docs/xsd/citygml/#{prefix}.xsd"
           else
             "reference-docs/xsd/#{prefix}.xsd"

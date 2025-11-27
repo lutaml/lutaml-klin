@@ -1,11 +1,14 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 require "nokogiri"
 require "fileutils"
 
 RSpec.describe "ShapeChange True Parity (Against Unmodified Reference)" do
   before(:all) do
-    @reference_dir = File.expand_path("../../fixtures/shapechange_unmodified", __FILE__)
-    @generated_dir = File.expand_path("../../../tmp/true_parity_test", __FILE__)
+    @reference_dir = File.expand_path("../fixtures/shapechange_unmodified",
+                                      __dir__)
+    @generated_dir = File.expand_path("../../tmp/true_parity_test", __dir__)
     FileUtils.mkdir_p(@generated_dir)
   end
 
@@ -56,15 +59,15 @@ RSpec.describe "ShapeChange True Parity (Against Unmodified Reference)" do
       reference_doc = load_xsd(reference_file)
 
       # Count all xs:element declarations
-      elements = reference_doc.xpath("//xs:element", ns_map)
+      reference_doc.xpath("//xs:element", ns_map)
 
       # The reference should NOT have the 99 VBA-added elements
       # We verify this by checking that specific VBA-added elements don't exist
-      vba_elements = [
-        "bldgDataQualityAttribute",
-        "bridBaseAttribute",
-        "ifcBuildingAttribute",
-        "pointCloud"
+      vba_elements = %w[
+        bldgDataQualityAttribute
+        bridBaseAttribute
+        ifcBuildingAttribute
+        pointCloud
       ]
 
       vba_elements.each do |elem_name|
@@ -73,7 +76,7 @@ RSpec.describe "ShapeChange True Parity (Against Unmodified Reference)" do
           ns_map
         )
         expect(global_elem).to be_empty,
-          "Found VBA-added element '#{elem_name}' in unmodified reference"
+                               "Found VBA-added element '#{elem_name}' in unmodified reference"
       end
     end
   end
@@ -127,7 +130,7 @@ RSpec.describe "ShapeChange True Parity (Against Unmodified Reference)" do
   end
 
   def compare_xsd_structure(reference_doc, generated_doc, filename)
-    puts "\n" + "=" * 80
+    puts "\n#{'=' * 80}"
     puts "Comparing XSD Structure: #{filename}"
     puts "=" * 80
 
@@ -157,9 +160,9 @@ RSpec.describe "ShapeChange True Parity (Against Unmodified Reference)" do
     gen_ns = generated_doc.root.namespaces
 
     expect(gen_ns).to eq(ref_ns),
-      "Namespace declarations don't match:\n" \
-      "Reference: #{ref_ns.inspect}\n" \
-      "Generated: #{gen_ns.inspect}"
+                      "Namespace declarations don't match:\n" \
+                      "Reference: #{ref_ns.inspect}\n" \
+                      "Generated: #{gen_ns.inspect}"
 
     puts "✓ Namespace declarations match (#{ref_ns.size} namespaces)"
   end
@@ -172,9 +175,9 @@ RSpec.describe "ShapeChange True Parity (Against Unmodified Reference)" do
     gen_import_data = extract_import_data(gen_imports)
 
     expect(gen_import_data).to match_array(ref_import_data),
-      "Import declarations don't match:\n" \
-      "Missing: #{(ref_import_data - gen_import_data).inspect}\n" \
-      "Extra: #{(gen_import_data - ref_import_data).inspect}"
+                               "Import declarations don't match:\n" \
+                               "Missing: #{(ref_import_data - gen_import_data).inspect}\n" \
+                               "Extra: #{(gen_import_data - ref_import_data).inspect}"
 
     puts "✓ Import declarations match (#{ref_imports.size} imports)"
   end
@@ -196,9 +199,9 @@ RSpec.describe "ShapeChange True Parity (Against Unmodified Reference)" do
     gen_type_names = gen_types.map { |t| t["name"] }.compact.sort
 
     expect(gen_type_names).to match_array(ref_type_names),
-      "Complex type names don't match:\n" \
-      "Missing: #{(ref_type_names - gen_type_names).inspect}\n" \
-      "Extra: #{(gen_type_names - ref_type_names).inspect}"
+                              "Complex type names don't match:\n" \
+                              "Missing: #{(ref_type_names - gen_type_names).inspect}\n" \
+                              "Extra: #{(gen_type_names - ref_type_names).inspect}"
 
     puts "✓ Complex types match (#{ref_types.size} types)"
 
@@ -225,27 +228,28 @@ RSpec.describe "ShapeChange True Parity (Against Unmodified Reference)" do
     gen_structure = extract_type_structure(gen_type)
 
     expect(gen_structure).to eq(ref_structure),
-      "Structure differs for complex type '#{type_name}'"
+                             "Structure differs for complex type '#{type_name}'"
   end
 
   def extract_type_structure(complex_type)
     {
       base: complex_type.xpath(".//xs:extension/@base", ns_map).first&.value,
-      sequence_elements: complex_type.xpath(".//xs:sequence/xs:element", ns_map).map { |e|
+      sequence_elements: complex_type.xpath(".//xs:sequence/xs:element",
+                                            ns_map).map do |e|
         {
           name: e["name"],
           type: e["type"],
           min_occurs: e["minOccurs"],
           max_occurs: e["maxOccurs"]
         }
-      },
-      attributes: complex_type.xpath(".//xs:attribute", ns_map).map { |a|
+      end,
+      attributes: complex_type.xpath(".//xs:attribute", ns_map).map do |a|
         {
           name: a["name"],
           type: a["type"],
           use: a["use"]
         }
-      }
+      end
     }
   end
 
@@ -257,9 +261,9 @@ RSpec.describe "ShapeChange True Parity (Against Unmodified Reference)" do
     gen_type_names = gen_types.map { |t| t["name"] }.compact.sort
 
     expect(gen_type_names).to match_array(ref_type_names),
-      "Simple type names don't match:\n" \
-      "Missing: #{(ref_type_names - gen_type_names).inspect}\n" \
-      "Extra: #{(gen_type_names - ref_type_names).inspect}"
+                              "Simple type names don't match:\n" \
+                              "Missing: #{(ref_type_names - gen_type_names).inspect}\n" \
+                              "Extra: #{(gen_type_names - ref_type_names).inspect}"
 
     puts "✓ Simple types match (#{ref_types.size} types)"
   end
@@ -273,18 +277,22 @@ RSpec.describe "ShapeChange True Parity (Against Unmodified Reference)" do
     gen_elem_names = gen_elements.map { |e| e["name"] }.sort
 
     expect(gen_elem_names).to match_array(ref_elem_names),
-      "Global element names don't match:\n" \
-      "Missing: #{(ref_elem_names - gen_elem_names).inspect}\n" \
-      "Extra: #{(gen_elem_names - ref_elem_names).inspect}"
+                              "Global element names don't match:\n" \
+                              "Missing: #{(ref_elem_names - gen_elem_names).inspect}\n" \
+                              "Extra: #{(gen_elem_names - ref_elem_names).inspect}"
 
     puts "✓ Global elements match (#{ref_elements.size} elements)"
 
     # Verify no VBA-style substitution group elements
-    vba_style_elements = gen_elements.select { |e| e["substitutionGroup"]&.include?("_GenericApplicationPropertyOf") }
+    vba_style_elements = gen_elements.select do |e|
+      e["substitutionGroup"]&.include?("_GenericApplicationPropertyOf")
+    end
 
     expect(vba_style_elements).to be_empty,
-      "Found VBA-style substitution group elements in generated XSD: " \
-      "#{vba_style_elements.map { |e| e['name'] }.inspect}"
+                                  "Found VBA-style substitution group elements in generated XSD: " \
+                                  "#{vba_style_elements.map do |e|
+                                    e['name']
+                                  end.inspect}"
   end
 
   def compare_attribute_groups(reference_doc, generated_doc)
@@ -295,9 +303,9 @@ RSpec.describe "ShapeChange True Parity (Against Unmodified Reference)" do
     gen_group_names = gen_groups.map { |g| g["name"] }.compact.sort
 
     expect(gen_group_names).to match_array(ref_group_names),
-      "Attribute group names don't match:\n" \
-      "Missing: #{(ref_group_names - gen_group_names).inspect}\n" \
-      "Extra: #{(gen_group_names - ref_group_names).inspect}"
+                               "Attribute group names don't match:\n" \
+                               "Missing: #{(ref_group_names - gen_group_names).inspect}\n" \
+                               "Extra: #{(gen_group_names - ref_group_names).inspect}"
 
     puts "✓ Attribute groups match (#{ref_groups.size} groups)"
   end

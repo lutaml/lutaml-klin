@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "English"
 require "spec_helper"
 require "lutaml/klin/commands/create_lxr_command"
 require "lutaml/klin/lxr/input_strategy"
@@ -107,7 +108,7 @@ RSpec.describe "Create LXR Workflow Integration" do
         .to receive(:system).with("which lutaml-xsd > /dev/null 2>&1").and_return(true)
 
       allow(IO).to receive(:popen).and_yield(StringIO.new("Package created successfully\n"))
-      allow($?).to receive(:success?).and_return(true)
+      allow($CHILD_STATUS).to receive(:success?).and_return(true)
 
       # Create a mock package file to simulate successful build
       allow(File).to receive(:write) do |path, content|
@@ -174,7 +175,7 @@ RSpec.describe "Create LXR Workflow Integration" do
         .to receive(:system).with("which lutaml-xsd > /dev/null 2>&1").and_return(true)
 
       allow(IO).to receive(:popen).and_yield(StringIO.new("Success\n"))
-      allow($?).to receive(:success?).and_return(true)
+      allow($CHILD_STATUS).to receive(:success?).and_return(true)
 
       options = {
         output: output_path,
@@ -228,13 +229,14 @@ RSpec.describe "Create LXR Workflow Integration" do
 
       FileUtils.mkdir_p(xsd_dir)
       File.write(File.join(xsd_dir, "test.xsd"), "<xs:schema/>")
-      File.write(namespaces_file, "namespace_mappings:\n  - prefix: test\n    uri: http://test.com")
+      File.write(namespaces_file,
+                 "namespace_mappings:\n  - prefix: test\n    uri: http://test.com")
 
       allow_any_instance_of(Lutaml::Klin::Lxr::PackageBuilder)
         .to receive(:system).with("which lutaml-xsd > /dev/null 2>&1").and_return(true)
 
       allow(IO).to receive(:popen).and_yield(StringIO.new("Build failed\n"))
-      allow($?).to receive(:success?).and_return(false)
+      allow($CHILD_STATUS).to receive(:success?).and_return(false)
 
       options = {
         output: output_path,

@@ -6,7 +6,9 @@ require "nokogiri"
 RSpec.describe "XSD Generation ShapeChange Parity", type: :integration do
   let(:lur_path) { "spec/fixtures/packages/plateau_all.lur" }
   let(:lxr_path) { "spec/fixtures/packages/plateau_schemas.lxr" }
-  let(:config_path) { "./reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml" }
+  let(:config_path) do
+    "./reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml"
+  end
   let(:output_dir) { "tmp/test_shapechange_parity" }
 
   before do
@@ -14,7 +16,7 @@ RSpec.describe "XSD Generation ShapeChange Parity", type: :integration do
   end
 
   after do
-    FileUtils.rm_rf(output_dir) if Dir.exist?(output_dir)
+    FileUtils.rm_rf(output_dir)
   end
 
   describe "URO package XSD generation" do
@@ -42,7 +44,7 @@ RSpec.describe "XSD Generation ShapeChange Parity", type: :integration do
         config
       )
 
-      results = generator.generate_schemas(['uro'], output_dir)
+      results = generator.generate_schemas(["uro"], output_dir)
       expect(results).not_to be_empty
 
       generated_file = results.first[:file]
@@ -52,8 +54,9 @@ RSpec.describe "XSD Generation ShapeChange Parity", type: :integration do
       generated_xsd = Nokogiri::XML(File.read(generated_file))
 
       # Compare element counts
-      generated_elements = generated_xsd.xpath('//xs:element[@name]', 'xs' => 'http://www.w3.org/2001/XMLSchema')
-      generated_types = generated_xsd.xpath('//xs:complexType[@name]', 'xs' => 'http://www.w3.org/2001/XMLSchema')
+      generated_elements = generated_xsd.xpath("//xs:element[@name]", "xs" => "http://www.w3.org/2001/XMLSchema")
+      generated_types = generated_xsd.xpath("//xs:complexType[@name]",
+                                            "xs" => "http://www.w3.org/2001/XMLSchema")
 
       puts "\nGenerated XSD Statistics:"
       puts "  Elements: #{generated_elements.size}"
@@ -66,10 +69,10 @@ RSpec.describe "XSD Generation ShapeChange Parity", type: :integration do
 
       # Check that elements have proper structure (from ObjectElementProcessor)
       generated_elements.each do |element|
-        expect(element['name']).not_to be_nil
-        expect(element['type']).not_to be_nil
+        expect(element["name"]).not_to be_nil
+        expect(element["type"]).not_to be_nil
         # Types should be in the form "prefix:TypeName"
-        expect(element['type']).to match(/\w+:\w+Type/)
+        expect(element["type"]).to match(/\w+:\w+Type/)
       end
     end
 

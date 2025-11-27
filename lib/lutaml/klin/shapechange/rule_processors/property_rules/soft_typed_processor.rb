@@ -36,10 +36,10 @@ module Lutaml
               return false unless property.respond_to?(:tags)
 
               tags = begin
-                       property.tags
-                     rescue
-                       nil
-                     end
+                property.tags
+              rescue StandardError
+                nil
+              end
               return false unless tags
 
               tag = tags.find { |t| t.name == "soft-typed" }

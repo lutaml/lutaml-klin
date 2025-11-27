@@ -115,17 +115,17 @@ module Lutaml
             return nil unless uml_type
 
             # Normalize type name: gml::CodeType → gml:CodeType
-            normalized_type = uml_type.to_s.gsub('::', ':').strip
+            normalized_type = uml_type.to_s.gsub("::", ":").strip
 
             # Look up in XsdMapEntry with normalized name
             map_entry = config.find_type_mapping(normalized_type,
-                                                  encoding_rule: encoding_rule)
+                                                 encoding_rule: encoding_rule)
 
             # Return normalized XSD type
             if map_entry
               map_entry.xml_type&.strip
             else
-              normalized_type  # Return normalized type as fallback
+              normalized_type # Return normalized type as fallback
             end
           end
 
@@ -162,10 +162,8 @@ module Lutaml
           def determine_namespace(uml_class)
             # Try to get package path from qualified name
             package_path = if uml_class.respond_to?(:qualified_name)
-                            uml_class.qualified_name
-                          else
-                            nil
-                          end
+                             uml_class.qualified_name
+                           end
 
             return nil unless package_path
 

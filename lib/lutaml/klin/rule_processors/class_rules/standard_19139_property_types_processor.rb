@@ -31,7 +31,7 @@ module Lutaml
           # @param uml_class [Lutaml::Uml::Class] The UML class to check
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [Boolean] true if rule is enabled
-          def self.applies_to?(uml_class, config)
+          def self.applies_to?(_uml_class, config)
             config.rule_enabled?(RULE_NAME)
           end
 
@@ -83,13 +83,17 @@ module Lutaml
           # @param uml_class [Lutaml::Uml::Class] The class
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @return [String, nil] The element reference (e.g., "prefix:ClassName")
-          def self.build_element_reference(uml_class, xsd_builder)
-            return nil unless uml_class.package
+          def self.build_element_reference(uml_class, _xsd_builder)
+            # TODO: Get xmlns from ShapeChange config's PackageInfo instead of uml_class.package
+            # return nil unless uml_class.package
+            #
+            # xmlns = uml_class.package.xmlns
+            # element_name = uml_class.name
+            #
+            # "#{xmlns}:#{element_name}"
 
-            xmlns = uml_class.package.xmlns
-            element_name = uml_class.name
-
-            "#{xmlns}:#{element_name}"
+            # Temporary fallback:
+            uml_class.name
           end
 
           # Determines if gco:ObjectReference should be omitted
@@ -104,9 +108,7 @@ module Lutaml
           def self.omit_object_reference?(uml_class)
             category = uml_class.category
 
-            category == :codelist ||
-              category == :enumeration ||
-              category == :union
+            %i[codelist enumeration union].include?(category)
           end
         end
       end

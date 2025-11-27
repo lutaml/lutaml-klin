@@ -64,22 +64,27 @@ RSpec.describe "ShapeChange Config Integration Fix" do
 
     describe "#find_type_mapping" do
       it "finds type mapping for UML type" do
-        mapping = config.find_type_mapping("gml:CodeType", encoding_rule: "citygml")
-        expect(mapping).to be_a(Lutaml::Klin::Shapechange::XsdMapEntry) if mapping
+        mapping = config.find_type_mapping("gml:CodeType",
+                                           encoding_rule: "citygml")
+        if mapping
+          expect(mapping).to be_a(Lutaml::Klin::Shapechange::XsdMapEntry)
+        end
       end
     end
 
     describe "#has_type_mapping?" do
       it "returns true when mapping exists" do
         # Test with a common type that should exist in the config
-        has_mapping = config.has_type_mapping?("gml:CodeType", encoding_rule: "citygml")
+        has_mapping = config.has_type_mapping?("gml:CodeType",
+                                               encoding_rule: "citygml")
         expect(has_mapping).to be_in([true, false])
       end
     end
 
     describe "#get_type_mapping" do
       it "returns mapping when it exists" do
-        mapping = config.get_type_mapping("gml:CodeType", encoding_rule: "citygml")
+        mapping = config.get_type_mapping("gml:CodeType",
+                                          encoding_rule: "citygml")
         expect(mapping).to be_a(Lutaml::Klin::Shapechange::XsdMapEntry).or be_nil
       end
     end

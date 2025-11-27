@@ -40,7 +40,7 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::BaseStrategy do
     # We'll test these through a concrete subclass
     let(:concrete_strategy) do
       Class.new(described_class) do
-        def applicable?(uml_element, context)
+        def applicable?(_uml_element, _context)
           true
         end
 
@@ -49,7 +49,7 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::BaseStrategy do
           {
             normalized: normalize_type_name(uml_element.type),
             prefix: extract_namespace_prefix(uml_element.type),
-            local: extract_local_name(uml_element.type),
+            local: extract_local_name(uml_element.type)
           }
         end
       end.new

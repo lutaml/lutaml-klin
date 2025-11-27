@@ -42,7 +42,8 @@ module Lutaml
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [void]
-          def self.process_property(property, parent_element, xsd_builder, config)
+          def self.process_property(property, parent_element, xsd_builder,
+                                    config)
             return unless applies_to?(property, config)
 
             parent_element.add_element(property.name) do |element|
@@ -88,7 +89,7 @@ module Lutaml
 
             element.min_occurs = min_occurs unless min_occurs == 1
 
-            if max_occurs == -1 || max_occurs == Float::INFINITY
+            if [-1, Float::INFINITY].include?(max_occurs)
               element.max_occurs = "unbounded"
             elsif max_occurs != 1
               element.max_occurs = max_occurs

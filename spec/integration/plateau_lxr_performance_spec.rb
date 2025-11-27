@@ -17,7 +17,8 @@ RSpec.describe "PLATEAU LXR Package Performance", :integration do
         Lutaml::Xsd::SchemaRepository.from_package(lxr_path)
       end
 
-      expect(load_time).to be < 0.1, "LXR load time was #{(load_time * 1000).round(2)}ms, expected < 100ms"
+      expect(load_time).to be < 0.1,
+                           "LXR load time was #{(load_time * 1000).round(2)}ms, expected < 100ms"
 
       puts "\n  ✓ LXR load time: #{(load_time * 1000).round(2)}ms"
     end
@@ -52,11 +53,9 @@ RSpec.describe "PLATEAU LXR Package Performance", :integration do
       query_time = Benchmark.realtime do
         100.times do
           test_types.each do |type|
-            begin
-              @repo.find_type(type)
-            rescue StandardError
-              # Some types may not exist, that's ok for performance testing
-            end
+            @repo.find_type(type)
+          rescue StandardError
+            # Some types may not exist, that's ok for performance testing
           end
         end
       end
@@ -64,7 +63,8 @@ RSpec.describe "PLATEAU LXR Package Performance", :integration do
       total_queries = 100 * test_types.size
       avg_query_time = query_time / total_queries
 
-      expect(avg_query_time).to be < 0.001, "Average query time was #{(avg_query_time * 1000).round(3)}ms, expected < 1ms"
+      expect(avg_query_time).to be < 0.001,
+                                "Average query time was #{(avg_query_time * 1000).round(3)}ms, expected < 1ms"
 
       puts "\n  ✓ Average query time: #{(avg_query_time * 1000).round(3)}ms (#{total_queries} queries)"
     end

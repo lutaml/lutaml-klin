@@ -41,7 +41,7 @@ module Lutaml
         # @param spa_generator [SpaGenerator] Optional custom SPA generator
         def initialize(spa_generator: nil)
           @spa_generator = spa_generator ||
-                          Domain::Services::SpaGenerator.new
+                           Domain::Services::SpaGenerator.new
         end
 
         # Generate a complete SPA for the given schema mapping
@@ -181,15 +181,15 @@ module Lutaml
           if options[:data_mode] == :embedded
             # Embedded mode - inject JSON directly into HTML
             html_with_data = template_html
-              .gsub('%{MAPPINGS_JSON}', JSON.generate(data_files[:mappings]))
-              .gsub('%{SEARCH_INDEX_JSON}', JSON.generate(data_files[:search_index]))
-              .gsub('%{STATISTICS_JSON}', JSON.generate(data_files[:statistics]))
+                             .gsub("%<MAPPINGS_JSON>s", JSON.generate(data_files[:mappings]))
+                             .gsub("%<SEARCH_INDEX_JSON>s", JSON.generate(data_files[:search_index]))
+                             .gsub("%<STATISTICS_JSON>s", JSON.generate(data_files[:statistics]))
           else
             # Linked mode - use empty placeholders, load from files
             html_with_data = template_html
-              .gsub('%{MAPPINGS_JSON}', '{}')
-              .gsub('%{SEARCH_INDEX_JSON}', '{}')
-              .gsub('%{STATISTICS_JSON}', '{}')
+                             .gsub("%<MAPPINGS_JSON>s", "{}")
+                             .gsub("%<SEARCH_INDEX_JSON>s", "{}")
+                             .gsub("%<STATISTICS_JSON>s", "{}")
           end
 
           # Write HTML
@@ -206,12 +206,12 @@ module Lutaml
 
           # Copy JavaScript
           js_source = File.join(TEMPLATE_DIR, "assets", "js", "app.js")
-          if File.exist?(js_source)
-            FileUtils.cp(
-              js_source,
-              File.join(output_path, "assets", "js", "app.js")
-            )
-          end
+          return unless File.exist?(js_source)
+
+          FileUtils.cp(
+            js_source,
+            File.join(output_path, "assets", "js", "app.js")
+          )
         end
 
         # Generate minimal HTML/CSS/JS assets inline
@@ -256,16 +256,16 @@ module Lutaml
         def generate_minimal_html(title, data_files, data_mode)
           # Prepare data injection
           data_script = if data_mode == :embedded
-            <<~SCRIPT
-              <script id="embedded-data">
-                window.MAPPING_DATA = #{JSON.generate(data_files[:mappings])};
-                window.SEARCH_INDEX = #{JSON.generate(data_files[:search_index])};
-                window.STATISTICS = #{JSON.generate(data_files[:statistics])};
-              </script>
-            SCRIPT
-          else
-            "<script id=\"embedded-data\">/* Data loaded from separate files */</script>"
-          end
+                          <<~SCRIPT
+                            <script id="embedded-data">
+                              window.MAPPING_DATA = #{JSON.generate(data_files[:mappings])};
+                              window.SEARCH_INDEX = #{JSON.generate(data_files[:search_index])};
+                              window.STATISTICS = #{JSON.generate(data_files[:statistics])};
+                            </script>
+                          SCRIPT
+                        else
+                          "<script id=\"embedded-data\">/* Data loaded from separate files */</script>"
+                        end
 
           <<~HTML
             <!DOCTYPE html>

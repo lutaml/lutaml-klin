@@ -27,19 +27,19 @@ RSpec.describe Lutaml::Klin::Cli do
     end
 
     it "displays help for generate command" do
-      expect { described_class.start(["help", "generate"]) }.to output(
+      expect { described_class.start(%w[help generate]) }.to output(
         /Generates a YAML mapping file/
       ).to_stdout
     end
 
     it "displays help for merge command" do
-      expect { described_class.start(["help", "merge"]) }.to output(
+      expect { described_class.start(%w[help merge]) }.to output(
         /Merges multiple YAML mapping files/
       ).to_stdout
     end
 
     it "displays help for validate command" do
-      expect { described_class.start(["help", "validate"]) }.to output(
+      expect { described_class.start(%w[help validate]) }.to output(
         /Validates the structure and content/
       ).to_stdout
     end
@@ -52,19 +52,19 @@ RSpec.describe Lutaml::Klin::Cli do
     let(:output_file) { File.join(Dir.tmpdir, "test_output.yaml") }
 
     after do
-      FileUtils.rm_f(output_file) if File.exist?(output_file)
+      FileUtils.rm_f(output_file)
     end
 
     it "generates mapping file" do
       expect do
         described_class.start([
-          "generate",
-          config_path,
-          xmi_path,
-          xsd_dir,
-          output_file,
-          "--package", "TestPackage"
-        ])
+                                "generate",
+                                config_path,
+                                xmi_path,
+                                xsd_dir,
+                                output_file,
+                                "--package", "TestPackage"
+                              ])
       end.to output(/Mapping generated/).to_stdout
 
       expect(File.exist?(output_file)).to be true
@@ -73,12 +73,12 @@ RSpec.describe Lutaml::Klin::Cli do
     it "requires package option" do
       expect do
         described_class.start([
-          "generate",
-          config_path,
-          xmi_path,
-          xsd_dir,
-          output_file
-        ])
+                                "generate",
+                                config_path,
+                                xmi_path,
+                                xsd_dir,
+                                output_file
+                              ])
       end.to raise_error(Thor::RequiredArgumentMissingError)
     end
   end
@@ -117,11 +117,11 @@ RSpec.describe Lutaml::Klin::Cli do
     it "merges multiple mapping files" do
       expect do
         described_class.start([
-          "merge",
-          file1,
-          file2,
-          output_file
-        ])
+                                "merge",
+                                file1,
+                                file2,
+                                output_file
+                              ])
       end.to output(/Merged 2 files/).to_stdout
 
       expect(File.exist?(output_file)).to be true
@@ -134,10 +134,10 @@ RSpec.describe Lutaml::Klin::Cli do
     it "handles single file merge" do
       expect do
         described_class.start([
-          "merge",
-          file1,
-          output_file
-        ])
+                                "merge",
+                                file1,
+                                output_file
+                              ])
       end.to output(/Merged 1 file/).to_stdout
 
       expect(File.exist?(output_file)).to be true
@@ -147,7 +147,7 @@ RSpec.describe Lutaml::Klin::Cli do
       expect do
         described_class.start(["merge", file1])
       end.to output(/Error: At least one input file/).to_stdout
-        .and raise_error(SystemExit)
+                                                     .and raise_error(SystemExit)
     end
   end
 
@@ -197,7 +197,7 @@ RSpec.describe Lutaml::Klin::Cli do
       expect do
         described_class.start(["validate", invalid_file])
       end.to output(/Validation failed/).to_stdout
-        .and raise_error(SystemExit)
+                                        .and raise_error(SystemExit)
     end
 
     it "shows verbose output with --verbose flag" do

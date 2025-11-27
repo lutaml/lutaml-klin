@@ -57,10 +57,10 @@ module Lutaml
           end
 
           output_dir = File.dirname(output_path)
-          unless Dir.exist?(output_dir)
-            error "Output directory not found: #{output_dir}"
-            exit 1
-          end
+          return if Dir.exist?(output_dir)
+
+          error "Output directory not found: #{output_dir}"
+          exit 1
         end
 
         def load_mappings
@@ -109,7 +109,9 @@ module Lutaml
             end
 
             if existing
-              log "  - Skipping duplicate class: #{class_mapping.uml_name}" if verbose
+              if verbose
+                log "  - Skipping duplicate class: #{class_mapping.uml_name}"
+              end
             else
               base_pkg.class_mappings << class_mapping.dup
             end

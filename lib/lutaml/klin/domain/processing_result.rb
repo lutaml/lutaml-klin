@@ -192,7 +192,11 @@ module Lutaml
             "resolution_rate=#{resolution_rate}% " \
             "packages=#{total_packages} " \
             "classes=#{resolved_classes}/#{total_classes} " \
-            "validation=#{validation_enabled? ? (validation_passed? ? 'passed' : 'failed') : 'disabled'}>"
+            "validation=#{if validation_enabled?
+                            validation_passed? ? 'passed' : 'failed'
+                          else
+                            'disabled'
+                          end}>"
         end
 
         alias to_s summary

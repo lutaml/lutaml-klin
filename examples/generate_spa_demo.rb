@@ -21,7 +21,7 @@ if File.exist?("packages/plateau_schemas.lxr")
       verbose: true
     )
     puts "✓ Multi-file SPA generated at: examples/spa_output/multi_file"
-  rescue => e
+  rescue StandardError => e
     puts "⚠ Error: #{e.message}"
   end
 else
@@ -34,8 +34,6 @@ if File.exist?("packages/plateau_schemas.lxr")
   begin
     yaml_path = if File.exist?("plateau_xsd_mapping/plateau_xsd_mapping.yaml")
                   "plateau_xsd_mapping/plateau_xsd_mapping.yaml"
-                else
-                  nil
                 end
 
     Lutaml::Klin::Spa.generate(
@@ -47,7 +45,7 @@ if File.exist?("packages/plateau_schemas.lxr")
       verbose: true
     )
     puts "✓ Embedded SPA generated at: examples/spa_output/plateau_embedded.html"
-  rescue => e
+  rescue StandardError => e
     puts "⚠ Error: #{e.message}"
   end
 else
@@ -70,7 +68,7 @@ if File.exist?("packages/plateau_schemas.lxr")
     puts "  Elements: #{schema.elements.size}"
     puts "  Complex Types: #{schema.complex_types.size}"
     puts "  Search Terms: #{schema.search_index.terms.size}"
-  rescue => e
+  rescue StandardError => e
     puts "⚠ Error: #{e.message}"
   end
 else
@@ -90,14 +88,14 @@ if File.exist?("packages/plateau_schemas.lxr")
       verbose: true
     )
     puts "✓ Custom themed SPA generated at: examples/spa_output/custom_theme"
-  rescue => e
+  rescue StandardError => e
     puts "⚠ Error: #{e.message}"
   end
 else
   puts "⚠ Skipped: LXR package not found"
 end
 
-puts "\n" + "=" * 80
+puts "\n#{'=' * 80}"
 puts "Demo complete!"
 puts ""
 puts "Generated SPAs can be viewed by:"

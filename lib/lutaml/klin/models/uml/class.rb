@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "attribute"
 require_relative "association"
 
@@ -11,7 +13,9 @@ module Lutaml
           attribute :stereotype, :string
           attribute :package_id, :string
           attribute :attributes, Attribute, collection: true, default: -> { [] }
-          attribute :associations, Association, collection: true, default: -> { [] }
+          attribute :associations, Association, collection: true, default: lambda {
+            []
+          }
           attribute :is_abstract, :boolean, default: -> { false }
           attribute :documentation, :string
 

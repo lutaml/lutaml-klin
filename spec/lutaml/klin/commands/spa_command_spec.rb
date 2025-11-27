@@ -36,25 +36,25 @@ RSpec.describe Lutaml::Klin::Commands::SpaCommand do
     end
 
     it "raises error if LXR path not provided" do
-      expect {
+      expect do
         described_class.new(output: output_path)
-      }.to raise_error(ArgumentError, /--lxr.*required/)
+      end.to raise_error(ArgumentError, /--lxr.*required/)
     end
 
     it "raises error if LXR file does not exist" do
-      expect {
+      expect do
         described_class.new(lxr: "nonexistent.lxr", output: output_path)
-      }.to raise_error(ArgumentError, /LXR package not found/)
+      end.to raise_error(ArgumentError, /LXR package not found/)
     end
 
     it "raises error if YAML file specified but does not exist" do
-      expect {
+      expect do
         described_class.new(
           lxr: lxr_file,
           yaml: "nonexistent.yaml",
           output: output_path
         )
-      }.to raise_error(ArgumentError, /YAML mapping not found/)
+      end.to raise_error(ArgumentError, /YAML mapping not found/)
     end
   end
 
@@ -124,95 +124,96 @@ RSpec.describe Lutaml::Klin::Commands::SpaCommand do
     end
 
     it "handles errors gracefully" do
-      allow(mock_generator).to receive(:generate).and_raise(StandardError, "Test error")
+      allow(mock_generator).to receive(:generate).and_raise(StandardError,
+                                                            "Test error")
 
-      expect {
+      expect do
         command.run
-      }.to raise_error(StandardError).and output(/SPA generation failed/).to_stdout
+      end.to raise_error(StandardError).and output(/SPA generation failed/).to_stdout
     end
   end
 
   describe "mode validation" do
     it "accepts embedded mode" do
-      expect {
+      expect do
         described_class.new(
           lxr: lxr_file,
           mode: "embedded",
           output: output_path
         )
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "accepts multi-file mode" do
-      expect {
+      expect do
         described_class.new(
           lxr: lxr_file,
           mode: "multi-file",
           output: output_path
         )
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "accepts multi_file mode (underscore variant)" do
-      expect {
+      expect do
         described_class.new(
           lxr: lxr_file,
           mode: "multi_file",
           output: output_path
         )
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "raises error for invalid mode" do
-      expect {
+      expect do
         described_class.new(
           lxr: lxr_file,
           mode: "invalid",
           output: output_path
         )
-      }.to raise_error(ArgumentError, /Invalid mode/)
+      end.to raise_error(ArgumentError, /Invalid mode/)
     end
   end
 
   describe "theme validation" do
     it "accepts default theme" do
-      expect {
+      expect do
         described_class.new(
           lxr: lxr_file,
           theme: "default",
           output: output_path
         )
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "accepts dark theme" do
-      expect {
+      expect do
         described_class.new(
           lxr: lxr_file,
           theme: "dark",
           output: output_path
         )
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "accepts plateau theme" do
-      expect {
+      expect do
         described_class.new(
           lxr: lxr_file,
           theme: "plateau",
           output: output_path
         )
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "raises error for invalid theme" do
-      expect {
+      expect do
         described_class.new(
           lxr: lxr_file,
           theme: "invalid",
           output: output_path
         )
-      }.to raise_error(ArgumentError, /Invalid theme/)
+      end.to raise_error(ArgumentError, /Invalid theme/)
     end
   end
 
@@ -252,7 +253,8 @@ RSpec.describe Lutaml::Klin::Commands::SpaCommand do
       # Mock elements with UML mappings
       elem_with_mapping = instance_double("Element", uml_mapping: {})
       elem_without_mapping = instance_double("Element", uml_mapping: nil)
-      allow(mock_schema).to receive(:elements).and_return([elem_with_mapping, elem_without_mapping])
+      allow(mock_schema).to receive(:elements).and_return([elem_with_mapping,
+                                                           elem_without_mapping])
       allow(mock_schema).to receive(:complex_types).and_return([])
       allow(mock_schema).to receive(:simple_types).and_return([])
       allow(mock_schema).to receive(:attributes).and_return([])

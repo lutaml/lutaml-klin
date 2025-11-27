@@ -137,31 +137,37 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
 
       # Mock PropertyTypeMapper
       property_type_mapper = class_double("PropertyTypeMapper")
-      stub_const("Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor::PropertyTypeMapper", property_type_mapper)
+      stub_const(
+        "Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor::PropertyTypeMapper", property_type_mapper
+      )
       allow(property_type_mapper).to receive(:map_property_type)
     end
 
     it "creates element for property" do
       expect(xsd_builder).to receive(:add_element).with("height")
-      described_class.process_property(property, parent_class, xsd_builder, config)
+      described_class.process_property(property, parent_class, xsd_builder,
+                                       config)
     end
 
     it "adds property documentation" do
       expect(annotation_builder).to receive(:add_documentation)
         .with("Building height")
-      described_class.process_property(property, parent_class, xsd_builder, config)
+      described_class.process_property(property, parent_class, xsd_builder,
+                                       config)
     end
 
     it "sets substitution group" do
       expect(element_builder).to receive(:substitution_group=)
         .with("bldg:_GenericApplicationPropertyOfAbstractBuilding")
-      described_class.process_property(property, parent_class, xsd_builder, config)
+      described_class.process_property(property, parent_class, xsd_builder,
+                                       config)
     end
 
     it "imports supertype namespace" do
       expect(xsd_builder).to receive(:add_import)
         .with("bldg", "http://example.org/building")
-      described_class.process_property(property, parent_class, xsd_builder, config)
+      described_class.process_property(property, parent_class, xsd_builder,
+                                       config)
     end
 
     context "when no unsuppressed supertype exists" do
@@ -177,7 +183,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
         expect(xsd_builder).to receive(:add_error)
           .with(/no unsuppressed supertype/, parent_class)
         expect(xsd_builder).not_to receive(:add_element)
-        described_class.process_property(property, parent_class, xsd_builder, config)
+        described_class.process_property(property, parent_class, xsd_builder,
+                                         config)
       end
     end
 
@@ -198,7 +205,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
 
       it "sets type to xs:string" do
         expect(element_builder).to receive(:type=).with("xs:string")
-        described_class.process_property(property, parent_class, xsd_builder, config)
+        described_class.process_property(property, parent_class, xsd_builder,
+                                         config)
       end
     end
 
@@ -216,7 +224,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
             "http://example.org/ade",
             false
           )
-        described_class.process_property(property, parent_class, xsd_builder, config)
+        described_class.process_property(property, parent_class, xsd_builder,
+                                         config)
       end
     end
   end
@@ -252,7 +261,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
       end
 
       it "returns the unsuppressed supertype" do
-        result = described_class.find_unsuppressed_supertype(uml_class, xsd_builder)
+        result = described_class.find_unsuppressed_supertype(uml_class,
+                                                             xsd_builder)
         expect(result).to eq(supertype)
       end
     end
@@ -306,7 +316,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
       end
 
       it "recursively finds unsuppressed supertype" do
-        result = described_class.find_unsuppressed_supertype(uml_class, xsd_builder)
+        result = described_class.find_unsuppressed_supertype(uml_class,
+                                                             xsd_builder)
         expect(result).to eq(unsuppressed_super)
       end
     end
@@ -320,7 +331,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
       end
 
       it "returns nil" do
-        result = described_class.find_unsuppressed_supertype(uml_class, xsd_builder)
+        result = described_class.find_unsuppressed_supertype(uml_class,
+                                                             xsd_builder)
         expect(result).to be_nil
       end
     end
@@ -339,7 +351,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
       end
 
       it "builds correct substitution group name" do
-        result = described_class.build_substitution_group_name(supertype, xsd_builder)
+        result = described_class.build_substitution_group_name(supertype,
+                                                               xsd_builder)
         expect(result).to eq("bldg:_GenericApplicationPropertyOfAbstractBuilding")
       end
     end
@@ -352,7 +365,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
       end
 
       it "normalizes and builds substitution group name" do
-        result = described_class.build_substitution_group_name(supertype, xsd_builder)
+        result = described_class.build_substitution_group_name(supertype,
+                                                               xsd_builder)
         expect(result).to eq("bldg:_GenericApplicationPropertyOfAbstractBuilding")
       end
     end
@@ -365,7 +379,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
       end
 
       it "builds substitution group name without prefix" do
-        result = described_class.build_substitution_group_name(supertype, xsd_builder)
+        result = described_class.build_substitution_group_name(supertype,
+                                                               xsd_builder)
         expect(result).to eq("_GenericApplicationPropertyOfAbstractBuilding")
       end
     end
@@ -378,7 +393,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
       end
 
       it "returns nil" do
-        result = described_class.build_substitution_group_name(supertype, xsd_builder)
+        result = described_class.build_substitution_group_name(supertype,
+                                                               xsd_builder)
         expect(result).to be_nil
       end
     end
@@ -411,7 +427,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
 
       it "sets type to xs:string" do
         expect(element).to receive(:type=).with("xs:string")
-        described_class.set_property_type(element, property, parent_class, xsd_builder, config)
+        described_class.set_property_type(element, property, parent_class,
+                                          xsd_builder, config)
       end
     end
 
@@ -430,7 +447,9 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
 
         # Mock PropertyTypeMapper
         property_type_mapper = class_double("PropertyTypeMapper")
-        stub_const("Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor::PropertyTypeMapper", property_type_mapper)
+        stub_const(
+          "Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor::PropertyTypeMapper", property_type_mapper
+        )
         allow(property_type_mapper).to receive(:map_property_type)
       end
 
@@ -438,7 +457,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor do
         property_type_mapper = Lutaml::Klin::RuleProcessors::ClassRules::SuppressProcessor::PropertyTypeMapper
         expect(property_type_mapper).to receive(:map_property_type)
           .with(element, property, parent_class, xsd_builder, config)
-        described_class.set_property_type(element, property, parent_class, xsd_builder, config)
+        described_class.set_property_type(element, property, parent_class,
+                                          xsd_builder, config)
       end
     end
   end

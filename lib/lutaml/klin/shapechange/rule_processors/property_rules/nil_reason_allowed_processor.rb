@@ -52,9 +52,9 @@ module Lutaml
               property_type = context[:property_type_element]
               return unless property_type
 
-              if should_add_nil_reason?(property)
-                add_nil_reason_attribute(property_type, context)
-              end
+              return unless should_add_nil_reason?(property)
+
+              add_nil_reason_attribute(property_type, context)
             end
 
             private

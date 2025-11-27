@@ -17,7 +17,7 @@ module Lutaml
               "http://www.isotc211.org/2005/gmx",
               "http://www.isotc211.org/2005/gsr",
               "http://www.isotc211.org/2005/gss",
-              "http://www.isotc211.org/2005/gts",
+              "http://www.isotc211.org/2005/gts"
             ].freeze
 
             # Check if this processor applies to the given class
@@ -36,7 +36,7 @@ module Lutaml
             # @param builder [XsdBuilder] The XSD builder
             # @param config [Configuration] The configuration
             # @return [Hash, nil] ISO type information or nil
-            def self.process(klass, builder, config)
+            def self.process(klass, _builder, config)
               base_class = klass.base_class
               return nil unless base_class
 
@@ -56,21 +56,22 @@ module Lutaml
 
               # Parse QName to get namespace and local name
               colon_idx = xml_element.index(":")
-              return nil unless colon_idx && colon_idx > 0
+              return nil unless colon_idx&.positive?
 
               nsabr = xml_element[0...colon_idx]
-              local_name = xml_element[(colon_idx + 1)..-1]
+              local_name = xml_element[(colon_idx + 1)..]
 
               # Get full namespace URI
               namespace = config.full_namespace(nsabr)
 
+              # TODO: Get xmlns/target_namespace from ShapeChange config's PackageInfo instead
               # Handle case where namespace might be from the same package
-              if namespace.nil? && base_class.package
-                pkg_nsabr = base_class.package.xmlns
-                if pkg_nsabr&.downcase == nsabr.downcase
-                  namespace = base_class.package.target_namespace
-                end
-              end
+              # if namespace.nil? && base_class.package
+              #   pkg_nsabr = base_class.package.xmlns
+              #   if pkg_nsabr&.downcase == nsabr.downcase
+              #     namespace = base_class.package.target_namespace
+              #   end
+              # end
 
               return nil unless namespace
 
@@ -82,7 +83,7 @@ module Lutaml
                 namespace: namespace,
                 namespace_abbr: nsabr,
                 local_name: local_name,
-                gco_namespace: config.full_namespace("gco"),
+                gco_namespace: config.full_namespace("gco")
               }
             end
 
@@ -90,7 +91,8 @@ module Lutaml
             # @param extension_element [Nokogiri::XML::Element] The xs:extension element
             # @param iso_type_info [Hash] ISO type information
             # @param builder [XsdBuilder] The XSD builder
-            def self.add_iso_type_attribute(extension_element, iso_type_info, builder)
+            def self.add_iso_type_attribute(extension_element, iso_type_info,
+                                            builder)
               # Ensure gco namespace is imported
               builder.add_namespace_import(
                 "gco",
@@ -101,7 +103,8 @@ module Lutaml
               attr_element = builder.create_element("attribute")
               builder.add_attribute(attr_element, "ref", "gco:isoType")
               builder.add_attribute(attr_element, "use", "required")
-              builder.add_attribute(attr_element, "fixed", iso_type_info[:local_name])
+              builder.add_attribute(attr_element, "fixed",
+                                    iso_type_info[:local_name])
 
               # Append to extension element
               extension_element.add_child(attr_element)

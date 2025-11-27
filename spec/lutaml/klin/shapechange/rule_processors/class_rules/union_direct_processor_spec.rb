@@ -15,7 +15,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::UnionDirec
       {
         xsd_document: xsd_doc,
         property_element: property_element,
-        current_property: nil, # Will be set in each test
+        current_property: nil # Will be set in each test
       }
     end
 

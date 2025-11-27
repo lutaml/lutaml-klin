@@ -320,11 +320,11 @@ RSpec.describe Lutaml::Klin::Domain::Reporters::MarkdownReporter do
         content = File.read(output_path)
 
         # Check for proper Markdown formatting
-        expect(content).to match(/^# /)  # Top-level heading
-        expect(content).to match(/^## /)  # Second-level heading
-        expect(content).to match(/^\| .* \|/)  # Table rows
-        expect(content).to include("**")  # Bold text
-        expect(content).to include("`")  # Code formatting
+        expect(content).to match(/^# /) # Top-level heading
+        expect(content).to match(/^## /) # Second-level heading
+        expect(content).to match(/^\| .* \|/) # Table rows
+        expect(content).to include("**") # Bold text
+        expect(content).to include("`") # Code formatting
       end
     end
   end

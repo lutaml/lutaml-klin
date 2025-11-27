@@ -10,7 +10,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
     double(
       "Context",
       rule_enabled?: true,
-      config: { "representTaggedValues" => "author,version,status" },
+      config: { "representTaggedValues" => "author,version,status" }
     )
   end
 
@@ -19,7 +19,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
       context "with element having configured tagged values" do
         let(:element) do
           double(
-            "Class",
+            "Class"
           )
         end
 
@@ -40,12 +40,12 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
           double(
             "Context",
             rule_enabled?: true,
-            config: { "representTaggedValues" => "" },
+            config: { "representTaggedValues" => "" }
           )
         end
         let(:element) do
           double(
-            "Class",
+            "Class"
           )
         end
 
@@ -57,7 +57,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
       context "with no matching tagged values" do
         let(:element) do
           double(
-            "Class",
+            "Class"
           )
         end
 
@@ -79,12 +79,12 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
         double(
           "Context",
           rule_enabled?: false,
-          config: { "representTaggedValues" => "author,version" },
+          config: { "representTaggedValues" => "author,version" }
         )
       end
       let(:element) do
         double(
-          "Class",
+          "Class"
         )
       end
 
@@ -98,7 +98,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
     context "with single tagged value" do
       let(:element) do
         double(
-          "Class",
+          "Class"
         )
       end
 
@@ -117,8 +117,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
             namespace: scai_namespace,
             element: "taggedValue",
             attributes: { tag: "author" },
-            text: "Transport Team",
-          ),
+            text: "Transport Team"
+          )
         )
       end
 
@@ -128,8 +128,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
         expect(result[:imports]).to include(
           hash_including(
             prefix: "sc",
-            namespace: scai_namespace,
-          ),
+            namespace: scai_namespace
+          )
         )
       end
     end
@@ -137,7 +137,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
     context "with multiple tagged values" do
       let(:element) do
         double(
-          "Class",
+          "Class"
         )
       end
 
@@ -158,7 +158,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
         result = processor.process(element, context)
         tags = result[:appinfo].map { |tv| tv[:attributes][:tag] }
 
-        expect(tags).to eq(["author", "status", "version"])
+        expect(tags).to eq(%w[author status version])
       end
     end
 
@@ -167,19 +167,20 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
         double(
           "Context",
           rule_enabled?: true,
-          config: { "representTaggedValues" => "example" },
+          config: { "representTaggedValues" => "example" }
         )
       end
       let(:element) do
         double(
-          "Property",
+          "Property"
         )
       end
 
       before do
         allow(element).to receive(:respond_to?).with(:tagged_value).and_return(true)
         allow(element).to receive(:tagged_value).with("example").and_return(
-          ["POINT(0 0)", "LINESTRING(0 0, 1 1)", "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))"],
+          ["POINT(0 0)", "LINESTRING(0 0, 1 1)",
+           "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))"]
         )
       end
 
@@ -187,7 +188,9 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
         result = processor.process(element, context)
 
         expect(result[:appinfo].length).to eq(3)
-        expect(result[:appinfo].all? { |tv| tv[:attributes][:tag] == "example" }).to be true
+        expect(result[:appinfo].all? do |tv|
+          tv[:attributes][:tag] == "example"
+        end).to be true
       end
 
       it "sorts values alphabetically" do
@@ -195,17 +198,17 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
         values = result[:appinfo].map { |tv| tv[:text] }
 
         expect(values).to eq([
-          "LINESTRING(0 0, 1 1)",
-          "POINT(0 0)",
-          "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))",
-        ])
+                               "LINESTRING(0 0, 1 1)",
+                               "POINT(0 0)",
+                               "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))"
+                             ])
       end
     end
 
     context "with empty tagged value" do
       let(:element) do
         double(
-          "Class",
+          "Class"
         )
       end
 
@@ -226,7 +229,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
     context "when rule does not apply" do
       let(:element) do
         double(
-          "Class",
+          "Class"
         )
       end
 
@@ -250,14 +253,14 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
       let(:context) do
         double(
           "Context",
-          config: { "representTaggedValues" => "author,version,status" },
+          config: { "representTaggedValues" => "author,version,status" }
         )
       end
 
       it "returns array of tag names" do
         tags = processor.get_represent_tags(context)
 
-        expect(tags).to eq(["author", "version", "status"])
+        expect(tags).to eq(%w[author version status])
       end
     end
 
@@ -265,14 +268,14 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
       let(:context) do
         double(
           "Context",
-          config: { "representTaggedValues" => " author , version , status " },
+          config: { "representTaggedValues" => " author , version , status " }
         )
       end
 
       it "returns trimmed tag names" do
         tags = processor.get_represent_tags(context)
 
-        expect(tags).to eq(["author", "version", "status"])
+        expect(tags).to eq(%w[author version status])
       end
     end
 
@@ -280,7 +283,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
       let(:context) do
         double(
           "Context",
-          config: {},
+          config: {}
         )
       end
 
@@ -295,7 +298,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
       let(:context) do
         double(
           "Context",
-          config: { "representTaggedValues" => "" },
+          config: { "representTaggedValues" => "" }
         )
       end
 
@@ -311,7 +314,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
     context "with element having tagged_value method" do
       let(:element) do
         double(
-          "Class",
+          "Class"
         )
       end
 
@@ -323,12 +326,13 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
       end
 
       it "returns hash of tag to values" do
-        result = processor.get_tagged_values_for_tags(element, ["author", "version", "status"])
+        result = processor.get_tagged_values_for_tags(element,
+                                                      %w[author version status])
 
         expect(result).to eq({
-          "author" => ["John Doe"],
-          "version" => ["1.0"],
-        })
+                               "author" => ["John Doe"],
+                               "version" => ["1.0"]
+                             })
       end
     end
 
@@ -338,8 +342,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
           "Class",
           tagged_values: {
             "author" => "Jane Smith",
-            "version" => "2.0",
-          },
+            "version" => "2.0"
+          }
         )
       end
 
@@ -349,12 +353,14 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
       end
 
       it "returns hash of tag to values" do
-        result = processor.get_tagged_values_for_tags(element, ["author", "version", "deprecated"])
+        result = processor.get_tagged_values_for_tags(element,
+                                                      %w[author version
+                                                         deprecated])
 
         expect(result).to eq({
-          "author" => ["Jane Smith"],
-          "version" => ["2.0"],
-        })
+                               "author" => ["Jane Smith"],
+                               "version" => ["2.0"]
+                             })
       end
     end
 
@@ -369,7 +375,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::TaggedValuesProcessor do
       end
 
       it "returns empty hash" do
-        result = processor.get_tagged_values_for_tags(element, ["author", "version"])
+        result = processor.get_tagged_values_for_tags(element,
+                                                      %w[author version])
 
         expect(result).to eq({})
       end

@@ -91,9 +91,9 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
     context "with simple template" do
       it "renders template with string context" do
         result = renderer.render_template("test.liquid", {
-          title: "Test Title",
-          description: "Test Description"
-        })
+                                            title: "Test Title",
+                                            description: "Test Description"
+                                          })
 
         expect(result).to include("<h1>Test Title</h1>")
         expect(result).to include("<p>Test Description</p>")
@@ -101,9 +101,9 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
 
       it "renders template with symbol keys" do
         result = renderer.render_template("test.liquid", {
-          title: "Symbol Keys",
-          description: "Works with symbols"
-        })
+                                            title: "Symbol Keys",
+                                            description: "Works with symbols"
+                                          })
 
         expect(result).to include("Symbol Keys")
         expect(result).to include("Works with symbols")
@@ -113,11 +113,11 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
     context "with nested data" do
       it "renders template with nested hash" do
         result = renderer.render_template("nested.liquid", {
-          metadata: {
-            name: "Test Schema",
-            version: "1.0.0"
-          }
-        })
+                                            metadata: {
+                                              name: "Test Schema",
+                                              version: "1.0.0"
+                                            }
+                                          })
 
         expect(result).to include("Test Schema")
         expect(result).to include("1.0.0")
@@ -127,12 +127,12 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
     context "with arrays" do
       it "renders template with array iteration" do
         result = renderer.render_template("array.liquid", {
-          items: [
-            { name: "Item 1" },
-            { name: "Item 2" },
-            { name: "Item 3" }
-          ]
-        })
+                                            items: [
+                                              { name: "Item 1" },
+                                              { name: "Item 2" },
+                                              { name: "Item 3" }
+                                            ]
+                                          })
 
         expect(result).to include("<li>Item 1</li>")
         expect(result).to include("<li>Item 2</li>")
@@ -148,10 +148,10 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
     context "with conditionals" do
       it "shows content when condition is true" do
         result = renderer.render_template("conditional.liquid", {
-          show_title: true,
-          title: "Conditional Title",
-          items: [1, 2, 3]
-        })
+                                            show_title: true,
+                                            title: "Conditional Title",
+                                            items: [1, 2, 3]
+                                          })
 
         expect(result).to include("<h1>Conditional Title</h1>")
         expect(result).to include("Found 3 items")
@@ -159,10 +159,10 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
 
       it "hides content when condition is false" do
         result = renderer.render_template("conditional.liquid", {
-          show_title: false,
-          title: "Hidden Title",
-          items: []
-        })
+                                            show_title: false,
+                                            title: "Hidden Title",
+                                            items: []
+                                          })
 
         expect(result).not_to include("<h1>")
         expect(result).not_to include("Found")
@@ -182,15 +182,15 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
 
     context "error handling" do
       it "raises error for non-existent template" do
-        expect {
+        expect do
           renderer.render_template("non_existent.liquid", {})
-        }.to raise_error(Lutaml::Klin::Spa::TemplateNotFoundError)
+        end.to raise_error(Lutaml::Klin::Spa::TemplateNotFoundError)
       end
 
       it "includes template path in error message" do
-        expect {
+        expect do
           renderer.render_template("missing.liquid", {})
-        }.to raise_error(/missing\.liquid/)
+        end.to raise_error(/missing\.liquid/)
       end
     end
   end
@@ -198,25 +198,25 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
   describe "#render_partial" do
     it "renders a partial with context" do
       result = renderer.render_partial("header", {
-        site_name: "Partial Test"
-      })
+                                         site_name: "Partial Test"
+                                       })
 
       expect(result).to include("<h1>Partial Test</h1>")
     end
 
     it "raises error for non-existent partial" do
-      expect {
+      expect do
         renderer.render_partial("non_existent", {})
-      }.to raise_error(Lutaml::Klin::Spa::TemplateNotFoundError)
+      end.to raise_error(Lutaml::Klin::Spa::TemplateNotFoundError)
     end
   end
 
   describe "key stringification" do
     it "converts symbol keys to strings" do
       result = renderer.render_template("test.liquid", {
-        title: "Symbol",
-        description: "Converted"
-      })
+                                          title: "Symbol",
+                                          description: "Converted"
+                                        })
 
       expect(result).to include("Symbol")
       expect(result).to include("Converted")
@@ -224,11 +224,11 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
 
     it "handles deeply nested symbol keys" do
       result = renderer.render_template("nested.liquid", {
-        metadata: {
-          name: "Deep",
-          version: "2.0"
-        }
-      })
+                                          metadata: {
+                                            name: "Deep",
+                                            version: "2.0"
+                                          }
+                                        })
 
       expect(result).to include("Deep")
       expect(result).to include("2.0")
@@ -236,11 +236,11 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
 
     it "handles arrays of hashes with symbol keys" do
       result = renderer.render_template("array.liquid", {
-        items: [
-          { name: "First" },
-          { name: "Second" }
-        ]
-      })
+                                          items: [
+                                            { name: "First" },
+                                            { name: "Second" }
+                                          ]
+                                        })
 
       expect(result).to include("First")
       expect(result).to include("Second")
@@ -259,8 +259,8 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
         LIQUID
 
         result = renderer.render_template("multi_file/index.liquid", {
-          page_title: "Index Page"
-        })
+                                            page_title: "Index Page"
+                                          })
 
         expect(result).to include("Index Page")
       end
@@ -270,9 +270,9 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
   describe "edge cases" do
     it "handles nil values gracefully" do
       result = renderer.render_template("test.liquid", {
-        title: nil,
-        description: "Has description"
-      })
+                                          title: nil,
+                                          description: "Has description"
+                                        })
 
       expect(result).to include("Has description")
       expect(result).not_to include("nil")
@@ -280,9 +280,9 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
 
     it "handles empty strings" do
       result = renderer.render_template("test.liquid", {
-        title: "",
-        description: ""
-      })
+                                          title: "",
+                                          description: ""
+                                        })
 
       expect(result).to include("<h1></h1>")
       expect(result).to include("<p></p>")
@@ -290,9 +290,9 @@ RSpec.describe Lutaml::Klin::Spa::TemplateRenderer do
 
     it "handles special characters in content" do
       result = renderer.render_template("test.liquid", {
-        title: "Title with <tags>",
-        description: "Description & special © chars"
-      })
+                                          title: "Title with <tags>",
+                                          description: "Description & special © chars"
+                                        })
 
       expect(result).to include("Title with <tags>")
       expect(result).to include("Description & special © chars")

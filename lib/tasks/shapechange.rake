@@ -9,7 +9,8 @@ namespace :shapechange do
     shapechange_dir = args[:shapechange_dir] || ENV["SHAPECHANGE_DIR"] ||
                       File.expand_path("~/src/external/ShapeChange")
 
-    config_dir = File.join(shapechange_dir, "shapechange-core/src/main/resources/config")
+    config_dir = File.join(shapechange_dir,
+                           "shapechange-core/src/main/resources/config")
     standard_rules_file = File.join(config_dir, "StandardRules.xml")
 
     unless File.exist?(standard_rules_file)
@@ -49,11 +50,11 @@ namespace :shapechange do
       StandardMapEntries_iso19139_2007.xml
     ].each do |filename|
       source = File.join(config_dir, filename)
-      if File.exist?(source)
-        dest = File.join(output_dir, filename)
-        FileUtils.cp(source, dest)
-        puts "✓ Copied #{filename}"
-      end
+      next unless File.exist?(source)
+
+      dest = File.join(output_dir, filename)
+      FileUtils.cp(source, dest)
+      puts "✓ Copied #{filename}"
     end
 
     puts ""

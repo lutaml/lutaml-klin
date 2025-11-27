@@ -184,7 +184,7 @@ module Lutaml
         # Report command results
         # @param result [Hash] Build result
         def report_results(result)
-          puts "\n" + "=" * 70
+          puts "\n#{'=' * 70}"
           puts "  LXR PACKAGE CREATION SUMMARY"
           puts "=" * 70
           puts ""
@@ -199,10 +199,8 @@ module Lutaml
               validation_status = result[:validation][:valid] ? "PASSED" : "FAILED"
               puts "#{validation_icon}  Validation: #{validation_status}"
 
-              if result[:validation][:messages]
-                result[:validation][:messages].each do |msg|
-                  puts "   • #{msg}"
-                end
+              result[:validation][:messages]&.each do |msg|
+                puts "   • #{msg}"
               end
             end
           else
@@ -223,7 +221,7 @@ module Lutaml
         def log_header
           return unless verbose?
 
-          puts "\n" + "=" * 70
+          puts "\n#{'=' * 70}"
           puts "  LUTAML-KLIN: LXR Package Creator"
           puts "=" * 70
           puts ""

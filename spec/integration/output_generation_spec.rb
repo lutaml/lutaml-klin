@@ -13,7 +13,7 @@ RSpec.describe "Output Generation Integration", :integration do
   end
 
   after do
-    FileUtils.rm_rf(output_dir) if File.exist?(output_dir)
+    FileUtils.rm_rf(output_dir)
   end
 
   describe "YAML mapping generation" do
@@ -171,7 +171,7 @@ RSpec.describe "Output Generation Integration", :integration do
           partial_attributes: 1,
           unresolved_attributes: 1,
           resolution_rate: 50.0,
-          attribute_resolution_rate: 60.0,
+          attribute_resolution_rate: 60.0
         },
         unresolved_items: [
           {
@@ -184,9 +184,9 @@ RSpec.describe "Output Generation Integration", :integration do
             error: "Type not found in repository",
             suggestions: [
               "Check namespace mappings",
-              "Verify type exists",
-            ],
-          },
+              "Verify type exists"
+            ]
+          }
         ],
         packages: [
           {
@@ -197,10 +197,10 @@ RSpec.describe "Output Generation Integration", :integration do
               {
                 name: "TestClass",
                 status: "partial",
-                attributes: [],
-              },
-            ],
-          },
+                attributes: []
+              }
+            ]
+          }
         ],
         generated_at: "2024-01-01T00:00:00Z"
       )
@@ -512,7 +512,8 @@ RSpec.describe "Output Generation Integration", :integration do
       expect(File.exist?(File.join(output_dir, "spa_stats.json"))).to be true
 
       # Verify content validity
-      expect(YAML.safe_load(File.read(yaml_path), permitted_classes: [Symbol, Time]))
+      expect(YAML.safe_load(File.read(yaml_path),
+                            permitted_classes: [Symbol, Time]))
         .to be_a(Hash)
       expect(JSON.parse(File.read(json_path))).to be_a(Hash)
       expect(File.read(md_path)).to include("# Validation Report")

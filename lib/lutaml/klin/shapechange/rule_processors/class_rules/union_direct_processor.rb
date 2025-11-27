@@ -205,12 +205,12 @@ module Lutaml
             end
 
             def set_nil_reason_allowed(property)
-              if property.respond_to?(:nil_reason_allowed=)
-                begin
-                  property.nil_reason_allowed = true
-                rescue StandardError
-                  # Ignore if can't set
-                end
+              return unless property.respond_to?(:nil_reason_allowed=)
+
+              begin
+                property.nil_reason_allowed = true
+              rescue StandardError
+                # Ignore if can't set
               end
             end
 
@@ -228,7 +228,7 @@ module Lutaml
               xsd_doc.add_attribute(element, "type", type_name)
             end
 
-            def get_type_name(type_info, context)
+            def get_type_name(type_info, _context)
               # Try to get from type_info
               type_name = type_info.respond_to?(:name) ? type_info.name : nil
               return "#{type_name}Type" if type_name

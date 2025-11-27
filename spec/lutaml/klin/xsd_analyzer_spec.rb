@@ -4,7 +4,9 @@ require "spec_helper"
 require "lutaml/klin/xsd_analyzer"
 
 RSpec.describe Lutaml::Klin::XsdAnalyzer do
-  let(:fixture_path) { File.join(__dir__, "../../fixtures/xsd/simple_schema.xsd") }
+  let(:fixture_path) do
+    File.join(__dir__, "../../fixtures/xsd/simple_schema.xsd")
+  end
   let(:analyzer) { described_class.new }
 
   describe "#parse_file" do

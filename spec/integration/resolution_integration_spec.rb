@@ -40,7 +40,7 @@ RSpec.describe "Resolution Integration", :integration do
     it "resolves complex type paths" do
       overrides = {
         "pkg::OldClass" => "ns:NewClass",
-        "SimpleName" => "xs:string",
+        "SimpleName" => "xs:string"
       }
 
       override_context = Lutaml::Klin::Domain::ResolutionContext.new(
@@ -78,7 +78,7 @@ RSpec.describe "Resolution Integration", :integration do
                xmlElement: nil,
                xmlType: "xs:integer",
                xmlTypeContent: "simple",
-               xmlTypeNilReason: false),
+               xmlTypeNilReason: false)
       ]
 
       allow(shapechange_config).to receive(:xsd_map_entries)
@@ -148,8 +148,6 @@ RSpec.describe "Resolution Integration", :integration do
           string_type
         when "CustomType"
           custom_type
-        else
-          nil
         end
       end
 
@@ -187,7 +185,7 @@ RSpec.describe "Resolution Integration", :integration do
       strategies = [
         Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy.new,
         Lutaml::Klin::Domain::Strategies::ShapeChangeMappingStrategy.new,
-        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new,
+        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new
       ]
       Lutaml::Klin::Domain::ResolutionEngine.new(strategies)
     end
@@ -202,7 +200,7 @@ RSpec.describe "Resolution Integration", :integration do
                              xmlPropertyType: nil,
                              xmlElement: nil,
                              xmlTypeContent: "simple",
-                             xmlTypeNilReason: false),
+                             xmlTypeNilReason: false)
                     ])
 
       string_type = double("XsdType",
@@ -281,8 +279,6 @@ RSpec.describe "Resolution Integration", :integration do
         if type_name == "PointType" &&
            (namespace.nil? || namespace.include?("gml"))
           gml_type
-        else
-          nil
         end
       end
 
@@ -309,7 +305,7 @@ RSpec.describe "Resolution Integration", :integration do
       strategies = [
         Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy.new,
         Lutaml::Klin::Domain::Strategies::ShapeChangeMappingStrategy.new,
-        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new,
+        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new
       ]
       Lutaml::Klin::Domain::ResolutionEngine.new(strategies)
     end
@@ -369,7 +365,7 @@ RSpec.describe "Resolution Integration", :integration do
   describe "error handling in resolution" do
     let(:engine) do
       strategies = [
-        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new,
+        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new
       ]
       Lutaml::Klin::Domain::ResolutionEngine.new(strategies)
     end

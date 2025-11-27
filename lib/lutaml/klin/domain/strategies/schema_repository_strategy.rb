@@ -39,7 +39,7 @@ module Lutaml
           # @example
           #   strategy.applicable?(element, context) # => true (always, if
           #   type present)
-          def applicable?(uml_element, context)
+          def applicable?(uml_element, _context)
             return false unless uml_element.respond_to?(:type)
 
             !uml_element.type.nil? && !uml_element.type.empty?
@@ -85,7 +85,7 @@ module Lutaml
                   strategy: name,
                   resolution_path: xsd_result&.resolution_path,
                   note: "This is the fallback strategy - all other " \
-                        "strategies were unable to resolve",
+                        "strategies were unable to resolve"
                 }
               )
             end
@@ -99,7 +99,7 @@ module Lutaml
                 original_type: original_type,
                 normalized_type: normalized_type,
                 resolution_method: "direct_lookup",
-                schema_file: xsd_result.schema_file,
+                schema_file: xsd_result.schema_file
               }
             )
           rescue StandardError => e
@@ -110,7 +110,7 @@ module Lutaml
                 normalized_type: normalized_type,
                 exception: e.class.name,
                 backtrace: e.backtrace&.first(3),
-                strategy: name,
+                strategy: name
               }
             )
           end

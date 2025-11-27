@@ -41,10 +41,10 @@ module Lutaml
                 imports: [
                   {
                     prefix: "gml",
-                    namespace: context.gml_namespace,
-                  },
+                    namespace: context.gml_namespace
+                  }
                 ],
-                processed: true,
+                processed: true
               }
             end
 

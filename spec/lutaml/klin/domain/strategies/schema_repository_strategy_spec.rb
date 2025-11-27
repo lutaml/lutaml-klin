@@ -50,14 +50,13 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy do
 
         # Create proper mock result object with required methods
         xsd_result = double("TypeResolutionResult",
-          resolved: true,
-          local_name: "string",
-          namespace: "http://www.w3.org/2001/XMLSchema",
-          schema_file: "schemas/xmlschema.xsd"
-        )
+                            resolved: true,
+                            local_name: "string",
+                            namespace: "http://www.w3.org/2001/XMLSchema",
+                            schema_file: "schemas/xmlschema.xsd")
 
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(xsd_result)
+                                                       .and_return(xsd_result)
 
         result = strategy.resolve(element, context: context)
 
@@ -73,14 +72,13 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy do
 
         # Create proper mock result object
         xsd_result = double("TypeResolutionResult",
-          resolved: true,
-          local_name: "string",
-          namespace: "http://www.w3.org/2001/XMLSchema",
-          schema_file: "schemas/xmlschema.xsd"
-        )
+                            resolved: true,
+                            local_name: "string",
+                            namespace: "http://www.w3.org/2001/XMLSchema",
+                            schema_file: "schemas/xmlschema.xsd")
 
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(xsd_result)
+                                                       .and_return(xsd_result)
 
         result = strategy.resolve(element, context: context)
 
@@ -92,14 +90,13 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy do
 
         # Create proper mock result object
         xsd_result = double("TypeResolutionResult",
-          resolved: true,
-          local_name: "string",
-          namespace: "http://www.w3.org/2001/XMLSchema",
-          schema_file: "schemas/xmlschema.xsd"
-        )
+                            resolved: true,
+                            local_name: "string",
+                            namespace: "http://www.w3.org/2001/XMLSchema",
+                            schema_file: "schemas/xmlschema.xsd")
 
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(xsd_result)
+                                                       .and_return(xsd_result)
 
         result = strategy.resolve(element, context: context)
 
@@ -115,13 +112,12 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy do
 
         # Create proper mock result object for unresolved case
         xsd_result = double("TypeResolutionResult",
-          resolved: false,
-          error_message: "Type 'UnknownType' not found",
-          resolution_path: nil
-        )
+                            resolved: false,
+                            error_message: "Type 'UnknownType' not found",
+                            resolution_path: nil)
 
         allow(xsd_repository).to receive(:resolve_type).with("UnknownType")
-          .and_return(xsd_result)
+                                                       .and_return(xsd_result)
 
         result = strategy.resolve(element, context: context)
 
@@ -134,13 +130,12 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy do
 
         # Create proper mock result object for unresolved case
         xsd_result = double("TypeResolutionResult",
-          resolved: false,
-          error_message: "Type 'UnknownType' not found",
-          resolution_path: nil
-        )
+                            resolved: false,
+                            error_message: "Type 'UnknownType' not found",
+                            resolution_path: nil)
 
         allow(xsd_repository).to receive(:resolve_type).with("UnknownType")
-          .and_return(xsd_result)
+                                                       .and_return(xsd_result)
 
         result = strategy.resolve(element, context: context)
 
@@ -150,7 +145,7 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy do
       it "handles nil result from repository" do
         element = double("UMLElement", type: "UnknownType")
         allow(xsd_repository).to receive(:resolve_type).with("UnknownType")
-          .and_return(nil)
+                                                       .and_return(nil)
 
         result = strategy.resolve(element, context: context)
 

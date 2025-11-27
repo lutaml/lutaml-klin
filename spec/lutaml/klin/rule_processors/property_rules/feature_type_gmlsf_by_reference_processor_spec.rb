@@ -98,30 +98,35 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::FeatureTypeGmlsfByRe
     it "creates element for property" do
       expect(parent_element).to receive(:add_element)
         .with("relatedFeature")
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     it "adds property documentation" do
       expect(annotation_builder).to receive(:add_documentation)
         .with("Reference to related feature")
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     it "sets type to gml:ReferenceType" do
       expect(element_builder).to receive(:type=)
         .with("gml:ReferenceType")
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     it "applies multiplicity constraints" do
       expect(element_builder).to receive(:min_occurs=).with(0)
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     it "imports GML namespace" do
       expect(xsd_builder).to receive(:add_import)
         .with("gml", "http://www.opengis.net/gml/3.2")
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     context "with multiple occurrences" do
@@ -138,7 +143,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::FeatureTypeGmlsfByRe
       it "sets max_occurs to unbounded" do
         expect(element_builder).to receive(:min_occurs=).with(0)
         expect(element_builder).to receive(:max_occurs=).with("unbounded")
-        described_class.process_property(property, parent_element, xsd_builder, config)
+        described_class.process_property(property, parent_element, xsd_builder,
+                                         config)
       end
     end
 
@@ -156,7 +162,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::FeatureTypeGmlsfByRe
       it "does not set multiplicity attributes for default 1..1" do
         expect(element_builder).not_to receive(:min_occurs=)
         expect(element_builder).not_to receive(:max_occurs=)
-        described_class.process_property(property, parent_element, xsd_builder, config)
+        described_class.process_property(property, parent_element, xsd_builder,
+                                         config)
       end
     end
 
@@ -174,7 +181,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::FeatureTypeGmlsfByRe
             "http://example.org/ns",
             false
           )
-        described_class.process_property(property, parent_element, xsd_builder, config)
+        described_class.process_property(property, parent_element, xsd_builder,
+                                         config)
       end
     end
 
@@ -188,7 +196,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::FeatureTypeGmlsfByRe
       it "uses custom prefix for import" do
         expect(xsd_builder).to receive(:add_import)
           .with("gml32", "http://www.opengis.net/gml/3.2")
-        described_class.process_property(property, parent_element, xsd_builder, config)
+        described_class.process_property(property, parent_element, xsd_builder,
+                                         config)
       end
     end
 
@@ -203,7 +212,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::FeatureTypeGmlsfByRe
 
       it "does not process the property" do
         expect(parent_element).not_to receive(:add_element)
-        described_class.process_property(property, parent_element, xsd_builder, config)
+        described_class.process_property(property, parent_element, xsd_builder,
+                                         config)
       end
     end
   end

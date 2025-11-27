@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
   spec.metadata["changelog_uri"] = "#{spec.homepage}/blob/main/CHANGELOG.adoc"
+  spec.metadata["rubygems_mfa_required"] = "true"
 
   spec.files = Dir.chdir(__dir__) do
     `git ls-files -z`.split("\x0").reject do |f|
@@ -33,11 +34,11 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "lutaml-model", "~> 0.7"
+  spec.add_dependency "liquid"
   spec.add_dependency "lutaml"
+  spec.add_dependency "lutaml-model", "~> 0.7"
   spec.add_dependency "lutaml-xsd"
   spec.add_dependency "moxml"
-  spec.add_dependency "thor"
-  spec.add_dependency "liquid"
   spec.add_dependency "sqlite3"
+  spec.add_dependency "thor"
 end

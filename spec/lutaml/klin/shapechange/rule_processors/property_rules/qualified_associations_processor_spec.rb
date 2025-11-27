@@ -77,7 +77,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::Qualifi
           qname: "ConnectionType"
         )
       end
-      let(:qualifier) { double("Qualifier", name: "type", type: "ConnectionType") }
+      let(:qualifier) do
+        double("Qualifier", name: "type", type: "ConnectionType")
+      end
       let(:reverse_property) do
         double(
           "ReverseProperty",
@@ -128,7 +130,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::Qualifi
           qname: "Category"
         )
       end
-      let(:qualifier) { double("Qualifier", name: "category", type: "Category") }
+      let(:qualifier) do
+        double("Qualifier", name: "category", type: "Category")
+      end
       let(:reverse_property) do
         double(
           "ReverseProperty",
@@ -173,7 +177,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::Qualifi
 
     context "when processing association with multiple qualifiers" do
       let(:qualifier1) { double("Qualifier", name: "distance", type: "Real") }
-      let(:qualifier2) { double("Qualifier", name: "direction", type: "String") }
+      let(:qualifier2) do
+        double("Qualifier", name: "direction", type: "String")
+      end
       let(:reverse_property) do
         double(
           "ReverseProperty",

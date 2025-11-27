@@ -23,8 +23,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::Nillabl
         double(
           "Property",
           name: "height",
-          respond_to?: ->(method) do
-            [:voidable?, :voidable, :nil_reason_allowed?, :nilReasonAllowed].include?(method)
+          respond_to?: lambda do |method|
+            %i[voidable? voidable nil_reason_allowed?
+               nilReasonAllowed].include?(method)
           end,
           voidable?: true,
           nil_reason_allowed?: false
@@ -50,8 +51,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::Nillabl
         double(
           "Property",
           name: "name",
-          respond_to?: ->(method) do
-            [:voidable?, :voidable, :nil_reason_allowed?, :nilReasonAllowed].include?(method)
+          respond_to?: lambda do |method|
+            %i[voidable? voidable nil_reason_allowed?
+               nilReasonAllowed].include?(method)
           end,
           voidable?: false,
           nil_reason_allowed?: false
@@ -76,8 +78,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::Nillabl
         double(
           "Property",
           name: "description",
-          respond_to?: ->(method) do
-            [:voidable?, :voidable, :nil_reason_allowed?, :nilReasonAllowed].include?(method)
+          respond_to?: lambda do |method|
+            %i[voidable? voidable nil_reason_allowed?
+               nilReasonAllowed].include?(method)
           end,
           voidable?: false,
           nil_reason_allowed?: true

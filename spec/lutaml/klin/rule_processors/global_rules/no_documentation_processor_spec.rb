@@ -43,7 +43,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::GlobalRules::NoDocumentationProcess
       end
 
       it "returns false" do
-        result = described_class.should_generate_documentation?(model_element, config)
+        result = described_class.should_generate_documentation?(model_element,
+                                                                config)
         expect(result).to be false
       end
     end
@@ -56,7 +57,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::GlobalRules::NoDocumentationProcess
       end
 
       it "returns true" do
-        result = described_class.should_generate_documentation?(model_element, config)
+        result = described_class.should_generate_documentation?(model_element,
+                                                                config)
         expect(result).to be true
       end
     end

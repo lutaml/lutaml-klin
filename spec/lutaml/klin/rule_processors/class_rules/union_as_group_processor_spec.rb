@@ -118,7 +118,7 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::UnionAsGroupProcessor d
           Lutaml::Uml::Attribute,
           name: "curve",
           type: "Curve"
-        ),
+        )
       ]
     end
 
@@ -136,7 +136,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::UnionAsGroupProcessor d
 
       allow(xsd_builder).to receive(:find_class).with("Point").and_return(point_class)
       allow(xsd_builder).to receive(:find_class).with("Curve").and_return(curve_class)
-      allow(xsd_builder).to receive(:map_to_element).and_return("gml:Point", "gml:Curve")
+      allow(xsd_builder).to receive(:map_to_element).and_return("gml:Point",
+                                                                "gml:Curve")
       allow(choice_builder).to receive(:add_element_reference).and_yield(double("elem_ref"))
       allow(xsd_builder).to receive(:add_import)
     end
@@ -233,25 +234,29 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::UnionAsGroupProcessor d
     it "creates group reference with correct name" do
       expect(parent_element).to receive(:add_group_reference)
         .with("prefix:GeometryUnionGroup")
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     it "adds property documentation" do
       expect(annotation_builder).to receive(:add_documentation)
         .with("The geometry property")
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     it "applies multiplicity constraints" do
       expect(group_ref_builder).to receive(:min_occurs=).with(0)
       expect(group_ref_builder).to receive(:max_occurs=).with("unbounded")
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     it "imports type namespace" do
       expect(xsd_builder).to receive(:add_import)
         .with("prefix", "http://example.org/ns")
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     context "when type class has no package" do
@@ -268,7 +273,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::UnionAsGroupProcessor d
         expect(xsd_builder).to receive(:add_error)
           .with(/no package or namespace/, property)
         expect(parent_element).not_to receive(:add_group_reference)
-        described_class.process_property(property, parent_element, xsd_builder, config)
+        described_class.process_property(property, parent_element, xsd_builder,
+                                         config)
       end
     end
 
@@ -288,7 +294,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::UnionAsGroupProcessor d
 
       it "does not process the property" do
         expect(parent_element).not_to receive(:add_group_reference)
-        described_class.process_property(property, parent_element, xsd_builder, config)
+        described_class.process_property(property, parent_element, xsd_builder,
+                                         config)
       end
     end
 
@@ -306,7 +313,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::UnionAsGroupProcessor d
       it "does not set multiplicity attributes" do
         expect(group_ref_builder).not_to receive(:min_occurs=)
         expect(group_ref_builder).not_to receive(:max_occurs=)
-        described_class.process_property(property, parent_element, xsd_builder, config)
+        described_class.process_property(property, parent_element, xsd_builder,
+                                         config)
       end
     end
   end
@@ -331,7 +339,7 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::UnionAsGroupProcessor d
         instance_double(
           Lutaml::Uml::Attribute,
           type: "Point"
-        ),
+        )
       ]
     end
 

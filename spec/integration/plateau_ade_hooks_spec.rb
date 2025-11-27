@@ -53,7 +53,9 @@ RSpec.describe "PLATEAU ADE Hooks Generation" do
 
   describe "ADE mappings configuration" do
     it "loads 99 ADE hook mappings from YAML" do
-      config_file = File.expand_path("../../../config/plateau_ade_mappings.yml", __dir__)
+      config_file = File.expand_path(
+        "../../../config/plateau_ade_mappings.yml", __dir__
+      )
       expect(File.exist?(config_file)).to be true
 
       data = YAML.load_file(config_file)
@@ -62,7 +64,9 @@ RSpec.describe "PLATEAU ADE Hooks Generation" do
     end
 
     it "has valid mapping structure for each hook" do
-      config_file = File.expand_path("../../../config/plateau_ade_mappings.yml", __dir__)
+      config_file = File.expand_path(
+        "../../../config/plateau_ade_mappings.yml", __dir__
+      )
       data = YAML.load_file(config_file)
 
       data["ade_hooks"].each do |hook|
@@ -75,11 +79,14 @@ RSpec.describe "PLATEAU ADE Hooks Generation" do
     end
 
     it "includes all CityGML module prefixes" do
-      config_file = File.expand_path("../../../config/plateau_ade_mappings.yml", __dir__)
+      config_file = File.expand_path(
+        "../../../config/plateau_ade_mappings.yml", __dir__
+      )
       data = YAML.load_file(config_file)
 
       prefixes = data["ade_hooks"].map { |h| h["citygml_prefix"] }.uniq.sort
-      expected_prefixes = %w[bldg brid core dem frn grp luse tran tun veg wtr].sort
+      expected_prefixes = %w[bldg brid core dem frn grp luse tran tun veg
+                             wtr].sort
 
       expect(prefixes).to eq(expected_prefixes)
     end
@@ -199,30 +206,52 @@ RSpec.describe "PLATEAU ADE Hooks Generation" do
 
   describe "Integration: ADE hook count verification" do
     it "confirms all 99 VBA modifications are mapped" do
-      config_file = File.expand_path("../../../config/plateau_ade_mappings.yml", __dir__)
+      config_file = File.expand_path(
+        "../../../config/plateau_ade_mappings.yml", __dir__
+      )
       data = YAML.load_file(config_file)
 
       # Count by CityGML module
-      building_hooks = data["ade_hooks"].select { |h| h["citygml_prefix"] == "bldg" }
-      bridge_hooks = data["ade_hooks"].select { |h| h["citygml_prefix"] == "brid" }
-      tunnel_hooks = data["ade_hooks"].select { |h| h["citygml_prefix"] == "tun" }
-      landuse_hooks = data["ade_hooks"].select { |h| h["citygml_prefix"] == "luse" }
-      waterbody_hooks = data["ade_hooks"].select { |h| h["citygml_prefix"] == "wtr" }
-      furniture_hooks = data["ade_hooks"].select { |h| h["citygml_prefix"] == "frn" }
-      transport_hooks = data["ade_hooks"].select { |h| h["citygml_prefix"] == "tran" }
-      vegetation_hooks = data["ade_hooks"].select { |h| h["citygml_prefix"] == "veg" }
-      group_hooks = data["ade_hooks"].select { |h| h["citygml_prefix"] == "grp" }
+      building_hooks = data["ade_hooks"].select do |h|
+        h["citygml_prefix"] == "bldg"
+      end
+      bridge_hooks = data["ade_hooks"].select do |h|
+        h["citygml_prefix"] == "brid"
+      end
+      tunnel_hooks = data["ade_hooks"].select do |h|
+        h["citygml_prefix"] == "tun"
+      end
+      landuse_hooks = data["ade_hooks"].select do |h|
+        h["citygml_prefix"] == "luse"
+      end
+      waterbody_hooks = data["ade_hooks"].select do |h|
+        h["citygml_prefix"] == "wtr"
+      end
+      furniture_hooks = data["ade_hooks"].select do |h|
+        h["citygml_prefix"] == "frn"
+      end
+      transport_hooks = data["ade_hooks"].select do |h|
+        h["citygml_prefix"] == "tran"
+      end
+      vegetation_hooks = data["ade_hooks"].select do |h|
+        h["citygml_prefix"] == "veg"
+      end
+      group_hooks = data["ade_hooks"].select do |h|
+        h["citygml_prefix"] == "grp"
+      end
       dem_hooks = data["ade_hooks"].select { |h| h["citygml_prefix"] == "dem" }
-      core_hooks = data["ade_hooks"].select { |h| h["citygml_prefix"] == "core" }
+      core_hooks = data["ade_hooks"].select do |h|
+        h["citygml_prefix"] == "core"
+      end
 
       # Verify counts match VBA analysis
-      expect(building_hooks.size).to eq(25)  # 14 + 11 building elements
+      expect(building_hooks.size).to eq(25) # 14 + 11 building elements
       expect(bridge_hooks.size).to eq(11)
       expect(tunnel_hooks.size).to eq(11)
       expect(landuse_hooks.size).to eq(8)
       expect(waterbody_hooks.size).to eq(8)
       expect(furniture_hooks.size).to eq(7)
-      expect(transport_hooks.size).to eq(15)  # 7 + 3 + 5 transport elements
+      expect(transport_hooks.size).to eq(15) # 7 + 3 + 5 transport elements
       expect(vegetation_hooks.size).to eq(6)
       expect(group_hooks.size).to eq(4)
       expect(dem_hooks.size).to eq(3)

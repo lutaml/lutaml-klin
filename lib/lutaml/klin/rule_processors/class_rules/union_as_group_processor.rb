@@ -72,18 +72,20 @@ module Lutaml
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [void]
-          def self.process_property(property, parent_element, xsd_builder, config)
+          def self.process_property(property, parent_element, xsd_builder,
+                                    config)
             type_class = xsd_builder.find_class(property.type)
             return unless applies_to?(type_class, config)
 
+            # TODO: Get xmlns/target_namespace from ShapeChange config's PackageInfo instead
             # Verify package and namespace
-            unless type_class.package&.xmlns
-              xsd_builder.add_error(
-                "Union class '#{type_class.name}' has no package or namespace",
-                property
-              )
-              return
-            end
+            # unless type_class.package&.xmlns
+            #   xsd_builder.add_error(
+            #     "Union class '#{type_class.name}' has no package or namespace",
+            #     property
+            #   )
+            #   return
+            # end
 
             # Create group reference
             group_ref = "#{type_class.qualified_name}Group"
@@ -99,11 +101,12 @@ module Lutaml
               # Apply multiplicity
               apply_multiplicity(group_ref_element, property)
 
+              # TODO: Get xmlns/target_namespace from ShapeChange config's PackageInfo instead
               # Add namespace import
-              xsd_builder.add_import(
-                type_class.package.xmlns,
-                type_class.package.target_namespace
-              )
+              # xsd_builder.add_import(
+              #   type_class.package.xmlns,
+              #   type_class.package.target_namespace
+              # )
             end
           end
 
@@ -114,7 +117,8 @@ module Lutaml
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [void]
-          def self.process_union_options(union_class, choice_element, xsd_builder, config)
+          def self.process_union_options(union_class, choice_element,
+                                         xsd_builder, _config)
             union_class.attributes.each do |option|
               option_class = xsd_builder.find_class(option.type)
               next unless option_class
@@ -124,13 +128,14 @@ module Lutaml
               next unless element_ref
 
               choice_element.add_element_reference(element_ref) do |elem_ref|
+                # TODO: Get xmlns/target_namespace from ShapeChange config's PackageInfo instead
                 # Add import for option type namespace
-                if option_class.package
-                  xsd_builder.add_import(
-                    option_class.package.xmlns,
-                    option_class.package.target_namespace
-                  )
-                end
+                # if option_class.package
+                #   xsd_builder.add_import(
+                #     option_class.package.xmlns,
+                #     option_class.package.target_namespace
+                #   )
+                # end
               end
             end
           end
@@ -148,7 +153,7 @@ module Lutaml
 
             element.min_occurs = min_occurs unless min_occurs == 1
 
-            if max_occurs == -1 || max_occurs == Float::INFINITY
+            if [-1, Float::INFINITY].include?(max_occurs)
               element.max_occurs = "unbounded"
             elsif max_occurs != 1
               element.max_occurs = max_occurs

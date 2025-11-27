@@ -16,17 +16,26 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::EnumSubtyp
 
   describe "#process" do
     context "when enumeration has subtype enumerations" do
-      let(:pending_prop) { double("Property", name: "pending", initial_value: nil) }
-      let(:active_prop) { double("Property", name: "active", initial_value: nil) }
-      let(:completed_prop) { double("Property", name: "completed", initial_value: nil) }
-      let(:archived_prop) { double("Property", name: "archived", initial_value: nil) }
+      let(:pending_prop) do
+        double("Property", name: "pending", initial_value: nil)
+      end
+      let(:active_prop) do
+        double("Property", name: "active", initial_value: nil)
+      end
+      let(:completed_prop) do
+        double("Property", name: "completed", initial_value: nil)
+      end
+      let(:archived_prop) do
+        double("Property", name: "archived", initial_value: nil)
+      end
 
       let(:extended_enum) do
         double(
           "ExtendedEnum",
           name: "ExtendedStatus",
           category: "enumeration",
-          properties: { "completed" => completed_prop, "archived" => archived_prop },
+          properties: { "completed" => completed_prop,
+                        "archived" => archived_prop },
           subtypes: nil
         )
       end
@@ -160,8 +169,12 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::EnumSubtyp
     end
 
     context "when enumeration has code list subtype" do
-      let(:enum_prop) { double("Property", name: "enumValue", initial_value: nil) }
-      let(:code_prop) { double("Property", name: "codeValue", initial_value: nil) }
+      let(:enum_prop) do
+        double("Property", name: "enumValue", initial_value: nil)
+      end
+      let(:code_prop) do
+        double("Property", name: "codeValue", initial_value: nil)
+      end
 
       let(:code_list) do
         double(
@@ -222,7 +235,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::EnumSubtyp
           "Enumeration",
           name: "ColorEnum",
           category: "enumeration",
-          properties: { "RED" => prop_with_value, "BLUE" => prop_without_value },
+          properties: { "RED" => prop_with_value,
+                        "BLUE" => prop_without_value },
           subtypes: nil
         )
       end
@@ -452,7 +466,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::EnumSubtyp
           name: "BaseEnum",
           category: "enumeration",
           properties: { "base" => prop1 },
-          subtypes: ["sub1_id", "sub2_id", "sub3_id"]
+          subtypes: %w[sub1_id sub2_id sub3_id]
         )
       end
 

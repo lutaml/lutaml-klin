@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Lutaml
   module Klin
     module Models
@@ -14,7 +16,7 @@ module Lutaml
           attribute :documentation, :string
 
           def required?
-            multiplicity_min && multiplicity_min.positive?
+            multiplicity_min&.positive?
           end
 
           def multi_valued?

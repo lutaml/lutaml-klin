@@ -15,7 +15,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::MixinClass
       {
         sequence_element: sequence_element,
         model: model,
-        rule_checker: rule_checker,
+        rule_checker: rule_checker
       }
     end
 

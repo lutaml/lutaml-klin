@@ -8,7 +8,9 @@ RSpec.describe Lutaml::Klin::Lxr::InputStrategy do
   describe "#extract_schema_info" do
     it "raises NotImplementedError" do
       strategy = described_class.new
-      expect { strategy.extract_schema_info }.to raise_error(NotImplementedError)
+      expect do
+        strategy.extract_schema_info
+      end.to raise_error(NotImplementedError)
     end
   end
 
@@ -23,7 +25,9 @@ end
 RSpec.describe Lutaml::Klin::Lxr::ShapeChangeInputStrategy do
   let(:config_path) { "spec/fixtures/shapechange/test_config.xml" }
   let(:extractor) { instance_double(Lutaml::Klin::Shapechange::LxrExtractor) }
-  let(:strategy) { described_class.new(config_path: config_path, extractor: extractor) }
+  let(:strategy) do
+    described_class.new(config_path: config_path, extractor: extractor)
+  end
 
   describe "#initialize" do
     it "stores config_path" do
@@ -103,7 +107,8 @@ RSpec.describe Lutaml::Klin::Lxr::ShapeChangeInputStrategy do
     it "returns schema information" do
       result = strategy.extract_schema_info
       expect(result).to eq(schema_info)
-      expect(result[:xsd_files]).to contain_exactly("schema1.xsd", "schema2.xsd")
+      expect(result[:xsd_files]).to contain_exactly("schema1.xsd",
+                                                    "schema2.xsd")
       expect(result[:namespace_mappings].first[:prefix]).to eq("urf")
     end
   end
@@ -112,7 +117,9 @@ end
 RSpec.describe Lutaml::Klin::Lxr::ManualInputStrategy do
   let(:xsd_dir) { "spec/fixtures/xsd" }
   let(:namespaces_config) { "spec/fixtures/namespaces.yaml" }
-  let(:strategy) { described_class.new(xsd_dir: xsd_dir, namespaces_config: namespaces_config) }
+  let(:strategy) do
+    described_class.new(xsd_dir: xsd_dir, namespaces_config: namespaces_config)
+  end
 
   describe "#initialize" do
     it "stores xsd_dir" do
@@ -134,7 +141,9 @@ RSpec.describe Lutaml::Klin::Lxr::ManualInputStrategy do
 
   describe "#validate!" do
     context "when neither xsd_dir nor xsd_files provided" do
-      let(:strategy) { described_class.new(namespaces_config: namespaces_config) }
+      let(:strategy) do
+        described_class.new(namespaces_config: namespaces_config)
+      end
 
       it "raises InvalidInputError" do
         expect { strategy.validate! }.to raise_error(
@@ -226,12 +235,13 @@ RSpec.describe Lutaml::Klin::Lxr::ManualInputStrategy do
       allow(File).to receive(:exist?).with(namespaces_config).and_return(true)
       allow(YAML).to receive(:load_file).with(namespaces_config).and_return(namespace_config_data)
       allow(Dir).to receive(:glob).with(File.join(xsd_dir, "**", "*.xsd"))
-                                   .and_return(["schema1.xsd", "schema2.xsd"])
+                                  .and_return(["schema1.xsd", "schema2.xsd"])
     end
 
     it "returns schema information with collected XSD files" do
       result = strategy.extract_schema_info
-      expect(result[:xsd_files]).to contain_exactly("schema1.xsd", "schema2.xsd")
+      expect(result[:xsd_files]).to contain_exactly("schema1.xsd",
+                                                    "schema2.xsd")
     end
 
     it "returns namespace mappings with symbol keys" do
@@ -257,7 +267,7 @@ RSpec.describe Lutaml::Klin::Lxr::ManualInputStrategy do
       before do
         allow(Dir).to receive(:exist?).with(xsd_dir).and_return(true)
         allow(Dir).to receive(:glob).with(File.join(xsd_dir, "**", "*.xsd"))
-                                     .and_return(["schema1.xsd"])
+                                    .and_return(["schema1.xsd"])
       end
 
       it "uses Hash directly without loading file" do

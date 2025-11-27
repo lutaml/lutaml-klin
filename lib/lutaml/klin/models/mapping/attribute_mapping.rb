@@ -57,7 +57,7 @@ module Lutaml
         #
         # @return [Boolean] true if resolution_status is 'resolved' or 'inferred'
         def resolved?
-          resolution_status == "resolved" || resolution_status == "inferred"
+          %w[resolved inferred].include?(resolution_status)
         end
 
         # Check if the attribute mapping is unresolved

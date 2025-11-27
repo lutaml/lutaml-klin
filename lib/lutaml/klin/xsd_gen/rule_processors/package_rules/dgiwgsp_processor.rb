@@ -54,22 +54,22 @@ module Lutaml
                       {
                         namespace: DGIWG_NAMESPACE,
                         element: "ComplianceLevel",
-                        text: compliance_level,
+                        text: compliance_level
                       },
                       {
                         namespace: DGIWG_NAMESPACE,
                         element: "GMLProfileSchema",
-                        text: profile_schema,
-                      },
-                    ],
-                  },
+                        text: profile_schema
+                      }
+                    ]
+                  }
                 ],
                 imports: [
                   {
                     prefix: DGIWG_NSABR,
-                    namespace: DGIWG_NAMESPACE,
-                  },
-                ],
+                    namespace: DGIWG_NAMESPACE
+                  }
+                ]
               }
             end
 

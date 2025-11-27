@@ -32,7 +32,8 @@ module Lutaml
             if needs_extension?(uml_class, base_type)
               # Add complexContent/extension and return the extension element
               # as the content container for properties
-              extension = xsd_doc.add_complex_content_extension(complex_type, base_type)
+              extension = xsd_doc.add_complex_content_extension(complex_type,
+                                                                base_type)
               context[:content_container] = extension
             else
               # Direct content model - complex_type is the container
@@ -45,7 +46,7 @@ module Lutaml
 
           private
 
-          def type_name(uml_class, xsd_doc)
+          def type_name(uml_class, _xsd_doc)
             # Follow GML/ISO 19139 naming conventions
             "#{uml_class.name}Type"
           end
@@ -72,7 +73,7 @@ module Lutaml
             default_base_type_for_class(uml_class, context)
           end
 
-          def default_base_type_for_class(uml_class, context)
+          def default_base_type_for_class(uml_class, _context)
             # Return nil for DATATYPE/UNION without base in GML naming
             # (these don't need complexContent/extension)
             return nil if is_datatype_or_union_without_base?(uml_class)
@@ -103,14 +104,13 @@ module Lutaml
             stereotypes.any? { |s| s.downcase == stereotype_name.downcase }
           end
 
-          def needs_extension?(uml_class, base_type)
+          def needs_extension?(_uml_class, base_type)
             # If we have a base type, we need complexContent/extension
             return true if base_type
 
             # DATATYPE/UNION without base don't need extension
             false
           end
-
         end
       end
     end

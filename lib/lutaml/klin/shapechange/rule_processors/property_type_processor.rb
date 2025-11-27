@@ -32,18 +32,15 @@ module Lutaml
             sequence.add_child(element_ref)
 
             # Add AssociationAttributeGroup if class has identity
-            if class_has_identity?(uml_class)
-              xsd_doc.add_attribute_group(
-                property_type,
-                ref: "gml:AssociationAttributeGroup"
-              )
+            return unless class_has_identity?(uml_class)
 
-              # Add import for gml namespace
-              xsd_doc.add_import(
-                namespace: "http://www.opengis.net/gml/3.2",
-                location: "http://schemas.opengis.net/gml/3.2.1/gml.xsd"
-              )
-            end
+            xsd_doc.add_attribute_group(
+              property_type,
+              ref: "gml:AssociationAttributeGroup"
+            )
+
+            # GML import is now added automatically via
+            # add_required_namespace_imports() based on config
           end
 
           private

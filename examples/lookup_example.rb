@@ -166,9 +166,11 @@ if result.found?
   puts "✓ Found #{result.match_count} fuzzy match(es):"
   result.matches.take(3).each_with_index do |match, i|
     puts "  Match #{i + 1}:"
-    if match[:uml_class]
-      puts "    UML Class: #{match[:uml_class]}"
-      puts "    Match Quality: #{(match[:match_quality] * 100).round(1)}%" if match[:match_quality]
+    next unless match[:uml_class]
+
+    puts "    UML Class: #{match[:uml_class]}"
+    if match[:match_quality]
+      puts "    Match Quality: #{(match[:match_quality] * 100).round(1)}%"
     end
   end
   puts "  ... (#{result.match_count - 3} more)" if result.match_count > 3
@@ -192,13 +194,13 @@ puts
 # JSON format
 puts "JSON Format (first 200 chars):"
 json_output = workflow.format_result(result, format: :json)
-puts json_output[0..200] + "..."
+puts "#{json_output[0..200]}..."
 puts
 
 # YAML format
 puts "YAML Format (first 200 chars):"
 yaml_output = workflow.format_result(result, format: :yaml)
-puts yaml_output[0..200] + "..."
+puts "#{yaml_output[0..200]}..."
 puts
 
 puts "=" * 80

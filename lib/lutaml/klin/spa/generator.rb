@@ -191,6 +191,7 @@ module Lutaml
         # @return [Hash] Hash representation
         def model_to_hash(model)
           return nil unless model
+
           JSON.parse(model.to_json)
         end
 

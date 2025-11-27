@@ -22,7 +22,7 @@ RSpec.describe Lutaml::Klin::Domain::ResolutionEngine do
     it "creates engine with strategies" do
       strategies = [
         Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy.new,
-        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new,
+        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new
       ]
 
       engine = described_class.new(strategies)
@@ -66,7 +66,7 @@ RSpec.describe Lutaml::Klin::Domain::ResolutionEngine do
     let(:strategies) do
       [
         Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy.new,
-        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new,
+        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new
       ]
     end
     let(:engine) { described_class.new(strategies) }
@@ -88,14 +88,13 @@ RSpec.describe Lutaml::Klin::Domain::ResolutionEngine do
       it "returns resolved result from first strategy" do
         element = double("UMLElement", type: "CharacterString")
         xsd_result = double("TypeResolutionResult",
-          resolved: true,
-          local_name: "string",
-          namespace: "http://www.w3.org/2001/XMLSchema",
-          schema_file: "schemas/xmlschema.xsd",
-          resolution_path: nil
-        )
+                            resolved: true,
+                            local_name: "string",
+                            namespace: "http://www.w3.org/2001/XMLSchema",
+                            schema_file: "schemas/xmlschema.xsd",
+                            resolution_path: nil)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(xsd_result)
+                                                       .and_return(xsd_result)
 
         result = engine.resolve(element, context: context)
 
@@ -106,14 +105,13 @@ RSpec.describe Lutaml::Klin::Domain::ResolutionEngine do
       it "does not try subsequent strategies" do
         element = double("UMLElement", type: "CharacterString")
         xsd_result = double("TypeResolutionResult",
-          resolved: true,
-          local_name: "string",
-          namespace: "http://www.w3.org/2001/XMLSchema",
-          schema_file: "schemas/xmlschema.xsd",
-          resolution_path: nil
-        )
+                            resolved: true,
+                            local_name: "string",
+                            namespace: "http://www.w3.org/2001/XMLSchema",
+                            schema_file: "schemas/xmlschema.xsd",
+                            resolution_path: nil)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(xsd_result)
+                                                       .and_return(xsd_result)
 
         # Should only be called once by TypeOverrideStrategy
         expect(xsd_repository).to receive(:resolve_type).once
@@ -126,14 +124,13 @@ RSpec.describe Lutaml::Klin::Domain::ResolutionEngine do
       it "tries next strategy" do
         element = double("UMLElement", type: "xs:string")
         xsd_result = double("TypeResolutionResult",
-          resolved: true,
-          local_name: "string",
-          namespace: "http://www.w3.org/2001/XMLSchema",
-          schema_file: "schemas/xmlschema.xsd",
-          resolution_path: nil
-        )
+                            resolved: true,
+                            local_name: "string",
+                            namespace: "http://www.w3.org/2001/XMLSchema",
+                            schema_file: "schemas/xmlschema.xsd",
+                            resolution_path: nil)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(xsd_result)
+                                                       .and_return(xsd_result)
 
         result = engine.resolve(element, context: context)
 
@@ -147,23 +144,21 @@ RSpec.describe Lutaml::Klin::Domain::ResolutionEngine do
         element = double("UMLElement", type: "CharacterString")
         # First strategy (override) will fail
         failed_result = double("TypeResolutionResult",
-          resolved: false,
-          error_message: "Type not found",
-          resolution_path: nil
-        )
+                               resolved: false,
+                               error_message: "Type not found",
+                               resolution_path: nil)
         # Second strategy (repository) will succeed
         success_result = double("TypeResolutionResult",
-          resolved: true,
-          local_name: "CharacterString",
-          namespace: "http://example.com",
-          schema_file: "schemas/example.xsd",
-          resolution_path: nil
-        )
+                                resolved: true,
+                                local_name: "CharacterString",
+                                namespace: "http://example.com",
+                                schema_file: "schemas/example.xsd",
+                                resolution_path: nil)
 
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(failed_result)
+                                                       .and_return(failed_result)
         allow(xsd_repository).to receive(:resolve_type).with("CharacterString")
-          .and_return(success_result)
+                                                       .and_return(success_result)
 
         result = engine.resolve(element, context: context)
 
@@ -176,10 +171,9 @@ RSpec.describe Lutaml::Klin::Domain::ResolutionEngine do
       it "returns aggregate failure result" do
         element = double("UMLElement", type: "UnknownType")
         failed_result = double("TypeResolutionResult",
-          resolved: false,
-          error_message: "Type not found in repository",
-          resolution_path: nil
-        )
+                               resolved: false,
+                               error_message: "Type not found in repository",
+                               resolution_path: nil)
         allow(xsd_repository).to receive(:resolve_type).and_return(failed_result)
 
         result = engine.resolve(element, context: context)
@@ -192,10 +186,9 @@ RSpec.describe Lutaml::Klin::Domain::ResolutionEngine do
       it "includes errors from all strategies" do
         element = double("UMLElement", type: "UnknownType")
         failed_result = double("TypeResolutionResult",
-          resolved: false,
-          error_message: "Type not found in repository",
-          resolution_path: nil
-        )
+                               resolved: false,
+                               error_message: "Type not found in repository",
+                               resolution_path: nil)
         allow(xsd_repository).to receive(:resolve_type).and_return(failed_result)
 
         result = engine.resolve(element, context: context)
@@ -228,21 +221,20 @@ RSpec.describe Lutaml::Klin::Domain::ResolutionEngine do
       let(:strategies) do
         [
           Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy.new,
-          Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new,
+          Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new
         ]
       end
 
       it "tries strategies in order" do
         element = double("UMLElement", type: "xs:string")
         xsd_result = double("TypeResolutionResult",
-          resolved: true,
-          local_name: "string",
-          namespace: "http://www.w3.org/2001/XMLSchema",
-          schema_file: "schemas/xmlschema.xsd",
-          resolution_path: nil
-        )
+                            resolved: true,
+                            local_name: "string",
+                            namespace: "http://www.w3.org/2001/XMLSchema",
+                            schema_file: "schemas/xmlschema.xsd",
+                            resolution_path: nil)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(xsd_result)
+                                                       .and_return(xsd_result)
 
         result = engine.resolve(element, context: context)
 
@@ -256,7 +248,7 @@ RSpec.describe Lutaml::Klin::Domain::ResolutionEngine do
     it "includes strategy count and names" do
       strategies = [
         Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy.new,
-        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new,
+        Lutaml::Klin::Domain::Strategies::SchemaRepositoryStrategy.new
       ]
       engine = described_class.new(strategies)
 
@@ -271,7 +263,7 @@ RSpec.describe Lutaml::Klin::Domain::ResolutionEngine do
   describe "#inspect" do
     it "includes strategy names" do
       strategies = [
-        Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy.new,
+        Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy.new
       ]
       engine = described_class.new(strategies)
 

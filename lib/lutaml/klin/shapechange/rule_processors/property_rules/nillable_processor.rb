@@ -24,9 +24,9 @@ module Lutaml
               return unless property_element
 
               # Check if property is voidable or nilReasonAllowed
-              if should_add_nillable?(property)
-                add_nillable_attribute(property_element, context)
-              end
+              return unless should_add_nillable?(property)
+
+              add_nillable_attribute(property_element, context)
             end
 
             private

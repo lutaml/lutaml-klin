@@ -13,19 +13,19 @@ module Lutaml
           scope: "class",
           category: "required",
           description: "Generate complexType for classes",
-          applies_to: [],
+          applies_to: []
         },
         "rule-xsd-cls-object-element" => {
           scope: "class",
           category: "required",
           description: "Generate element for classes",
-          applies_to: [],
+          applies_to: []
         },
         "rule-xsd-prop-att" => {
           scope: "property",
           category: "required",
           description: "Generate attribute for properties",
-          applies_to: [],
+          applies_to: []
         },
 
         # GML 3.2 specific rules
@@ -33,25 +33,25 @@ module Lutaml
           scope: "all",
           category: "optional",
           description: "Use GML naming conventions",
-          applies_to: [],
+          applies_to: []
         },
         "rule-xsd-cls-standard-gml-property-types" => {
           scope: "class",
           category: "optional",
           description: "Use standard GML property types",
-          applies_to: [],
+          applies_to: []
         },
         "rule-xsd-cls-byValuePropertyType" => {
           scope: "class",
           category: "optional",
           description: "Generate byValue property types",
-          applies_to: [],
+          applies_to: []
         },
         "rule-xsd-cls-standard-19136-property-types" => {
           scope: "class",
           category: "optional",
           description: "Use ISO 19136 standard property types",
-          applies_to: [],
+          applies_to: []
         },
 
         # Type-specific rules
@@ -59,25 +59,25 @@ module Lutaml
           scope: "class",
           category: "optional",
           description: "Represent code lists as dictionaries",
-          applies_to: ["CodeList"],
+          applies_to: ["CodeList"]
         },
         "rule-xsd-cls-enum-object-element" => {
           scope: "class",
           category: "optional",
           description: "Generate object element for enumerations",
-          applies_to: ["Enumeration"],
+          applies_to: ["Enumeration"]
         },
         "rule-xsd-cls-union-as-group-property-type" => {
           scope: "class",
           category: "optional",
           description: "Represent unions as group property types",
-          applies_to: ["Union"],
+          applies_to: ["Union"]
         },
         "rule-xsd-cls-sequence" => {
           scope: "class",
           category: "required",
           description: "Generate sequence content model for classes",
-          applies_to: [],
+          applies_to: []
         },
 
         # Inheritance rules
@@ -85,13 +85,13 @@ module Lutaml
           scope: "class",
           category: "optional",
           description: "Do not generate base class elements",
-          applies_to: [],
+          applies_to: []
         },
         "rule-xsd-cls-no-abstract-classes" => {
           scope: "class",
           category: "optional",
           description: "Do not generate abstract classes",
-          applies_to: [],
+          applies_to: []
         },
 
         # Property encoding rules
@@ -99,25 +99,25 @@ module Lutaml
           scope: "class",
           category: "required",
           description: "Encode properties as elements in sequence",
-          applies_to: [],
+          applies_to: []
         },
         "rule-xsd-prop-sequence" => {
           scope: "property",
           category: "optional",
           description: "Use sequence for properties",
-          applies_to: [],
+          applies_to: []
         },
         "rule-xsd-prop-metadata-gmlsf-byReference" => {
           scope: "property",
           category: "optional",
           description: "Support metadata by reference",
-          applies_to: [],
+          applies_to: []
         },
         "rule-xsd-prop-nillable" => {
           scope: "property",
           category: "optional",
           description: "Make properties nillable",
-          applies_to: [],
+          applies_to: []
         },
 
         # Basic type rules
@@ -125,19 +125,19 @@ module Lutaml
           scope: "class",
           category: "optional",
           description: "Generate basic types with facet restrictions",
-          applies_to: ["BasicType"],
+          applies_to: ["BasicType"]
         },
         "rule-xsd-cls-basictype-list" => {
           scope: "class",
           category: "optional",
           description: "Generate list-based basic types",
-          applies_to: ["BasicType"],
+          applies_to: ["BasicType"]
         },
         "rule-xsd-cls-local-basictype" => {
           scope: "class",
           category: "optional",
           description: "Generate anonymous basic types for local scope",
-          applies_to: ["BasicType"],
+          applies_to: ["BasicType"]
         },
 
         # Package rules
@@ -145,13 +145,13 @@ module Lutaml
           scope: "package",
           category: "optional",
           description: "Include contained packages",
-          applies_to: [],
+          applies_to: []
         },
         "rule-xsd-pkg-gmlProfileSchema" => {
           scope: "package",
           category: "optional",
           description: "Generate GML profile schema",
-          applies_to: [],
+          applies_to: []
         },
 
         # PLATEAU-specific rules
@@ -159,8 +159,8 @@ module Lutaml
           scope: "class",
           category: "optional",
           description: "Generate PLATEAU ADE hook elements for CityGML integration",
-          applies_to: [],
-        },
+          applies_to: []
+        }
       }.freeze
 
       # Load standard rules into a registry

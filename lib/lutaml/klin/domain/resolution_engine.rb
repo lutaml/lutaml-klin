@@ -149,11 +149,11 @@ module Lutaml
                     "respond to #applicable?"
             end
 
-            unless strategy.respond_to?(:resolve)
-              raise ArgumentError,
-                    "Strategy at index #{index} (#{strategy.class}) must " \
-                    "respond to #resolve"
-            end
+            next if strategy.respond_to?(:resolve)
+
+            raise ArgumentError,
+                  "Strategy at index #{index} (#{strategy.class}) must " \
+                  "respond to #resolve"
           end
         end
 
@@ -165,14 +165,14 @@ module Lutaml
         # @param errors [Array<String>] Error messages from each strategy
         # @return [ResolutionResult] An unresolved result
         def create_aggregate_failure_result(uml_element, attempted_strategies,
-                                             errors)
-          if attempted_strategies.empty?
-            error_msg = "No applicable strategies found for type " \
-                        "'#{uml_element.type}'"
-          else
-            error_msg = "Type '#{uml_element.type}' not resolved by any " \
-                        "strategy"
-          end
+                                            errors)
+          error_msg = if attempted_strategies.empty?
+                        "No applicable strategies found for type " \
+                          "'#{uml_element.type}'"
+                      else
+                        "Type '#{uml_element.type}' not resolved by any " \
+                          "strategy"
+                      end
 
           ResolutionResult.unresolved(
             error: error_msg,
@@ -181,7 +181,7 @@ module Lutaml
               attempted_strategies: attempted_strategies,
               strategy_errors: errors,
               total_strategies: strategies.size,
-              applicable_strategies: attempted_strategies.size,
+              applicable_strategies: attempted_strategies.size
             }
           )
         end

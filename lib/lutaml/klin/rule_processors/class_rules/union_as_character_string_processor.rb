@@ -38,7 +38,8 @@ module Lutaml
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [Boolean] true if processed (type set to xs:string)
-          def self.map_property_type(element, property, type_class, xsd_builder, config)
+          def self.map_property_type(element, _property, type_class,
+                                     _xsd_builder, config)
             return false unless applies_to?(type_class, config)
 
             # Set simple string type
@@ -56,6 +57,7 @@ module Lutaml
           # @return [Boolean] true if should encode as string
           def self.encode_as_string?(type_class, config)
             return false unless type_class
+
             applies_to?(type_class, config)
           end
         end

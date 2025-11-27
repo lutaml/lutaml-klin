@@ -4,7 +4,9 @@ require "spec_helper"
 require "lutaml/klin/xmi_navigator"
 
 RSpec.describe Lutaml::Klin::XmiNavigator do
-  let(:fixture_path) { "/Users/mulgogi/src/mn/mn-samples-plateau/sources/xmi/20251022-uro.xmi" }
+  let(:fixture_path) do
+    "/Users/mulgogi/src/mn/mn-samples-plateau/sources/xmi/20251022-uro.xmi"
+  end
   let(:navigator) { described_class.new }
 
   describe "#parse_file" do

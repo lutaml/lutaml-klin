@@ -11,7 +11,7 @@ module Lutaml
         # Traceability information
         class Traceability < Lutaml::Model::Serializable
           attribute :resolution_strategies, :string, collection: true,
-                    default: -> { [] }
+                                                     default: -> { [] }
           attribute :lxr_package_info, LxrPackageInfo
           attribute :lur_package_info, LurPackageInfo
 

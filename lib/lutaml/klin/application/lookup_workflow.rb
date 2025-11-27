@@ -42,7 +42,8 @@ module Lutaml
 
             attr_name = parts.pop
             class_qname = parts.join("::")
-            @lookup_service.find_xsd_for_uml_attribute(class_qname, attr_name, fuzzy: fuzzy)
+            @lookup_service.find_xsd_for_uml_attribute(class_qname, attr_name,
+                                                       fuzzy: fuzzy)
           when :auto
             # Auto-detect based on format
             @lookup_service.auto_lookup(uml_identifier, fuzzy: fuzzy)
@@ -62,7 +63,8 @@ module Lutaml
           when :type
             @lookup_service.find_uml_for_xsd_type(xsd_identifier, fuzzy: fuzzy)
           when :element
-            @lookup_service.find_uml_for_xsd_element(xsd_identifier, fuzzy: fuzzy)
+            @lookup_service.find_uml_for_xsd_element(xsd_identifier,
+                                                     fuzzy: fuzzy)
           when :auto
             # Auto-detect - try both type and element
             @lookup_service.auto_lookup(xsd_identifier, fuzzy: fuzzy)
@@ -195,59 +197,91 @@ module Lutaml
         def format_match(match, direction)
           lines = []
 
-          if direction == :uml_to_xsd || direction == :auto
+          if %i[uml_to_xsd auto].include?(direction)
             # UML → XSD mapping
             if match[:uml_class]
               lines << "UML Class: #{match[:uml_class]}"
-              lines << "  Package: #{match[:uml_package]}" if match[:uml_package]
-              lines << "  Stereotype: #{match[:uml_stereotype]}" if match[:uml_stereotype]
+              if match[:uml_package]
+                lines << "  Package: #{match[:uml_package]}"
+              end
+              if match[:uml_stereotype]
+                lines << "  Stereotype: #{match[:uml_stereotype]}"
+              end
             end
 
             if match[:uml_attribute]
               lines << "UML Attribute: #{match[:uml_attribute]}"
               lines << "  Type: #{match[:uml_type]}" if match[:uml_type]
-              lines << "  Multiplicity: #{match[:uml_multiplicity]}" if match[:uml_multiplicity]
+              if match[:uml_multiplicity]
+                lines << "  Multiplicity: #{match[:uml_multiplicity]}"
+              end
             end
 
-            lines << "XSD Element: #{match[:xsd_element]}" if match[:xsd_element]
+            if match[:xsd_element]
+              lines << "XSD Element: #{match[:xsd_element]}"
+            end
             lines << "XSD Type: #{match[:xsd_type]}" if match[:xsd_type]
-            lines << "XSD Type Name: #{match[:xsd_type_name]}" if match[:xsd_type_name]
-            lines << "XSD Namespace: #{match[:xsd_namespace]}" if match[:xsd_namespace]
+            if match[:xsd_type_name]
+              lines << "XSD Type Name: #{match[:xsd_type_name]}"
+            end
+            if match[:xsd_namespace]
+              lines << "XSD Namespace: #{match[:xsd_namespace]}"
+            end
 
             if match[:xsd_name]
               lines << "XSD Name: #{match[:xsd_name]}"
-              lines << "  Namespace: #{match[:xsd_namespace]}" if match[:xsd_namespace]
+              if match[:xsd_namespace]
+                lines << "  Namespace: #{match[:xsd_namespace]}"
+              end
               lines << "  Type: #{match[:xsd_type]}" if match[:xsd_type]
               lines << "  Path: #{match[:xsd_path]}" if match[:xsd_path]
-              lines << "  Min Occurs: #{match[:min_occurs]}" if match[:min_occurs]
-              lines << "  Max Occurs: #{match[:max_occurs]}" if match[:max_occurs]
-              lines << "  Is Element: #{match[:is_element]}" unless match[:is_element].nil?
+              if match[:min_occurs]
+                lines << "  Min Occurs: #{match[:min_occurs]}"
+              end
+              if match[:max_occurs]
+                lines << "  Max Occurs: #{match[:max_occurs]}"
+              end
+              unless match[:is_element].nil?
+                lines << "  Is Element: #{match[:is_element]}"
+              end
             end
           elsif direction == :xsd_to_uml
             # XSD → UML mapping
-            lines << "XSD Element: #{match[:xsd_element]}" if match[:xsd_element]
+            if match[:xsd_element]
+              lines << "XSD Element: #{match[:xsd_element]}"
+            end
             lines << "XSD Type: #{match[:xsd_type]}" if match[:xsd_type]
-            lines << "XSD Namespace: #{match[:xsd_namespace]}" if match[:xsd_namespace]
+            if match[:xsd_namespace]
+              lines << "XSD Namespace: #{match[:xsd_namespace]}"
+            end
 
             if match[:uml_class]
               lines << "UML Class: #{match[:uml_class]}"
               lines << "  Name: #{match[:uml_name]}" if match[:uml_name]
-              lines << "  Package: #{match[:uml_package]}" if match[:uml_package]
-              lines << "  Stereotype: #{match[:uml_stereotype]}" if match[:uml_stereotype]
+              if match[:uml_package]
+                lines << "  Package: #{match[:uml_package]}"
+              end
+              if match[:uml_stereotype]
+                lines << "  Stereotype: #{match[:uml_stereotype]}"
+              end
             end
 
             if match[:uml_attribute]
               lines << "UML Attribute: #{match[:uml_attribute]}"
               lines << "  Class: #{match[:uml_class]}" if match[:uml_class]
               lines << "  Type: #{match[:uml_type]}" if match[:uml_type]
-              lines << "  Multiplicity: #{match[:uml_multiplicity]}" if match[:uml_multiplicity]
+              if match[:uml_multiplicity]
+                lines << "  Multiplicity: #{match[:uml_multiplicity]}"
+              end
             end
           end
 
           # Add resolution info
           if match[:resolution_status]
             lines << "Resolution Status: #{match[:resolution_status]}"
-            lines << "Resolution Method: #{match[:resolution_method]}" if match[:resolution_method]
+            if match[:resolution_method]
+              lines << "Resolution Method: #{match[:resolution_method]}"
+            end
           end
 
           # Add match quality if available

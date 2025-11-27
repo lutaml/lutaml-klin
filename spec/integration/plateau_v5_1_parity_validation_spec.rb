@@ -9,7 +9,8 @@ require "lutaml/klin/repositories/schema_repository_adapter"
 require "lutaml/klin/shapechange/config_parser"
 require "lutaml/klin/shapechange/xsd_generator"
 
-RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration do
+RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation",
+               type: :integration do
   let(:lur_path) { "spec/fixtures/packages/plateau_all.lur" }
   let(:urf_config_path) { "examples/ShapeChangeConfig_Plateau_urf.xml" }
   let(:uro_config_path) { "examples/ShapeChangeConfig_Plateau_uro.xml" }
@@ -25,7 +26,7 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
   end
 
   after do
-    FileUtils.rm_rf(output_dir) if Dir.exist?(output_dir)
+    FileUtils.rm_rf(output_dir)
   end
 
   describe "Parity Fix #1: Property Name Prefixing" do
@@ -33,7 +34,9 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
       # Generate URF schema (which references URO types)
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(urf_config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
       results = generator.generate_schemas(["urf"], output_dir)
       generated_file = results.first[:file]
@@ -47,13 +50,17 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
 
       # Find property elements that reference URO types (cross-package references)
       # Example: <xs:element name="urfDmAttribute" type="uro:DmAttributePropertyType"/>
-      ref_cross_pkg_props = reference.xpath("//xs:element[contains(@type, 'uro:')]", xs_ns)
+      ref_cross_pkg_props = reference.xpath(
+        "//xs:element[contains(@type, 'uro:')]", xs_ns
+      )
 
       puts "\n=== Property Name Prefixing Validation ==="
       puts "Reference cross-package properties: #{ref_cross_pkg_props.size}"
 
       # Check if we have similar properties in generated
-      gen_cross_pkg_props = generated.xpath("//xs:element[contains(@type, 'uro:')]", xs_ns)
+      gen_cross_pkg_props = generated.xpath(
+        "//xs:element[contains(@type, 'uro:')]", xs_ns
+      )
       puts "Generated cross-package properties: #{gen_cross_pkg_props.size}"
 
       # Sample validation: Check specific known properties
@@ -67,16 +74,17 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
         puts "  Type: #{ref_type}"
 
         # Look for corresponding property in generated
-        gen_match = generated.at_xpath("//xs:element[@name='#{ref_name}']", xs_ns)
+        gen_match = generated.at_xpath("//xs:element[@name='#{ref_name}']",
+                                       xs_ns)
         if gen_match
           puts "\nGenerated equivalent:"
           puts "  Name: #{gen_match['name']}"
           puts "  Type: #{gen_match['type']}"
 
-          expect(gen_match['name']).to eq(ref_name),
-            "Property name should match reference: expected #{ref_name}"
-          expect(gen_match['type']).to eq(ref_type),
-            "Property type should match reference: expected #{ref_type}"
+          expect(gen_match["name"]).to eq(ref_name),
+                                       "Property name should match reference: expected #{ref_name}"
+          expect(gen_match["type"]).to eq(ref_type),
+                                       "Property type should match reference: expected #{ref_type}"
         else
           puts "\n⚠️  Property '#{ref_name}' not found in generated XSD"
         end
@@ -84,7 +92,7 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
 
       # Verify we're generating cross-package property elements
       expect(gen_cross_pkg_props.size).to be > 0,
-        "Should generate property elements with cross-package type references"
+                                          "Should generate property elements with cross-package type references"
     end
   end
 
@@ -93,7 +101,9 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
       # Generate URF schema
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(urf_config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
       results = generator.generate_schemas(["urf"], output_dir)
       generated_file = results.first[:file]
@@ -108,39 +118,43 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
       ref_props_with_types = reference.xpath("//xs:element[@type]", xs_ns)
 
       # Group by namespace prefix
-      ref_type_namespaces = ref_props_with_types.map { |e|
+      ref_type_namespaces = ref_props_with_types.map do |e|
         type = e["type"]
         type.include?(":") ? type.split(":").first : "xs"
-      }.uniq.sort
+      end.uniq.sort
 
       puts "Reference uses type namespaces: #{ref_type_namespaces.join(', ')}"
 
       # Check generated
       gen_props_with_types = generated.xpath("//xs:element[@type]", xs_ns)
-      gen_type_namespaces = gen_props_with_types.map { |e|
+      gen_type_namespaces = gen_props_with_types.map do |e|
         type = e["type"]
         type.include?(":") ? type.split(":").first : "xs"
-      }.uniq.sort
+      end.uniq.sort
 
       puts "Generated uses type namespaces: #{gen_type_namespaces.join(', ')}"
 
       # Verify uro: namespace is used when referencing URO types
       expect(gen_type_namespaces).to include("uro"),
-        "Generated XSD should use 'uro:' namespace for URO type references"
+                                     "Generated XSD should use 'uro:' namespace for URO type references"
 
       # Check specific property: dmAttribute should reference uro:DmAttributePropertyType
-      ref_dm_attr = reference.at_xpath("//xs:element[contains(@name, 'Attribute')]", xs_ns)
+      ref_dm_attr = reference.at_xpath(
+        "//xs:element[contains(@name, 'Attribute')]", xs_ns
+      )
       if ref_dm_attr
         puts "\nChecking DmAttribute property:"
         puts "  Reference: name=#{ref_dm_attr['name']}, type=#{ref_dm_attr['type']}"
 
-        gen_dm_attr = generated.at_xpath("//xs:element[@name='#{ref_dm_attr['name']}']", xs_ns)
+        gen_dm_attr = generated.at_xpath(
+          "//xs:element[@name='#{ref_dm_attr['name']}']", xs_ns
+        )
         if gen_dm_attr
           puts "  Generated: name=#{gen_dm_attr['name']}, type=#{gen_dm_attr['type']}"
 
           # The type should be from uro namespace, not urf
-          expect(gen_dm_attr['type']).to start_with("uro:"),
-            "DmAttribute type should use uro: namespace (source package), not urf: (current package)"
+          expect(gen_dm_attr["type"]).to start_with("uro:"),
+                                         "DmAttribute type should use uro: namespace (source package), not urf: (current package)"
         end
       end
     end
@@ -151,7 +165,9 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
       # Generate URF schema
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(urf_config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
       results = generator.generate_schemas(["urf"], output_dir)
       generated_file = results.first[:file]
@@ -163,17 +179,17 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
       puts "\n=== Namespace Import Validation ==="
 
       # Extract imports from reference
-      ref_imports = reference.xpath("//xs:import", xs_ns).map { |i|
+      ref_imports = reference.xpath("//xs:import", xs_ns).map do |i|
         { namespace: i["namespace"], location: i["schemaLocation"] }
-      }
+      end
 
       puts "Reference imports:"
       ref_imports.each { |imp| puts "  #{imp[:namespace]}" }
 
       # Extract imports from generated
-      gen_imports = generated.xpath("//xs:import", xs_ns).map { |i|
+      gen_imports = generated.xpath("//xs:import", xs_ns).map do |i|
         { namespace: i["namespace"], location: i["schemaLocation"] }
-      }
+      end
 
       puts "\nGenerated imports:"
       gen_imports.each { |imp| puts "  #{imp[:namespace]}" }
@@ -193,7 +209,7 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
       if ref_namespaces.any? { |ns| ns.include?("gml") }
         gml_imported = gen_namespaces.any? { |ns| ns.include?("gml") }
         expect(gml_imported).to be true,
-          "Should import GML namespace"
+                                   "Should import GML namespace"
       end
 
       # Should import CityGML if referenced
@@ -210,7 +226,9 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
     it "generates URF schema matching reference structure" do
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(urf_config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
       results = generator.generate_schemas(["urf"], output_dir)
       generated_file = results.first[:file]
@@ -234,16 +252,22 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
       puts "Simple Types:   Reference: #{ref_simple_types}, Generated: #{gen_simple_types}"
 
       # Calculate percentages
-      element_pct = (gen_elements.to_f / ref_elements * 100).round(1) if ref_elements > 0
-      type_pct = (gen_complex_types.to_f / ref_complex_types * 100).round(1) if ref_complex_types > 0
+      if ref_elements > 0
+        element_pct = (gen_elements.to_f / ref_elements * 100).round(1)
+      end
+      if ref_complex_types > 0
+        type_pct = (gen_complex_types.to_f / ref_complex_types * 100).round(1)
+      end
 
       puts "\nCoverage:"
       puts "  Elements: #{element_pct}%" if element_pct
       puts "  Types: #{type_pct}%" if type_pct
 
       # Verify substantial generation occurred
-      expect(gen_elements).to be > 50, "Should generate substantial number of elements"
-      expect(gen_complex_types).to be > 100, "Should generate substantial number of types"
+      expect(gen_elements).to be > 50,
+                              "Should generate substantial number of elements"
+      expect(gen_complex_types).to be > 100,
+                                   "Should generate substantial number of types"
     end
   end
 
@@ -254,7 +278,9 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
 
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(uro_config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
       results = generator.generate_schemas(["uro"], output_dir)
       generated_file = results.first[:file]
@@ -274,8 +300,12 @@ RSpec.describe "PLATEAU v5.1 ShapeChange Parity Validation", type: :integration 
       puts "Elements:       Reference: #{ref_elements}, Generated: #{gen_elements}"
       puts "Complex Types:  Reference: #{ref_complex_types}, Generated: #{gen_complex_types}"
 
-      element_pct = (gen_elements.to_f / ref_elements * 100).round(1) if ref_elements > 0
-      type_pct = (gen_complex_types.to_f / ref_complex_types * 100).round(1) if ref_complex_types > 0
+      if ref_elements > 0
+        element_pct = (gen_elements.to_f / ref_elements * 100).round(1)
+      end
+      if ref_complex_types > 0
+        type_pct = (gen_complex_types.to_f / ref_complex_types * 100).round(1)
+      end
 
       puts "\nCoverage:"
       puts "  Elements: #{element_pct}%" if element_pct

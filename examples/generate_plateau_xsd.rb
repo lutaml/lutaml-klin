@@ -14,7 +14,7 @@
 require "bundler/setup"
 require_relative "../lib/lutaml/klin"
 
-puts "\n" + "=" * 80
+puts "\n#{'=' * 80}"
 puts "  PLATEAU XSD Generation Example"
 puts "  Demonstrates: [LUR + ShapeChange Config] → XSD Files"
 puts "=" * 80
@@ -63,7 +63,7 @@ generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
 FileUtils.mkdir_p(OUTPUT_DIR)
 
 # Generate for URO and URF packages
-results = generator.generate_schemas(['uro', 'urf'], OUTPUT_DIR)
+results = generator.generate_schemas(%w[uro urf], OUTPUT_DIR)
 
 puts "  ✓ Generated #{results.size} XSD file(s):"
 results.each do |r|
@@ -88,8 +88,8 @@ results.each do |r|
   end
 
   # Count generated elements
-  elements = xsd_doc.xpath('//xs:element[@name]', 'xs' => 'http://www.w3.org/2001/XMLSchema')
-  complex_types = xsd_doc.xpath('//xs:complexType[@name]', 'xs' => 'http://www.w3.org/2001/XMLSchema')
+  elements = xsd_doc.xpath("//xs:element[@name]", "xs" => "http://www.w3.org/2001/XMLSchema")
+  complex_types = xsd_doc.xpath("//xs:complexType[@name]", "xs" => "http://www.w3.org/2001/XMLSchema")
 
   puts "    Elements: #{elements.size}"
   puts "    Complex Types: #{complex_types.size}"
@@ -102,7 +102,7 @@ if File.exist?(LXR_REFERENCE)
 
   lxr_adapter = Lutaml::Klin::Repositories::SchemaRepositoryAdapter.new(LXR_REFERENCE)
 
-  ['uro', 'urf'].each do |pkg|
+  %w[uro urf].each do |pkg|
     reference = lxr_adapter.find_schema_by_namespace(pkg)
     next unless reference
 
@@ -110,7 +110,7 @@ if File.exist?(LXR_REFERENCE)
     next unless result
 
     generated_xsd = Nokogiri::XML(File.read(result[:file]))
-    gen_elements = generated_xsd.xpath('//xs:element[@name]', 'xs' => 'http://www.w3.org/2001/XMLSchema')
+    gen_elements = generated_xsd.xpath("//xs:element[@name]", "xs" => "http://www.w3.org/2001/XMLSchema")
 
     ref_elements = reference.elements.size
     gen_count = gen_elements.size
@@ -121,11 +121,10 @@ if File.exist?(LXR_REFERENCE)
     puts "    Generated: #{gen_count} elements"
     puts "    Match: #{match_percent}%"
   end
-  puts ""
 else
   puts "Step 5: Skipped (LXR reference not available)"
-  puts ""
 end
+puts ""
 
 # Summary
 puts "=" * 80

@@ -156,7 +156,8 @@ module Lutaml
           # @param class_mapping [ClassMapping] Parent class
           # @param package_mapping [PackageMapping] Parent package
           # @return [Array<String>] List of suggestions
-          def generate_suggestions(attr_mapping, class_mapping, package_mapping)
+          def generate_suggestions(attr_mapping, _class_mapping,
+                                   package_mapping)
             suggestions = []
 
             # Check for common issues and provide specific advice

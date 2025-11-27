@@ -14,8 +14,12 @@ module Lutaml
           attribute :mixed, :boolean, default: -> { false }
           attribute :base_type, :string
           attribute :extension, :boolean, default: -> { false }
-          attribute :elements, ElementMapping, collection: true, default: -> { [] }
-          attribute :attributes, ElementMapping, collection: true, default: -> { [] }
+          attribute :elements, ElementMapping, collection: true, default: lambda {
+            []
+          }
+          attribute :attributes, ElementMapping, collection: true, default: lambda {
+            []
+          }
           attribute :namespace, :string
           attribute :documentation, :string
         end

@@ -10,7 +10,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
     double(
       "Context",
       rule_enabled?: true,
-      gml_namespace: gml_32_namespace,
+      gml_namespace: gml_32_namespace
     )
   end
 
@@ -20,7 +20,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
         let(:package) do
           double(
             "Package",
-            tagged_value: "http://www.opengis.net/gml/3.2",
+            tagged_value: "http://www.opengis.net/gml/3.2"
           )
         end
 
@@ -34,7 +34,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
           double(
             "Package",
             tagged_value: nil,
-            gml_profile_schema: "http://www.opengis.net/def/profile/gml/2.0/gml-sf0",
+            gml_profile_schema: "http://www.opengis.net/def/profile/gml/2.0/gml-sf0"
           )
         end
 
@@ -53,7 +53,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
         let(:package) do
           double(
             "Package",
-            tagged_value: "  ",
+            tagged_value: "  "
           )
         end
 
@@ -66,7 +66,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
         let(:package) do
           double(
             "Package",
-            tagged_value: nil,
+            tagged_value: nil
           )
         end
 
@@ -87,13 +87,13 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
         double(
           "Context",
           rule_enabled?: true,
-          gml_namespace: "http://www.opengis.net/gml",
+          gml_namespace: "http://www.opengis.net/gml"
         )
       end
       let(:package) do
         double(
           "Package",
-          tagged_value: "http://www.opengis.net/gml/3.2",
+          tagged_value: "http://www.opengis.net/gml/3.2"
         )
       end
 
@@ -107,13 +107,13 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
         double(
           "Context",
           rule_enabled?: false,
-          gml_namespace: gml_32_namespace,
+          gml_namespace: gml_32_namespace
         )
       end
       let(:package) do
         double(
           "Package",
-          tagged_value: "http://www.opengis.net/gml/3.2",
+          tagged_value: "http://www.opengis.net/gml/3.2"
         )
       end
 
@@ -128,7 +128,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
       let(:package) do
         double(
           "Package",
-          tagged_value: "http://www.opengis.net/gml/3.2",
+          tagged_value: "http://www.opengis.net/gml/3.2"
         )
       end
 
@@ -139,8 +139,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
           hash_including(
             namespace: gml_32_namespace,
             element: "gmlProfileSchema",
-            text: "http://www.opengis.net/gml/3.2",
-          ),
+            text: "http://www.opengis.net/gml/3.2"
+          )
         )
       end
 
@@ -150,8 +150,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
         expect(result[:imports]).to include(
           hash_including(
             prefix: "gml",
-            namespace: gml_32_namespace,
-          ),
+            namespace: gml_32_namespace
+          )
         )
       end
     end
@@ -160,7 +160,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
       let(:package) do
         double(
           "Package",
-          tagged_value: "http://www.opengis.net/def/profile/gml/2.0/gml-sf0",
+          tagged_value: "http://www.opengis.net/def/profile/gml/2.0/gml-sf0"
         )
       end
 
@@ -169,8 +169,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
 
         expect(result[:appinfo]).to include(
           hash_including(
-            text: "http://www.opengis.net/def/profile/gml/2.0/gml-sf0",
-          ),
+            text: "http://www.opengis.net/def/profile/gml/2.0/gml-sf0"
+          )
         )
       end
     end
@@ -179,7 +179,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
       let(:package) do
         double(
           "Package",
-          tagged_value: "http://example.org/profiles/custom/1.0",
+          tagged_value: "http://example.org/profiles/custom/1.0"
         )
       end
 
@@ -188,8 +188,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
 
         expect(result[:appinfo]).to include(
           hash_including(
-            text: "http://example.org/profiles/custom/1.0",
-          ),
+            text: "http://example.org/profiles/custom/1.0"
+          )
         )
       end
     end
@@ -198,7 +198,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
       let(:package) do
         double(
           "Package",
-          tagged_value: nil,
+          tagged_value: nil
         )
       end
 
@@ -220,7 +220,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
         double(
           "Package",
           tagged_value: nil,
-          gml_profile_schema: "http://www.opengis.net/def/profile/gml/2.0/gml-sf1",
+          gml_profile_schema: "http://www.opengis.net/def/profile/gml/2.0/gml-sf1"
         )
       end
 
@@ -235,8 +235,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
 
         expect(result[:appinfo]).to include(
           hash_including(
-            text: "http://www.opengis.net/def/profile/gml/2.0/gml-sf1",
-          ),
+            text: "http://www.opengis.net/def/profile/gml/2.0/gml-sf1"
+          )
         )
       end
     end
@@ -247,7 +247,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
       let(:package) do
         double(
           "Package",
-          tagged_value: "http://www.opengis.net/gml/3.2",
+          tagged_value: "http://www.opengis.net/gml/3.2"
         )
       end
 
@@ -263,7 +263,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
         double(
           "Package",
           tagged_value: nil,
-          gml_profile_schema: "http://example.org/profile",
+          gml_profile_schema: "http://example.org/profile"
         )
       end
 
@@ -284,7 +284,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::GmlProfileSch
       let(:package) do
         double(
           "Package",
-          tagged_value: nil,
+          tagged_value: nil
         )
       end
 

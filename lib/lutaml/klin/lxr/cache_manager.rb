@@ -126,7 +126,7 @@ module Lutaml
         # @return [Boolean] True if cache is valid
         def cache_valid?(cache_file, config_path)
           return false unless File.exist?(cache_file)
-          return false if File.size(cache_file).zero?
+          return false if File.empty?(cache_file)
 
           # Cache is valid if config hasn't been modified since cache creation
           File.mtime(cache_file) >= File.mtime(config_path)
@@ -135,7 +135,7 @@ module Lutaml
         # Ensure cache directory exists
         # @return [void]
         def ensure_cache_dir_exists
-          FileUtils.mkdir_p(cache_dir) unless Dir.exist?(cache_dir)
+          FileUtils.mkdir_p(cache_dir)
         end
       end
     end

@@ -16,6 +16,7 @@ require_relative "rule_processors/enumeration_processor"
 require_relative "rule_processors/code_list_processor"
 require_relative "rule_processors/class_rules/basic_type_processor"
 require_relative "rule_processors/plateau_ade_hooks_processor"
+require_relative "class_selector"
 
 module Lutaml
   module Klin
@@ -37,7 +38,7 @@ module Lutaml
         # @param output_dir [String] Output directory for XSD files
         # @return [Array<Hash>] Generated files info
         def generate_schemas(package_names, output_dir)
-          FileUtils.mkdir_p(output_dir) unless Dir.exist?(output_dir)
+          FileUtils.mkdir_p(output_dir)
 
           results = []
 
@@ -63,7 +64,8 @@ module Lutaml
           if shapechange_config_dir &&
              File.exist?(File.join(shapechange_config_dir, "StandardRules.xml"))
             # Load encoding rules from ShapeChange XML
-            standard_rules_path = File.join(shapechange_config_dir, "StandardRules.xml")
+            standard_rules_path = File.join(shapechange_config_dir,
+                                            "StandardRules.xml")
             encoding_rules = Parsers::StandardRulesParser.parse_encoding_rules(standard_rules_path)
             encoding_rules.each do |er|
               registry.register_encoding_rule(er)
@@ -73,7 +75,9 @@ module Lutaml
           # Always load project-specific encoding rules from config
           # These override or extend the standard rules
           config.encoding_rules.each do |er|
-            registry.register_encoding_rule(er) unless registry.encoding_rule(er.name)
+            unless registry.encoding_rule(er.name)
+              registry.register_encoding_rule(er)
+            end
           end
 
           # Load standard rule definitions
@@ -95,7 +99,7 @@ module Lutaml
           # Priority 3: Project reference directory
           project_reference = File.expand_path(
             "reference/shapechange-configs",
-            File.dirname(__FILE__) + "/../../.."
+            "#{File.dirname(__FILE__)}/../../.."
           )
           return project_reference if Dir.exist?(project_reference)
 
@@ -133,29 +137,33 @@ module Lutaml
           encoding_rule = determine_encoding_rule(package)
           rule_checker = RuleChecker.new(rule_registry, encoding_rule)
 
-          # Process all classes and enums in package
-          classes = uml_repository.classes_in_package(pkg_name)
+          # Get classes using ClassSelector (reads appSchemaName from config)
+          # This replaces the hardcoded ReferenceClasses filter
+          classes = ClassSelector.select_classes(config, uml_repository, pkg_name)
+
+          # Apply suppression filters
+          classes = apply_suppression_filters(classes, rule_checker, pkg_name)
 
           # Also get enums if repository supports it
           enums = begin
-                    if uml_repository.respond_to?(:enums_in_package)
-                      uml_repository.enums_in_package(pkg_name)
-                    else
-                      []
-                    end
-                  rescue StandardError => e
-                    puts "Warning: Could not retrieve enums: #{e.message}"
-                    []
-                  end
+            if uml_repository.respond_to?(:enums_in_package)
+              uml_repository.enums_in_package(pkg_name)
+            else
+              []
+            end
+          rescue StandardError => e
+            puts "Warning: Could not retrieve enums: #{e.message}"
+            []
+          end
 
           # Process all classes
           classes.each do |uml_class|
-            process_class(uml_class, xsd_doc, rule_checker)
+            process_class(uml_class, xsd_doc, rule_checker, pkg_name)
           end
 
           # Process all enums
           enums.each do |uml_enum|
-            process_class(uml_enum, xsd_doc, rule_checker)
+            process_class(uml_enum, xsd_doc, rule_checker, pkg_name)
           end
 
           # Generate filename with stripped spaces
@@ -173,7 +181,7 @@ module Lutaml
             file: filepath,
             namespace: package_info.ns.strip,
             classes_processed: classes.size,
-            enums_processed: enums.size,
+            enums_processed: enums.size
           }
         end
 
@@ -196,38 +204,108 @@ module Lutaml
           parts[0..-2].join("/")
         end
 
-        def determine_encoding_rule(package)
+        def determine_encoding_rule(_package)
           # Read from config's target section first
           config.target_config&.dig(:default_encoding_rule) || "citygml"
         end
 
-        def process_class(uml_class, xsd_doc, rule_checker)
+        def apply_suppression_filters(classes, rule_checker, package_name)
+          filtered = classes
+
+          # Filter 1: rule-xsd-all-notEncoded
+          # Skip classes with notEncoded=true tagged value
+          if rule_checker.rule_enabled?('rule-xsd-all-notEncoded')
+            filtered = filtered.reject do |uml_class|
+              has_not_encoded_tag?(uml_class)
+            end
+          end
+
+          # Filter 2: rule-xsd-cls-suppress
+          # Skip classes with stereotype «suppress»
+          if rule_checker.rule_enabled?('rule-xsd-cls-suppress')
+            filtered = filtered.reject do |uml_class|
+              has_suppress_stereotype?(uml_class)
+            end
+          end
+
+          puts "  Classes after filtering: #{filtered.size} (from #{classes.size})" if ENV['VERBOSE']
+
+          filtered
+        end
+
+        def has_not_encoded_tag?(uml_class)
+          return false unless uml_class.respond_to?(:tagged_values)
+
+          tagged_values = uml_class.tagged_values || []
+          tagged_values.any? do |tv|
+            (tv.respond_to?(:tag) && tv.tag == 'notEncoded' &&
+             tv.respond_to?(:value) && tv.value.to_s.downcase == 'true') ||
+            (tv.is_a?(Hash) && tv[:tag] == 'notEncoded' &&
+             tv[:value].to_s.downcase == 'true')
+          end
+        end
+
+        def has_suppress_stereotype?(uml_class)
+          return false unless uml_class.respond_to?(:stereotype)
+
+          stereotypes = Array(uml_class.stereotype)
+          stereotypes.any? { |st| st.to_s.downcase == 'suppress' }
+        end
+
+        def belongs_to_package?(uml_class, package_name)
+          return true unless uml_class.respond_to?(:package)
+          return true unless uml_class.package
+
+          # Get the immediate parent package name
+          class_package_name = if uml_class.package.respond_to?(:name)
+                                 uml_class.package.name
+                               else
+                                 uml_class.package.to_s
+                               end
+
+          # Check exact match (not subpackage)
+          class_package_name == package_name
+        end
+
+        def process_class(uml_class, xsd_doc, rule_checker, package_name)
           context = {
             xsd_document: xsd_doc,
             uml_class: uml_class,
             prefix: xsd_doc.prefix,
             config: config,
             uml_repository: uml_repository,
-            package_name: uml_class.package&.name,
+            package_name: package_name,
+            gml_namespace: determine_gml_namespace(config),
+            model: uml_repository
           }
 
           # Create processors in order of execution
           processors = [
             RuleProcessors::ObjectElementProcessor.new(rule_checker, config),
             RuleProcessors::ComplexTypeProcessor.new(rule_checker, config),
-            RuleProcessors::ClassRules::BasicTypeProcessor.new(rule_checker, config),
+            RuleProcessors::ClassRules::BasicTypeProcessor.new(rule_checker,
+                                                               config),
             RuleProcessors::SequenceProcessor.new(rule_checker, config),
             RuleProcessors::PropertyElementProcessor.new(rule_checker, config),
             RuleProcessors::PropertyTypeProcessor.new(rule_checker, config),
             RuleProcessors::EnumerationProcessor.new(rule_checker, config),
             RuleProcessors::CodeListProcessor.new(rule_checker, config),
-            RuleProcessors::PlateauAdeHooksProcessor.new(rule_checker, config),
+            RuleProcessors::PlateauAdeHooksProcessor.new(rule_checker, config)
           ]
 
           # Apply all applicable processors
           processors.each do |processor|
             processor.process(uml_class, context)
           end
+        end
+
+        def determine_gml_namespace(config)
+          # Try to find GML namespace from config
+          gml_ns_info = config.xml_namespaces.find { |ns| ns.nsabr == "gml" }
+          return gml_ns_info.ns if gml_ns_info
+
+          # Default to GML 3.2
+          "http://www.opengis.net/gml/3.2"
         end
       end
     end

@@ -106,14 +106,15 @@ module Lutaml
           )
 
           # Step 3: Parse and apply package filter
-          report_progress(:filtering, "Filtering packages with pattern: #{package_filter}")
+          report_progress(:filtering,
+                          "Filtering packages with pattern: #{package_filter}")
           packages = filter_packages(uml_repo, package_filter)
 
           if packages.empty?
             # Provide helpful error with available packages
             all_packages = uml_repo.all_packages
             available_info = all_packages.map do |pkg|
-              simple_name = pkg.name.split('::').last
+              simple_name = pkg.name.split("::").last
               "#{simple_name} (#{pkg.name})"
             end
 
@@ -137,7 +138,7 @@ module Lutaml
           # Show matched packages in verbose mode
           if verbose
             matched_info = packages.map do |pkg|
-              simple_name = pkg.name.split('::').last
+              simple_name = pkg.name.split("::").last
               class_count = uml_repo.classes_in_package(pkg.name).size
               "#{simple_name} → #{pkg.name} (#{class_count} classes)"
             end
@@ -292,8 +293,7 @@ module Lutaml
         # @return [Shapechange::ShapeChangeConfiguration] Configuration object
         def load_shapechange_config(config_path)
           parser = Shapechange::ConfigParser.new
-          config = parser.parse_file(config_path)
-          config
+          parser.parse_file(config_path)
         rescue StandardError => e
           raise "Failed to load ShapeChange configuration: #{e.message}"
         end
@@ -354,10 +354,10 @@ module Lutaml
         # @param xsd_repo [SchemaRepositoryAdapter] XSD repository
         def set_traceability_metadata(schema_mapping, uml_repo, xsd_repo)
           traceability = {
-            resolution_strategies: [
-              "TypeOverrideStrategy",
-              "ShapeChangeStrategy",
-              "SchemaRepositoryStrategy"
+            resolution_strategies: %w[
+              TypeOverrideStrategy
+              ShapeChangeStrategy
+              SchemaRepositoryStrategy
             ]
           }
 
@@ -394,10 +394,10 @@ module Lutaml
           schema_mapping.package_mappings.each do |pkg_mapping|
             # Derive filename from package name
             filename = pkg_mapping.uml_package_name
-              .split("::")
-              .last
-              .downcase
-              .gsub(/[^a-z0-9_]/, "_") + ".yaml"
+                                  .split("::")
+                                  .last
+                                  .downcase
+                                  .gsub(/[^a-z0-9_]/, "_") + ".yaml"
 
             pkg_path = File.join(mappings_dir, filename)
             File.write(pkg_path, pkg_mapping.to_yaml)

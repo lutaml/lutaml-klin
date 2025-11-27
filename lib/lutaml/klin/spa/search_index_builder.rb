@@ -54,7 +54,9 @@ module Lutaml
           schema.elements.each do |elem|
             tokens = tokenize(elem.name)
             tokens.each do |token|
-              index[token] << elem.qualified_name unless  index[token].include?(elem.qualified_name)
+              unless index[token].include?(elem.qualified_name)
+                index[token] << elem.qualified_name
+              end
             end
           end
 
@@ -62,7 +64,9 @@ module Lutaml
           schema.complex_types.each do |type|
             tokens = tokenize(type.name)
             tokens.each do |token|
-              index[token] << type.qualified_name unless index[token].include?(type.qualified_name)
+              unless index[token].include?(type.qualified_name)
+                index[token] << type.qualified_name
+              end
             end
           end
 
@@ -70,7 +74,9 @@ module Lutaml
           schema.simple_types.each do |type|
             tokens = tokenize(type.name)
             tokens.each do |token|
-              index[token] << type.qualified_name unless index[token].include?(type.qualified_name)
+              unless index[token].include?(type.qualified_name)
+                index[token] << type.qualified_name
+              end
             end
           end
 
@@ -78,7 +84,9 @@ module Lutaml
           schema.attributes.each do |attr|
             tokens = tokenize(attr.name)
             tokens.each do |token|
-              index[token] << attr.qualified_name unless index[token].include?(attr.qualified_name)
+              unless index[token].include?(attr.qualified_name)
+                index[token] << attr.qualified_name
+              end
             end
           end
 

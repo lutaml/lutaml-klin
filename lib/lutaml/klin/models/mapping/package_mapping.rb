@@ -47,10 +47,14 @@ module Lutaml
           total_classes = class_mappings.size
           # Count both "resolved" and "inferred" as successfully resolved
           resolved_classes = class_mappings.count do |cm|
-            cm.resolution_status == "resolved" || cm.resolution_status == "inferred"
+            %w[resolved inferred].include?(cm.resolution_status)
           end
-          partial_classes = class_mappings.count { |cm| cm.resolution_status == "partial" }
-          unresolved_classes = class_mappings.count { |cm| cm.resolution_status == "unresolved" }
+          partial_classes = class_mappings.count do |cm|
+            cm.resolution_status == "partial"
+          end
+          unresolved_classes = class_mappings.count do |cm|
+            cm.resolution_status == "unresolved"
+          end
 
           total_attributes = class_mappings.sum(&:attribute_count)
           resolved_attributes = class_mappings.sum(&:resolved_attribute_count)

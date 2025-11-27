@@ -137,37 +137,37 @@ module Lutaml
         end
 
         # Extract namespaces from LXR package
-        def extract_namespaces_from_lxr(lxr_path)
+        def extract_namespaces_from_lxr(_lxr_path)
           # Placeholder - will be implemented with lutaml-xsd integration
           []
         end
 
         # Extract elements from LXR package
-        def extract_elements_from_lxr(lxr_path)
+        def extract_elements_from_lxr(_lxr_path)
           # Placeholder - will be implemented with lutaml-xsd integration
           []
         end
 
         # Extract complex types from LXR package
-        def extract_complex_types_from_lxr(lxr_path)
+        def extract_complex_types_from_lxr(_lxr_path)
           # Placeholder - will be implemented with lutaml-xsd integration
           []
         end
 
         # Extract simple types from LXR package
-        def extract_simple_types_from_lxr(lxr_path)
+        def extract_simple_types_from_lxr(_lxr_path)
           # Placeholder - will be implemented with lutaml-xsd integration
           []
         end
 
         # Extract attributes from LXR package
-        def extract_attributes_from_lxr(lxr_path)
+        def extract_attributes_from_lxr(_lxr_path)
           # Placeholder - will be implemented with lutaml-xsd integration
           []
         end
 
         # Build statistics from LXR data
-        def build_lxr_statistics(lxr_path)
+        def build_lxr_statistics(_lxr_path)
           Models::Statistics.new
         end
 
@@ -268,7 +268,7 @@ module Lutaml
         end
 
         # Enrich types with UML mappings
-        def enrich_types(types, yaml_data, type_kind)
+        def enrich_types(types, yaml_data, _type_kind)
           mappings = yaml_data&.dig(:mappings) || {}
 
           types.map do |type|

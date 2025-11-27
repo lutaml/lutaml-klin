@@ -108,7 +108,8 @@ RSpec.describe Lutaml::Klin::Lxr::ConfigBuilder do
 
     it "includes schemas section with XSD files" do
       result = builder.build(schema_info, metadata)
-      expect(result["schemas"]["files"]).to contain_exactly("schema1.xsd", "schema2.xsd")
+      expect(result["schemas"]["files"]).to contain_exactly("schema1.xsd",
+                                                            "schema2.xsd")
     end
 
     it "includes options section" do

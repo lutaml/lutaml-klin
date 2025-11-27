@@ -89,7 +89,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::MixinClassesAsGroupProc
       end
 
       it "returns true" do
-        expect(described_class.is_mixin_or_abstract?(mixin_class, config)).to be true
+        expect(described_class.is_mixin_or_abstract?(mixin_class,
+                                                     config)).to be true
       end
     end
 
@@ -111,7 +112,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::MixinClassesAsGroupProc
       end
 
       it "returns true" do
-        expect(described_class.is_mixin_or_abstract?(abstract_class, config)).to be true
+        expect(described_class.is_mixin_or_abstract?(abstract_class,
+                                                     config)).to be true
       end
     end
 
@@ -130,7 +132,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::MixinClassesAsGroupProc
       end
 
       it "returns false" do
-        expect(described_class.is_mixin_or_abstract?(concrete_class, config)).to be false
+        expect(described_class.is_mixin_or_abstract?(concrete_class,
+                                                     config)).to be false
       end
     end
   end
@@ -300,7 +303,9 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::MixinClassesAsGroupProc
 
         # Mock PropertyProcessor
         property_processor = class_double("PropertyProcessor")
-        stub_const("Lutaml::Klin::RuleProcessors::ClassRules::MixinClassesAsGroupProcessor::PropertyProcessor", property_processor)
+        stub_const(
+          "Lutaml::Klin::RuleProcessors::ClassRules::MixinClassesAsGroupProcessor::PropertyProcessor", property_processor
+        )
         allow(property_processor).to receive(:process_property)
       end
 
@@ -364,7 +369,9 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::MixinClassesAsGroupProc
 
       # Mock PropertyProcessor
       property_processor = class_double("PropertyProcessor")
-      stub_const("Lutaml::Klin::RuleProcessors::ClassRules::MixinClassesAsGroupProcessor::PropertyProcessor", property_processor)
+      stub_const(
+        "Lutaml::Klin::RuleProcessors::ClassRules::MixinClassesAsGroupProcessor::PropertyProcessor", property_processor
+      )
       allow(property_processor).to receive(:process_property)
 
       allow(config).to receive(:rule_enabled?)

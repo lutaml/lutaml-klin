@@ -10,7 +10,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
   let(:context) do
     double(
       "Context",
-      rule_enabled?: true,
+      rule_enabled?: true
     )
   end
 
@@ -19,7 +19,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
       context "with both DGIWG tagged values" do
         let(:package) do
           double(
-            "Package",
+            "Package"
           )
         end
 
@@ -36,7 +36,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
       context "with only compliance level" do
         let(:package) do
           double(
-            "Package",
+            "Package"
           )
         end
 
@@ -53,7 +53,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
       context "with only profile schema" do
         let(:package) do
           double(
-            "Package",
+            "Package"
           )
         end
 
@@ -70,7 +70,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
       context "with empty compliance level" do
         let(:package) do
           double(
-            "Package",
+            "Package"
           )
         end
 
@@ -87,7 +87,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
       context "with empty profile schema" do
         let(:package) do
           double(
-            "Package",
+            "Package"
           )
         end
 
@@ -104,7 +104,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
       context "with neither tagged value" do
         let(:package) do
           double(
-            "Package",
+            "Package"
           )
         end
 
@@ -123,12 +123,12 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
       let(:context) do
         double(
           "Context",
-          rule_enabled?: false,
+          rule_enabled?: false
         )
       end
       let(:package) do
         double(
-          "Package",
+          "Package"
         )
       end
 
@@ -147,7 +147,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
     context "with valid DGIWG tagged values" do
       let(:package) do
         double(
-          "Package",
+          "Package"
         )
       end
 
@@ -168,7 +168,9 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
         result = processor.process(package, context)
         elements = result[:appinfo].first[:elements]
 
-        compliance_level_element = elements.find { |e| e[:element] == "ComplianceLevel" }
+        compliance_level_element = elements.find do |e|
+          e[:element] == "ComplianceLevel"
+        end
         expect(compliance_level_element).to be_present
         expect(compliance_level_element[:namespace]).to eq(dgiwg_namespace)
         expect(compliance_level_element[:text]).to eq("1")
@@ -178,7 +180,9 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
         result = processor.process(package, context)
         elements = result[:appinfo].first[:elements]
 
-        profile_schema_element = elements.find { |e| e[:element] == "GMLProfileSchema" }
+        profile_schema_element = elements.find do |e|
+          e[:element] == "GMLProfileSchema"
+        end
         expect(profile_schema_element).to be_present
         expect(profile_schema_element[:namespace]).to eq(dgiwg_namespace)
         expect(profile_schema_element[:text]).to eq(dgiwg_schema_location)
@@ -190,8 +194,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
         expect(result[:imports]).to include(
           hash_including(
             prefix: "gmldgiwgsp",
-            namespace: dgiwg_namespace,
-          ),
+            namespace: dgiwg_namespace
+          )
         )
       end
     end
@@ -199,7 +203,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
     context "with DGIWG Level 2 compliance" do
       let(:package) do
         double(
-          "Package",
+          "Package"
         )
       end
       let(:level_2_schema) { "http://www.dgiwg.org/gml/3.2/profiles/spatial/2.0/profile.xsd" }
@@ -213,10 +217,14 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
         result = processor.process(package, context)
         elements = result[:appinfo].first[:elements]
 
-        compliance_level_element = elements.find { |e| e[:element] == "ComplianceLevel" }
+        compliance_level_element = elements.find do |e|
+          e[:element] == "ComplianceLevel"
+        end
         expect(compliance_level_element[:text]).to eq("2")
 
-        profile_schema_element = elements.find { |e| e[:element] == "GMLProfileSchema" }
+        profile_schema_element = elements.find do |e|
+          e[:element] == "GMLProfileSchema"
+        end
         expect(profile_schema_element[:text]).to eq(level_2_schema)
       end
     end
@@ -224,7 +232,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
     context "when only compliance level is present" do
       let(:package) do
         double(
-          "Package",
+          "Package"
         )
       end
 
@@ -243,7 +251,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
     context "when only profile schema is present" do
       let(:package) do
         double(
-          "Package",
+          "Package"
         )
       end
 
@@ -263,7 +271,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
   describe ".get_compliance_level" do
     let(:package) do
       double(
-        "Package",
+        "Package"
       )
     end
 
@@ -295,7 +303,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PackageRules::DgiwgspProces
   describe ".get_profile_schema" do
     let(:package) do
       double(
-        "Package",
+        "Package"
       )
     end
 

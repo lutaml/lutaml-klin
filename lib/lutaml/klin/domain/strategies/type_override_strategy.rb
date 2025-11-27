@@ -78,7 +78,7 @@ module Lutaml
                   override_type: override_type,
                   normalized_type: normalized_type,
                   strategy: name,
-                  resolution_path: xsd_result&.resolution_path,
+                  resolution_path: xsd_result&.resolution_path
                 }
               )
             end
@@ -92,7 +92,7 @@ module Lutaml
                 original_type: uml_element.type,
                 override_type: override_type,
                 normalized_type: normalized_type,
-                schema_file: xsd_result.schema_file,
+                schema_file: xsd_result.schema_file
               }
             )
           rescue StandardError => e
@@ -102,7 +102,7 @@ module Lutaml
                 original_type: uml_element.type,
                 override_type: override_type,
                 exception: e.class.name,
-                strategy: name,
+                strategy: name
               }
             )
           end

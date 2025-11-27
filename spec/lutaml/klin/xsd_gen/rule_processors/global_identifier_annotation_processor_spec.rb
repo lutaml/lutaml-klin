@@ -9,7 +9,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
   let(:context) do
     double(
       "Context",
-      rule_enabled?: true,
+      rule_enabled?: true
     )
   end
 
@@ -19,7 +19,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
         let(:element) do
           double(
             "Class",
-            tagged_value: "urn:example:def:featureType:Building",
+            tagged_value: "urn:example:def:featureType:Building"
           )
         end
 
@@ -36,7 +36,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
         let(:element) do
           double(
             "Property",
-            tagged_value: "urn:example:def:propertyType:height",
+            tagged_value: "urn:example:def:propertyType:height"
           )
         end
 
@@ -53,7 +53,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
         let(:element) do
           double(
             "Class",
-            global_identifier: "urn:inspire:def:featureType:Parcel",
+            global_identifier: "urn:inspire:def:featureType:Parcel"
           )
         end
 
@@ -73,7 +73,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
         let(:element) do
           double(
             "Class",
-            tagged_value: "  ",
+            tagged_value: "  "
           )
         end
 
@@ -90,7 +90,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
         let(:element) do
           double(
             "Class",
-            tagged_value: nil,
+            tagged_value: nil
           )
         end
 
@@ -109,7 +109,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
         let(:element) do
           double(
             "Package",
-            tagged_value: "urn:example:def:package:MyPackage",
+            tagged_value: "urn:example:def:package:MyPackage"
           )
         end
 
@@ -127,13 +127,13 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
       let(:context) do
         double(
           "Context",
-          rule_enabled?: false,
+          rule_enabled?: false
         )
       end
       let(:element) do
         double(
           "Class",
-          tagged_value: "urn:example:def:featureType:Road",
+          tagged_value: "urn:example:def:featureType:Road"
         )
       end
 
@@ -148,7 +148,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
       let(:element) do
         double(
           "Class",
-          tagged_value: "urn:example:def:featureType:Building",
+          tagged_value: "urn:example:def:featureType:Building"
         )
       end
 
@@ -163,8 +163,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
           hash_including(
             namespace: scai_namespace,
             element: "globalIdentifier",
-            text: "urn:example:def:featureType:Building",
-          ),
+            text: "urn:example:def:featureType:Building"
+          )
         )
       end
 
@@ -174,8 +174,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
         expect(result[:imports]).to include(
           hash_including(
             prefix: "sc",
-            namespace: scai_namespace,
-          ),
+            namespace: scai_namespace
+          )
         )
       end
     end
@@ -184,7 +184,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
       let(:element) do
         double(
           "Property",
-          tagged_value: "urn:inspire:def:propertyType:areaValue",
+          tagged_value: "urn:inspire:def:propertyType:areaValue"
         )
       end
 
@@ -197,8 +197,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
 
         expect(result[:appinfo]).to include(
           hash_including(
-            text: "urn:inspire:def:propertyType:areaValue",
-          ),
+            text: "urn:inspire:def:propertyType:areaValue"
+          )
         )
       end
     end
@@ -207,7 +207,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
       let(:element) do
         double(
           "Class",
-          tagged_value: nil,
+          tagged_value: nil
         )
       end
 
@@ -286,7 +286,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
       let(:element) do
         double(
           "Class",
-          tagged_value: "urn:example:def:featureType:Road",
+          tagged_value: "urn:example:def:featureType:Road"
         )
       end
 
@@ -305,7 +305,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::GlobalIdentifierAnnotationP
       let(:element) do
         double(
           "Class",
-          global_identifier: "urn:inspire:def:featureType:Parcel",
+          global_identifier: "urn:inspire:def:featureType:Parcel"
         )
       end
 

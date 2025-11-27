@@ -126,7 +126,8 @@ module Lutaml
         #
         # @raise [RuntimeError] if package not found
         # @raise [RuntimeError] if namespace cannot be determined
-        def generate_mapping_for_package(package_path, recursive: false, verbose: false, progress_callback: nil)
+        def generate_mapping_for_package(package_path, recursive: false,
+                                         verbose: false, progress_callback: nil)
           # 1. Find UML package
           uml_package = uml_repository.find_package(package_path)
           raise "Package not found: #{package_path}" if uml_package.nil?
@@ -141,16 +142,20 @@ module Lutaml
           )
 
           if verbose
-            progress_callback&.call(:mapping, "\nProcessing package: #{package_path}")
-            progress_callback&.call(:mapping, "  Found #{uml_classes.size} classes")
+            progress_callback&.call(:mapping,
+                                    "\nProcessing package: #{package_path}")
+            progress_callback&.call(:mapping,
+                                    "  Found #{uml_classes.size} classes")
           end
 
           # 4. Map each class
           class_mappings = uml_classes.map.with_index do |uml_class, idx|
             if verbose
-              progress_callback&.call(:mapping, "\n[#{idx + 1}/#{uml_classes.size}] Processing class: #{uml_class.name}")
+              progress_callback&.call(:mapping,
+                                      "\n[#{idx + 1}/#{uml_classes.size}] Processing class: #{uml_class.name}")
             end
-            build_class_mapping(uml_class, xsd_namespace, verbose: verbose, progress_callback: progress_callback)
+            build_class_mapping(uml_class, xsd_namespace, verbose: verbose,
+                                                          progress_callback: progress_callback)
           end
 
           # 5. Build and return PackageMapping
@@ -174,15 +179,19 @@ module Lutaml
         # @param recursive [Boolean] Whether to include subpackages
         # @param verbose [Boolean] Enable verbose output
         # @return [Mapping::SchemaMapping] The complete schema mapping
-        def generate_mappings_for_packages(package_paths, recursive: false, verbose: false)
-          package_mappings = package_paths.map.with_index do |path, idx|
+        def generate_mappings_for_packages(package_paths, recursive: false,
+                                           verbose: false)
+          package_mappings = package_paths.map.with_index do |path, _idx|
             if verbose
-              progress_callback = ->(stage, msg) {
-                puts "[#{Time.now.strftime('%H:%M:%S')}] #{msg}" if stage == :mapping
+              progress_callback = lambda { |stage, msg|
+                if stage == :mapping
+                  puts "[#{Time.now.strftime('%H:%M:%S')}] #{msg}"
+                end
               }
             end
 
-            generate_mapping_for_package(path, recursive: recursive, verbose: verbose, progress_callback: progress_callback)
+            generate_mapping_for_package(path, recursive: recursive,
+                                               verbose: verbose, progress_callback: progress_callback)
           end
 
           Mapping::SchemaMapping.new.tap do |schema_mapping|
@@ -192,9 +201,9 @@ module Lutaml
 
             # Extract unique namespaces
             schema_mapping.namespaces = package_mappings
-              .map(&:xsd_namespace)
-              .compact
-              .uniq
+                                        .map(&:xsd_namespace)
+                                        .compact
+                                        .uniq
           end
         end
 
@@ -250,10 +259,12 @@ module Lutaml
         # @param verbose [Boolean] Enable verbose output
         # @param progress_callback [Proc] Optional progress callback
         # @return [Mapping::ClassMapping] The class mapping
-        def build_class_mapping(uml_class, xsd_namespace, verbose: false, progress_callback: nil)
+        def build_class_mapping(uml_class, xsd_namespace, verbose: false,
+                                progress_callback: nil)
           # Report progress for verbose mode
           if verbose
-            progress_callback&.call(:mapping, "Processing class: #{uml_class.name} (#{uml_class.stereotype})")
+            progress_callback&.call(:mapping,
+                                    "Processing class: #{uml_class.name} (#{uml_class.stereotype})")
           end
 
           # Create resolution context
@@ -274,9 +285,11 @@ module Lutaml
           # Map attributes with verbose output
           attribute_mappings = (uml_class.attributes || []).map.with_index do |attr, idx|
             if verbose
-              progress_callback&.call(:mapping, "  [#{idx + 1}/#{uml_class.attributes.size}] Attribute: #{attr.name}")
+              progress_callback&.call(:mapping,
+                                      "  [#{idx + 1}/#{uml_class.attributes.size}] Attribute: #{attr.name}")
             end
-            build_attribute_mapping(attr, context, verbose: verbose, progress_callback: progress_callback)
+            build_attribute_mapping(attr, context, verbose: verbose,
+                                                   progress_callback: progress_callback)
           end
 
           # Build ClassMapping model
@@ -303,7 +316,8 @@ module Lutaml
         # @param verbose [Boolean] Enable verbose output
         # @param progress_callback [Proc] Optional progress callback
         # @return [Mapping::AttributeMapping] The attribute mapping
-        def build_attribute_mapping(uml_attribute, context, verbose: false, progress_callback: nil)
+        def build_attribute_mapping(uml_attribute, context, verbose: false,
+                                    progress_callback: nil)
           # Use mapping service to map attribute
           attr_details = mapping_service.map_attribute_to_xsd(
             uml_attribute,
@@ -316,7 +330,8 @@ module Lutaml
             method = attr_details[:resolution_method] || "none"
             confidence = attr_details[:resolution_confidence] ? "(#{(attr_details[:resolution_confidence] * 100).round(1)}%)" : ""
 
-            progress_callback&.call(:mapping, "    #{status} #{method} #{confidence}")
+            progress_callback&.call(:mapping,
+                                    "    #{status} #{method} #{confidence}")
           end
 
           # Build AttributeMapping model
@@ -347,10 +362,10 @@ module Lutaml
         def determine_xsd_namespace(uml_package)
           # Get package name - try qualified_name first, fall back to name
           package_path = if uml_package.respond_to?(:qualified_name)
-            uml_package.qualified_name
-          else
-            uml_package.name
-          end
+                           uml_package.qualified_name
+                         else
+                           uml_package.name
+                         end
 
           # Get namespace from ShapeChange config
           namespace = shapechange_config.namespace_for_package(package_path)
@@ -360,7 +375,7 @@ module Lutaml
           end
 
           namespace
-        rescue StandardError => e
+        rescue StandardError
           # Fallback namespace
           "http://example.org/#{uml_package.name.downcase}"
         end

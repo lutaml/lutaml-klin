@@ -11,7 +11,9 @@ module Lutaml
           attribute :type_ref, :string
           attribute :substitution_group_ref, :string
           attribute :used_by, :string, collection: true, default: -> { [] }
-          attribute :related_elements, :string, collection: true, default: -> { [] }
+          attribute :related_elements, :string, collection: true, default: lambda {
+            []
+          }
 
           json do
             map "typeRef", to: :type_ref

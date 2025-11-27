@@ -136,8 +136,8 @@ module Lutaml
         # From complex_content extension sequence
         if complex_type.complex_content&.extension&.sequence
           elements.concat(extract_elements_from_sequence(
-            complex_type.complex_content.extension.sequence
-          ))
+                            complex_type.complex_content.extension.sequence
+                          ))
         end
 
         # From choice
@@ -198,13 +198,17 @@ module Lutaml
 
         # Direct attributes
         if complex_type.attribute
-          attributes.concat(complex_type.attribute.map { |attr| create_attribute_mapping(attr) })
+          attributes.concat(complex_type.attribute.map do |attr|
+            create_attribute_mapping(attr)
+          end)
         end
 
         # Attributes from complex_content extension
         if complex_type.complex_content&.extension&.attribute
           attributes.concat(
-            complex_type.complex_content.extension.attribute.map { |attr| create_attribute_mapping(attr) }
+            complex_type.complex_content.extension.attribute.map do |attr|
+              create_attribute_mapping(attr)
+            end
           )
         end
 

@@ -9,10 +9,18 @@ module Lutaml
         # Cross-references for types
         class TypeCrossReferences < Lutaml::Model::Serializable
           attribute :base_type, :string
-          attribute :derived_types, :string, collection: true, default: -> { [] }
-          attribute :used_by_elements, :string, collection: true, default: -> { [] }
-          attribute :used_by_types, :string, collection: true, default: -> { [] }
-          attribute :required_types, :string, collection: true, default: -> { [] }
+          attribute :derived_types, :string, collection: true, default: lambda {
+            []
+          }
+          attribute :used_by_elements, :string, collection: true, default: lambda {
+            []
+          }
+          attribute :used_by_types, :string, collection: true, default: lambda {
+            []
+          }
+          attribute :required_types, :string, collection: true, default: lambda {
+            []
+          }
 
           json do
             map "baseType", to: :base_type

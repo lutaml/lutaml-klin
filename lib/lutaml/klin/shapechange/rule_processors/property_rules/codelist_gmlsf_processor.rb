@@ -92,12 +92,16 @@ module Lutaml
               return nil unless model
 
               if model.respond_to?(:class_by_id)
-                type_class = model.class_by_id(type_info.id) if type_info.respond_to?(:id)
+                if type_info.respond_to?(:id)
+                  type_class = model.class_by_id(type_info.id)
+                end
                 return type_class if type_class
               end
 
               if model.respond_to?(:class_by_name)
-                type_class = model.class_by_name(type_info.name) if type_info.respond_to?(:name)
+                if type_info.respond_to?(:name)
+                  type_class = model.class_by_name(type_info.name)
+                end
                 return type_class if type_class
               end
 
@@ -185,7 +189,9 @@ module Lutaml
               if tagged_values.respond_to?(:[])
                 tagged_values[tag_name]
               elsif tagged_values.respond_to?(:find)
-                tv = tagged_values.find { |t| t.respond_to?(:tag) && t.tag == tag_name }
+                tv = tagged_values.find do |t|
+                  t.respond_to?(:tag) && t.tag == tag_name
+                end
                 tv&.value if tv.respond_to?(:value)
               end
             rescue StandardError

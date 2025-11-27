@@ -58,10 +58,10 @@ module Lutaml
         private
 
         def validate_file_exists
-          unless File.exist?(mapping_file)
-            error "Mapping file not found: #{mapping_file}"
-            exit 1
-          end
+          return if File.exist?(mapping_file)
+
+          error "Mapping file not found: #{mapping_file}"
+          exit 1
         end
 
         def load_mapping
@@ -124,10 +124,10 @@ module Lutaml
           end
 
           # Validate attribute mappings
-          if class_mapping.attribute_mappings&.any?
-            class_mapping.attribute_mappings.each do |attr_mapping|
-              validate_attribute_mapping(attr_mapping, class_mapping.uml_name)
-            end
+          return unless class_mapping.attribute_mappings&.any?
+
+          class_mapping.attribute_mappings.each do |attr_mapping|
+            validate_attribute_mapping(attr_mapping, class_mapping.uml_name)
           end
         end
 
@@ -157,14 +157,16 @@ module Lutaml
           end
 
           # Check XSD cardinality
-          if attr_mapping.xsd_min_occurs && attr_mapping.xsd_max_occurs
-            min = attr_mapping.xsd_min_occurs.to_i
-            max = attr_mapping.xsd_max_occurs == "unbounded" ? Float::INFINITY : attr_mapping.xsd_max_occurs.to_i
-
-            if min > max
-              @errors << "Attribute '#{attr_mapping.uml_name}' in class '#{class_name}' has invalid XSD cardinality: min (#{min}) > max (#{max})"
-            end
+          unless attr_mapping.xsd_min_occurs && attr_mapping.xsd_max_occurs
+            return
           end
+
+          min = attr_mapping.xsd_min_occurs.to_i
+          max = attr_mapping.xsd_max_occurs == "unbounded" ? Float::INFINITY : attr_mapping.xsd_max_occurs.to_i
+
+          return unless min > max
+
+          @errors << "Attribute '#{attr_mapping.uml_name}' in class '#{class_name}' has invalid XSD cardinality: min (#{min}) > max (#{max})"
         end
 
         def validate_content(mapping)
@@ -173,7 +175,9 @@ module Lutaml
           # Check for duplicate class names within packages
           mapping.package_mappings.each do |pkg_mapping|
             class_names = pkg_mapping.class_mappings.map(&:uml_name)
-            duplicates = class_names.select { |name| class_names.count(name) > 1 }.uniq
+            duplicates = class_names.select do |name|
+              class_names.count(name) > 1
+            end.uniq
 
             if duplicates.any?
               @errors << "Package '#{pkg_mapping.uml_name}' has duplicate class names: #{duplicates.join(', ')}"
@@ -187,10 +191,10 @@ module Lutaml
             @errors.each { |e| puts "  ✗ #{e}" }
           end
 
-          if @warnings.any?
-            puts "\nWarnings (#{@warnings.length}):"
-            @warnings.each { |w| puts "  ⚠ #{w}" }
-          end
+          return unless @warnings.any?
+
+          puts "\nWarnings (#{@warnings.length}):"
+          @warnings.each { |w| puts "  ⚠ #{w}" }
         end
 
         def log(message)

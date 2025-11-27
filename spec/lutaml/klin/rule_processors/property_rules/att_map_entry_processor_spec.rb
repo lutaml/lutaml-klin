@@ -170,24 +170,28 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::AttMapEntryProcessor
 
     it "creates anonymous complex type" do
       expect(parent_element).to receive(:add_complex_type)
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     it "adds attribute reference" do
       expect(attribute_element).to receive(:ref=).with("xlink:href")
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     it "adds attributeGroup reference" do
       expect(complex_type).to receive(:add_attribute_group)
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     it "imports required namespaces" do
       expect(xsd_builder).to receive(:add_import)
         .with("xlink", "http://www.w3.org/1999/xlink")
         .at_least(:once)
-      described_class.process_property(property, parent_element, xsd_builder, config)
+      described_class.process_property(property, parent_element, xsd_builder,
+                                       config)
     end
 
     context "with nilReason enabled" do
@@ -219,7 +223,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::AttMapEntryProcessor
       it "adds nilReason attribute" do
         expect(nil_reason_attr).to receive(:name=).with("nilReason")
         expect(nil_reason_attr).to receive(:type=).with("gml:NilReasonType")
-        described_class.process_property(property, parent_element, xsd_builder, config)
+        described_class.process_property(property, parent_element, xsd_builder,
+                                         config)
       end
     end
 
@@ -251,7 +256,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::AttMapEntryProcessor
       it "adds metadata attribute" do
         expect(metadata_attr).to receive(:name=).with("metadata")
         expect(metadata_attr).to receive(:type=).with("xs:anyURI")
-        described_class.process_property(property, parent_element, xsd_builder, config)
+        described_class.process_property(property, parent_element, xsd_builder,
+                                         config)
       end
     end
 
@@ -287,7 +293,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::AttMapEntryProcessor
         expect(name_attr).to receive(:name=).with("name")
         expect(name_attr).to receive(:type=).with("xs:NCName")
         expect(name_attr).to receive(:use=).with("required")
-        described_class.process_property(property, parent_element, xsd_builder, config)
+        described_class.process_property(property, parent_element, xsd_builder,
+                                         config)
       end
     end
   end
@@ -387,7 +394,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::AttMapEntryProcessor
       end
 
       it "returns true" do
-        expect(described_class.should_add_nil_reason?(property, config)).to be true
+        expect(described_class.should_add_nil_reason?(property,
+                                                      config)).to be true
       end
     end
 
@@ -407,7 +415,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::AttMapEntryProcessor
       end
 
       it "returns true" do
-        expect(described_class.should_add_nil_reason?(property, config)).to be true
+        expect(described_class.should_add_nil_reason?(property,
+                                                      config)).to be true
       end
     end
 
@@ -427,7 +436,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::AttMapEntryProcessor
       end
 
       it "returns false" do
-        expect(described_class.should_add_nil_reason?(property, config)).to be false
+        expect(described_class.should_add_nil_reason?(property,
+                                                      config)).to be false
       end
     end
   end
@@ -448,7 +458,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::AttMapEntryProcessor
       end
 
       it "returns true" do
-        expect(described_class.should_add_metadata?(property, config)).to be true
+        expect(described_class.should_add_metadata?(property,
+                                                    config)).to be true
       end
     end
 
@@ -467,7 +478,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::AttMapEntryProcessor
       end
 
       it "returns false" do
-        expect(described_class.should_add_metadata?(property, config)).to be false
+        expect(described_class.should_add_metadata?(property,
+                                                    config)).to be false
       end
     end
   end
@@ -488,7 +500,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::AttMapEntryProcessor
       end
 
       it "returns true" do
-        expect(described_class.should_add_soft_typed_name?(property, config)).to be true
+        expect(described_class.should_add_soft_typed_name?(property,
+                                                           config)).to be true
       end
     end
 
@@ -504,7 +517,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::PropertyRules::AttMapEntryProcessor
       end
 
       it "returns false" do
-        expect(described_class.should_add_soft_typed_name?(property, config)).to be false
+        expect(described_class.should_add_soft_typed_name?(property,
+                                                           config)).to be false
       end
     end
   end

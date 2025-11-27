@@ -10,7 +10,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
       "Context",
       rule_enabled?: true,
       gml_namespace: "http://www.opengis.net/gml/3.2",
-      model: model,
+      model: model
     )
   end
   let(:model) { double("Model") }
@@ -22,7 +22,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
           double(
             "Property",
             is_metadata: true,
-            type: nil,
+            type: nil
           )
         end
 
@@ -36,7 +36,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
           double(
             "Property",
             is_metadata: false,
-            type: "MetadataType",
+            type: "MetadataType"
           )
         end
         let(:metadata_class) do
@@ -59,7 +59,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
           double(
             "Property",
             is_metadata: false,
-            type: "RegularType",
+            type: "RegularType"
           )
         end
         let(:regular_class) do
@@ -84,14 +84,14 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
           "Context",
           rule_enabled?: false,
           gml_namespace: "http://www.opengis.net/gml/3.2",
-          model: model,
+          model: model
         )
       end
       let(:property) do
         double(
           "Property",
           is_metadata: true,
-          type: nil,
+          type: nil
         )
       end
 
@@ -107,7 +107,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
         double(
           "Property",
           is_metadata: true,
-          type: nil,
+          type: nil
         )
       end
 
@@ -124,8 +124,8 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
         expect(result[:imports]).to include(
           hash_including(
             prefix: "gml",
-            namespace: "http://www.opengis.net/gml/3.2",
-          ),
+            namespace: "http://www.opengis.net/gml/3.2"
+          )
         )
       end
     end
@@ -135,7 +135,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
         double(
           "Property",
           is_metadata: false,
-          type: "DataQuality",
+          type: "DataQuality"
         )
       end
       let(:metadata_class) do
@@ -161,7 +161,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
         double(
           "Property",
           is_metadata: false,
-          type: "FeatureType",
+          type: "FeatureType"
         )
       end
       let(:regular_class) do
@@ -187,14 +187,14 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
           "Context",
           rule_enabled?: false,
           gml_namespace: "http://www.opengis.net/gml/3.2",
-          model: model,
+          model: model
         )
       end
       let(:property) do
         double(
           "Property",
           is_metadata: true,
-          type: nil,
+          type: nil
         )
       end
 
@@ -212,7 +212,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
         double(
           "Property",
           is_metadata: true,
-          type: nil,
+          type: nil
         )
       end
 
@@ -226,7 +226,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
         double(
           "Property",
           is_metadata: false,
-          type: "Lineage",
+          type: "Lineage"
         )
       end
       let(:metadata_class) do
@@ -249,7 +249,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
         double(
           "Property",
           is_metadata: false,
-          type: "String",
+          type: "String"
         )
       end
       let(:regular_class) do
@@ -272,7 +272,7 @@ RSpec.describe Lutaml::Klin::XsdGen::RuleProcessors::PropertyRules::MetadataGmls
         double(
           "Property",
           is_metadata: false,
-          type: nil,
+          type: nil
         )
       end
 

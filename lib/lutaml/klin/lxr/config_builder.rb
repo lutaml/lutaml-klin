@@ -74,26 +74,26 @@ module Lutaml
         # Validate configuration options
         # @raise [ConfigurationError] If options are invalid
         def validate_options!
-          valid_xsd_modes = ["include_all", "allow_external"]
+          valid_xsd_modes = %w[include_all allow_external]
           unless valid_xsd_modes.include?(xsd_mode)
             raise ConfigurationError,
                   "Invalid xsd_mode: #{xsd_mode}. " \
                   "Must be one of: #{valid_xsd_modes.join(', ')}"
           end
 
-          valid_resolution_modes = ["resolved", "bare"]
+          valid_resolution_modes = %w[resolved bare]
           unless valid_resolution_modes.include?(resolution_mode)
             raise ConfigurationError,
                   "Invalid resolution_mode: #{resolution_mode}. " \
                   "Must be one of: #{valid_resolution_modes.join(', ')}"
           end
 
-          valid_formats = ["marshal", "json", "yaml", "parse"]
-          unless valid_formats.include?(serialization_format)
-            raise ConfigurationError,
-                  "Invalid serialization_format: #{serialization_format}. " \
-                  "Must be one of: #{valid_formats.join(', ')}"
-          end
+          valid_formats = %w[marshal json yaml parse]
+          return if valid_formats.include?(serialization_format)
+
+          raise ConfigurationError,
+                "Invalid serialization_format: #{serialization_format}. " \
+                "Must be one of: #{valid_formats.join(', ')}"
         end
 
         # Validate schema information structure
@@ -114,10 +114,10 @@ module Lutaml
                   "Schema info :xsd_files must be an Array"
           end
 
-          if schema_info[:xsd_files].empty?
-            raise InvalidInputError,
-                  "Schema info :xsd_files cannot be empty"
-          end
+          return unless schema_info[:xsd_files].empty?
+
+          raise InvalidInputError,
+                "Schema info :xsd_files cannot be empty"
         end
 
         # Build package metadata section
@@ -136,7 +136,9 @@ module Lutaml
         # @return [Hash] Schemas configuration
         def build_schemas_section(schema_info)
           {
-            "files" => schema_info[:xsd_files].map { |file| normalize_path(file) }
+            "files" => schema_info[:xsd_files].map do |file|
+              normalize_path(file)
+            end
           }
         end
 
@@ -192,7 +194,7 @@ module Lutaml
         def write_config(config, output_path)
           # Ensure output directory exists
           output_dir = File.dirname(output_path)
-          FileUtils.mkdir_p(output_dir) unless Dir.exist?(output_dir)
+          FileUtils.mkdir_p(output_dir)
 
           File.write(output_path, config.to_yaml)
         end

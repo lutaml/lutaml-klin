@@ -29,7 +29,7 @@ RSpec.describe "Property Rules Batch 4" do
     let(:context) do
       {
         xsd_document: xsd_doc,
-        extension_element: element,
+        extension_element: element
       }
     end
 
@@ -44,8 +44,10 @@ RSpec.describe "Property Rules Batch 4" do
 
         it "adds metadata attribute" do
           expect(xsd_doc).to receive(:create_element).with("attribute")
-          expect(xsd_doc).to receive(:add_attribute).with(element, "name", "metadata")
-          expect(xsd_doc).to receive(:add_attribute).with(element, "type", "anyURI")
+          expect(xsd_doc).to receive(:add_attribute).with(element, "name",
+                                                          "metadata")
+          expect(xsd_doc).to receive(:add_attribute).with(element, "type",
+                                                          "anyURI")
 
           processor.process(property, context)
         end
@@ -58,7 +60,8 @@ RSpec.describe "Property Rules Batch 4" do
         end
 
         it "does not add metadata attribute" do
-          expect(xsd_doc).not_to receive(:add_attribute).with(anything, "name", "metadata")
+          expect(xsd_doc).not_to receive(:add_attribute).with(anything, "name",
+                                                              "metadata")
 
           processor.process(property, context)
         end
@@ -93,7 +96,7 @@ RSpec.describe "Property Rules Batch 4" do
         gml_namespace: "http://www.opengis.net/gml/3.2",
         model: model,
         annotation_element: annotation,
-        appinfo_element: appinfo,
+        appinfo_element: appinfo
       }
     end
 
@@ -110,7 +113,8 @@ RSpec.describe "Property Rules Batch 4" do
         end
 
         it "adds targetElement annotation" do
-          expect(xsd_doc).to receive(:create_element).with("gml:targetElement", anything)
+          expect(xsd_doc).to receive(:create_element).with("gml:targetElement",
+                                                           anything)
           expect(element).to receive(:content=).with("app:Building")
 
           processor.process(property, context)
@@ -158,7 +162,7 @@ RSpec.describe "Property Rules Batch 4" do
         xsd_document: xsd_doc,
         gml_namespace: "http://www.opengis.net/gml/3.2",
         annotation_element: annotation,
-        appinfo_element: appinfo,
+        appinfo_element: appinfo
       }
     end
 
@@ -173,7 +177,9 @@ RSpec.describe "Property Rules Batch 4" do
         end
 
         it "adds reversePropertyName annotation" do
-          expect(xsd_doc).to receive(:create_element).with("gml:reversePropertyName", anything)
+          expect(xsd_doc).to receive(:create_element).with(
+            "gml:reversePropertyName", anything
+          )
           expect(element).to receive(:content=).with("building")
 
           processor.process(property, context)
@@ -218,7 +224,7 @@ RSpec.describe "Property Rules Batch 4" do
         xsd_document: xsd_doc,
         gml_namespace: "http://www.opengis.net/gml/3.2",
         annotation_element: annotation,
-        appinfo_element: appinfo,
+        appinfo_element: appinfo
       }
     end
 
@@ -231,7 +237,9 @@ RSpec.describe "Property Rules Batch 4" do
         end
 
         it "adds defaultCodeSpace annotation" do
-          expect(xsd_doc).to receive(:create_element).with("gml:defaultCodeSpace", anything)
+          expect(xsd_doc).to receive(:create_element).with(
+            "gml:defaultCodeSpace", anything
+          )
           expect(element).to receive(:content=).with("http://example.org/codelists/colors.xml")
 
           processor.process(property, context)
@@ -274,7 +282,7 @@ RSpec.describe "Property Rules Batch 4" do
     let(:context) do
       {
         xsd_document: xsd_doc,
-        extension_element: element,
+        extension_element: element
       }
     end
 
@@ -287,9 +295,12 @@ RSpec.describe "Property Rules Batch 4" do
 
         it "adds name attribute with required NCName type" do
           expect(xsd_doc).to receive(:create_element).with("attribute")
-          expect(xsd_doc).to receive(:add_attribute).with(element, "name", "name")
-          expect(xsd_doc).to receive(:add_attribute).with(element, "type", "NCName")
-          expect(xsd_doc).to receive(:add_attribute).with(element, "use", "required")
+          expect(xsd_doc).to receive(:add_attribute).with(element, "name",
+                                                          "name")
+          expect(xsd_doc).to receive(:add_attribute).with(element, "type",
+                                                          "NCName")
+          expect(xsd_doc).to receive(:add_attribute).with(element, "use",
+                                                          "required")
 
           processor.process(property, context)
         end
@@ -303,7 +314,8 @@ RSpec.describe "Property Rules Batch 4" do
         end
 
         it "does not add name attribute" do
-          expect(xsd_doc).not_to receive(:add_attribute).with(anything, "name", "name")
+          expect(xsd_doc).not_to receive(:add_attribute).with(anything, "name",
+                                                              "name")
 
           processor.process(property, context)
         end
@@ -316,7 +328,8 @@ RSpec.describe "Property Rules Batch 4" do
         end
 
         it "does not add name attribute" do
-          expect(xsd_doc).not_to receive(:add_attribute).with(anything, "name", "name")
+          expect(xsd_doc).not_to receive(:add_attribute).with(anything, "name",
+                                                              "name")
 
           processor.process(property, context)
         end

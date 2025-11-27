@@ -91,8 +91,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::GlobalRules::DescriptorAnnotationPr
       context "with single descriptor value" do
         before do
           allow(model_element).to receive(:descriptors).and_return({
-            "alias" => [{ value: "Building" }]
-          })
+                                                                     "alias" => [{ value: "Building" }]
+                                                                   })
           allow(annotation_builder).to receive(:appinfo).and_return(nil)
           allow(annotation_builder).to receive(:add_appinfo).and_return(annotation_builder)
         end
@@ -115,7 +115,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::GlobalRules::DescriptorAnnotationPr
 
         it "imports sc namespace" do
           allow(annotation_builder).to receive(:add_element)
-          expect(xsd_builder).to receive(:add_import).with("sc", described_class::SCAI_NS)
+          expect(xsd_builder).to receive(:add_import).with("sc",
+                                                           described_class::SCAI_NS)
 
           described_class.add_descriptor_annotations(
             annotation_builder,
@@ -129,8 +130,10 @@ RSpec.describe Lutaml::Klin::RuleProcessors::GlobalRules::DescriptorAnnotationPr
       context "with descriptor value and language" do
         before do
           allow(model_element).to receive(:descriptors).and_return({
-            "alias" => [{ value: "Bâtiment", lang: "fr" }]
-          })
+                                                                     "alias" => [{
+                                                                       value: "Bâtiment", lang: "fr"
+                                                                     }]
+                                                                   })
           allow(annotation_builder).to receive(:appinfo).and_return(nil)
           allow(annotation_builder).to receive(:add_appinfo).and_return(annotation_builder)
         end
@@ -156,22 +159,27 @@ RSpec.describe Lutaml::Klin::RuleProcessors::GlobalRules::DescriptorAnnotationPr
       context "with multiple descriptor values" do
         before do
           allow(model_element).to receive(:descriptors).and_return({
-            "alias" => [
-              { value: "Building" },
-              { value: "Bâtiment", lang: "fr" },
-              { value: "Gebäude", lang: "de" }
-            ],
-            "definition" => [
-              { value: "A permanent structure" }
-            ]
-          })
+                                                                     "alias" => [
+                                                                       { value: "Building" },
+                                                                       {
+                                                                         value: "Bâtiment", lang: "fr"
+                                                                       },
+                                                                       {
+                                                                         value: "Gebäude", lang: "de"
+                                                                       }
+                                                                     ],
+                                                                     "definition" => [
+                                                                       { value: "A permanent structure" }
+                                                                     ]
+                                                                   })
           allow(annotation_builder).to receive(:appinfo).and_return(nil)
           allow(annotation_builder).to receive(:add_appinfo).and_return(annotation_builder)
         end
 
         it "adds all descriptor elements in sorted order" do
           call_count = 0
-          expected_values = ["Building", "Gebäude", "Bâtiment", "A permanent structure"]
+          expected_values = ["Building", "Gebäude", "Bâtiment",
+                             "A permanent structure"]
 
           expect(annotation_builder).to receive(:add_element).exactly(4).times.with("sc:descriptor") do |&block|
             element = double("element_#{call_count}")
@@ -195,12 +203,12 @@ RSpec.describe Lutaml::Klin::RuleProcessors::GlobalRules::DescriptorAnnotationPr
       context "with empty descriptor values" do
         before do
           allow(model_element).to receive(:descriptors).and_return({
-            "alias" => [
-              { value: "" },
-              { value: "  " },
-              { value: nil }
-            ]
-          })
+                                                                     "alias" => [
+                                                                       { value: "" },
+                                                                       { value: "  " },
+                                                                       { value: nil }
+                                                                     ]
+                                                                   })
           allow(annotation_builder).to receive(:appinfo).and_return(nil)
           allow(annotation_builder).to receive(:add_appinfo).and_return(annotation_builder)
         end
@@ -220,9 +228,9 @@ RSpec.describe Lutaml::Klin::RuleProcessors::GlobalRules::DescriptorAnnotationPr
       context "with unconfigured descriptors" do
         before do
           allow(model_element).to receive(:descriptors).and_return({
-            "example" => [{ value: "Example text" }],
-            "legalBasis" => [{ value: "Legal text" }]
-          })
+                                                                     "example" => [{ value: "Example text" }],
+                                                                     "legalBasis" => [{ value: "Legal text" }]
+                                                                   })
         end
 
         it "skips unconfigured descriptors" do
@@ -249,7 +257,7 @@ RSpec.describe Lutaml::Klin::RuleProcessors::GlobalRules::DescriptorAnnotationPr
 
       it "returns array of descriptor names" do
         result = described_class.descriptors_to_represent(config)
-        expect(result).to eq(["alias", "definition", "description"])
+        expect(result).to eq(%w[alias definition description])
       end
     end
 

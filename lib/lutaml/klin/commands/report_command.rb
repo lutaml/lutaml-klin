@@ -56,7 +56,7 @@ module Lutaml
         def generate_report(mapping)
           report = []
           report << "ShapeChange Transformation Investigation"
-          report << "=" * 80
+          report << ("=" * 80)
           report << ""
 
           mapping.package_mappings.each do |package|
@@ -72,7 +72,7 @@ module Lutaml
         def generate_package_section(package)
           lines = []
           lines << "Package: #{package.uml_name}"
-          lines << "-" * 80
+          lines << ("-" * 80)
           lines << "XSD Namespace: #{package.xsd_namespace}"
           lines << ""
 
@@ -89,7 +89,7 @@ module Lutaml
 
           # UML Class section
           lines << "UML Class: #{class_mapping.uml_name}"
-          lines << "-" * 40
+          lines << ("-" * 40)
           if class_mapping.uml_stereotype
             lines << "Stereotype: #{class_mapping.uml_stereotype}"
           end
@@ -109,7 +109,7 @@ module Lutaml
           # XSD Element section
           if class_mapping.xsd_element
             lines << "XSD Element: #{class_mapping.xsd_element}"
-            lines << "-" * 40
+            lines << ("-" * 40)
             if class_mapping.xsd_substitution_group
               lines << "Substitution Group: #{class_mapping.xsd_substitution_group}"
             end
@@ -119,7 +119,7 @@ module Lutaml
 
           # XSD Type section
           lines << "XSD Type: #{class_mapping.xsd_type}"
-          lines << "-" * 40
+          lines << ("-" * 40)
           if class_mapping.xsd_base_type
             lines << "Base: #{class_mapping.xsd_base_type} (extends)"
           end
@@ -138,7 +138,7 @@ module Lutaml
         def generate_transformation_patterns(mapping)
           lines = []
           lines << "Transformation Patterns Observed"
-          lines << "=" * 80
+          lines << ("=" * 80)
           lines << ""
 
           patterns = analyze_patterns(mapping)
@@ -187,11 +187,11 @@ module Lutaml
               end
 
               # Pattern 4: Substitution groups
-              if cls.xsd_substitution_group
-                substitution_count += 1
-                patterns["Substitution: FeatureType → substitutionGroup"] ||= []
-                patterns["Substitution: FeatureType → substitutionGroup"] << "#{cls.xsd_element} → #{cls.xsd_substitution_group}"
-              end
+              next unless cls.xsd_substitution_group
+
+              substitution_count += 1
+              patterns["Substitution: FeatureType → substitutionGroup"] ||= []
+              patterns["Substitution: FeatureType → substitutionGroup"] << "#{cls.xsd_element} → #{cls.xsd_substitution_group}"
             end
           end
 
@@ -203,7 +203,9 @@ module Lutaml
         end
 
         def format_uml_cardinality(attr)
-          return "" unless attr.uml_multiplicity_min || attr.uml_multiplicity_max
+          unless attr.uml_multiplicity_min || attr.uml_multiplicity_max
+            return ""
+          end
 
           min = attr.uml_multiplicity_min || "0"
           max = attr.uml_multiplicity_max || "1"

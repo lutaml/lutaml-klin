@@ -23,7 +23,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::Initial
         double(
           "Property",
           name: "floors",
-          respond_to?: ->(method) { [:initial_value, :read_only?].include?(method) },
+          respond_to?: lambda { |method|
+            %i[initial_value read_only?].include?(method)
+          },
           initial_value: "1",
           read_only?: false
         )
@@ -48,7 +50,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::Initial
         double(
           "Property",
           name: "pi",
-          respond_to?: ->(method) { [:initial_value, :read_only?].include?(method) },
+          respond_to?: lambda { |method|
+            %i[initial_value read_only?].include?(method)
+          },
           initial_value: "3.14159",
           read_only?: true
         )
@@ -73,7 +77,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::Initial
         double(
           "Property",
           name: "status",
-          respond_to?: ->(method) { [:initial_value, :read_only?].include?(method) },
+          respond_to?: lambda { |method|
+            %i[initial_value read_only?].include?(method)
+          },
           initial_value: '"active"',
           read_only?: false
         )
@@ -144,7 +150,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::Initial
         double(
           "Property",
           name: "test",
-          respond_to?: ->(method) { [:initial_value, :read_only?].include?(method) },
+          respond_to?: lambda { |method|
+            %i[initial_value read_only?].include?(method)
+          },
           initial_value: "value",
           read_only?: false
         )
@@ -174,7 +182,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::Initial
         double(
           "Property",
           name: "enabled",
-          respond_to?: ->(method) { [:initial_value, :read_only?].include?(method) },
+          respond_to?: lambda { |method|
+            %i[initial_value read_only?].include?(method)
+          },
           initial_value: "true",
           read_only?: false
         )

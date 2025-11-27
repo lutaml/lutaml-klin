@@ -30,7 +30,8 @@ module Lutaml
           # @return [Boolean] true if property has attribute map entries
           def self.applies_to?(property, config)
             return false unless config.rule_enabled?(RULE_NAME)
-            return false if property.is_attribute? # Already an attribute element
+            # Already an attribute element
+            return false if property.is_attribute?
 
             # Check if property type has attribute or attributeGroup map entries
             has_attribute_map_entries?(property, config)
@@ -43,12 +44,14 @@ module Lutaml
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [void]
-          def self.process_property(property, parent_element, xsd_builder, config)
+          def self.process_property(property, parent_element, xsd_builder,
+                                    config)
             return unless applies_to?(property, config)
 
             # Get attribute and attributeGroup map entries
             attribute_ref = get_attribute_map_entry(property, config)
-            attribute_group_ref = get_attribute_group_map_entry(property, config)
+            attribute_group_ref = get_attribute_group_map_entry(property,
+                                                                config)
 
             return if attribute_ref.nil? && attribute_group_ref.nil?
 
@@ -100,7 +103,8 @@ module Lutaml
           # @return [Boolean] true if attribute or attributeGroup map entries exist
           def self.has_attribute_map_entries?(property, config)
             attribute_ref = get_attribute_map_entry(property, config)
-            attribute_group_ref = get_attribute_group_map_entry(property, config)
+            attribute_group_ref = get_attribute_group_map_entry(property,
+                                                                config)
 
             !attribute_ref.nil? || !attribute_group_ref.nil?
           end
@@ -127,7 +131,8 @@ module Lutaml
             type_name = property.type
             encoding_rule = config.encoding_rule || "xsd"
 
-            map_entry = config.attribute_group_map_entry(type_name, encoding_rule)
+            map_entry = config.attribute_group_map_entry(type_name,
+                                                         encoding_rule)
             map_entry&.rule
           end
 
@@ -172,13 +177,12 @@ module Lutaml
           def self.add_nil_reason_attribute(attribute_element, config)
             gml_version = config.gml_version || "3.2"
 
-            if gml_version == "3.2"
-              attribute_element.name = "nilReason"
-              attribute_element.type = "gml:NilReasonType"
-            else
-              attribute_element.name = "nilReason"
-              attribute_element.type = "gml:NullType"
-            end
+            attribute_element.name = "nilReason"
+            attribute_element.type = if gml_version == "3.2"
+                                       "gml:NilReasonType"
+                                     else
+                                       "gml:NullType"
+                                     end
           end
 
           # Adds metadata attribute
@@ -208,7 +212,8 @@ module Lutaml
           # @param attribute_ref [String] The attribute reference (e.g., "xlink:href")
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @return [void]
-          def self.add_attribute_reference(complex_type, attribute_ref, xsd_builder)
+          def self.add_attribute_reference(complex_type, attribute_ref,
+                                           xsd_builder)
             complex_type.add_attribute do |attr|
               attr.ref = attribute_ref
 
@@ -227,7 +232,8 @@ module Lutaml
           # @param group_ref [String] The attributeGroup reference
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @return [void]
-          def self.add_attribute_group_reference(complex_type, group_ref, xsd_builder)
+          def self.add_attribute_group_reference(complex_type, group_ref,
+                                                 xsd_builder)
             complex_type.add_attribute_group do |attr_group|
               attr_group.ref = group_ref
 

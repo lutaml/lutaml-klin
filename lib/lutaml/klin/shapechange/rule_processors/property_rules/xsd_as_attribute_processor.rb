@@ -30,7 +30,8 @@ module Lutaml
               in_assoc_class = context[:in_association_class] || false
 
               as_attribute = get_xsd_as_attribute(property)
-              should_encode = should_encode_as_attribute?(property, as_attribute, in_assoc_class)
+              should_encode = should_encode_as_attribute?(property,
+                                                          as_attribute, in_assoc_class)
 
               {
                 applies: true,
@@ -40,7 +41,8 @@ module Lutaml
                   constraints_met: should_encode,
                   use_required: should_encode && is_required?(property)
                 },
-                message: generate_message(should_encode, as_attribute, in_assoc_class)
+                message: generate_message(should_encode, as_attribute,
+                                          in_assoc_class)
               }
             end
 
@@ -70,6 +72,7 @@ module Lutaml
               begin
                 value = property.tagged_value(tag_name)
                 return nil if value.nil? || value.to_s.strip.empty?
+
                 value.to_s.strip
               rescue StandardError
                 nil
@@ -82,7 +85,8 @@ module Lutaml
             # @param as_attribute [String, nil] Tagged value
             # @param in_assoc_class [Boolean] In association class
             # @return [Boolean] True if should encode as attribute
-            def should_encode_as_attribute?(property, as_attribute, in_assoc_class)
+            def should_encode_as_attribute?(property, as_attribute,
+                                            in_assoc_class)
               # Must have tagged value set to "true"
               return false unless as_attribute&.casecmp("true")&.zero?
 
@@ -168,7 +172,9 @@ module Lutaml
 
               begin
                 # Check for gmlListProperty rule
-                return false unless property.matches?("rule-xsd-prop-gmlListProperty")
+                unless property.matches?("rule-xsd-prop-gmlListProperty")
+                  return false
+                end
 
                 # Check tagged value
                 list_value = get_tagged_value(property, "gmlListProperty")
@@ -213,7 +219,7 @@ module Lutaml
             #
             # @param property [Object] The property
             # @return [Boolean] Always true
-            def applies_to?(property)
+            def applies_to?(_property)
               true
             end
           end

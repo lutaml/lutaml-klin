@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "lutaml"
 require_relative "models/uml/package"
 require_relative "models/uml/class"
@@ -175,7 +177,7 @@ module Lutaml
         attr.id = element.xmi_id || element.id
         attr.name = element.name
         attr.type = element.respond_to?(:type) ? element.type : nil
-        attr.type_id = nil  # Will be populated if needed
+        attr.type_id = nil # Will be populated if needed
         attr.is_derived = element.respond_to?(:is_derived) ? element.is_derived : false
         attr.documentation = element.respond_to?(:definition) ? element.definition : nil
 
@@ -198,10 +200,10 @@ module Lutaml
           attribute.multiplicity_min = cardinality.min.to_i
         end
 
-        if cardinality.respond_to?(:max)
-          max_val = cardinality.max
-          attribute.multiplicity_max = max_val == "*" ? "*" : max_val.to_s
-        end
+        return unless cardinality.respond_to?(:max)
+
+        max_val = cardinality.max
+        attribute.multiplicity_max = max_val == "*" ? "*" : max_val.to_s
       end
 
       def extract_type_name(element)
@@ -258,7 +260,9 @@ module Lutaml
       end
 
       def find_element_by_id(element, target_id)
-        return element if element.respond_to?(:xmi_id) && element.xmi_id == target_id
+        if element.respond_to?(:xmi_id) && element.xmi_id == target_id
+          return element
+        end
 
         if element.respond_to?(:packaged_element)
           elements = element.packaged_element || []

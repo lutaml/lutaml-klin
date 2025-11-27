@@ -32,7 +32,9 @@ RSpec.describe "Mapping Generation Integration", :integration do
 
   describe "generating mapping from PLATEAU data" do
     it "generates valid YAML mapping from urbanFunction XSD" do
-      skip "Skipping unless PLATEAU data is available" unless File.exist?(xsd_file)
+      unless File.exist?(xsd_file)
+        skip "Skipping unless PLATEAU data is available"
+      end
 
       generator = Lutaml::Klin::MappingGenerator.new(config_file)
       mapping = generator.generate_from_xsd(xsd_file)
@@ -54,7 +56,9 @@ RSpec.describe "Mapping Generation Integration", :integration do
     end
 
     it "extracts correct namespace information" do
-      skip "Skipping unless PLATEAU data is available" unless File.exist?(xsd_file)
+      unless File.exist?(xsd_file)
+        skip "Skipping unless PLATEAU data is available"
+      end
 
       generator = Lutaml::Klin::MappingGenerator.new(config_file)
       mapping = generator.generate_from_xsd(xsd_file)
@@ -62,11 +66,15 @@ RSpec.describe "Mapping Generation Integration", :integration do
       # urbanFunction.xsd should have i-ur namespace in package mappings
       namespaces = mapping.package_mappings.map(&:xsd_namespace).compact
       expect(namespaces).not_to be_empty
-      expect(namespaces.any? { |ns| ns.include?("i-ur") || ns.include?("urbanFunction") }).to be true
+      expect(namespaces.any? do |ns|
+        ns.include?("i-ur") || ns.include?("urbanFunction")
+      end).to be true
     end
 
     it "creates package mappings with classes" do
-      skip "Skipping unless PLATEAU data is available" unless File.exist?(xsd_file)
+      unless File.exist?(xsd_file)
+        skip "Skipping unless PLATEAU data is available"
+      end
 
       generator = Lutaml::Klin::MappingGenerator.new(config_file)
       mapping = generator.generate_from_xsd(xsd_file)
@@ -81,7 +89,9 @@ RSpec.describe "Mapping Generation Integration", :integration do
     end
 
     it "includes attribute mappings for classes" do
-      skip "Skipping unless PLATEAU data is available" unless File.exist?(xsd_file)
+      unless File.exist?(xsd_file)
+        skip "Skipping unless PLATEAU data is available"
+      end
 
       generator = Lutaml::Klin::MappingGenerator.new(config_file)
       mapping = generator.generate_from_xsd(xsd_file)
@@ -106,7 +116,9 @@ RSpec.describe "Mapping Generation Integration", :integration do
     end
 
     it "handles missing XSD file gracefully" do
-      skip "Skipping unless PLATEAU data is available" unless File.exist?(config_file)
+      unless File.exist?(config_file)
+        skip "Skipping unless PLATEAU data is available"
+      end
 
       generator = Lutaml::Klin::MappingGenerator.new(config_file)
       expect do

@@ -16,6 +16,7 @@ module Lutaml
         attribute :encoding_rules, EncodingRule, collection: true
         attribute :xsd_schema_locations, :string, collection: true
         attribute :target_config, :hash
+        attribute :input_config, :hash
 
         xml do
           root "ShapeChangeConfiguration", mixed: true
@@ -30,11 +31,10 @@ module Lutaml
 
         # Find namespace for a UML package
         def namespace_for_package(package_path)
-          simple_name = package_path.split('::').last.strip
+          simple_name = package_path.split("::").last.strip
 
           pkg_info = package_infos.find do |pi|
-            pi.package_name&.strip == simple_name ||
-            pi.package_name&.strip == package_path
+            [simple_name, package_path].include?(pi.package_name&.strip)
           end
 
           pkg_info&.ns&.strip
@@ -57,13 +57,13 @@ module Lutaml
         # Find type mapping for UML type
         def find_type_mapping(uml_type, encoding_rule: "citygml")
           # Normalize type name (gml::CodeType → gml:CodeType)
-          clean_type = uml_type.to_s.gsub('::', ':').strip
+          clean_type = uml_type.to_s.gsub("::", ":").strip
 
           xsd_map_entries.find do |entry|
             # Normalize BOTH the search term and the entry's type
-            entry_type = entry.type&.gsub('::', ':')&.strip
+            entry_type = entry.type&.gsub("::", ":")&.strip
             entry_type == clean_type &&
-            entry.applies_to?(encoding_rule)
+              entry.applies_to?(encoding_rule)
           end
         end
 

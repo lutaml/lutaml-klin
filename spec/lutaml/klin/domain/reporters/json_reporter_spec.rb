@@ -259,7 +259,7 @@ RSpec.describe Lutaml::Klin::Domain::Reporters::JsonReporter do
 
         # Pretty-printed JSON should have multiple lines
         expect(content.lines.count).to be > 10
-        expect(content).to include("  ")  # Should have indentation
+        expect(content).to include("  ") # Should have indentation
       end
     end
   end

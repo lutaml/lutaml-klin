@@ -17,10 +17,10 @@ module Lutaml
         attribute :source_lur, :string
         attribute :source_lxr, :string
         attribute :source_config, :string
-        attribute :source_xmi, :string  # Legacy support
+        attribute :source_xmi, :string # Legacy support
 
         # Enhanced traceability metadata (Phase 2)
-        attribute :traceability, :string  # Will be serialized as Hash in YAML
+        attribute :traceability, :string # Will be serialized as Hash in YAML
 
         # Mappings and namespaces
         attribute :package_mappings, PackageMapping, collection: true

@@ -23,7 +23,8 @@ module Lutaml
 
           # Try to load from ShapeChange StandardRules.xml if available
           if shapechange_config_dir
-            standard_rules_path = File.join(shapechange_config_dir, "StandardRules.xml")
+            standard_rules_path = File.join(shapechange_config_dir,
+                                            "StandardRules.xml")
 
             if File.exist?(standard_rules_path)
               encoding_rules = Parsers::StandardRulesParser.parse_encoding_rules(standard_rules_path)

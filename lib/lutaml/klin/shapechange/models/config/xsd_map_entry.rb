@@ -7,7 +7,7 @@ module Lutaml
     module Shapechange
       class XsdMapEntry < Lutaml::Model::Serializable
         attribute :type, :string
-        attribute :xsd_encoding_rules, :string  # Space-separated rule names
+        attribute :xsd_encoding_rules, :string # Space-separated rule names
         attribute :xml_type, :string
         attribute :xml_property_type, :string
         attribute :xml_element, :string

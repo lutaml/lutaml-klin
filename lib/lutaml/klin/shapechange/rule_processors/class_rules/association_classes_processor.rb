@@ -23,7 +23,7 @@ module Lutaml
             # @param uml_class [Lutaml::Uml::Class] The class to process
             # @param context [Hash] Processing context
             # @return [Hash] Processing result with association end properties
-            def process(uml_class, context = {})
+            def process(uml_class, _context = {})
               return default_result unless applies_to?(uml_class)
 
               association = uml_class.is_association_class

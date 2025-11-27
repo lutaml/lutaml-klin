@@ -26,7 +26,7 @@ module Lutaml
             # @param uml_class [Lutaml::Uml::Class] The class
             # @param context [Hash] Processing context
             # @return [Hash] Processing result
-            def process(uml_class, context = {})
+            def process(uml_class, _context = {})
               return default_result(true) unless applies_to?(uml_class)
 
               # Rule is active, check includePropertyType
@@ -97,7 +97,7 @@ module Lutaml
               include_value = get_include_property_type(uml_class)
 
               # Generate only if explicitly set to true
-              include_value == true || include_value == "true"
+              [true, "true"].include?(include_value)
             end
 
             # Get includePropertyType tagged value

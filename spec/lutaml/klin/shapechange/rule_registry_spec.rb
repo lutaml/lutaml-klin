@@ -11,7 +11,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleRegistry do
   let(:base_encoding_rule) do
     Lutaml::Klin::Shapechange::EncodingRule.new.tap do |er|
       er.name = "xsd"
-      er.rules = ["rule-xsd-cls-type", "rule-xsd-cls-object-element"]
+      er.rules = %w[rule-xsd-cls-type rule-xsd-cls-object-element]
     end
   end
 
@@ -50,7 +50,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleRegistry do
       registry.register_encoding_rule(base_encoding_rule)
       registry.register_encoding_rule(child_encoding_rule)
 
-      expect(registry.encoding_rules.keys).to contain_exactly("xsd", "iso19136_2007")
+      expect(registry.encoding_rules.keys).to contain_exactly("xsd",
+                                                              "iso19136_2007")
     end
   end
 
@@ -76,13 +77,15 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleRegistry do
 
     context "when rule is in parent encoding rule" do
       it "returns true for inherited rule" do
-        expect(registry.has_rule?("rule-xsd-cls-type", "iso19136_2007")).to be true
+        expect(registry.has_rule?("rule-xsd-cls-type",
+                                  "iso19136_2007")).to be true
       end
     end
 
     context "when rule is only in child encoding rule" do
       it "returns true" do
-        expect(registry.has_rule?("rule-xsd-all-naming-gml", "iso19136_2007")).to be true
+        expect(registry.has_rule?("rule-xsd-all-naming-gml",
+                                  "iso19136_2007")).to be true
       end
 
       it "returns false for parent" do
@@ -98,7 +101,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleRegistry do
 
     context "when encoding rule does not exist" do
       it "returns false" do
-        expect(registry.has_rule?("rule-xsd-cls-type", "non-existent")).to be false
+        expect(registry.has_rule?("rule-xsd-cls-type",
+                                  "non-existent")).to be false
       end
     end
   end
@@ -133,7 +137,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleRegistry do
       child_with_duplicate = Lutaml::Klin::Shapechange::EncodingRule.new.tap do |er|
         er.name = "custom"
         er.extends = "xsd"
-        er.rules = ["rule-xsd-cls-type", "rule-custom"]
+        er.rules = %w[rule-xsd-cls-type rule-custom]
       end
       registry.register_encoding_rule(child_with_duplicate)
 

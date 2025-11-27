@@ -77,12 +77,12 @@ module Lutaml
 
             private
 
-            def codelist_or_enumeration?(property, context)
+            def codelist_or_enumeration?(property, _context)
               # Check if property value type is CODELIST or ENUMERATION
               return false unless property.respond_to?(:category_of_value)
 
               category = property.category_of_value
-              category == :codelist || category == :enumeration
+              %i[codelist enumeration].include?(category)
             rescue StandardError
               false
             end
@@ -92,7 +92,7 @@ module Lutaml
                 length: get_length_value(property),
                 pattern: get_tagged_value(property, "pattern"),
                 min: get_tagged_value(property, "rangeMinimum"),
-                max: get_tagged_value(property, "rangeMaximum"),
+                max: get_tagged_value(property, "rangeMaximum")
               }
             end
 
@@ -151,12 +151,10 @@ module Lutaml
                 "dateTime"
               when "Date"
                 "date"
-              else
-                nil
               end
             end
 
-            def get_base_from_map(type_info, context)
+            def get_base_from_map(_type_info, _context)
               # This would check configuration map entries
               # For now return nil to use type-based lookup
               nil
@@ -171,7 +169,9 @@ module Lutaml
                           model.class_by_id(type_info.id)
                         end
 
-              type_ci ||= model.class_by_name(type_info.name) if type_info.respond_to?(:name)
+              if type_info.respond_to?(:name)
+                type_ci ||= model.class_by_name(type_info.name)
+              end
               type_ci
             end
 
@@ -217,10 +217,10 @@ module Lutaml
               # Create appropriate structure based on type content
               if type_content == "complex/simple"
                 add_complex_simple_restriction(element, base_type, facets,
-                                                xsd_doc)
+                                               xsd_doc)
               elsif type_content == "simple/simple"
                 add_simple_simple_restriction(element, base_type, facets,
-                                               xsd_doc)
+                                              xsd_doc)
               else
                 # complex/complex - use extension
                 add_complex_complex_extension(element, base_type, xsd_doc)
@@ -295,11 +295,13 @@ module Lutaml
               end
 
               # Add maxInclusive if supported
-              if facet_supported?("maxInclusive", base_type) && facets[:max]
-                facet = xsd_doc.create_element("maxInclusive")
-                xsd_doc.add_attribute(facet, "value", facets[:max])
-                restriction.append_child(facet)
+              unless facet_supported?("maxInclusive", base_type) && facets[:max]
+                return
               end
+
+              facet = xsd_doc.create_element("maxInclusive")
+              xsd_doc.add_attribute(facet, "value", facets[:max])
+              restriction.append_child(facet)
             end
 
             def facet_supported?(facet, base_type)

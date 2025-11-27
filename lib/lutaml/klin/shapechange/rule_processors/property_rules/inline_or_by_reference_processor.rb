@@ -109,15 +109,11 @@ module Lutaml
               embed = false
 
               # GML 3.2+ cases
-              if gml_32_with_member_type?(property, context)
-                embed = true
-              end
+              embed = true if gml_32_with_member_type?(property, context)
 
               # Older GML or special conditions
               value_ci = get_value_class(property, context)
-              if value_ci
-                embed = true unless include_property_type?(value_ci)
-              end
+              embed = true if value_ci && !include_property_type?(value_ci)
 
               # Check for soft-typed, qualifiers, metadata
               if needs_nil_reason?(property) ||
@@ -136,21 +132,21 @@ module Lutaml
 
               # Check if property is aggregation/composition/metadata
               (aggregation_or_composition?(property) || metadata?(property)) &&
-                (gmlobject_or_feature?(property, context))
+                gmlobject_or_feature?(property, context)
             end
 
             def aggregation_or_composition?(property)
               aggregation = if property.respond_to?(:aggregation?)
-                             property.aggregation?
-                           else
-                             false
-                           end
+                              property.aggregation?
+                            else
+                              false
+                            end
 
               composition = if property.respond_to?(:composition?)
-                             property.composition?
-                           else
-                             false
-                           end
+                              property.composition?
+                            else
+                              false
+                            end
 
               aggregation || composition
             end
@@ -170,21 +166,21 @@ module Lutaml
               return false unless value_ci.respond_to?(:category)
 
               category = value_ci.category.to_s.upcase
-              category == "GMLOBJECT" || category == "FEATURE"
+              %w[GMLOBJECT FEATURE].include?(category)
             end
 
             def needs_nil_reason?(property)
               nil_reason = if property.respond_to?(:nil_reason_allowed?)
-                            property.nil_reason_allowed?
-                          else
-                            false
-                          end
+                             property.nil_reason_allowed?
+                           else
+                             false
+                           end
 
               voidable = if property.respond_to?(:voidable?)
-                          property.voidable?
-                        else
-                          false
-                        end
+                           property.voidable?
+                         else
+                           false
+                         end
 
               nil_reason || voidable
             end
@@ -194,10 +190,10 @@ module Lutaml
               return false unless property.respond_to?(:tags)
 
               tags = begin
-                      property.tags
-                    rescue
-                      nil
-                    end
+                property.tags
+              rescue StandardError
+                nil
+              end
               return false unless tags
 
               tag = tags.find { |t| t.name == "gmlArrayProperty" }
@@ -209,12 +205,14 @@ module Lutaml
 
             def has_qualifiers?(property)
               return false unless property.respond_to?(:qualifiers)
+
               qualifiers = property.qualifiers
               qualifiers && !qualifiers.empty?
             end
 
-            def has_metadata?(property, context)
+            def has_metadata?(property, _context)
               return false unless property.respond_to?(:property_metadata?)
+
               property.property_metadata?
             end
 
@@ -222,10 +220,10 @@ module Lutaml
               return nil unless property.respond_to?(:type)
 
               type_info = begin
-                           property.type
-                         rescue
-                           nil
-                         end
+                property.type
+              rescue StandardError
+                nil
+              end
               return nil unless type_info
 
               # Try to find class by ID or name
@@ -233,20 +231,22 @@ module Lutaml
               return nil unless model
 
               class_by_id = begin
-                             model.class_by_id(type_info.id) if type_info.respond_to?(:id)
-                           rescue
-                             nil
-                           end
+                model.class_by_id(type_info.id) if type_info.respond_to?(:id)
+              rescue StandardError
+                nil
+              end
               return class_by_id if class_by_id
 
               begin
-                model.class_by_name(type_info.name) if type_info.respond_to?(:name)
-              rescue
+                if type_info.respond_to?(:name)
+                  model.class_by_name(type_info.name)
+                end
+              rescue StandardError
                 nil
               end
             end
 
-            def class_has_identity?(ci, context)
+            def class_has_identity?(ci, _context)
               return false unless ci.respond_to?(:category)
 
               category = ci.category.to_s.upcase
@@ -259,7 +259,7 @@ module Lutaml
               else
                 false
               end
-            rescue
+            rescue StandardError
               false
             end
 
@@ -269,7 +269,7 @@ module Lutaml
               else
                 true # Default to true if not specified
               end
-            rescue
+            rescue StandardError
               true
             end
           end

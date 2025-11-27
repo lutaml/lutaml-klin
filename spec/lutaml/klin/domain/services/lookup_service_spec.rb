@@ -262,7 +262,9 @@ RSpec.describe Lutaml::Klin::Domain::Services::LookupService do
         # Should return a result, found or not
         expect(result).to be_a(Lutaml::Klin::Domain::LookupResult)
         # If found, should have correct class
-        expect(result.matches.first[:uml_class]).to eq("ModelRoot::i-UR::urf::UrbanPlanningArea") if result.found?
+        if result.found?
+          expect(result.matches.first[:uml_class]).to eq("ModelRoot::i-UR::urf::UrbanPlanningArea")
+        end
       end
     end
 

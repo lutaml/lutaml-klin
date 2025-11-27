@@ -48,7 +48,8 @@ RSpec.describe Lutaml::Klin::Commands::CreateLxrCommand do
     end
 
     it "creates package builder with verbose setting" do
-      command = described_class.new(output: "test.lxr", shapechange: "config.xml", verbose: true)
+      command = described_class.new(output: "test.lxr",
+                                    shapechange: "config.xml", verbose: true)
       expect(command.package_builder.verbose).to be true
     end
   end
@@ -97,12 +98,14 @@ RSpec.describe Lutaml::Klin::Commands::CreateLxrCommand do
     end
 
     it "builds configuration" do
-      expect(command.config_builder).to receive(:build).with(schema_info, anything)
+      expect(command.config_builder).to receive(:build).with(schema_info,
+                                                             anything)
       expect { command.run }.to raise_error(SystemExit)
     end
 
     it "creates package" do
-      expect(command.package_builder).to receive(:build).with(config, "tmp/test.lxr", anything)
+      expect(command.package_builder).to receive(:build).with(config,
+                                                              "tmp/test.lxr", anything)
       expect { command.run }.to raise_error(SystemExit)
     end
 
@@ -246,7 +249,9 @@ RSpec.describe Lutaml::Klin::Commands::CreateLxrCommand do
     end
 
     let(:config) { { "package" => { "name" => "test" } } }
-    let(:build_result) { { success: true, output_path: "tmp/test.lxr", messages: [] } }
+    let(:build_result) do
+      { success: true, output_path: "tmp/test.lxr", messages: [] }
+    end
 
     before do
       allow(command.input_strategy).to receive(:validate!)
@@ -256,8 +261,10 @@ RSpec.describe Lutaml::Klin::Commands::CreateLxrCommand do
     end
 
     it "outputs verbose messages" do
-      expect { command.run }.to output(/Extracting schema information/).to_stdout
-                                                                         .and raise_error(SystemExit)
+      expect do
+        command.run
+      end.to output(/Extracting schema information/).to_stdout
+                                                    .and raise_error(SystemExit)
     end
   end
 

@@ -20,7 +20,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::BasicTypeP
             double(name: "base", value: "string"),
             double(name: "maxLength", value: "50")
           ],
-          respond_to?: ->(method) { [:tags, :generalizations].include?(method) },
+          respond_to?: lambda { |method|
+            %i[tags generalizations].include?(method)
+          },
           generalizations: []
         )
       end
@@ -61,9 +63,12 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::BasicTypeP
           name: "EmailString",
           tags: [
             double(name: "base", value: "string"),
-            double(name: "pattern", value: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+            double(name: "pattern",
+                   value: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
           ],
-          respond_to?: ->(method) { [:tags, :generalizations].include?(method) },
+          respond_to?: lambda { |method|
+            %i[tags generalizations].include?(method)
+          },
           generalizations: []
         )
       end
@@ -107,7 +112,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::BasicTypeP
             double(name: "rangeMinimum", value: "0.0"),
             double(name: "rangeMaximum", value: "100.0")
           ],
-          respond_to?: ->(method) { [:tags, :generalizations].include?(method) },
+          respond_to?: lambda { |method|
+            %i[tags generalizations].include?(method)
+          },
           generalizations: []
         )
       end
@@ -154,7 +161,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::BasicTypeP
             double(name: "rangeMinimum", value: "0"),
             double(name: "rangeMaximum", value: "9999999999")
           ],
-          respond_to?: ->(method) { [:tags, :generalizations].include?(method) },
+          respond_to?: lambda { |method|
+            %i[tags generalizations].include?(method)
+          },
           generalizations: []
         )
       end
@@ -203,7 +212,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::BasicTypeP
             double(name: "base", value: "string"),
             double(name: "maxLength", value: "100")
           ],
-          respond_to?: ->(method) { [:tags, :generalizations].include?(method) },
+          respond_to?: lambda { |method|
+            %i[tags generalizations].include?(method)
+          },
           generalizations: [generalization]
         )
       end
@@ -272,7 +283,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::BasicTypeP
           "UmlClass",
           name: "TransformationMatrix2x2",
           tags: [],
-          respond_to?: ->(method) { [:tags, :attributes, :generalizations].include?(method) },
+          respond_to?: lambda { |method|
+            %i[tags attributes generalizations].include?(method)
+          },
           attributes: [property],
           generalizations: []
         )
@@ -329,7 +342,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::BasicTypeP
           "UmlClass",
           name: "IntegerList",
           tags: [],
-          respond_to?: ->(method) { [:tags, :attributes, :generalizations].include?(method) },
+          respond_to?: lambda { |method|
+            %i[tags attributes generalizations].include?(method)
+          },
           attributes: [property],
           generalizations: []
         )
@@ -366,7 +381,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::BasicTypeP
           "UmlClass",
           name: "InvalidBasicType",
           tags: [],
-          respond_to?: ->(method) { [:tags, :generalizations].include?(method) },
+          respond_to?: lambda { |method|
+            %i[tags generalizations].include?(method)
+          },
           generalizations: []
         )
       end
@@ -393,29 +410,40 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::BasicTypeP
     let(:processor_instance) { described_class.new(rule_checker, config) }
 
     it "supports totalDigits for integer types" do
-      expect(processor_instance.send(:facet_supported?, "totalDigits", "integer")).to be true
-      expect(processor_instance.send(:facet_supported?, "totalDigits", "decimal")).to be true
+      expect(processor_instance.send(:facet_supported?, "totalDigits",
+                                     "integer")).to be true
+      expect(processor_instance.send(:facet_supported?, "totalDigits",
+                                     "decimal")).to be true
     end
 
     it "supports maxLength for string types" do
-      expect(processor_instance.send(:facet_supported?, "maxLength", "string")).to be true
-      expect(processor_instance.send(:facet_supported?, "maxLength", "normalizedString")).to be true
+      expect(processor_instance.send(:facet_supported?, "maxLength",
+                                     "string")).to be true
+      expect(processor_instance.send(:facet_supported?, "maxLength",
+                                     "normalizedString")).to be true
     end
 
     it "supports min/max inclusive for numeric types" do
-      expect(processor_instance.send(:facet_supported?, "minInclusive", "integer")).to be true
-      expect(processor_instance.send(:facet_supported?, "maxInclusive", "double")).to be true
-      expect(processor_instance.send(:facet_supported?, "minInclusive", "string")).to be false
+      expect(processor_instance.send(:facet_supported?, "minInclusive",
+                                     "integer")).to be true
+      expect(processor_instance.send(:facet_supported?, "maxInclusive",
+                                     "double")).to be true
+      expect(processor_instance.send(:facet_supported?, "minInclusive",
+                                     "string")).to be false
     end
 
     it "supports pattern for most types" do
-      expect(processor_instance.send(:facet_supported?, "pattern", "string")).to be true
-      expect(processor_instance.send(:facet_supported?, "pattern", "integer")).to be true
+      expect(processor_instance.send(:facet_supported?, "pattern",
+                                     "string")).to be true
+      expect(processor_instance.send(:facet_supported?, "pattern",
+                                     "integer")).to be true
     end
 
     it "handles namespaced base types" do
-      expect(processor_instance.send(:facet_supported?, "minInclusive", "xs:integer")).to be true
-      expect(processor_instance.send(:facet_supported?, "maxLength", "xs:string")).to be true
+      expect(processor_instance.send(:facet_supported?, "minInclusive",
+                                     "xs:integer")).to be true
+      expect(processor_instance.send(:facet_supported?, "maxLength",
+                                     "xs:string")).to be true
     end
   end
 end

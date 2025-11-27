@@ -36,7 +36,7 @@ RSpec.describe "LUR and LXR Package Loading Integration", :integration do
                                      name: "name",
                                      type: "String",
                                      documentation: "Name",
-                                     multiplicity: "1"),
+                                     multiplicity: "1")
                             ])
 
         allow(uml_adapter).to receive(:all_packages)
@@ -175,10 +175,10 @@ RSpec.describe "LUR and LXR Package Loading Integration", :integration do
           .and_return([
                         "http://www.w3.org/2001/XMLSchema",
                         gml_namespace,
-                        test_namespace,
+                        test_namespace
                       ])
 
-        allow(xsd_adapter).to receive(:find_type) do |type_name, namespace|
+        allow(xsd_adapter).to receive(:find_type) do |type_name, _namespace|
           case type_name
           when "string"
             string_type
@@ -186,12 +186,10 @@ RSpec.describe "LUR and LXR Package Loading Integration", :integration do
             integer_type
           when "TestClassType"
             test_type
-          else
-            nil
           end
         end
 
-        allow(xsd_adapter).to receive(:find_element) do |element_name, namespace|
+        allow(xsd_adapter).to receive(:find_element) do |element_name, _namespace|
           element_name == "TestClass" ? test_element : nil
         end
 
@@ -317,7 +315,7 @@ RSpec.describe "LUR and LXR Package Loading Integration", :integration do
                            double("UmlAttribute",
                                   name: "property",
                                   type: "PropertyType",
-                                  multiplicity: "1"),
+                                  multiplicity: "1")
                          ])
 
       allow(uml_adapter).to receive(:find_package)

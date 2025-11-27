@@ -46,15 +46,15 @@ module Lutaml
                 {
                   namespace: SCAI_NAMESPACE,
                   element: "globalIdentifier",
-                  text: global_id,
-                },
+                  text: global_id
+                }
               ],
               imports: [
                 {
                   prefix: SCAI_PREFIX,
-                  namespace: SCAI_NAMESPACE,
-                },
-              ],
+                  namespace: SCAI_NAMESPACE
+                }
+              ]
             }
           end
 
@@ -66,7 +66,7 @@ module Lutaml
             element.is_a?(Lutaml::Uml::Class) ||
               element.is_a?(Lutaml::Uml::Property) ||
               (element.respond_to?(:type) &&
-               (element.type == :class || element.type == :property))
+               %i[class property].include?(element.type))
           end
 
           # Get the global identifier from element
@@ -75,15 +75,15 @@ module Lutaml
           # @return [String, nil] the global identifier or nil
           def self.get_global_identifier(element)
             # Try tagged value first
-            value = element.tagged_value("globalIdentifier") if element.respond_to?(:tagged_value)
+            if element.respond_to?(:tagged_value)
+              value = element.tagged_value("globalIdentifier")
+            end
             return value if value
 
             # Try as property if available
-            if element.respond_to?(:global_identifier)
-              element.global_identifier
-            else
-              nil
-            end
+            return unless element.respond_to?(:global_identifier)
+
+            element.global_identifier
           end
         end
       end

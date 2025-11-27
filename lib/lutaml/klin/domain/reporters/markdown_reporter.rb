@@ -140,7 +140,9 @@ module Lutaml
           # @param result [ValidationResult] The validation result
           # @return [String] Packages section
           def build_packages_section(result)
-            return "## Packages\n\n_No packages found_" if result.packages.empty?
+            if result.packages.empty?
+              return "## Packages\n\n_No packages found_"
+            end
 
             packages_md = result.packages.map do |pkg|
               format_package(pkg)
@@ -197,8 +199,8 @@ module Lutaml
           # @param total [Integer] Total count
           # @return [String] Status text
           def resolution_status_text(resolved, total)
-            return "✅ All resolved" if resolved == total && total > 0
-            return "❌ None resolved" if resolved.zero? && total > 0
+            return "✅ All resolved" if resolved == total && total.positive?
+            return "❌ None resolved" if resolved.zero? && total.positive?
             return "N/A" if total.zero?
 
             unresolved = total - resolved
@@ -210,7 +212,7 @@ module Lutaml
           # @param count [Integer] Count value
           # @return [String] Status text
           def status_for_count(count)
-            count > 0 ? "✅" : "❌"
+            count.positive? ? "✅" : "❌"
           end
         end
       end

@@ -14,7 +14,8 @@ module Lutaml
         # @return [Hash] Schema information with :xsd_files, :namespace_mappings, :schema_location_mappings
         # @raise [NotImplementedError] Must be implemented by subclasses
         def extract_schema_info
-          raise NotImplementedError, "#{self.class} must implement #extract_schema_info"
+          raise NotImplementedError,
+                "#{self.class} must implement #extract_schema_info"
         end
 
         # Validate that required input parameters are present
@@ -39,13 +40,14 @@ module Lutaml
         # @raise [InvalidInputError] If configuration file is missing
         def validate!
           unless config_path
-            raise InvalidInputError, "ShapeChange configuration path is required"
+            raise InvalidInputError,
+                  "ShapeChange configuration path is required"
           end
 
-          unless File.exist?(config_path)
-            raise InvalidInputError,
-                  "ShapeChange configuration file not found: #{config_path}"
-          end
+          return if File.exist?(config_path)
+
+          raise InvalidInputError,
+                "ShapeChange configuration file not found: #{config_path}"
         end
 
         # Extract schema information from ShapeChange configuration
@@ -72,11 +74,9 @@ module Lutaml
         # Validate required manual input parameters
         # @raise [InvalidInputError] If required parameters are missing
         def validate!
-          if xsd_files.nil? || xsd_files.empty?
-            unless xsd_dir && Dir.exist?(xsd_dir)
-              raise InvalidInputError,
-                    "Either xsd_dir or xsd_files must be provided"
-            end
+          if (xsd_files.nil? || xsd_files.empty?) && !(xsd_dir && Dir.exist?(xsd_dir))
+            raise InvalidInputError,
+                  "Either xsd_dir or xsd_files must be provided"
           end
 
           unless namespaces_config

@@ -34,7 +34,8 @@ module Lutaml
                 result: {
                   is_list: true,
                   item_type: context[:item_type],
-                  needs_restriction: needs_length_restriction?(min_occurs, max_occurs),
+                  needs_restriction: needs_length_restriction?(min_occurs,
+                                                               max_occurs),
                   min_length: min_occurs,
                   max_length: max_occurs == "unbounded" ? nil : max_occurs,
                   use_length: min_occurs == max_occurs && max_occurs != "unbounded",
@@ -61,7 +62,7 @@ module Lutaml
             # @param max_occurs [String, Integer] Maximum occurrences
             # @return [Boolean] True if restrictions needed
             def needs_length_restriction?(min_occurs, max_occurs)
-              return false if min_occurs == 0 && max_occurs == "unbounded"
+              return false if min_occurs.zero? && max_occurs == "unbounded"
 
               true
             end
@@ -80,7 +81,7 @@ module Lutaml
             # @return [String, Integer] Maximum occurrences
             def extract_max_occurs(property)
               upper = property.upper_value&.value
-              return "unbounded" if upper == -1 || upper == "*"
+              return "unbounded" if [-1, "*"].include?(upper)
 
               upper || 1
             end

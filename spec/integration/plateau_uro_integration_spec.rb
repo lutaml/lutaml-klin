@@ -8,8 +8,12 @@ require_relative "../../lib/lutaml/klin/shapechange/config_parser"
 require_relative "../../lib/lutaml/klin/commands/report_command"
 
 RSpec.describe "PLATEAU URO Package Integration", :integration do
-  let(:xmi_path) { "/Users/mulgogi/src/mn/mn-samples-plateau/sources/xmi/20251022-uro.xmi" }
-  let(:config_path) { "/Users/mulgogi/src/mn/mn-samples-plateau/PLATEAU-Manual-Generator/src/ShapeChange-3.1.0/ShapeChangeConfig_Plateau_uro.xml" }
+  let(:xmi_path) do
+    "/Users/mulgogi/src/mn/mn-samples-plateau/sources/xmi/20251022-uro.xmi"
+  end
+  let(:config_path) do
+    "/Users/mulgogi/src/mn/mn-samples-plateau/PLATEAU-Manual-Generator/src/ShapeChange-3.1.0/ShapeChangeConfig_Plateau_uro.xml"
+  end
   let(:package_name) { "uro" }
 
   describe "XMI Parsing" do
@@ -35,16 +39,20 @@ RSpec.describe "PLATEAU URO Package Integration", :integration do
 
       navigator = Lutaml::Klin::XmiNavigator.new
       navigator.parse_file(xmi_path)
-      uro_package = navigator.find_package(package_name)
+      navigator.find_package(package_name)
 
       # Verify some key classes exist
       classes_in_uro = navigator.classes_in_package(package_name)
 
-      boundary_surface = classes_in_uro.find { |c| c.name == "_BoundarySurface" }
+      boundary_surface = classes_in_uro.find do |c|
+        c.name == "_BoundarySurface"
+      end
       expect(boundary_surface).not_to be_nil
       expect(boundary_surface.attributes.size).to be >= 2
 
-      abstract_construction = classes_in_uro.find { |c| c.name == "AbstractConstruction" }
+      abstract_construction = classes_in_uro.find do |c|
+        c.name == "AbstractConstruction"
+      end
       expect(abstract_construction).not_to be_nil
       expect(abstract_construction.attributes.size).to be >= 10
     end
@@ -141,14 +149,20 @@ RSpec.describe "PLATEAU URO Package Integration", :integration do
       navigator.parse_file(xmi_path)
       classes_in_uro = navigator.classes_in_package(package_name)
 
-      abstract_construction = classes_in_uro.find { |c| c.name == "AbstractConstruction" }
+      abstract_construction = classes_in_uro.find do |c|
+        c.name == "AbstractConstruction"
+      end
 
       # Check specific attributes
-      date_attr = abstract_construction.attributes.find { |a| a.name == "dateOfConstruction" }
+      date_attr = abstract_construction.attributes.find do |a|
+        a.name == "dateOfConstruction"
+      end
       expect(date_attr).not_to be_nil
       expect(date_attr.type).to eq("xs:date").or eq("date")
 
-      condition_attr = abstract_construction.attributes.find { |a| a.name == "conditionOfConstruction" }
+      condition_attr = abstract_construction.attributes.find do |a|
+        a.name == "conditionOfConstruction"
+      end
       expect(condition_attr).not_to be_nil
       expect(condition_attr.type).to eq("ConditionOfConstructionValue")
     end
@@ -183,7 +197,8 @@ RSpec.describe "PLATEAU URO Package Integration", :integration do
       report_file.unlink
     end
 
-    it "generates human-readable report from mapping", pending: "Requires mapping generation" do
+    it "generates human-readable report from mapping",
+       pending: "Requires mapping generation" do
       skip "Requires complete workflow"
 
       # Once we have generated mappings, test report generation

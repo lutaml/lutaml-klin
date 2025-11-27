@@ -13,7 +13,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleChecker do
   let(:encoding_rule) do
     Lutaml::Klin::Shapechange::EncodingRule.new.tap do |er|
       er.name = "iso19136_2007"
-      er.rules = ["rule-xsd-cls-type", "rule-xsd-cls-codelist"]
+      er.rules = %w[rule-xsd-cls-type rule-xsd-cls-codelist]
     end
   end
 
@@ -56,14 +56,16 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleChecker do
   describe "#applies?" do
     context "when rule is not in encoding rule set" do
       it "returns false" do
-        expect(checker.applies?("non-existent-rule", feature_type_class)).to be false
+        expect(checker.applies?("non-existent-rule",
+                                feature_type_class)).to be false
       end
     end
 
     context "when rule is in encoding rule set" do
       context "when rule definition does not exist" do
         it "returns true (assumes applies)" do
-          expect(checker.applies?("rule-xsd-cls-type", feature_type_class)).to be true
+          expect(checker.applies?("rule-xsd-cls-type",
+                                  feature_type_class)).to be true
         end
       end
 
@@ -85,32 +87,39 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleChecker do
 
           context "when applies_to is empty" do
             it "returns true for any class" do
-              expect(checker.applies?("rule-xsd-cls-type", feature_type_class)).to be true
-              expect(checker.applies?("rule-xsd-cls-type", data_type_class)).to be true
-              expect(checker.applies?("rule-xsd-cls-type", plain_class)).to be true
+              expect(checker.applies?("rule-xsd-cls-type",
+                                      feature_type_class)).to be true
+              expect(checker.applies?("rule-xsd-cls-type",
+                                      data_type_class)).to be true
+              expect(checker.applies?("rule-xsd-cls-type",
+                                      plain_class)).to be true
             end
           end
 
           context "when applies_to specifies stereotypes" do
             before do
-              class_rule.applies_to = ["FeatureType", "DataType"]
+              class_rule.applies_to = %w[FeatureType DataType]
             end
 
             it "returns true for matching stereotypes" do
-              expect(checker.applies?("rule-xsd-cls-type", feature_type_class)).to be true
-              expect(checker.applies?("rule-xsd-cls-type", data_type_class)).to be true
+              expect(checker.applies?("rule-xsd-cls-type",
+                                      feature_type_class)).to be true
+              expect(checker.applies?("rule-xsd-cls-type",
+                                      data_type_class)).to be true
             end
 
             it "returns false for non-matching stereotypes" do
-              expect(checker.applies?("rule-xsd-cls-type", codelist_class)).to be false
-              expect(checker.applies?("rule-xsd-cls-type", plain_class)).to be false
+              expect(checker.applies?("rule-xsd-cls-type",
+                                      codelist_class)).to be false
+              expect(checker.applies?("rule-xsd-cls-type",
+                                      plain_class)).to be false
             end
           end
 
           context "when class has multiple stereotypes" do
             let(:multi_stereotype_class) do
               double("UMLClass",
-                     stereotype: ["FeatureType", "AbstractType"],
+                     stereotype: %w[FeatureType AbstractType],
                      respond_to?: true)
             end
 
@@ -119,7 +128,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleChecker do
             end
 
             it "returns true if any stereotype matches" do
-              expect(checker.applies?("rule-xsd-cls-type", multi_stereotype_class)).to be true
+              expect(checker.applies?("rule-xsd-cls-type",
+                                      multi_stereotype_class)).to be true
             end
           end
 
@@ -133,7 +143,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleChecker do
             end
 
             it "returns false" do
-              expect(checker.applies?("rule-xsd-cls-type", non_stereotype_element)).to be false
+              expect(checker.applies?("rule-xsd-cls-type",
+                                      non_stereotype_element)).to be false
             end
           end
         end
@@ -154,7 +165,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleChecker do
           end
 
           it "returns true for properties" do
-            expect(checker.applies?("rule-xsd-prop-att", uml_property)).to be true
+            expect(checker.applies?("rule-xsd-prop-att",
+                                    uml_property)).to be true
           end
         end
 
@@ -174,7 +186,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleChecker do
           end
 
           it "returns true for packages" do
-            expect(checker.applies?("rule-xsd-pkg-contained", uml_package)).to be true
+            expect(checker.applies?("rule-xsd-pkg-contained",
+                                    uml_package)).to be true
           end
         end
 
@@ -194,9 +207,12 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleChecker do
           end
 
           it "returns true for any element" do
-            expect(checker.applies?("rule-xsd-all-naming", feature_type_class)).to be true
-            expect(checker.applies?("rule-xsd-all-naming", uml_property)).to be true
-            expect(checker.applies?("rule-xsd-all-naming", uml_package)).to be true
+            expect(checker.applies?("rule-xsd-all-naming",
+                                    feature_type_class)).to be true
+            expect(checker.applies?("rule-xsd-all-naming",
+                                    uml_property)).to be true
+            expect(checker.applies?("rule-xsd-all-naming",
+                                    uml_package)).to be true
           end
         end
       end
@@ -236,7 +252,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleChecker do
     end
 
     it "applies inherited rules from parent encoding rule" do
-      expect(child_checker.applies?("rule-xsd-base", feature_type_class)).to be true
+      expect(child_checker.applies?("rule-xsd-base",
+                                    feature_type_class)).to be true
     end
 
     it "applies rules defined in child encoding rule" do
@@ -247,7 +264,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleChecker do
       end
       registry.register_rule_definition(child_rule_def)
 
-      expect(child_checker.applies?("rule-xsd-gml", feature_type_class)).to be true
+      expect(child_checker.applies?("rule-xsd-gml",
+                                    feature_type_class)).to be true
     end
   end
 
@@ -270,7 +288,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleChecker do
       end
 
       it "handles string stereotype correctly" do
-        expect(checker.applies?("rule-xsd-cls-type", string_stereotype_class)).to be true
+        expect(checker.applies?("rule-xsd-cls-type",
+                                string_stereotype_class)).to be true
       end
     end
 
@@ -292,7 +311,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleChecker do
       end
 
       it "returns false when stereotype is required" do
-        expect(checker.applies?("rule-xsd-cls-type", nil_stereotype_class)).to be false
+        expect(checker.applies?("rule-xsd-cls-type",
+                                nil_stereotype_class)).to be false
       end
     end
   end

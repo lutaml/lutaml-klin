@@ -65,10 +65,14 @@ module Lutaml
 
               # Create gml:defaultCodeSpace
               gml_ns = context[:gml_namespace]
-              code_space_elem = create_element_with_namespace("defaultCodeSpace", gml_ns, context)
+              code_space_elem = create_element_with_namespace(
+                "defaultCodeSpace", gml_ns, context
+              )
               set_text_content(code_space_elem, code_space, context)
 
-              appinfo.add_child(code_space_elem) if appinfo.respond_to?(:add_child)
+              return unless appinfo.respond_to?(:add_child)
+
+              appinfo.add_child(code_space_elem)
             end
 
             def ensure_appinfo_element(context)
@@ -112,7 +116,7 @@ module Lutaml
               xsd_doc.create_element(qualified_name, namespace)
             end
 
-            def set_text_content(element, text, context)
+            def set_text_content(element, text, _context)
               return unless element
 
               if element.respond_to?(:content=)

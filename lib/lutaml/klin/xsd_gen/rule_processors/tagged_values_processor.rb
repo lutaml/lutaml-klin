@@ -62,7 +62,7 @@ module Lutaml
                   namespace: SCAI_NAMESPACE,
                   element: "taggedValue",
                   attributes: { tag: tag },
-                  text: value.to_s,
+                  text: value.to_s
                 }
               end
             end
@@ -74,9 +74,9 @@ module Lutaml
               imports: [
                 {
                   prefix: SCAI_PREFIX,
-                  namespace: SCAI_NAMESPACE,
-                },
-              ],
+                  namespace: SCAI_NAMESPACE
+                }
+              ]
             }
           end
 

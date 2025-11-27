@@ -54,14 +54,14 @@ RSpec.describe Lutaml::Klin::Spa::Generator do
 
     before do
       allow(generator.data_loader).to receive(:load_lxr).and_return({
-        metadata: {},
-        namespaces: [],
-        elements: [],
-        complex_types: [],
-        simple_types: [],
-        attributes: [],
-        statistics: Lutaml::Klin::Spa::Models::Statistics.new
-      })
+                                                                      metadata: {},
+                                                                      namespaces: [],
+                                                                      elements: [],
+                                                                      complex_types: [],
+                                                                      simple_types: [],
+                                                                      attributes: [],
+                                                                      statistics: Lutaml::Klin::Spa::Models::Statistics.new
+                                                                    })
       allow(generator.data_loader).to receive(:merge).and_return(mock_schema)
       allow(generator.cross_ref_builder).to receive(:build).and_return(
         Lutaml::Klin::Spa::Models::CrossReferenceIndex.new
@@ -94,9 +94,12 @@ RSpec.describe Lutaml::Klin::Spa::Generator do
 
         generator.generate(lxr_path, yaml_path, output_dir)
 
-        expect(File.exist?(File.join(output_dir, "data/schema.json"))).to be true
-        expect(File.exist?(File.join(output_dir, "data/cross_refs.json"))).to be true
-        expect(File.exist?(File.join(output_dir, "data/search_index.json"))).to be true
+        expect(File.exist?(File.join(output_dir,
+                                     "data/schema.json"))).to be true
+        expect(File.exist?(File.join(output_dir,
+                                     "data/cross_refs.json"))).to be true
+        expect(File.exist?(File.join(output_dir,
+                                     "data/search_index.json"))).to be true
       end
 
       it "copies assets to output directory" do
@@ -236,9 +239,9 @@ RSpec.describe Lutaml::Klin::Spa::Generator do
     it "uses default for embedded mode" do
       gen = described_class.new(mode: :embedded)
       allow(gen.data_loader).to receive(:load_lxr).and_return({
-        metadata: {}, namespaces: [], elements: [], complex_types: [],
-        simple_types: [], attributes: [], statistics: Lutaml::Klin::Spa::Models::Statistics.new
-      })
+                                                                metadata: {}, namespaces: [], elements: [], complex_types: [],
+                                                                simple_types: [], attributes: [], statistics: Lutaml::Klin::Spa::Models::Statistics.new
+                                                              })
       allow(gen.data_loader).to receive(:merge).and_return(
         Lutaml::Klin::Spa::Models::UnifiedSchema.new.tap do |s|
           s.metadata = Lutaml::Klin::Spa::Models::SchemaMetadata.new
@@ -270,9 +273,9 @@ RSpec.describe Lutaml::Klin::Spa::Generator do
     it "uses default for multi-file mode" do
       gen = described_class.new(mode: :multi_file)
       allow(gen.data_loader).to receive(:load_lxr).and_return({
-        metadata: {}, namespaces: [], elements: [], complex_types: [],
-        simple_types: [], attributes: [], statistics: Lutaml::Klin::Spa::Models::Statistics.new
-      })
+                                                                metadata: {}, namespaces: [], elements: [], complex_types: [],
+                                                                simple_types: [], attributes: [], statistics: Lutaml::Klin::Spa::Models::Statistics.new
+                                                              })
       allow(gen.data_loader).to receive(:merge).and_return(
         Lutaml::Klin::Spa::Models::UnifiedSchema.new.tap do |s|
           s.metadata = Lutaml::Klin::Spa::Models::SchemaMetadata.new

@@ -25,22 +25,22 @@ module Lutaml
           EncodingRule.new.tap do |er|
             er.name = "*"
             er.extends = nil
-            er.rules = [
-              "req-xsd-pkg-xsdDocument-unique",
-              "req-xsd-cls-name-unique",
-              "req-xsd-cls-ncname",
-              "req-xsd-prop-data-type",
-              "req-xsd-prop-value-type-exists",
-              "req-xsd-prop-ncname",
-              "rule-xsd-pkg-contained-packages",
-              "rule-xsd-pkg-dependencies",
-              "rule-xsd-cls-unknown-as-object",
-              "rule-xsd-cls-object-element",
-              "rule-xsd-cls-type",
-              "rule-xsd-cls-property-type",
-              "rule-xsd-cls-local-properties",
-              "rule-xsd-cls-sequence",
-              "rule-xsd-prop-encode-properties",
+            er.rules = %w[
+              req-xsd-pkg-xsdDocument-unique
+              req-xsd-cls-name-unique
+              req-xsd-cls-ncname
+              req-xsd-prop-data-type
+              req-xsd-prop-value-type-exists
+              req-xsd-prop-ncname
+              rule-xsd-pkg-contained-packages
+              rule-xsd-pkg-dependencies
+              rule-xsd-cls-unknown-as-object
+              rule-xsd-cls-object-element
+              rule-xsd-cls-type
+              rule-xsd-cls-property-type
+              rule-xsd-cls-local-properties
+              rule-xsd-cls-sequence
+              rule-xsd-prop-encode-properties
             ]
           end
         end
@@ -51,19 +51,19 @@ module Lutaml
           EncodingRule.new.tap do |er|
             er.name = "iso19136_2007"
             er.extends = "*"
-            er.rules = [
-              "req-xsd-cls-generalization-consistent",
-              "rule-xsd-all-naming-gml",
-              "rule-xsd-cls-global-enumeration",
-              "rule-xsd-cls-codelist-asDictionary",
-              "rule-xsd-cls-standard-gml-property-types",
-              "rule-xsd-cls-noPropertyType",
-              "rule-xsd-cls-byValuePropertyType",
-              "rule-xsd-pkg-gmlProfileSchema",
-              "rule-xsd-prop-targetElement",
-              "rule-xsd-prop-reverseProperty",
-              "rule-xsd-prop-defaultCodeSpace",
-              "rule-xsd-prop-inlineOrByReference",
+            er.rules = %w[
+              req-xsd-cls-generalization-consistent
+              rule-xsd-all-naming-gml
+              rule-xsd-cls-global-enumeration
+              rule-xsd-cls-codelist-asDictionary
+              rule-xsd-cls-standard-gml-property-types
+              rule-xsd-cls-noPropertyType
+              rule-xsd-cls-byValuePropertyType
+              rule-xsd-pkg-gmlProfileSchema
+              rule-xsd-prop-targetElement
+              rule-xsd-prop-reverseProperty
+              rule-xsd-prop-defaultCodeSpace
+              rule-xsd-prop-inlineOrByReference
             ]
           end
         end
@@ -74,20 +74,20 @@ module Lutaml
           EncodingRule.new.tap do |er|
             er.name = "gml33"
             er.extends = "*"
-            er.rules = [
-              "req-xsd-cls-generalization-consistent",
-              "rule-xsd-all-naming-gml",
-              "rule-xsd-cls-global-enumeration",
-              "rule-xsd-cls-codelist-asDictionaryGml33",
-              "rule-xsd-cls-standard-gml-property-types",
-              "rule-xsd-cls-noPropertyType",
-              "rule-xsd-cls-byValuePropertyType",
-              "rule-xsd-pkg-gmlProfileSchema",
-              "rule-xsd-prop-targetElement",
-              "rule-xsd-prop-reverseProperty",
-              "rule-xsd-prop-defaultCodeSpace",
-              "rule-xsd-prop-inlineOrByReference",
-              "rule-xsd-rel-association-classes",
+            er.rules = %w[
+              req-xsd-cls-generalization-consistent
+              rule-xsd-all-naming-gml
+              rule-xsd-cls-global-enumeration
+              rule-xsd-cls-codelist-asDictionaryGml33
+              rule-xsd-cls-standard-gml-property-types
+              rule-xsd-cls-noPropertyType
+              rule-xsd-cls-byValuePropertyType
+              rule-xsd-pkg-gmlProfileSchema
+              rule-xsd-prop-targetElement
+              rule-xsd-prop-reverseProperty
+              rule-xsd-prop-defaultCodeSpace
+              rule-xsd-prop-inlineOrByReference
+              rule-xsd-rel-association-classes
             ]
           end
         end
@@ -98,12 +98,12 @@ module Lutaml
           EncodingRule.new.tap do |er|
             er.name = "iso19139_2007"
             er.extends = "*"
-            er.rules = [
-              "rule-xsd-cls-enum-object-element",
-              "rule-xsd-cls-enum-property-type",
-              "rule-xsd-cls-global-enumeration",
-              "rule-xsd-cls-standard-19139-property-types",
-              "rule-xsd-all-naming-19139",
+            er.rules = %w[
+              rule-xsd-cls-enum-object-element
+              rule-xsd-cls-enum-property-type
+              rule-xsd-cls-global-enumeration
+              rule-xsd-cls-standard-19139-property-types
+              rule-xsd-all-naming-19139
             ]
           end
         end
@@ -116,6 +116,8 @@ module Lutaml
             er.extends = "iso19136_2007"
             er.rules = [
               # Inherit all iso19136_2007 rules
+              # Add PLATEAU-specific rule for ADE hook elements
+              "rule-xsd-cls-plateau-ade-hooks"
             ]
           end
         end
@@ -129,7 +131,7 @@ module Lutaml
             er.extends = "citygml"
             er.rules = [
               # Add PLATEAU-specific rule for ADE hook elements
-              "rule-xsd-cls-plateau-ade-hooks",
+              "rule-xsd-cls-plateau-ade-hooks"
             ]
           end
         end
@@ -143,7 +145,7 @@ module Lutaml
             gml33,
             iso19139_2007,
             citygml,
-            x_plateau,
+            x_plateau
           ]
         end
 

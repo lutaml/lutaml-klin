@@ -63,19 +63,17 @@ module Lutaml
             return packages if pattern_string == "**"
 
             # Split comma-separated patterns
-            patterns = pattern_string.split(',').map(&:strip)
+            patterns = pattern_string.split(",").map(&:strip)
 
-            matched_packages = packages.select do |pkg|
+            packages.select do |pkg|
               path = pkg.respond_to?(path_method) ? pkg.send(path_method) : pkg.to_s
-              simple_name = path.split('::').last
+              simple_name = path.split("::").last
 
               # Try multiple matching strategies for each pattern
               patterns.any? do |pattern|
                 matches_package?(path, simple_name, pattern)
               end
             end
-
-            matched_packages
           end
 
           private
@@ -100,7 +98,7 @@ module Lutaml
             return true if full_path.downcase.include?(pattern.downcase)
 
             # Strategy 5: Regex match (if pattern starts and ends with /)
-            if pattern.start_with?('/') && pattern.end_with?('/')
+            if pattern.start_with?("/") && pattern.end_with?("/")
               begin
                 regex = Regexp.new(pattern[1..-2])
                 return true if regex.match?(full_path)
@@ -128,8 +126,6 @@ module Lutaml
               "regex=#{pattern_regex.inspect}>"
           end
 
-          private
-
           # Parse a filter string into a regex pattern.
           #
           # Converts filter syntax to regex:
@@ -150,8 +146,8 @@ module Lutaml
             # ** => match zero or more characters (greedy)
             # * => match one package segment (no ::)
             regex_pattern = escaped
-              .gsub(Regexp.escape("**"), ".*")
-              .gsub(Regexp.escape("*"), "[^:]+")
+                            .gsub(Regexp.escape("**"), ".*")
+                            .gsub(Regexp.escape("*"), "[^:]+")
 
             # Anchor the pattern to match the full path
             Regexp.new("\\A#{regex_pattern}\\z")

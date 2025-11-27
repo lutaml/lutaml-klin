@@ -57,7 +57,7 @@ RSpec.describe "Batch 12: Final Rules (59-60)" do
       config = double(
         "Config",
         element_map_entry: { element: "gmd:CI_Citation" },
-        full_namespace: ->(ns) {
+        full_namespace: lambda { |ns|
           case ns
           when "gmd" then "http://www.isotc211.org/2005/gmd"
           when "gco" then "http://www.isotc211.org/2005/gco"
@@ -89,7 +89,7 @@ RSpec.describe "Batch 12: Final Rules (59-60)" do
       config = double(
         "Config",
         element_map_entry: { element: "gco:AbstractObject" },
-        full_namespace: ->(ns) {
+        full_namespace: lambda { |ns|
           case ns
           when "gco" then "http://www.isotc211.org/2005/gco"
           end
@@ -134,7 +134,7 @@ RSpec.describe "Batch 12: Final Rules (59-60)" do
         "gmx" => "http://www.isotc211.org/2005/gmx",
         "gsr" => "http://www.isotc211.org/2005/gsr",
         "gss" => "http://www.isotc211.org/2005/gss",
-        "gts" => "http://www.isotc211.org/2005/gts",
+        "gts" => "http://www.isotc211.org/2005/gts"
       }
 
       iso_namespaces.each do |prefix, namespace|
@@ -151,7 +151,7 @@ RSpec.describe "Batch 12: Final Rules (59-60)" do
         config = double(
           "Config",
           element_map_entry: { element: "#{prefix}:TestType" },
-          full_namespace: ->(ns) {
+          full_namespace: lambda { |ns|
             iso_namespaces[ns] || (ns == "gco" ? "http://www.isotc211.org/2005/gco" : nil)
           }
         )
@@ -169,7 +169,7 @@ RSpec.describe "Batch 12: Final Rules (59-60)" do
         namespace: "http://www.isotc211.org/2005/gmd",
         namespace_abbr: "gmd",
         local_name: "CI_Citation",
-        gco_namespace: "http://www.isotc211.org/2005/gco",
+        gco_namespace: "http://www.isotc211.org/2005/gco"
       }
 
       extension_element = double("ExtensionElement")
@@ -178,12 +178,16 @@ RSpec.describe "Batch 12: Final Rules (59-60)" do
       builder = double("Builder")
       expect(builder).to receive(:add_namespace_import).with("gco", "http://www.isotc211.org/2005/gco")
       expect(builder).to receive(:create_element).with("attribute").and_return(attr_element)
-      expect(builder).to receive(:add_attribute).with(attr_element, "ref", "gco:isoType")
-      expect(builder).to receive(:add_attribute).with(attr_element, "use", "required")
-      expect(builder).to receive(:add_attribute).with(attr_element, "fixed", "CI_Citation")
+      expect(builder).to receive(:add_attribute).with(attr_element, "ref",
+                                                      "gco:isoType")
+      expect(builder).to receive(:add_attribute).with(attr_element, "use",
+                                                      "required")
+      expect(builder).to receive(:add_attribute).with(attr_element, "fixed",
+                                                      "CI_Citation")
       expect(extension_element).to receive(:add_child).with(attr_element)
 
-      processor.add_iso_type_attribute(extension_element, iso_type_info, builder)
+      processor.add_iso_type_attribute(extension_element, iso_type_info,
+                                       builder)
     end
 
     it "returns nil when no element map entry exists" do
@@ -207,7 +211,8 @@ RSpec.describe "Batch 12: Final Rules (59-60)" do
 
   describe "rule-xsd-prop-att-map-entry" do
     it "has documentation" do
-      doc_path = File.join(__dir__, "../../../../docs/rules/rule-xsd-prop-att-map-entry.adoc")
+      doc_path = File.join(__dir__,
+                           "../../../../docs/rules/rule-xsd-prop-att-map-entry.adoc")
       expect(File.exist?(doc_path)).to be true
     end
 

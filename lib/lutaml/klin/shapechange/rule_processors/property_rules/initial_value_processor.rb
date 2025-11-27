@@ -73,10 +73,12 @@ module Lutaml
 
             def readonly?(property)
               return false unless property.respond_to?(:read_only?)
+
               property.read_only?
-            rescue
+            rescue StandardError
               # Fallback for different method names
               return property.readonly if property.respond_to?(:readonly)
+
               false
             end
 
@@ -85,7 +87,7 @@ module Lutaml
               # This would be determined by element's local name
               element.respond_to?(:local_name?) &&
                 element.local_name? == "attribute"
-            rescue
+            rescue StandardError
               false
             end
 

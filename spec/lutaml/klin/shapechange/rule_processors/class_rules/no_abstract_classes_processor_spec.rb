@@ -132,7 +132,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::NoAbstract
 
       it "returns all concrete subtypes" do
         subtypes = processor.send(:find_concrete_subtypes, abstract_class,
-                                   context)
+                                  context)
         expect(subtypes).to contain_exactly(concrete1, concrete2)
       end
     end
@@ -178,7 +178,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::NoAbstract
 
       it "recursively finds concrete subtypes" do
         subtypes = processor.send(:find_concrete_subtypes, abstract_class,
-                                   context)
+                                  context)
         expect(subtypes).to contain_exactly(concrete)
       end
     end
@@ -220,7 +220,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::NoAbstract
 
       it "skips mixin and finds concrete subtypes" do
         subtypes = processor.send(:find_concrete_subtypes, abstract_class,
-                                   context)
+                                  context)
         expect(subtypes).to contain_exactly(concrete)
       end
     end
@@ -235,7 +235,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::NoAbstract
 
       it "returns empty array" do
         subtypes = processor.send(:find_concrete_subtypes, abstract_class,
-                                   context)
+                                  context)
         expect(subtypes).to be_empty
       end
     end

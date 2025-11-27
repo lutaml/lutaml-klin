@@ -9,7 +9,9 @@ require "lutaml/klin/shapechange/config_parser"
 RSpec.describe Lutaml::Klin::MappingGenerator do
   let(:fixtures_path) { File.join(__dir__, "..", "..", "fixtures") }
   let(:config_path) { File.join(fixtures_path, "configs", "simple_config.xml") }
-  let(:xmi_path) { "/Users/mulgogi/src/mn/mn-samples-plateau/sources/xmi/20251022-uro.xmi" }
+  let(:xmi_path) do
+    "/Users/mulgogi/src/mn/mn-samples-plateau/sources/xmi/20251022-uro.xmi"
+  end
   let(:xsd_path) { File.join(fixtures_path, "xsd", "simple_schema.xsd") }
 
   let(:config_parser) { Lutaml::Klin::Shapechange::ConfigParser.new }
@@ -141,7 +143,7 @@ RSpec.describe Lutaml::Klin::MappingGenerator do
         expect(content).to include("version:")
         expect(content).to include("package_mappings:")
       ensure
-        File.delete(output_path) if File.exist?(output_path)
+        FileUtils.rm_f(output_path)
       end
     end
   end

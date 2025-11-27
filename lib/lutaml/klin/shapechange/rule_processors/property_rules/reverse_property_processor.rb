@@ -76,11 +76,11 @@ module Lutaml
             def determine_qname(property, context)
               # Try config's determineQName method if available
               config = context[:config]
-              if config && config.respond_to?(:determine_qname)
+              if config.respond_to?(:determine_qname)
                 begin
                   qname = config.determine_qname(property)
                   return qname if qname
-                rescue
+                rescue StandardError
                   # Fall through to manual determination
                 end
               end
@@ -98,9 +98,9 @@ module Lutaml
               # Try to get package xmlns
               if property.respond_to?(:in_class)
                 owner_class = property.in_class
-                if owner_class && owner_class.respond_to?(:pkg)
+                if owner_class.respond_to?(:pkg)
                   pkg = owner_class.pkg
-                  if pkg && pkg.respond_to?(:xmlns)
+                  if pkg.respond_to?(:xmlns)
                     xmlns = pkg.xmlns
                     return "#{xmlns}:#{name}" if xmlns
                   end
@@ -118,7 +118,9 @@ module Lutaml
 
               # Create gml:reversePropertyName
               gml_ns = context[:gml_namespace]
-              reverse_elem = create_element_with_namespace("reversePropertyName", gml_ns, context)
+              reverse_elem = create_element_with_namespace(
+                "reversePropertyName", gml_ns, context
+              )
               set_text_content(reverse_elem, qname, context)
 
               appinfo.add_child(reverse_elem) if appinfo.respond_to?(:add_child)
@@ -166,7 +168,7 @@ module Lutaml
               xsd_doc.create_element(qualified_name, namespace)
             end
 
-            def set_text_content(element, text, context)
+            def set_text_content(element, text, _context)
               return unless element
 
               if element.respond_to?(:content=)

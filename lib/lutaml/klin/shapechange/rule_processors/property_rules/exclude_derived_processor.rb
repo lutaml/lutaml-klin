@@ -25,7 +25,7 @@ module Lutaml
             # @param property [Object] The property to process
             # @param context [Hash] Processing context
             # @return [Hash] Processing result indicating exclusion
-            def process(property, context = {})
+            def process(property, _context = {})
               return default_result unless applies_to?(property)
 
               is_derived = check_if_derived(property)
@@ -64,7 +64,9 @@ module Lutaml
               if property.respond_to?(:is_derived?)
                 begin
                   result = property.is_derived?
-                  return result if result.is_a?(TrueClass) || result.is_a?(FalseClass)
+                  if result.is_a?(TrueClass) || result.is_a?(FalseClass)
+                    return result
+                  end
                 rescue StandardError
                   # Fall through
                 end
@@ -74,7 +76,9 @@ module Lutaml
               if property.respond_to?(:is_derived)
                 begin
                   result = property.is_derived
-                  return result if result.is_a?(TrueClass) || result.is_a?(FalseClass)
+                  if result.is_a?(TrueClass) || result.is_a?(FalseClass)
+                    return result
+                  end
                 rescue StandardError
                   # Fall through
                 end
@@ -84,7 +88,9 @@ module Lutaml
               if property.respond_to?(:derived?)
                 begin
                   result = property.derived?
-                  return result if result.is_a?(TrueClass) || result.is_a?(FalseClass)
+                  if result.is_a?(TrueClass) || result.is_a?(FalseClass)
+                    return result
+                  end
                 rescue StandardError
                   # Fall through
                 end
@@ -94,7 +100,9 @@ module Lutaml
               if property.respond_to?(:derived)
                 begin
                   result = property.derived
-                  return result if result.is_a?(TrueClass) || result.is_a?(FalseClass)
+                  if result.is_a?(TrueClass) || result.is_a?(FalseClass)
+                    return result
+                  end
                 rescue StandardError
                   # Fall through
                 end
@@ -127,7 +135,9 @@ module Lutaml
               if tagged_values.respond_to?(:[])
                 tagged_values[tag_name]
               elsif tagged_values.respond_to?(:find)
-                tv = tagged_values.find { |t| t.respond_to?(:tag) && t.tag == tag_name }
+                tv = tagged_values.find do |t|
+                  t.respond_to?(:tag) && t.tag == tag_name
+                end
                 tv&.value if tv.respond_to?(:value)
               end
             rescue StandardError
@@ -138,7 +148,7 @@ module Lutaml
             #
             # @param property [Object] The property
             # @return [Boolean] True if rule is active for property
-            def applies_to?(property)
+            def applies_to?(_property)
               # Rule always applies - it's a filter rule
               # The actual decision is whether the property is derived
               true

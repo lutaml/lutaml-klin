@@ -37,7 +37,7 @@ module Lutaml
 
           private
 
-          def type_name(uml_class, xsd_doc)
+          def type_name(uml_class, _xsd_doc)
             # Follow GML/ISO 19139 naming conventions
             "#{uml_class.name}Type"
           end

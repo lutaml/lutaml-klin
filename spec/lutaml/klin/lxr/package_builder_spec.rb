@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "English"
 require "spec_helper"
 require "lutaml/klin/lxr/package_builder"
 require "lutaml/klin/lxr/errors"
@@ -61,7 +62,7 @@ RSpec.describe Lutaml::Klin::Lxr::PackageBuilder do
 
       it "creates temporary config file" do
         allow(IO).to receive(:popen).and_yield(StringIO.new(""))
-        allow($?).to receive(:success?).and_return(true)
+        allow($CHILD_STATUS).to receive(:success?).and_return(true)
 
         builder.build(config_hash, output_path)
 
@@ -78,14 +79,14 @@ RSpec.describe Lutaml::Klin::Lxr::PackageBuilder do
           expect(cmd).to include("--output", output_path)
           StringIO.new("")
         end
-        allow($?).to receive(:success?).and_return(true)
+        allow($CHILD_STATUS).to receive(:success?).and_return(true)
 
         builder.build(config_hash, output_path)
       end
 
       it "returns success result when build succeeds" do
         allow(IO).to receive(:popen).and_yield(StringIO.new("Build successful\n"))
-        allow($?).to receive(:success?).and_return(true)
+        allow($CHILD_STATUS).to receive(:success?).and_return(true)
 
         result = builder.build(config_hash, output_path)
 
@@ -96,7 +97,7 @@ RSpec.describe Lutaml::Klin::Lxr::PackageBuilder do
 
       it "returns failure result when build fails" do
         allow(IO).to receive(:popen).and_yield(StringIO.new("Build failed\n"))
-        allow($?).to receive(:success?).and_return(false)
+        allow($CHILD_STATUS).to receive(:success?).and_return(false)
 
         result = builder.build(config_hash, output_path)
 
@@ -120,7 +121,7 @@ RSpec.describe Lutaml::Klin::Lxr::PackageBuilder do
             expect(cmd).to include("--description", "Custom description")
             StringIO.new("")
           end
-          allow($?).to receive(:success?).and_return(true)
+          allow($CHILD_STATUS).to receive(:success?).and_return(true)
 
           builder.build(config_hash, output_path, options)
         end
@@ -129,7 +130,7 @@ RSpec.describe Lutaml::Klin::Lxr::PackageBuilder do
       context "with validation option" do
         before do
           allow(IO).to receive(:popen).and_yield(StringIO.new(""))
-          allow($?).to receive(:success?).and_return(true)
+          allow($CHILD_STATUS).to receive(:success?).and_return(true)
         end
 
         it "validates package after creation when validate option is true" do
@@ -166,7 +167,7 @@ RSpec.describe Lutaml::Klin::Lxr::PackageBuilder do
             expect(cmd).to include("--verbose")
             StringIO.new("")
           end
-          allow($?).to receive(:success?).and_return(true)
+          allow($CHILD_STATUS).to receive(:success?).and_return(true)
 
           builder.build(config_hash, output_path)
         end
@@ -174,7 +175,8 @@ RSpec.describe Lutaml::Klin::Lxr::PackageBuilder do
 
       context "when execution raises an error" do
         before do
-          allow(IO).to receive(:popen).and_raise(StandardError, "Execution failed")
+          allow(IO).to receive(:popen).and_raise(StandardError,
+                                                 "Execution failed")
         end
 
         it "returns failure result with error information" do

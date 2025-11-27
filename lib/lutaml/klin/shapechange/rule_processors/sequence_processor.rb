@@ -21,11 +21,11 @@ module Lutaml
             return unless container
 
             # Determine if we need sequence or choice
-            if needs_choice?(uml_class)
-              sequence_or_choice = xsd_doc.add_choice(container)
-            else
-              sequence_or_choice = xsd_doc.add_sequence(container)
-            end
+            sequence_or_choice = if needs_choice?(uml_class)
+                                   xsd_doc.add_choice(container)
+                                 else
+                                   xsd_doc.add_sequence(container)
+                                 end
 
             # Store for PropertyElementProcessor to add property elements
             context[:sequence_or_choice] = sequence_or_choice

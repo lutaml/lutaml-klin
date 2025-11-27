@@ -18,7 +18,9 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::EnumSupert
     context "when enumeration has supertype enumerations" do
       let(:red_prop) { double("Property", name: "red", initial_value: nil) }
       let(:blue_prop) { double("Property", name: "blue", initial_value: nil) }
-      let(:yellow_prop) { double("Property", name: "yellow", initial_value: nil) }
+      let(:yellow_prop) do
+        double("Property", name: "yellow", initial_value: nil)
+      end
       let(:green_prop) { double("Property", name: "green", initial_value: nil) }
 
       let(:base_enum) do
@@ -152,8 +154,12 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::EnumSupert
     end
 
     context "when enumeration has code list supertype" do
-      let(:enum_prop) { double("Property", name: "enumValue", initial_value: nil) }
-      let(:code_prop) { double("Property", name: "codeValue", initial_value: nil) }
+      let(:enum_prop) do
+        double("Property", name: "enumValue", initial_value: nil)
+      end
+      let(:code_prop) do
+        double("Property", name: "codeValue", initial_value: nil)
+      end
 
       let(:code_list) do
         double(
@@ -214,7 +220,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::ClassRules::EnumSupert
           "Enumeration",
           name: "ColorEnum",
           category: "enumeration",
-          properties: { "RED" => prop_with_value, "BLUE" => prop_without_value },
+          properties: { "RED" => prop_with_value,
+                        "BLUE" => prop_without_value },
           supertypes: nil
         )
       end

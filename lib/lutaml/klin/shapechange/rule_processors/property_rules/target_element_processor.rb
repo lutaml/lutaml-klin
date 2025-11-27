@@ -76,10 +76,10 @@ module Lutaml
               return nil unless property.respond_to?(:type)
 
               type_info = begin
-                            property.type
-                          rescue
-                            nil
-                          end
+                property.type
+              rescue StandardError
+                nil
+              end
               return nil unless type_info
 
               # Try to find class by ID or name
@@ -87,15 +87,17 @@ module Lutaml
               return nil unless model
 
               class_by_id = begin
-                              model.class_by_id(type_info.id) if type_info.respond_to?(:id)
-                            rescue
-                              nil
-                            end
+                model.class_by_id(type_info.id) if type_info.respond_to?(:id)
+              rescue StandardError
+                nil
+              end
               return class_by_id if class_by_id
 
               begin
-                model.class_by_name(type_info.name) if type_info.respond_to?(:name)
-              rescue
+                if type_info.respond_to?(:name)
+                  model.class_by_name(type_info.name)
+                end
+              rescue StandardError
                 nil
               end
             end
@@ -107,7 +109,7 @@ module Lutaml
               category == "CODELIST"
             end
 
-            def has_object_element?(value_class, context)
+            def has_object_element?(value_class, _context)
               return false unless value_class.respond_to?(:category)
 
               category = value_class.category.to_s.upcase
@@ -119,15 +121,13 @@ module Lutaml
             def determine_target_element(value_class, context)
               # First try to get mapped element from config
               config = context[:config]
-              if config && config.respond_to?(:element_map_entry)
+              if config.respond_to?(:element_map_entry)
                 map_entry = config.element_map_entry(value_class.name, "xsd")
-                return map_entry.target if map_entry && map_entry.respond_to?(:target)
+                return map_entry.target if map_entry.respond_to?(:target)
               end
 
               # Fall back to qname
-              if value_class.respond_to?(:qname)
-                return value_class.qname
-              end
+              return value_class.qname if value_class.respond_to?(:qname)
 
               nil
             end
@@ -139,7 +139,8 @@ module Lutaml
 
               # Create gml:targetElement
               gml_ns = context[:gml_namespace]
-              target_elem = create_element_with_namespace("targetElement", gml_ns, context)
+              target_elem = create_element_with_namespace("targetElement",
+                                                          gml_ns, context)
               set_text_content(target_elem, target_element, context)
 
               appinfo.add_child(target_elem) if appinfo.respond_to?(:add_child)
@@ -194,15 +195,12 @@ module Lutaml
             def namespace_abbreviation(namespace)
               case namespace
               when "http://www.opengis.net/gml/3.2"
-                "gml"
               when "http://www.opengis.net/gml"
-                "gml"
-              else
-                "gml"
               end
+              "gml"
             end
 
-            def set_text_content(element, text, context)
+            def set_text_content(element, text, _context)
               return unless element
 
               if element.respond_to?(:content=)

@@ -118,7 +118,7 @@ puts "  Resolved Attributes: #{result.resolved_attributes}"
 puts "  Unresolved Items: #{result.unresolved_count}"
 puts
 
-if result.unresolved_count > 0
+if result.unresolved_count.positive?
   puts "-" * 70
   puts "Unresolved Items"
   puts "-" * 70

@@ -49,9 +49,7 @@ module Lutaml
 
           # Load type overrides if provided
           type_overrides = load_type_overrides
-          if type_overrides
-            log "Loaded #{type_overrides.size} type overrides"
-          end
+          log "Loaded #{type_overrides.size} type overrides" if type_overrides
 
           # Generate mapping
           log "Generating mapping for package: #{package}"
@@ -96,10 +94,10 @@ module Lutaml
           end
 
           output_dir = File.dirname(output_path)
-          unless Dir.exist?(output_dir)
-            error "Output directory not found: #{output_dir}"
-            exit 1
-          end
+          return if Dir.exist?(output_dir)
+
+          error "Output directory not found: #{output_dir}"
+          exit 1
         end
 
         def parse_config
@@ -153,12 +151,12 @@ module Lutaml
           log "Loading type overrides from: #{type_mapping_path}"
 
           content = YAML.load_file(type_mapping_path)
-          unless content.is_a?(Hash) && content.key?('type_overrides')
+          unless content.is_a?(Hash) && content.key?("type_overrides")
             error "Invalid type mapping file format. Expected 'type_overrides' key."
             exit 1
           end
 
-          content['type_overrides']
+          content["type_overrides"]
         rescue StandardError => e
           error "Failed to load type mapping file: #{e.message}"
           exit 1

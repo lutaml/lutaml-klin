@@ -25,7 +25,7 @@ module Lutaml
             # @param uml_class [Lutaml::Uml::Class] The class to process
             # @param context [Hash] Processing context
             # @return [Hash] Processing result with code list encoding info
-            def process(uml_class, context = {})
+            def process(uml_class, _context = {})
               return default_result unless applies_to?(uml_class)
 
               {
@@ -77,7 +77,9 @@ module Lutaml
               if tagged_values.respond_to?(:[])
                 tagged_values[tag_name]
               elsif tagged_values.respond_to?(:find)
-                tv = tagged_values.find { |t| t.respond_to?(:tag) && t.tag == tag_name }
+                tv = tagged_values.find do |t|
+                  t.respond_to?(:tag) && t.tag == tag_name
+                end
                 tv&.value if tv.respond_to?(:value)
               end
             rescue StandardError
@@ -121,7 +123,9 @@ module Lutaml
                 return uml_class.as_dictionary?
               elsif uml_class.respond_to?(:as_dictionary)
                 result = uml_class.as_dictionary
-                return result if result.is_a?(TrueClass) || result.is_a?(FalseClass)
+                if result.is_a?(TrueClass) || result.is_a?(FalseClass)
+                  return result
+                end
               end
 
               # Try asDictionaryGml33 method
@@ -129,14 +133,17 @@ module Lutaml
                 return uml_class.as_dictionary_gml33?
               elsif uml_class.respond_to?(:as_dictionary_gml33)
                 result = uml_class.as_dictionary_gml33
-                return result if result.is_a?(TrueClass) || result.is_a?(FalseClass)
+                if result.is_a?(TrueClass) || result.is_a?(FalseClass)
+                  return result
+                end
               end
 
               # Check tagged values
               as_dict_tv = get_tagged_value(uml_class, "asDictionary")
               return true if as_dict_tv&.to_s&.downcase == "true"
 
-              as_dict_gml33_tv = get_tagged_value(uml_class, "asDictionaryGml33")
+              as_dict_gml33_tv = get_tagged_value(uml_class,
+                                                  "asDictionaryGml33")
               return true if as_dict_gml33_tv&.to_s&.downcase == "true"
 
               false

@@ -34,7 +34,7 @@ module Lutaml
             {
               version: schema_mapping.version || "1.0",
               generated_at: schema_mapping.generated_at ||
-                           Time.now.utc.iso8601,
+                Time.now.utc.iso8601,
               packages: schema_mapping.package_mappings.map do |pkg|
                 package_to_json(pkg)
               end

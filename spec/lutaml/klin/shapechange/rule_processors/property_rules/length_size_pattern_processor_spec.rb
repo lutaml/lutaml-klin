@@ -14,7 +14,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::LengthS
     let(:context) do
       {
         xsd_document: xsd_doc,
-        property_element: property_element,
+        property_element: property_element
       }
     end
 
@@ -30,7 +30,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::LengthS
       before do
         allow(rule_checker).to receive(:applies?).and_return(true)
         allow(property_element).to receive(:has_attribute?).with("type")
-                                                            .and_return(true)
+                                                           .and_return(true)
         allow(property_element).to receive(:remove_attribute).with("type")
         allow(property_element).to receive(:append_child)
       end
@@ -41,11 +41,11 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::LengthS
         facet = double("Facet")
 
         allow(xsd_doc).to receive(:create_element).with("simpleType")
-                                                   .and_return(simple_type)
+                                                  .and_return(simple_type)
         allow(xsd_doc).to receive(:create_element).with("restriction")
-                                                   .and_return(restriction)
+                                                  .and_return(restriction)
         allow(xsd_doc).to receive(:create_element).with("maxLength")
-                                                   .and_return(facet)
+                                                  .and_return(facet)
         allow(xsd_doc).to receive(:add_attribute)
         allow(simple_type).to receive(:append_child)
         allow(restriction).to receive(:append_child)
@@ -73,7 +73,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::LengthS
       before do
         allow(rule_checker).to receive(:applies?).and_return(true)
         allow(property_element).to receive(:has_attribute?).with("type")
-                                                            .and_return(false)
+                                                           .and_return(false)
         allow(property_element).to receive(:append_child)
       end
 
@@ -83,11 +83,11 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::LengthS
         facet = double("Facet")
 
         allow(xsd_doc).to receive(:create_element).with("simpleType")
-                                                   .and_return(simple_type)
+                                                  .and_return(simple_type)
         allow(xsd_doc).to receive(:create_element).with("restriction")
-                                                   .and_return(restriction)
+                                                  .and_return(restriction)
         allow(xsd_doc).to receive(:create_element).with("pattern")
-                                                   .and_return(facet)
+                                                  .and_return(facet)
         allow(xsd_doc).to receive(:add_attribute)
         allow(simple_type).to receive(:append_child)
         allow(restriction).to receive(:append_child)
@@ -145,7 +145,7 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::LengthS
           allow(p).to receive(:tagged_value).with("length").and_return(nil)
           allow(p).to receive(:tagged_value).with("size").and_return(nil)
           allow(p).to receive(:tagged_value).with("pattern")
-                                             .and_return("[A-Z]+")
+                                            .and_return("[A-Z]+")
         end
       end
 

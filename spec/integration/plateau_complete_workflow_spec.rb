@@ -7,8 +7,12 @@ require "benchmark"
 
 RSpec.describe "PLATEAU Complete Workflow", :integration do
   let(:lur_package) { "spec/fixtures/packages/plateau_all.lur" }
-  let(:shapechange_uro) { "reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml" }
-  let(:shapechange_urf) { "reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml" }
+  let(:shapechange_uro) do
+    "reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml"
+  end
+  let(:shapechange_urf) do
+    "reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml"
+  end
   let(:output_dir) { "tmp/plateau_integration_test" }
 
   before(:all) do
@@ -24,8 +28,12 @@ RSpec.describe "PLATEAU Complete Workflow", :integration do
   describe "URO Package Processing" do
     context "when all prerequisites are available" do
       it "processes URO package with auto-LXR" do
-        skip "LUR package not found: #{lur_package}" unless File.exist?(lur_package)
-        skip "ShapeChange config not found: #{shapechange_uro}" unless File.exist?(shapechange_uro)
+        unless File.exist?(lur_package)
+          skip "LUR package not found: #{lur_package}"
+        end
+        unless File.exist?(shapechange_uro)
+          skip "ShapeChange config not found: #{shapechange_uro}"
+        end
 
         # Run process command with auto-LXR
         result = system(
@@ -38,7 +46,8 @@ RSpec.describe "PLATEAU Complete Workflow", :integration do
         )
 
         expect(result).to be true, "lutaml-klin process command failed"
-        expect(Dir.exist?("#{output_dir}/uro")).to be true, "Output directory not created"
+        expect(Dir.exist?("#{output_dir}/uro")).to be true,
+                                                      "Output directory not created"
       end
 
       it "generates valid YAML mappings" do
@@ -74,7 +83,7 @@ RSpec.describe "PLATEAU Complete Workflow", :integration do
           # Check for traceability metadata (if implemented)
           next unless content.key?("schema_mapping")
 
-          schema_mapping = content["schema_mapping"]
+          content["schema_mapping"]
 
           # These are future enhancements
           # expect(schema_mapping).to have_key("generated_at") if traceability is added
@@ -95,7 +104,8 @@ RSpec.describe "PLATEAU Complete Workflow", :integration do
           err: File::NULL
         )
 
-        expect(result).to be false, "Command should fail with missing LUR package"
+        expect(result).to be false,
+                             "Command should fail with missing LUR package"
       end
 
       it "fails gracefully when ShapeChange config is missing" do
@@ -111,15 +121,20 @@ RSpec.describe "PLATEAU Complete Workflow", :integration do
           err: File::NULL
         )
 
-        expect(result).to be false, "Command should fail with missing ShapeChange config"
+        expect(result).to be false,
+                             "Command should fail with missing ShapeChange config"
       end
     end
   end
 
   describe "URF Package Processing" do
     it "processes URF package with auto-LXR" do
-      skip "LUR package not found: #{lur_package}" unless File.exist?(lur_package)
-      skip "ShapeChange config not found: #{shapechange_urf}" unless File.exist?(shapechange_urf)
+      unless File.exist?(lur_package)
+        skip "LUR package not found: #{lur_package}"
+      end
+      unless File.exist?(shapechange_urf)
+        skip "ShapeChange config not found: #{shapechange_urf}"
+      end
 
       result = system(
         "bin/lutaml-klin", "process",
@@ -131,7 +146,8 @@ RSpec.describe "PLATEAU Complete Workflow", :integration do
       )
 
       expect(result).to be true, "lutaml-klin process command failed"
-      expect(Dir.glob("#{output_dir}/urf/**/*.yaml")).not_to be_empty, "No YAML files generated"
+      expect(Dir.glob("#{output_dir}/urf/**/*.yaml")).not_to be_empty,
+                                                             "No YAML files generated"
     end
   end
 
@@ -172,7 +188,7 @@ RSpec.describe "PLATEAU Complete Workflow", :integration do
       # Second run should be faster or at least not significantly slower
       # Allow some variance for system performance
       expect(second_run_time).to be <= (first_run_time * 1.2),
-        "Second run should utilize cache and be faster"
+                                 "Second run should utilize cache and be faster"
     end
   end
 
@@ -182,7 +198,7 @@ RSpec.describe "PLATEAU Complete Workflow", :integration do
 
       total_yaml_files = Dir.glob("#{output_dir}/**/*.yaml").size
 
-      puts "\n" + "=" * 70
+      puts "\n#{'=' * 70}"
       puts "  PLATEAU Integration Test Results"
       puts "=" * 70
       puts ""
@@ -192,21 +208,18 @@ RSpec.describe "PLATEAU Complete Workflow", :integration do
 
       # Collect statistics from YAML files
       class_count = 0
-      attribute_count = 0
 
       Dir.glob("#{output_dir}/**/*.yaml").each do |file|
-        begin
-          content = YAML.load_file(file)
+        content = YAML.load_file(file)
 
-          # Count based on actual YAML structure
-          # This is a placeholder - adjust based on real structure
-          if content.is_a?(Hash) && content.key?("mapping")
-            mapping = content["mapping"]
-            class_count += 1 if mapping
-          end
-        rescue StandardError => e
-          puts "  Warning: Failed to parse #{file}: #{e.message}"
+        # Count based on actual YAML structure
+        # This is a placeholder - adjust based on real structure
+        if content.is_a?(Hash) && content.key?("mapping")
+          mapping = content["mapping"]
+          class_count += 1 if mapping
         end
+      rescue StandardError => e
+        puts "  Warning: Failed to parse #{file}: #{e.message}"
       end
 
       puts "  Estimated classes processed: #{class_count}"
@@ -228,11 +241,9 @@ RSpec.describe "PLATEAU Complete Workflow", :integration do
       invalid_files = []
 
       yaml_files.each do |file|
-        begin
-          YAML.load_file(file)
-        rescue StandardError => e
-          invalid_files << { file: file, error: e.message }
-        end
+        YAML.load_file(file)
+      rescue StandardError => e
+        invalid_files << { file: file, error: e.message }
       end
 
       if invalid_files.any?
@@ -242,7 +253,8 @@ RSpec.describe "PLATEAU Complete Workflow", :integration do
         end
       end
 
-      expect(invalid_files).to be_empty, "Found #{invalid_files.size} invalid YAML files"
+      expect(invalid_files).to be_empty,
+                               "Found #{invalid_files.size} invalid YAML files"
     end
 
     it "creates output files with consistent structure" do
@@ -259,7 +271,8 @@ RSpec.describe "PLATEAU Complete Workflow", :integration do
 
       # All files should have similar top-level keys
       # Allow for some variance but expect consistency
-      expect(structures.size).to be <= 3, "YAML files have inconsistent structure"
+      expect(structures.size).to be <= 3,
+                                 "YAML files have inconsistent structure"
     end
   end
 

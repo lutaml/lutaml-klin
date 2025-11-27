@@ -47,15 +47,15 @@ module Lutaml
                   {
                     namespace: context.gml_namespace,
                     element: "gmlProfileSchema",
-                    text: profile_value,
-                  },
+                    text: profile_value
+                  }
                 ],
                 imports: [
                   {
                     prefix: "gml",
-                    namespace: context.gml_namespace,
-                  },
-                ],
+                    namespace: context.gml_namespace
+                  }
+                ]
               }
             end
 

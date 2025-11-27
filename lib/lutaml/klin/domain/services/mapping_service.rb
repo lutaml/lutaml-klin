@@ -79,16 +79,18 @@ module Lutaml
             result = resolution_engine.resolve(class_element, context: context)
 
             # Construct qualified name from package and class name
-            qualified_name = uml_class.respond_to?(:qualified_name) ?
-                           uml_class.qualified_name :
-                           uml_class.name
+            qualified_name = if uml_class.respond_to?(:qualified_name)
+                               uml_class.qualified_name
+                             else
+                               uml_class.name
+                             end
 
             mapping_details = {
               uml_name: uml_class.name,
               uml_qualified_name: qualified_name,
               uml_stereotype: extract_primary_stereotype(uml_class),
               uml_documentation: extract_documentation(uml_class),
-              xsd_namespace: xsd_namespace,
+              xsd_namespace: xsd_namespace
             }
 
             # Add resolution tracking
@@ -145,7 +147,7 @@ module Lutaml
             result = resolution_engine.resolve(uml_attribute, context: context)
 
             # Derive XSD element name from UML attribute name
-            xsd_element_name = derive_xsd_element_name(uml_attribute)
+            derive_xsd_element_name(uml_attribute)
 
             # Convert UML multiplicity to XSD occurs
             multiplicity = extract_multiplicity(uml_attribute)
@@ -158,7 +160,7 @@ module Lutaml
               uml_multiplicity: multiplicity,
               xsd_name: analysis[:xml_name],
               xsd_min_occurs: occurs[:min],
-              xsd_max_occurs: occurs[:max],
+              xsd_max_occurs: occurs[:max]
             }
 
             # Add resolution details
@@ -229,7 +231,7 @@ module Lutaml
           #   map_multiplicity(nil)      # => {min: "1", max: "1"}
           def map_multiplicity(multiplicity)
             return { min: "1", max: "1" } if multiplicity.nil? ||
-                                              multiplicity.empty?
+                                             multiplicity.empty?
 
             case multiplicity
             when "1"
@@ -244,8 +246,11 @@ module Lutaml
               # Handle numeric ranges like "2..5"
               if multiplicity =~ /^(\d+)\.\.(\d+|\*)$/
                 min_val = Regexp.last_match(1)
-                max_val = Regexp.last_match(2) == "*" ? "unbounded" :
-                          Regexp.last_match(2)
+                max_val = if Regexp.last_match(2) == "*"
+                            "unbounded"
+                          else
+                            Regexp.last_match(2)
+                          end
                 { min: min_val, max: max_val }
               else
                 # Default for unrecognized multiplicity
@@ -301,7 +306,7 @@ module Lutaml
 
             # Try to get confidence from metadata
             confidence = result.metadata[:confidence] ||
-                        result.metadata["confidence"]
+                         result.metadata["confidence"]
 
             return confidence.to_f if confidence
 

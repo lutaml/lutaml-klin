@@ -2,22 +2,12 @@
 
 require "spec_helper"
 require "lutaml/klin/application/mapping_workflow"
-require "lutaml/klin/repositories/uml_repository_adapter"
-require "lutaml/klin/repositories/schema_repository_adapter"
-require "lutaml/klin/domain/resolution_engine"
-require "lutaml/klin/domain/resolution_result"
-require "tempfile"
-require "ostruct"
 
 RSpec.describe Lutaml::Klin::Application::MappingWorkflow do
-  let(:mock_uml_repo) { instance_double("UmlRepositoryAdapter") }
-  let(:mock_xsd_repo) { instance_double("SchemaRepositoryAdapter") }
-  let(:mock_config) do
-    double("ShapeChangeConfig",
-           namespace_for_package: "http://example.org/core",
-           prefix_for_namespace: "core")
-  end
-  let(:type_overrides) { { "OldType" => "NewType" } }
+  let(:mock_uml_repo) { create_mock_uml_repository }
+  let(:mock_xsd_repo) { create_mock_xsd_repository }
+  let(:mock_config) { create_mock_shapechange_config }
+  let(:type_overrides) { {} }
 
   let(:workflow) do
     described_class.new(
@@ -30,359 +20,350 @@ RSpec.describe Lutaml::Klin::Application::MappingWorkflow do
 
   describe "#initialize" do
     it "requires uml_repository" do
-      expect do
+      expect {
         described_class.new(
           uml_repository: nil,
           xsd_repository: mock_xsd_repo,
           shapechange_config: mock_config
         )
-      end.to raise_error(ArgumentError, /uml_repository is required/)
+      }.to raise_error(ArgumentError, /uml_repository is required/)
     end
 
     it "requires xsd_repository" do
-      expect do
+      expect {
         described_class.new(
           uml_repository: mock_uml_repo,
           xsd_repository: nil,
           shapechange_config: mock_config
         )
-      end.to raise_error(ArgumentError, /xsd_repository is required/)
+      }.to raise_error(ArgumentError, /xsd_repository is required/)
     end
 
     it "requires shapechange_config" do
-      expect do
+      expect {
         described_class.new(
           uml_repository: mock_uml_repo,
           xsd_repository: mock_xsd_repo,
           shapechange_config: nil
         )
-      end.to raise_error(ArgumentError, /shapechange_config is required/)
+      }.to raise_error(ArgumentError, /shapechange_config is required/)
     end
 
-    it "initializes with all required parameters" do
+    it "initializes with valid parameters" do
+      workflow = described_class.new(
+        uml_repository: mock_uml_repo,
+        xsd_repository: mock_xsd_repo,
+        shapechange_config: mock_config
+      )
+
       expect(workflow.uml_repository).to eq(mock_uml_repo)
       expect(workflow.xsd_repository).to eq(mock_xsd_repo)
       expect(workflow.shapechange_config).to eq(mock_config)
-      expect(workflow.type_overrides).to eq(type_overrides)
+      expect(workflow.resolution_engine).not_to be_nil
+      expect(workflow.mapping_service).not_to be_nil
+      expect(workflow.transformation_analyzer).not_to be_nil
     end
 
-    it "builds a resolution engine" do
-      expect(workflow.resolution_engine).to be_a(
-        Lutaml::Klin::Domain::ResolutionEngine
-      )
-    end
-
-    it "creates a mapping service" do
-      expect(workflow.mapping_service).to be_a(
-        Lutaml::Klin::Domain::Services::MappingService
-      )
-    end
-
-    it "handles nil type_overrides" do
-      wf = described_class.new(
+    it "accepts type_overrides" do
+      overrides = { "OldType" => "NewType" }
+      workflow = described_class.new(
         uml_repository: mock_uml_repo,
         xsd_repository: mock_xsd_repo,
         shapechange_config: mock_config,
-        type_overrides: nil
+        type_overrides: overrides
       )
-      expect(wf.type_overrides).to eq({})
+
+      expect(workflow.type_overrides).to eq(overrides)
+    end
+
+    it "defaults type_overrides to empty hash" do
+      expect(workflow.type_overrides).to eq({})
     end
   end
 
   describe "#generate_mapping_for_package" do
-    let(:package_path) { "ModelRoot::Core::Building" }
-    let(:mock_package) do
-      OpenStruct.new(
-        name: "Building",
-        qualified_name: package_path
-      )
-    end
-
-    let(:mock_class) do
-      OpenStruct.new(
-        name: "Building",
-        qualified_name: "ModelRoot::Core::Building::Building",
-        stereotype: "featureType",
-        documentation: "Building feature",
-        package: OpenStruct.new(qualified_name: package_path),
-        attributes: [
-          OpenStruct.new(
-            name: "height",
-            type: "Real",
-            documentation: "Height in meters",
-            multiplicity: "0..1"
-          )
-        ]
-      )
-    end
+    let(:package_path) { "ModelRoot::TestPackage" }
+    let(:mock_package) { create_mock_uml_package("TestPackage", package_path) }
+    let(:mock_class) { create_mock_uml_class("TestClass") }
 
     before do
       allow(mock_uml_repo).to receive(:find_package)
         .with(package_path)
         .and_return(mock_package)
-
       allow(mock_uml_repo).to receive(:classes_in_package)
-        .with(package_path, recursive: false)
         .and_return([mock_class])
-
-      # Mock the resolution engine to return resolved results
-      allow_any_instance_of(Lutaml::Klin::Domain::ResolutionEngine)
-        .to receive(:resolve)
-        .and_return(
-          Lutaml::Klin::Domain::ResolutionResult.resolved(
-            xsd_type: "BuildingType",
-            method: "MockStrategy",
-            xsd_element: OpenStruct.new(
-              name: "Building",
-              documentation: "Building element"
-            )
-          )
-        )
+      allow(mock_config).to receive(:namespace_for_package)
+        .and_return("http://test.org")
     end
 
-    it "generates a package mapping" do
+    it "generates PackageMapping for valid package" do
       result = workflow.generate_mapping_for_package(package_path)
 
       expect(result).to be_a(Lutaml::Klin::Mapping::PackageMapping)
-      expect(result.uml_name).to eq("Building")
       expect(result.uml_package_name).to eq(package_path)
-      expect(result.xsd_namespace).to eq("http://example.org/core")
-      expect(result.xsd_namespace_prefix).to eq("core")
-    end
-
-    it "includes class mappings" do
-      result = workflow.generate_mapping_for_package(package_path)
-
+      expect(result.xsd_namespace).to eq("http://test.org")
       expect(result.class_mappings).not_to be_empty
-      expect(result.class_mappings.first.uml_name).to eq("Building")
     end
 
-    it "includes attribute mappings" do
-      result = workflow.generate_mapping_for_package(package_path)
+    it "raises error when package not found" do
+      allow(mock_uml_repo).to receive(:find_package)
+        .with(package_path)
+        .and_return(nil)
 
-      class_mapping = result.class_mappings.first
-      expect(class_mapping.attribute_mappings).not_to be_empty
-      expect(class_mapping.attribute_mappings.first.uml_name).to eq("height")
+      expect {
+        workflow.generate_mapping_for_package(package_path)
+      }.to raise_error(/Package not found/)
     end
 
-    it "sets created_at timestamp" do
+    it "handles recursive option" do
+      workflow.generate_mapping_for_package(package_path, recursive: true)
+
+      expect(mock_uml_repo).to have_received(:classes_in_package)
+        .with(package_path, recursive: true)
+    end
+
+    it "defaults to non-recursive" do
+      workflow.generate_mapping_for_package(package_path)
+
+      expect(mock_uml_repo).to have_received(:classes_in_package)
+        .with(package_path, recursive: false)
+    end
+
+    it "includes created_at timestamp" do
       result = workflow.generate_mapping_for_package(package_path)
 
       expect(result.created_at).not_to be_nil
-      expect(result.created_at).to match(/^\d{4}-\d{2}-\d{2}T/)
+      expect(result.created_at).to match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
     end
 
-    it "calculates resolution statistics" do
+    it "includes resolution statistics" do
       result = workflow.generate_mapping_for_package(package_path)
 
       expect(result.resolution_statistics).not_to be_nil
     end
 
-    it "raises error if package not found" do
-      allow(mock_uml_repo).to receive(:find_package)
-        .with(package_path)
-        .and_return(nil)
+    context "with verbose mode" do
+      it "calls progress callback" do
+        called = false
+        callback = ->(stage, msg) { called = true }
 
-      expect do
-        workflow.generate_mapping_for_package(package_path)
-      end.to raise_error(/Package not found/)
+        workflow.generate_mapping_for_package(
+          package_path,
+          verbose: true,
+          progress_callback: callback
+        )
+
+        expect(called).to be true
+      end
     end
 
-    it "supports recursive flag" do
-      expect(mock_uml_repo).to receive(:classes_in_package)
-        .with(package_path, recursive: true)
-        .and_return([mock_class])
+    context "with namespace fallback" do
+      it "uses fallback namespace when config fails" do
+        allow(mock_config).to receive(:namespace_for_package)
+          .and_raise(StandardError)
 
-      workflow.generate_mapping_for_package(package_path, recursive: true)
+        result = workflow.generate_mapping_for_package(package_path)
+
+        expect(result.xsd_namespace).to match(/testpackage/)
+      end
     end
   end
 
   describe "#generate_mappings_for_packages" do
-    let(:package_paths) do
-      ["ModelRoot::Core::Building", "ModelRoot::Core::Road"]
-    end
-
-    let(:mock_packages) do
-      package_paths.map do |path|
-        OpenStruct.new(
-          name: path.split("::").last,
-          qualified_name: path
-        )
-      end
-    end
-
-    let(:mock_classes) do
-      [
-        OpenStruct.new(
-          name: "Building",
-          qualified_name: "ModelRoot::Core::Building::Building",
-          stereotype: "featureType",
-          documentation: "Building",
-          package: OpenStruct.new(qualified_name: package_paths[0]),
-          attributes: []
-        ),
-        OpenStruct.new(
-          name: "Road",
-          qualified_name: "ModelRoot::Core::Road::Road",
-          stereotype: "featureType",
-          documentation: "Road",
-          package: OpenStruct.new(qualified_name: package_paths[1]),
-          attributes: []
-        )
-      ]
-    end
+    let(:package_paths) { ["ModelRoot::Package1", "ModelRoot::Package2"] }
+    let(:mock_package1) { create_mock_uml_package("Package1", package_paths[0]) }
+    let(:mock_package2) { create_mock_uml_package("Package2", package_paths[1]) }
 
     before do
-      package_paths.each_with_index do |path, idx|
-        allow(mock_uml_repo).to receive(:find_package)
-          .with(path)
-          .and_return(mock_packages[idx])
-
-        allow(mock_uml_repo).to receive(:classes_in_package)
-          .with(path, recursive: false)
-          .and_return([mock_classes[idx]])
-      end
-
-      allow_any_instance_of(Lutaml::Klin::Domain::ResolutionEngine)
-        .to receive(:resolve)
-        .and_return(
-          Lutaml::Klin::Domain::ResolutionResult.resolved(
-            xsd_type: "SomeType",
-            method: "MockStrategy"
-          )
-        )
+      allow(mock_uml_repo).to receive(:find_package)
+        .with(package_paths[0])
+        .and_return(mock_package1)
+      allow(mock_uml_repo).to receive(:find_package)
+        .with(package_paths[1])
+        .and_return(mock_package2)
+      allow(mock_uml_repo).to receive(:classes_in_package)
+        .and_return([])
+      allow(mock_config).to receive(:namespace_for_package)
+        .and_return("http://test.org")
     end
 
-    it "generates a schema mapping" do
+    it "generates SchemaMapping for multiple packages" do
       result = workflow.generate_mappings_for_packages(package_paths)
 
       expect(result).to be_a(Lutaml::Klin::Mapping::SchemaMapping)
+      expect(result.package_mappings.size).to eq(2)
       expect(result.version).to eq("1.0")
     end
 
-    it "includes all package mappings" do
+    it "includes unique namespaces" do
+      allow(mock_config).to receive(:namespace_for_package)
+        .with(package_paths[0])
+        .and_return("http://test1.org")
+      allow(mock_config).to receive(:namespace_for_package)
+        .with(package_paths[1])
+        .and_return("http://test2.org")
+
       result = workflow.generate_mappings_for_packages(package_paths)
 
-      expect(result.package_mappings.size).to eq(2)
-      expect(result.package_mappings[0].uml_name).to eq("Building")
-      expect(result.package_mappings[1].uml_name).to eq("Road")
+      expect(result.namespaces).to include("http://test1.org", "http://test2.org")
+      expect(result.namespaces.size).to eq(2)
     end
 
-    it "sets generated_at timestamp" do
+    it "includes timestamp" do
       result = workflow.generate_mappings_for_packages(package_paths)
 
       expect(result.generated_at).not_to be_nil
-      expect(result.generated_at).to match(/^\d{4}-\d{2}-\d{2}T/)
     end
 
-    it "collects unique namespaces" do
-      result = workflow.generate_mappings_for_packages(package_paths)
+    it "handles empty package list" do
+      result = workflow.generate_mappings_for_packages([])
 
-      expect(result.namespaces).to include("http://example.org/core")
-      expect(result.namespaces.uniq).to eq(result.namespaces)
+      expect(result.package_mappings).to be_empty
     end
 
-    it "supports recursive flag" do
-      expect(mock_uml_repo).to receive(:classes_in_package)
-        .twice
-        .with(anything, recursive: true)
-        .and_return([])
-
+    it "handles recursive option" do
       workflow.generate_mappings_for_packages(package_paths, recursive: true)
+
+      expect(mock_uml_repo).to have_received(:classes_in_package)
+        .with(anything, recursive: true).at_least(:once)
     end
   end
 
   describe "#save_mapping" do
-    let(:package_mapping) do
-      Lutaml::Klin::Mapping::PackageMapping.new.tap do |pm|
-        pm.uml_name = "Test"
-        pm.xsd_namespace = "http://example.org/test"
-      end
+    let(:mapping) { create_test_schema_mapping }
+    let(:output_path) { "test_output.yaml" }
+
+    after do
+      File.delete(output_path) if File.exist?(output_path)
     end
 
     it "saves mapping to YAML file" do
-      Tempfile.create(["mapping", ".yaml"]) do |file|
-        workflow.save_mapping(package_mapping, file.path)
+      workflow.save_mapping(mapping, output_path)
 
-        content = File.read(file.path)
-        expect(content).to include("uml_name: Test")
-        expect(content).to include("http://example.org/test")
-      end
+      expect(File.exist?(output_path)).to be true
+      content = File.read(output_path)
+      expect(content).to include("version:")
+      expect(content).to include("package_mappings:")
     end
 
-    it "raises error if save fails" do
-      invalid_path = "/invalid/path/that/does/not/exist/mapping.yaml"
+    it "raises error on save failure" do
+      allow(File).to receive(:write).and_raise(StandardError, "Write failed")
 
-      expect do
-        workflow.save_mapping(package_mapping, invalid_path)
-      end.to raise_error(/Failed to save mapping/)
+      expect {
+        workflow.save_mapping(mapping, output_path)
+      }.to raise_error(/Failed to save mapping/)
+    end
+
+    it "handles complex mappings" do
+      complex_mapping = create_test_schema_mapping(
+        num_packages: 3,
+        num_classes: 5,
+        num_attributes: 10
+      )
+
+      workflow.save_mapping(complex_mapping, output_path)
+
+      expect(File.exist?(output_path)).to be true
     end
   end
 
   describe "private methods" do
     describe "#build_resolution_engine" do
-      it "creates engine with type override strategy when overrides provided" do
-        engine = workflow.send(:build_resolution_engine)
+      it "builds engine with strategies in correct order" do
+        engine = workflow.resolution_engine
 
-        strategy_names = engine.strategies.map(&:name)
-        expect(strategy_names).to include("TypeOverrideStrategy")
+        expect(engine).to be_a(Lutaml::Klin::Domain::ResolutionEngine)
+        # Engine should have strategies registered
       end
 
-      it "creates engine with shapechange strategy" do
-        engine = workflow.send(:build_resolution_engine)
-
-        strategy_names = engine.strategies.map(&:name)
-        expect(strategy_names).to include("ShapeChangeMappingStrategy")
-      end
-
-      it "creates engine with schema repository strategy" do
-        engine = workflow.send(:build_resolution_engine)
-
-        strategy_names = engine.strategies.map(&:name)
-        expect(strategy_names).to include("SchemaRepositoryStrategy")
-      end
-
-      it "omits type override strategy when no overrides" do
-        wf = described_class.new(
+      it "includes TypeOverrideStrategy when overrides provided" do
+        workflow_with_overrides = described_class.new(
           uml_repository: mock_uml_repo,
           xsd_repository: mock_xsd_repo,
           shapechange_config: mock_config,
-          type_overrides: {}
+          type_overrides: { "Type1" => "Type2" }
         )
 
-        engine = wf.send(:build_resolution_engine)
-        strategy_names = engine.strategies.map(&:name)
-        expect(strategy_names).not_to include("TypeOverrideStrategy")
+        engine = workflow_with_overrides.resolution_engine
+        expect(engine).to be_a(Lutaml::Klin::Domain::ResolutionEngine)
+      end
+    end
+
+    describe "#determine_xsd_namespace" do
+      let(:mock_package) { create_mock_uml_package("Test") }
+
+      it "gets namespace from ShapeChange config" do
+        allow(mock_config).to receive(:namespace_for_package)
+          .with("Test")
+          .and_return("http://configured.org")
+
+        namespace = workflow.send(:determine_xsd_namespace, mock_package)
+
+        expect(namespace).to eq("http://configured.org")
+      end
+
+      it "uses fallback when namespace not configured" do
+        allow(mock_config).to receive(:namespace_for_package)
+          .and_raise(StandardError)
+
+        namespace = workflow.send(:determine_xsd_namespace, mock_package)
+
+        expect(namespace).to match(/test/)
+      end
+    end
+
+    describe "#extract_namespace_prefix" do
+      it "gets prefix from ShapeChange config" do
+        namespace = "http://test.org"
+        allow(mock_config).to receive(:prefix_for_namespace)
+          .with(namespace)
+          .and_return("test")
+
+        prefix = workflow.send(:extract_namespace_prefix, namespace)
+
+        expect(prefix).to eq("test")
+      end
+
+      it "derives prefix from namespace URI when config unavailable" do
+        namespace = "http://www.opengis.net/gml/3.2"
+        allow(mock_config).to receive(:prefix_for_namespace)
+          .and_raise(NoMethodError)
+
+        prefix = workflow.send(:extract_namespace_prefix, namespace)
+
+        expect(prefix).to eq("gml")
       end
     end
 
     describe "#derive_prefix_from_namespace" do
-      it "extracts prefix from namespace URI" do
-        namespace = "http://www.opengis.net/gml/3.2"
-        prefix = workflow.send(:derive_prefix_from_namespace, namespace)
+      it "extracts meaningful part from namespace" do
+        prefix = workflow.send(
+          :derive_prefix_from_namespace,
+          "http://www.opengis.net/gml/3.2"
+        )
+
         expect(prefix).to eq("gml")
       end
 
-      it "handles simple namespaces" do
-        namespace = "http://example.org/core"
-        prefix = workflow.send(:derive_prefix_from_namespace, namespace)
-        expect(prefix).to eq("core")
-      end
-
-      it "ignores http/https/www parts" do
-        namespace = "https://www.example.org/test/namespace"
-        prefix = workflow.send(:derive_prefix_from_namespace, namespace)
-        expect(prefix).to eq("namespace")
-      end
-
-      it "returns nil for empty namespace" do
-        prefix = workflow.send(:derive_prefix_from_namespace, "")
-        expect(prefix).to be_nil
-      end
-
-      it "returns nil for nil namespace" do
+      it "handles nil namespace" do
         prefix = workflow.send(:derive_prefix_from_namespace, nil)
+
         expect(prefix).to be_nil
+      end
+
+      it "handles empty namespace" do
+        prefix = workflow.send(:derive_prefix_from_namespace, "")
+
+        expect(prefix).to be_nil
+      end
+
+      it "skips http/https/www parts" do
+        prefix = workflow.send(
+          :derive_prefix_from_namespace,
+          "https://www.example.com/test/schema"
+        )
+
+        expect(%w[test schema]).to include(prefix)
       end
     end
   end

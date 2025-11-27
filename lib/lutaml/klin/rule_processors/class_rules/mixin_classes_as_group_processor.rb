@@ -36,7 +36,9 @@ module Lutaml
           # @return [Boolean] true if rule is enabled and class has mixin supertypes
           def self.applies_to?(uml_class, config)
             return false unless config.rule_enabled?(RULE_NAME)
-            return false unless config.rule_enabled?("rule-xsd-cls-mixin-classes")
+            unless config.rule_enabled?("rule-xsd-cls-mixin-classes")
+              return false
+            end
             return false unless config.rule_enabled?("rule-xsd-cls-sequence")
 
             # Check if class has mixin supertypes
@@ -51,7 +53,8 @@ module Lutaml
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @param recursive [Boolean] Whether to recursively process mixin hierarchies
           # @return [void]
-          def self.add_group_references(uml_class, sequence_element, xsd_builder, config, recursive: false)
+          def self.add_group_references(uml_class, sequence_element,
+                                        xsd_builder, config, recursive: false)
             return unless uml_class.generalizations
 
             uml_class.generalizations.each do |generalization|
@@ -104,10 +107,10 @@ module Lutaml
           # @param uml_class [Lutaml::Uml::Class] The class to check
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [Boolean] true if class has mixin supertypes
-          def self.has_mixin_supertypes?(uml_class, config)
+          def self.has_mixin_supertypes?(uml_class, _config)
             return false unless uml_class.generalizations
 
-            uml_class.generalizations.any? do |generalization|
+            uml_class.generalizations.any? do |_generalization|
               # Would need to resolve the supertype to check, but for now
               # we assume if generalizations exist, we might need this rule
               true
@@ -123,8 +126,8 @@ module Lutaml
             return true if uml_class.is_a?(Lutaml::Uml::Mixin)
 
             # Check if abstract class should be treated as mixin
-            if config.rule_enabled?("rule-xsd-cls-no-abstract-classes")
-              return true if uml_class.is_abstract?
+            if config.rule_enabled?("rule-xsd-cls-no-abstract-classes") && uml_class.is_abstract?
+              return true
             end
 
             false
@@ -137,17 +140,19 @@ module Lutaml
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [void]
-          def self.add_mixin_group_reference(mixin_class, sequence_element, xsd_builder, config)
+          def self.add_mixin_group_reference(mixin_class, sequence_element,
+                                             _xsd_builder, _config)
             group_ref = "#{mixin_class.qualified_name}Group"
 
             sequence_element.add_group_reference(group_ref) do |group_ref_element|
+              # TODO: Get xmlns/target_namespace from ShapeChange config's PackageInfo instead
               # Import mixin's namespace
-              if mixin_class.package
-                xsd_builder.add_import(
-                  mixin_class.package.xmlns,
-                  mixin_class.package.target_namespace
-                )
-              end
+              # if mixin_class.package
+              #   xsd_builder.add_import(
+              #     mixin_class.package.xmlns,
+              #     mixin_class.package.target_namespace
+              #   )
+              # end
             end
           end
 
@@ -158,7 +163,8 @@ module Lutaml
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [void]
-          def self.process_supertype_properties_inline(supertype, sequence_element, xsd_builder, config)
+          def self.process_supertype_properties_inline(supertype,
+                                                       sequence_element, xsd_builder, config)
             return unless supertype.attributes
 
             supertype.attributes.each do |property|

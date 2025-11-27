@@ -60,6 +60,9 @@ module Lutaml
           # Extract target configuration from <targets><TargetXmlSchema>
           config.target_config = extract_target_config(doc)
 
+          # Extract input configuration from <input>
+          config.input_config = extract_input_config(doc)
+
           config
         rescue StandardError => e
           raise FatalError,
@@ -69,21 +72,18 @@ module Lutaml
         private
 
         def extract_xml_namespaces(doc)
-          namespaces = []
-          doc.xpath("//xmlNamespaces/XmlNamespace").each do |node|
-            namespaces << XmlNamespace.new(
+          doc.xpath("//xmlNamespaces/XmlNamespace").map do |node|
+            XmlNamespace.new(
               nsabr: node["nsabr"],
               ns: node["ns"],
               location: node["location"]
             )
           end
-          namespaces
         end
 
         def extract_xsd_map_entries(doc)
-          entries = []
-          doc.xpath("//xsdMapEntries/XsdMapEntry").each do |node|
-            entries << XsdMapEntry.new(
+          doc.xpath("//xsdMapEntries/XsdMapEntry").map do |node|
+            XsdMapEntry.new(
               type: node["type"],
               xsd_encoding_rules: node["xsdEncodingRules"],
               xml_type: node["xmlType"],
@@ -94,13 +94,11 @@ module Lutaml
               xml_type_nil_reason: node["xmlTypeNilReason"]
             )
           end
-          entries
         end
 
         def extract_package_infos(doc)
-          packages = []
-          doc.xpath("//packages/PackageInfo").each do |node|
-            packages << PackageInfo.new(
+          doc.xpath("//packages/PackageInfo").map do |node|
+            PackageInfo.new(
               package_name: node["packageName"],
               ns: node["ns"],
               nsabr: node["nsabr"],
@@ -108,7 +106,6 @@ module Lutaml
               version: node["version"]
             )
           end
-          packages
         end
 
         def extract_encoding_rules(doc)
@@ -137,9 +134,7 @@ module Lutaml
           # Extract from XmlNamespace location attributes (filter for XSD files)
           doc.xpath("//xmlNamespaces/XmlNamespace[@location]").each do |node|
             location = node["location"]
-            if location&.strip&.end_with?('.xsd')
-              locations << location.strip
-            end
+            locations << location.strip if location&.strip&.end_with?(".xsd")
           end
 
           locations
@@ -149,13 +144,15 @@ module Lutaml
           includes = []
 
           # Extract xi:include elements for XSD files
-          doc.xpath("//xi:include[contains(@href, '.xsd')]").each do |node|
+          doc.xpath("//xi:include[contains(@href, '.xsd')]",
+                    "xi" => "http://www.w3.org/2001/XInclude").each do |node|
             href = node["href"]
             includes << { from: href } if href&.strip
           end
 
           # Extract xi:fallback elements for XSD files
-          doc.xpath("//xi:fallback[contains(., '.xsd')]").each do |node|
+          doc.xpath("//xi:fallback[contains(., '.xsd')]",
+                    "xi" => "http://www.w3.org/2001/XInclude").each do |node|
             fallback_content = node.text.strip
             includes << { fallback: fallback_content } if fallback_content
           end
@@ -173,6 +170,18 @@ module Lutaml
             output_directory: target_node.at_xpath("targetParameter[@name='outputDirectory']")&.[]("value"),
             xsd_schema_locations: extract_xsd_schema_locations(doc),
             schema_includes: extract_schema_includes(doc)
+          }
+        end
+
+        def extract_input_config(doc)
+          input_node = doc.at_xpath("//input")
+          return {} unless input_node
+
+          # Extract appSchemaName parameter
+          app_schema_name = input_node.at_xpath("parameter[@name='appSchemaName']")&.[]("value")
+
+          {
+            app_schema_name: app_schema_name&.strip
           }
         end
       end

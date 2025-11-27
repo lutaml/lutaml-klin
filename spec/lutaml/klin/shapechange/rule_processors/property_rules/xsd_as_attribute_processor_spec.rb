@@ -403,7 +403,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::XsdAsAt
     let(:context) { {} }
 
     it "handles maxOccurs = Integer::MAX_VALUE" do
-      cardinality = double("Cardinality", min_occurs: 0, max_occurs: 2_147_483_647)
+      cardinality = double("Cardinality", min_occurs: 0,
+                                          max_occurs: 2_147_483_647)
       prop = double("Property", cardinality: cardinality, matches?: false)
       allow(prop).to receive(:respond_to?).with(:tagged_value).and_return(true)
       allow(prop).to receive(:respond_to?).with(:cardinality).and_return(true)
@@ -439,19 +440,22 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::XsdAsAt
     let(:cardinality) { double("Cardinality", min_occurs: 1, max_occurs: 1) }
 
     it "provides attribute message when encoding as attribute" do
-      prop = double("Property", name: "attr", tagged_value: "true", cardinality: cardinality, matches?: true)
+      prop = double("Property", name: "attr", tagged_value: "true",
+                                cardinality: cardinality, matches?: true)
       result = processor.process(prop, {})
       expect(result[:message]).to include("XML attribute")
     end
 
     it "provides element message when not encoding as attribute" do
-      prop = double("Property", name: "elem", tagged_value: "false", cardinality: cardinality)
+      prop = double("Property", name: "elem", tagged_value: "false",
+                                cardinality: cardinality)
       result = processor.process(prop, {})
       expect(result[:message]).to include("XML element")
     end
 
     it "explains association class constraint" do
-      prop = double("Property", name: "attr", tagged_value: "true", cardinality: cardinality, matches?: true)
+      prop = double("Property", name: "attr", tagged_value: "true",
+                                cardinality: cardinality, matches?: true)
       result = processor.process(prop, { in_association_class: true })
       expect(result[:message]).to include("association class")
     end
@@ -459,7 +463,10 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::XsdAsAt
 
   describe "context handling" do
     let(:cardinality) { double("Cardinality", min_occurs: 1, max_occurs: 1) }
-    let(:property) { double("Property", name: "attr", tagged_value: "true", cardinality: cardinality, matches?: true) }
+    let(:property) do
+      double("Property", name: "attr", tagged_value: "true",
+                         cardinality: cardinality, matches?: true)
+    end
 
     it "handles missing context" do
       result = processor.process(property, nil)

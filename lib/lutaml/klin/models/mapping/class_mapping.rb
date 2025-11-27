@@ -56,7 +56,7 @@ module Lutaml
         #
         # @return [Boolean] true if class is resolved/inferred and all attributes are resolved
         def fully_resolved?
-          (resolution_status == "resolved" || resolution_status == "inferred") &&
+          %w[resolved inferred].include?(resolution_status) &&
             (attribute_mappings.nil? || attribute_mappings.empty? ||
              attribute_mappings.all?(&:resolved?))
         end

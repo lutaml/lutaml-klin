@@ -44,7 +44,7 @@ module Lutaml
           )
 
           report_success(schema)
-        rescue => e
+        rescue StandardError => e
           report_error(e)
           raise
         end
@@ -89,22 +89,22 @@ module Lutaml
           valid_modes = %w[embedded multi-file multi_file]
           mode_str = @options[:mode].to_s.tr("_", "-")
 
-          unless valid_modes.include?(mode_str)
-            raise ArgumentError,
-                  "Invalid mode: #{@options[:mode]}. " \
-                  "Must be 'embedded' or 'multi-file'"
-          end
+          return if valid_modes.include?(mode_str)
+
+          raise ArgumentError,
+                "Invalid mode: #{@options[:mode]}. " \
+                "Must be 'embedded' or 'multi-file'"
         end
 
         # Validate theme option
         # @raise [ArgumentError] If theme is invalid
         def validate_theme
           valid_themes = %w[default dark plateau]
-          unless valid_themes.include?(@options[:theme])
-            raise ArgumentError,
-                  "Invalid theme: #{@options[:theme]}. " \
-                  "Must be one of: #{valid_themes.join(', ')}"
-          end
+          return if valid_themes.include?(@options[:theme])
+
+          raise ArgumentError,
+                "Invalid theme: #{@options[:theme]}. " \
+                "Must be one of: #{valid_themes.join(', ')}"
         end
 
         # Report successful generation
@@ -116,10 +116,10 @@ module Lutaml
           puts "  Schemas: #{schema.schemas.size}"
           puts "  Total components: #{total_components(schema)}"
 
-          if @options[:yaml]
-            mapped_count = count_mapped_components(schema)
-            puts "  UML-mapped components: #{mapped_count}"
-          end
+          return unless @options[:yaml]
+
+          mapped_count = count_mapped_components(schema)
+          puts "  UML-mapped components: #{mapped_count}"
         end
 
         # Report generation error
@@ -162,10 +162,18 @@ module Lutaml
         # @return [Integer] Mapped component count
         def count_mapped_components(schema)
           count = 0
-          count += schema.elements.count { |e| e.respond_to?(:uml_mapping) && e.uml_mapping }
-          count += schema.complex_types.count { |t| t.respond_to?(:uml_mapping) && t.uml_mapping }
-          count += schema.simple_types.count { |t| t.respond_to?(:uml_mapping) && t.uml_mapping }
-          count += schema.attributes.count { |a| a.respond_to?(:uml_mapping) && a.uml_mapping }
+          count += schema.elements.count do |e|
+            e.respond_to?(:uml_mapping) && e.uml_mapping
+          end
+          count += schema.complex_types.count do |t|
+            t.respond_to?(:uml_mapping) && t.uml_mapping
+          end
+          count += schema.simple_types.count do |t|
+            t.respond_to?(:uml_mapping) && t.uml_mapping
+          end
+          count += schema.attributes.count do |a|
+            a.respond_to?(:uml_mapping) && a.uml_mapping
+          end
           count
         end
       end

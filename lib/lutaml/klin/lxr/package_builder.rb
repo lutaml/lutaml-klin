@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "English"
 require "fileutils"
 require "tempfile"
 require_relative "errors"
@@ -46,7 +47,7 @@ module Lutaml
             result
           ensure
             # Clean up temporary config file
-            File.unlink(config_file) if File.exist?(config_file)
+            FileUtils.rm_f(config_file)
           end
         end
 
@@ -112,11 +113,9 @@ module Lutaml
 
           # Capture output
           output = []
-          error_output = []
-          success = false
 
           # Execute command
-          IO.popen(cmd, err: [:child, :out]) do |io|
+          IO.popen(cmd, err: %i[child out]) do |io|
             io.each_line do |line|
               line = line.chomp
               output << line
@@ -124,7 +123,7 @@ module Lutaml
             end
           end
 
-          success = $?.success?
+          success = $CHILD_STATUS.success?
 
           {
             success: success,
@@ -156,7 +155,10 @@ module Lutaml
           # Add options from config (these are in the YAML, but can be overridden)
           cmd += ["--name", options[:name]] if options[:name]
           cmd += ["--version", options[:version]] if options[:version]
-          cmd += ["--description", options[:description]] if options[:description]
+          if options[:description]
+            cmd += ["--description",
+                    options[:description]]
+          end
 
           # Add verbose flag if needed
           cmd << "--verbose" if verbose

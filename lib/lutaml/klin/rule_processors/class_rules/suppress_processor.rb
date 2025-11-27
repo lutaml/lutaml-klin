@@ -42,7 +42,8 @@ module Lutaml
             return unless applies_to?(parent_class, config)
 
             # Find unsuppressed supertype
-            unsuppressed_supertype = find_unsuppressed_supertype(parent_class, xsd_builder)
+            unsuppressed_supertype = find_unsuppressed_supertype(parent_class,
+                                                                 xsd_builder)
 
             unless unsuppressed_supertype
               xsd_builder.add_error(
@@ -62,7 +63,8 @@ module Lutaml
               end
 
               # Set property type
-              set_property_type(element, property, parent_class, xsd_builder, config)
+              set_property_type(element, property, parent_class, xsd_builder,
+                                config)
 
               # Set substitution group
               substitution_group = build_substitution_group_name(
@@ -73,13 +75,14 @@ module Lutaml
               if substitution_group
                 element.substitution_group = substitution_group
 
+                # TODO: Get xmlns/target_namespace from ShapeChange config's PackageInfo instead
                 # Import supertype namespace
-                if unsuppressed_supertype.package
-                  xsd_builder.add_import(
-                    unsuppressed_supertype.package.xmlns,
-                    unsuppressed_supertype.package.target_namespace
-                  )
-                end
+                # if unsuppressed_supertype.package
+                #   xsd_builder.add_import(
+                #     unsuppressed_supertype.package.xmlns,
+                #     unsuppressed_supertype.package.target_namespace
+                #   )
+                # end
               end
 
               # Record encoding info
@@ -107,9 +110,7 @@ module Lutaml
               next unless supertype
 
               # Check if this supertype is unsuppressed
-              unless supertype.stereotype?("adeelement")
-                return supertype
-              end
+              return supertype unless supertype.stereotype?("adeelement")
 
               # Recursively check supertype's supertypes
               result = find_unsuppressed_supertype(supertype, xsd_builder)
@@ -127,7 +128,8 @@ module Lutaml
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [void]
-          def self.set_property_type(element, property, parent_class, xsd_builder, config)
+          def self.set_property_type(element, property, parent_class,
+                                     xsd_builder, config)
             type_class = xsd_builder.find_class(property.type)
 
             if type_class&.as_character_string?
@@ -160,7 +162,7 @@ module Lutaml
             # e.g., "bldg:AbstractBuilding" -> "bldg:_GenericApplicationPropertyOfAbstractBuilding"
 
             # Replace :_ with : (normalize)
-            normalized = element_name.gsub(/:_/, ":")
+            normalized = element_name.gsub(":_", ":")
 
             # Split into prefix and local name
             if normalized.include?(":")

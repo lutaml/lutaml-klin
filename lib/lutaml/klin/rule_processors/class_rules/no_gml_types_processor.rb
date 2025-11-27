@@ -27,7 +27,7 @@ module Lutaml
           # @param uml_class [Lutaml::Uml::Class] The UML class to check
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [Boolean] true if rule is enabled
-          def self.applies_to?(uml_class, config)
+          def self.applies_to?(_uml_class, config)
             config.rule_enabled?(RULE_NAME)
           end
 
@@ -64,7 +64,8 @@ module Lutaml
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [void]
-          def self.add_property_type_attributes(property_type_element, uml_class, xsd_builder, config)
+          def self.add_property_type_attributes(property_type_element,
+                                                uml_class, xsd_builder, config)
             return unless applies_to?(uml_class, config)
 
             # Add xlink:simpleAttrs instead of GML attribute groups

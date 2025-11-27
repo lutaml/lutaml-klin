@@ -10,7 +10,9 @@ require "lutaml/klin/shapechange/xsd_generator"
 
 RSpec.describe "XSD Generation Integration", type: :integration do
   let(:lur_path) { "spec/fixtures/packages/plateau_all.lur" }
-  let(:config_path) { "./reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml" }
+  let(:config_path) do
+    "./reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml"
+  end
   let(:output_dir) { "tmp/test_xsd_generation" }
 
   before do
@@ -18,7 +20,7 @@ RSpec.describe "XSD Generation Integration", type: :integration do
   end
 
   after do
-    FileUtils.rm_rf(output_dir) if Dir.exist?(output_dir)
+    FileUtils.rm_rf(output_dir)
   end
 
   describe "End-to-end XSD generation from LUR + ShapeChange config" do
@@ -143,7 +145,7 @@ RSpec.describe "XSD Generation Integration", type: :integration do
       )
 
       # Generate for both URO and URF
-      results = generator.generate_schemas(["uro", "urf"], output_dir)
+      results = generator.generate_schemas(%w[uro urf], output_dir)
 
       # Verify both were generated
       expect(results.size).to eq(2)

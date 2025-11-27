@@ -16,7 +16,7 @@ RSpec.describe Lutaml::Klin::Lxr::CacheManager do
     temp_config.unlink
     temp_lxr.close
     temp_lxr.unlink
-    FileUtils.rm_rf(temp_cache_dir) if Dir.exist?(temp_cache_dir)
+    FileUtils.rm_rf(temp_cache_dir)
   end
 
   describe "#initialize" do

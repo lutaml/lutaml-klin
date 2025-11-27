@@ -32,7 +32,7 @@ module Lutaml
           # @param model_element [Object] The model element (Class, Property, Package)
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @return [Boolean] true if rule is enabled and descriptors configured
-          def self.applies_to?(model_element, config)
+          def self.applies_to?(_model_element, config)
             return false unless config.rule_enabled?(RULE_NAME)
             return false if descriptors_to_represent(config).empty?
 
@@ -46,7 +46,8 @@ module Lutaml
           # @param config [Lutaml::Klin::XsdGeneratorConfiguration] Configuration
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @return [void]
-          def self.add_descriptor_annotations(annotation_builder, model_element, config, xsd_builder)
+          def self.add_descriptor_annotations(annotation_builder,
+                                              model_element, config, xsd_builder)
             return unless applies_to?(model_element, config)
             return unless model_element.respond_to?(:descriptors)
 
@@ -70,7 +71,9 @@ module Lutaml
 
               # Add descriptor elements
               sorted_values.each do |descriptor_val|
-                next if descriptor_val[:value].nil? || descriptor_val[:value].strip.empty?
+                if descriptor_val[:value].nil? || descriptor_val[:value].strip.empty?
+                  next
+                end
 
                 add_descriptor_element(
                   annotation_builder,
@@ -89,7 +92,8 @@ module Lutaml
           # @param descriptor_value [Hash] Hash with :value and optional :lang
           # @param xsd_builder [Lutaml::Klin::Builders::XsdDocumentBuilder] XSD builder
           # @return [void]
-          def self.add_descriptor_element(annotation_builder, descriptor_name, descriptor_value, xsd_builder)
+          def self.add_descriptor_element(annotation_builder, descriptor_name,
+                                          descriptor_value, xsd_builder)
             # Ensure appinfo exists
             appinfo = annotation_builder.appinfo || annotation_builder.add_appinfo
 

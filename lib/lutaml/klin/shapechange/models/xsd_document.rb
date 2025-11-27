@@ -19,6 +19,7 @@ module Lutaml
             @version = version
             @imports = []
             @includes = []
+            @property_elements = {} # Track global property elements: {name => element}
             create_document
             add_standard_imports
           end
@@ -159,13 +160,61 @@ module Lutaml
             pattern
           end
 
+          # Register a global property element declaration
+          # @param name [String] Element name
+          # @param type [String] XSD type
+          # @param attributes [Hash] Additional attributes (minOccurs, maxOccurs, etc.)
+          # @return [Nokogiri::XML::Element] The registered element
+          def register_property_element(name:, type:, **attributes)
+            # Check if already registered
+            return @property_elements[name] if @property_elements[name]
+
+            # Create the element but don't add to document yet
+            element = create_element("element")
+            element["name"] = name
+            element["type"] = type
+
+            # Add optional attributes (but NOT minOccurs/maxOccurs - those go in references)
+            attributes.each do |k, v|
+              # Skip occurrence constraints - they belong in element references, not declarations
+              next if k.to_s == "minOccurs" || k.to_s == "maxOccurs"
+              element[k.to_s] = v.to_s if v
+            end
+
+            # Store in registry
+            @property_elements[name] = element
+            element
+          end
+
+          # Add all registered global property elements to the schema
+          # Called after imports but before class elements
+          def add_global_property_elements
+            return if @property_elements.empty?
+
+            # Find insertion point: after last import, before first complexType/element
+            last_import = @root_element.xpath("xs:import").last
+
+            # Add all property elements in alphabetical order for consistency
+            # Filter out nil keys and sort
+            @property_elements.keys.compact.sort.each do |name|
+              element = @property_elements[name]
+              next unless element # Skip if element is nil
+
+              if last_import
+                last_import.add_next_sibling(element)
+                last_import = element # Update for next insertion
+              else
+                # No imports, prepend to schema
+                @root_element.prepend_child(element)
+              end
+            end
+          end
+
           # Add standard GML import that's always needed
           def add_standard_imports
-            # GML 3.2 is the standard for geometric types
-            add_import(
-              namespace: "http://www.opengis.net/gml/3.2",
-              location: "http://schemas.opengis.net/gml/3.2.1/gml.xsd"
-            )
+            # GML namespace is now added dynamically from config
+            # via add_required_namespace_imports() which reads xmlNamespaces
+            # This allows using GML 3.1.1 or 3.2 as specified in config
           end
 
           # Scan document for referenced namespaces and add imports
@@ -175,11 +224,13 @@ module Lutaml
 
             # For each referenced prefix, find its namespace and add import
             referenced_prefixes.each do |prefix_name|
-              next if prefix_name == 'xs' # Skip XML Schema namespace
+              next if prefix_name == "xs" # Skip XML Schema namespace
               next if prefix_name == @prefix # Skip target namespace
 
               # Find namespace info from config
-              ns_info = config.xml_namespaces.find { |ns| ns.nsabr&.strip == prefix_name }
+              ns_info = config.xml_namespaces.find do |ns|
+                ns.nsabr&.strip == prefix_name
+              end
               next unless ns_info
 
               # Add import for this namespace
@@ -204,8 +255,8 @@ module Lutaml
             # Scan all type attributes (e.g., type="gml:CodeType")
             @root_element.xpath(".//@type").each do |attr|
               type_value = attr.value
-              if type_value.include?(':')
-                prefix_name = type_value.split(':').first
+              if type_value.include?(":")
+                prefix_name = type_value.split(":").first
                 prefixes << prefix_name
               end
             end
@@ -213,8 +264,8 @@ module Lutaml
             # Scan all ref attributes (e.g., ref="gml:AbstractFeature")
             @root_element.xpath(".//@ref").each do |attr|
               ref_value = attr.value
-              if ref_value.include?(':')
-                prefix_name = ref_value.split(':').first
+              if ref_value.include?(":")
+                prefix_name = ref_value.split(":").first
                 prefixes << prefix_name
               end
             end
@@ -222,8 +273,8 @@ module Lutaml
             # Scan all base attributes in extensions (e.g., base="gml:AbstractFeatureType")
             @root_element.xpath(".//@base").each do |attr|
               base_value = attr.value
-              if base_value.include?(':')
-                prefix_name = base_value.split(':').first
+              if base_value.include?(":")
+                prefix_name = base_value.split(":").first
                 prefixes << prefix_name
               end
             end
@@ -231,8 +282,8 @@ module Lutaml
             # Scan all substitutionGroup attributes
             @root_element.xpath(".//@substitutionGroup").each do |attr|
               sub_value = attr.value
-              if sub_value.include?(':')
-                prefix_name = sub_value.split(':').first
+              if sub_value.include?(":")
+                prefix_name = sub_value.split(":").first
                 prefixes << prefix_name
               end
             end

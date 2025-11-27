@@ -9,7 +9,9 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy do
   let(:strategy) { described_class.new }
   let(:xsd_repository) { double("SchemaRepositoryAdapter") }
   let(:shapechange_config) { double("ShapeChangeConfig") }
-  let(:type_overrides) { { "CharacterString" => "xs:string", "xs::string" => "xs:string" } }
+  let(:type_overrides) do
+    { "CharacterString" => "xs:string", "xs::string" => "xs:string" }
+  end
   let(:context) do
     Lutaml::Klin::Domain::ResolutionContext.new(
       xsd_repository: xsd_repository,
@@ -50,14 +52,13 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy do
       it "returns resolved result" do
         element = double("UMLElement", type: "CharacterString")
         xsd_result = double("TypeResolutionResult",
-          resolved: true,
-          local_name: "string",
-          namespace: "http://www.w3.org/2001/XMLSchema",
-          schema_file: "schemas/xmlschema.xsd",
-          resolution_path: nil
-        )
+                            resolved: true,
+                            local_name: "string",
+                            namespace: "http://www.w3.org/2001/XMLSchema",
+                            schema_file: "schemas/xmlschema.xsd",
+                            resolution_path: nil)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(xsd_result)
+                                                       .and_return(xsd_result)
 
         result = strategy.resolve(element, context: context)
 
@@ -71,14 +72,13 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy do
       it "normalizes :: to : in override type" do
         element = double("UMLElement", type: "xs::string")
         xsd_result = double("TypeResolutionResult",
-          resolved: true,
-          local_name: "string",
-          namespace: "http://www.w3.org/2001/XMLSchema",
-          schema_file: "schemas/xmlschema.xsd",
-          resolution_path: nil
-        )
+                            resolved: true,
+                            local_name: "string",
+                            namespace: "http://www.w3.org/2001/XMLSchema",
+                            schema_file: "schemas/xmlschema.xsd",
+                            resolution_path: nil)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(xsd_result)
+                                                       .and_return(xsd_result)
 
         result = strategy.resolve(element, context: context)
 
@@ -88,14 +88,13 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy do
       it "includes metadata about the resolution" do
         element = double("UMLElement", type: "CharacterString")
         xsd_result = double("TypeResolutionResult",
-          resolved: true,
-          local_name: "string",
-          namespace: "http://www.w3.org/2001/XMLSchema",
-          schema_file: "schemas/xmlschema.xsd",
-          resolution_path: nil
-        )
+                            resolved: true,
+                            local_name: "string",
+                            namespace: "http://www.w3.org/2001/XMLSchema",
+                            schema_file: "schemas/xmlschema.xsd",
+                            resolution_path: nil)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(xsd_result)
+                                                       .and_return(xsd_result)
 
         result = strategy.resolve(element, context: context)
 
@@ -109,12 +108,11 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy do
       it "returns unresolved result" do
         element = double("UMLElement", type: "CharacterString")
         failed_result = double("TypeResolutionResult",
-          resolved: false,
-          error_message: "Type not found in repository",
-          resolution_path: nil
-        )
+                               resolved: false,
+                               error_message: "Type not found in repository",
+                               resolution_path: nil)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(failed_result)
+                                                       .and_return(failed_result)
 
         result = strategy.resolve(element, context: context)
 
@@ -125,12 +123,11 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::TypeOverrideStrategy do
       it "includes metadata about the failed resolution" do
         element = double("UMLElement", type: "CharacterString")
         failed_result = double("TypeResolutionResult",
-          resolved: false,
-          error_message: "Type not found in repository",
-          resolution_path: nil
-        )
+                               resolved: false,
+                               error_message: "Type not found in repository",
+                               resolution_path: nil)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(failed_result)
+                                                       .and_return(failed_result)
 
         result = strategy.resolve(element, context: context)
 

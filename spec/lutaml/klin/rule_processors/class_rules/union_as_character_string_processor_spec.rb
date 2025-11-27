@@ -153,7 +153,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::UnionAsCharacterStringP
       end
 
       it "returns false" do
-        expect(described_class.encode_as_string?(type_class, config)).to be false
+        expect(described_class.encode_as_string?(type_class,
+                                                 config)).to be false
       end
     end
 
@@ -168,7 +169,8 @@ RSpec.describe Lutaml::Klin::RuleProcessors::ClassRules::UnionAsCharacterStringP
       end
 
       it "returns false" do
-        expect(described_class.encode_as_string?(type_class, config)).to be false
+        expect(described_class.encode_as_string?(type_class,
+                                                 config)).to be false
       end
     end
   end

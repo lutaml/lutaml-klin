@@ -57,7 +57,8 @@ module Lutaml
               xsd_doc.append_child(container, element_ref)
             end
 
-            def add_global_hook_element(xsd_doc, element_name, uml_class, context)
+            def add_global_hook_element(xsd_doc, element_name, uml_class,
+                                        context)
               # Create global element definition
               hook_element = xsd_doc.create_global_element(element_name)
 
@@ -67,9 +68,9 @@ module Lutaml
               xsd_doc.add_attribute(hook_element, "abstract", "true")
 
               # Record in encoding infos if enabled
-              if context[:write_xml_encoding_infos]
-                record_encoding_info(xsd_doc, uml_class, element_name, context)
-              end
+              return unless context[:write_xml_encoding_infos]
+
+              record_encoding_info(xsd_doc, uml_class, element_name, context)
             end
 
             def add_ade_hook_multiplicity(xsd_doc, element)
@@ -79,7 +80,7 @@ module Lutaml
               xsd_doc.add_attribute(element, "maxOccurs", "unbounded")
             end
 
-            def record_encoding_info(xsd_doc, uml_class, element_name, context)
+            def record_encoding_info(_xsd_doc, uml_class, element_name, context)
               # Record encoding information for documentation
               encoding_infos = context[:encoding_infos]
               return unless encoding_infos

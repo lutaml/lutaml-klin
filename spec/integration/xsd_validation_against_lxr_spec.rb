@@ -10,16 +10,20 @@ require "lutaml/klin/shapechange/xsd_generator"
 RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
   let(:lur_path) { "spec/fixtures/packages/plateau_all.lur" }
   let(:lxr_path) { "spec/fixtures/packages/plateau_schemas.lxr" }
-  let(:config_path) { "./reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml" }
+  let(:config_path) do
+    "./reference/shapechange-configs/ShapeChangeConfig_Plateau_urf.xml"
+  end
   let(:output_dir) { "tmp/xsd_validation" }
 
   before do
     FileUtils.mkdir_p(output_dir)
-    skip "LUR/LXR packages not available" unless File.exist?(lur_path) && File.exist?(lxr_path)
+    unless File.exist?(lur_path) && File.exist?(lxr_path)
+      skip "LUR/LXR packages not available"
+    end
   end
 
   after do
-    FileUtils.rm_rf(output_dir) if Dir.exist?(output_dir)
+    FileUtils.rm_rf(output_dir)
   end
 
   describe "URO package validation" do
@@ -30,7 +34,9 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       # Generate from LUR
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
       results = generator.generate_schemas([namespace], output_dir)
       expect(results).not_to be_empty
@@ -43,9 +49,17 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       xs_ns = { "xs" => "http://www.w3.org/2001/XMLSchema" }
 
       # Extract counts from generated XSD
-      gen_elements = generated.xpath("//xs:element[@name]", xs_ns).map { |e| e["name"] }.sort
-      gen_complex_types = generated.xpath("//xs:complexType[@name]", xs_ns).map { |e| e["name"] }.sort
-      gen_simple_types = generated.xpath("//xs:simpleType[@name]", xs_ns).map { |e| e["name"] }.sort
+      gen_elements = generated.xpath("//xs:element[@name]", xs_ns).map do |e|
+        e["name"]
+      end.sort
+      gen_complex_types = generated.xpath("//xs:complexType[@name]",
+                                          xs_ns).map do |e|
+        e["name"]
+      end.sort
+      gen_simple_types = generated.xpath("//xs:simpleType[@name]",
+                                         xs_ns).map do |e|
+        e["name"]
+      end.sort
 
       # Analyze generated content
       puts "\n=== URO Generation Summary ==="
@@ -73,7 +87,9 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       # Generate XSD
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
       results = generator.generate_schemas([namespace], output_dir)
       generated_file = results.first[:file]
@@ -81,7 +97,9 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       xs_ns = { "xs" => "http://www.w3.org/2001/XMLSchema" }
 
       # Check complex types have proper sequences
-      complex_types_with_sequence = generated.xpath("//xs:complexType[xs:complexContent/xs:extension/xs:sequence]", xs_ns)
+      complex_types_with_sequence = generated.xpath(
+        "//xs:complexType[xs:complexContent/xs:extension/xs:sequence]", xs_ns
+      )
       complex_types_total = generated.xpath("//xs:complexType[@name]", xs_ns)
 
       puts "\n=== URO Complex Type Structure ==="
@@ -96,7 +114,9 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       # Generate XSD
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
       results = generator.generate_schemas([namespace], output_dir)
       generated_file = results.first[:file]
@@ -104,16 +124,21 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       xs_ns = { "xs" => "http://www.w3.org/2001/XMLSchema" }
 
       # Check simple types with enumerations
-      enums = generated.xpath("//xs:simpleType[xs:restriction[@base='xs:string']/xs:enumeration]", xs_ns)
+      enums = generated.xpath(
+        "//xs:simpleType[xs:restriction[@base='xs:string']/xs:enumeration]", xs_ns
+      )
 
       puts "\n=== URO Enumeration Types ==="
       puts "  Enumeration types: #{enums.size}"
 
       if enums.any?
         sample = enums.first
-        enum_values = sample.xpath("xs:restriction/xs:enumeration", xs_ns).map { |e| e["value"] }
-        puts "  Sample enumeration: #{sample["name"]}"
-        puts "  Values: #{enum_values.join(", ")}"
+        enum_values = sample.xpath("xs:restriction/xs:enumeration",
+                                   xs_ns).map do |e|
+          e["value"]
+        end
+        puts "  Sample enumeration: #{sample['name']}"
+        puts "  Values: #{enum_values.join(', ')}"
       end
 
       expect(enums.size).to be > 0
@@ -123,7 +148,9 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       # Generate XSD
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
       results = generator.generate_schemas([namespace], output_dir)
       generated_file = results.first[:file]
@@ -131,7 +158,9 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       xs_ns = { "xs" => "http://www.w3.org/2001/XMLSchema" }
 
       # Check property types (ending with PropertyType)
-      property_types = generated.xpath("//xs:complexType[contains(@name, 'PropertyType')]", xs_ns)
+      property_types = generated.xpath(
+        "//xs:complexType[contains(@name, 'PropertyType')]", xs_ns
+      )
 
       puts "\n=== URO Property Types ==="
       puts "  Property types: #{property_types.size}"
@@ -148,7 +177,9 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       # Generate from LUR
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
       results = generator.generate_schemas([namespace], output_dir)
       expect(results).not_to be_empty
@@ -161,9 +192,17 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       xs_ns = { "xs" => "http://www.w3.org/2001/XMLSchema" }
 
       # Extract counts from generated XSD
-      gen_elements = generated.xpath("//xs:element[@name]", xs_ns).map { |e| e["name"] }.sort
-      gen_complex_types = generated.xpath("//xs:complexType[@name]", xs_ns).map { |e| e["name"] }.sort
-      gen_simple_types = generated.xpath("//xs:simpleType[@name]", xs_ns).map { |e| e["name"] }.sort
+      gen_elements = generated.xpath("//xs:element[@name]", xs_ns).map do |e|
+        e["name"]
+      end.sort
+      gen_complex_types = generated.xpath("//xs:complexType[@name]",
+                                          xs_ns).map do |e|
+        e["name"]
+      end.sort
+      gen_simple_types = generated.xpath("//xs:simpleType[@name]",
+                                         xs_ns).map do |e|
+        e["name"]
+      end.sort
 
       # Analyze generated content
       puts "\n=== URF Generation Summary ==="
@@ -193,12 +232,16 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       # Generate both packages
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
-      results = generator.generate_schemas(["uro", "urf"], output_dir)
+      results = generator.generate_schemas(%w[uro urf], output_dir)
 
       expect(results.size).to eq(2)
-      expect(results.map { |r| r[:file] }.all? { |f| File.exist?(f) }).to be true
+      expect(results.map do |r|
+        r[:file]
+      end.all? { |f| File.exist?(f) }).to be true
 
       puts "\n=== Generated Schemas ==="
       results.each do |result|
@@ -213,7 +256,9 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
     it "includes proper namespace declarations" do
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
       results = generator.generate_schemas([namespace], output_dir)
       generated_file = results.first[:file]
@@ -223,7 +268,8 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       expect(schema_elem).not_to be_nil
 
       target_ns = schema_elem["targetNamespace"]
-      expect(target_ns).to include("uro"), "Target namespace should include 'uro'"
+      expect(target_ns).to include("uro"),
+                           "Target namespace should include 'uro'"
 
       puts "\n=== Namespace Declarations ==="
       puts "  targetNamespace: #{target_ns}"
@@ -236,7 +282,9 @@ RSpec.describe "XSD Validation Against LXR Reference", type: :integration do
       skip "Documentation/annotation generation is a future enhancement"
       lur_adapter = Lutaml::Klin::Repositories::UmlRepositoryAdapter.new(lur_path)
       config = Lutaml::Klin::Shapechange::ConfigParser.new.parse_file(config_path)
-      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(lur_adapter.repository, config)
+      generator = Lutaml::Klin::Shapechange::XsdGenerator.new(
+        lur_adapter.repository, config
+      )
 
       results = generator.generate_schemas([namespace], output_dir)
       generated_file = results.first[:file]

@@ -39,11 +39,11 @@ RSpec.describe Lutaml::Klin::Mapping::SchemaMapping do
                     attr.min_occurs = "1"
                     attr.max_occurs = "1"
                     attr.namespace = "http://example.org/test"
-                  end,
+                  end
                 ]
-              end,
+              end
             ]
-          end,
+          end
         ]
       end
 

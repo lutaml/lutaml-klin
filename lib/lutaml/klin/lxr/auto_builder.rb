@@ -55,7 +55,9 @@ module Lutaml
           log("💾 Cached for future use: #{cached_path}")
 
           # Remove temporary file if it was created
-          File.unlink(lxr_path) if lxr_path != cached_path && File.exist?(lxr_path)
+          if lxr_path != cached_path && File.exist?(lxr_path)
+            File.unlink(lxr_path)
+          end
 
           cached_path
         rescue StandardError => e

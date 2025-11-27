@@ -21,9 +21,9 @@ module Lutaml
           attribute :schemas, SchemaInfo, collection: true, default: -> { [] }
           attribute :elements, Element, collection: true, default: -> { [] }
           attribute :complex_types, ComplexType, collection: true,
-                    default: -> { [] }
+                                                 default: -> { [] }
           attribute :simple_types, SimpleType, collection: true,
-                    default: -> { [] }
+                                               default: -> { [] }
           attribute :attributes, Attribute, collection: true, default: -> { [] }
           attribute :cross_references, CrossReferenceIndex
           attribute :search_index, SearchIndex

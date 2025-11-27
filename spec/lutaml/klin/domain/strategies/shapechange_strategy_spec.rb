@@ -63,7 +63,8 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::ShapeChangeMappingStrategy do
         allow(shapechange_config).to receive(:get_type_mapping)
           .with("CharacterString").and_return(mapping)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return({ local_name: "string", namespace: "http://www.w3.org/2001/XMLSchema" })
+                                                       .and_return({ local_name: "string",
+                                                                     namespace: "http://www.w3.org/2001/XMLSchema" })
 
         result = strategy.resolve(element, context: context)
 
@@ -80,7 +81,8 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::ShapeChangeMappingStrategy do
         allow(shapechange_config).to receive(:get_type_mapping)
           .with("CharacterString").and_return(mapping)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return({ local_name: "string", namespace: "http://www.w3.org/2001/XMLSchema" })
+                                                       .and_return({ local_name: "string",
+                                                                     namespace: "http://www.w3.org/2001/XMLSchema" })
 
         result = strategy.resolve(element, context: context)
 
@@ -93,7 +95,8 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::ShapeChangeMappingStrategy do
         allow(shapechange_config).to receive(:get_type_mapping)
           .with("CharacterString").and_return(mapping)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return({ local_name: "string", namespace: "http://www.w3.org/2001/XMLSchema" })
+                                                       .and_return({ local_name: "string",
+                                                                     namespace: "http://www.w3.org/2001/XMLSchema" })
 
         result = strategy.resolve(element, context: context)
 
@@ -106,7 +109,8 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::ShapeChangeMappingStrategy do
         allow(shapechange_config).to receive(:get_type_mapping)
           .with("CharacterString").and_return(mapping)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return({ local_name: "string", namespace: "http://www.w3.org/2001/XMLSchema" })
+                                                       .and_return({ local_name: "string",
+                                                                     namespace: "http://www.w3.org/2001/XMLSchema" })
 
         result = strategy.resolve(element, context: context)
 
@@ -150,7 +154,7 @@ RSpec.describe Lutaml::Klin::Domain::Strategies::ShapeChangeMappingStrategy do
         allow(shapechange_config).to receive(:get_type_mapping)
           .with("CharacterString").and_return(mapping)
         allow(xsd_repository).to receive(:resolve_type).with("xs:string")
-          .and_return(nil)
+                                                       .and_return(nil)
 
         result = strategy.resolve(element, context: context)
 

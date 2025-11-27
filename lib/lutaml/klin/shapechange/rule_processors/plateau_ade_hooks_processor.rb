@@ -47,11 +47,7 @@ module Lutaml
 
           def add_ade_hook_element(xsd_doc, prefix, uml_class, hook)
             # Determine the type to use
-            element_type = if hook[:type_override]
-                            hook[:type_override]
-                          else
-                            "#{prefix}:#{uml_class.name}PropertyType"
-                          end
+            element_type = hook[:type_override] || "#{prefix}:#{uml_class.name}PropertyType"
 
             # Add global element with substitutionGroup
             xsd_doc.add_element(
@@ -109,7 +105,9 @@ module Lutaml
 
             # Group by class name for quick lookup
             # A single class can have multiple hook elements
-            data["ade_hooks"].each_with_object(Hash.new { |h, k| h[k] = [] }) do |hook, hash|
+            data["ade_hooks"].each_with_object(Hash.new do |h, k|
+              h[k] = []
+            end) do |hook, hash|
               hash[hook["class"]] << {
                 element_name: hook["element_name"],
                 citygml_prefix: hook["citygml_prefix"],

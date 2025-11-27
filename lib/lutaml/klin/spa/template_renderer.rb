@@ -25,7 +25,10 @@ module Lutaml
         # @return [String] Rendered HTML
         def render_template(template_name, context = {})
           template_path = File.join(@template_dir, template_name)
-          raise TemplateNotFoundError, "Template not found: #{template_path}" unless File.exist?(template_path)
+          unless File.exist?(template_path)
+            raise TemplateNotFoundError,
+                  "Template not found: #{template_path}"
+          end
 
           template_content = File.read(template_path)
 
@@ -43,7 +46,10 @@ module Lutaml
         # @return [String] Rendered HTML
         def render_partial(partial_name, context = {})
           partial_path = File.join(@partials_dir, "#{partial_name}.liquid")
-          raise TemplateNotFoundError, "Partial not found: #{partial_path}" unless File.exist?(partial_path)
+          unless File.exist?(partial_path)
+            raise TemplateNotFoundError,
+                  "Partial not found: #{partial_path}"
+          end
 
           partial_content = File.read(partial_path)
 

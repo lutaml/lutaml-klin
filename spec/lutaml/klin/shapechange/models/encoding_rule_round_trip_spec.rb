@@ -2,7 +2,8 @@
 
 require "spec_helper"
 
-RSpec.describe Lutaml::Klin::Shapechange::EncodingRule, "Round-trip serialization" do
+RSpec.describe Lutaml::Klin::Shapechange::EncodingRule,
+               "Round-trip serialization" do
   describe "#to_xml and .from_xml" do
     it "round-trips encoding rule with lutaml-model" do
       # Create an encoding rule
@@ -10,13 +11,13 @@ RSpec.describe Lutaml::Klin::Shapechange::EncodingRule, "Round-trip serializatio
         name: "test_rule",
         extends: "iso19136_2007"
       )
-      original.rules = ["rule-xsd-cls-type", "rule-xsd-cls-object-element"]
+      original.rules = %w[rule-xsd-cls-type rule-xsd-cls-object-element]
 
       # Serialize to XML using lutaml-model's to_xml
       xml_output = original.to_xml
 
       # Verify XML structure
-      expect(xml_output).to include('<EncodingRule')
+      expect(xml_output).to include("<EncodingRule")
       expect(xml_output).to include('name="test_rule"')
       expect(xml_output).to include('extends="iso19136_2007"')
       expect(xml_output).to include('<rule name="rule-xsd-cls-type"')

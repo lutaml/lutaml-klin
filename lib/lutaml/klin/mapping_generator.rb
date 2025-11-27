@@ -14,7 +14,8 @@ module Lutaml
     # It generates YAML mappings showing how UML classes and attributes
     # map to XSD complex types and elements.
     class MappingGenerator
-      attr_reader :config, :xmi_navigator, :xsd_analyzers, :mapping, :type_overrides
+      attr_reader :config, :xmi_navigator, :xsd_analyzers, :mapping,
+                  :type_overrides
 
       # Initialize the mapping generator
       #
@@ -23,7 +24,8 @@ module Lutaml
       # @param xmi_navigator [XmiNavigator] Navigator for UML model
       # @param xsd_analyzers [Hash<String, XsdAnalyzer>] XSD analyzers by namespace
       # @param type_overrides [Hash<String, String>] Optional type override mappings
-      def initialize(config:, xmi_navigator:, xsd_analyzers:, type_overrides: nil)
+      def initialize(config:, xmi_navigator:, xsd_analyzers:,
+                     type_overrides: nil)
         @config = config
         @xmi_navigator = xmi_navigator
         @xsd_analyzers = xsd_analyzers
@@ -208,14 +210,14 @@ module Lutaml
       # 1. Type override mapping (e.g., "xs::string" -> "xs:string")
       # 2. ShapeChange type mapping cache
       # 3. Original type reference
-      def resolve_xsd_type(xsd_type_ref, xsd_analyzer)
+      def resolve_xsd_type(xsd_type_ref, _xsd_analyzer)
         return xsd_type_ref unless xsd_type_ref
 
         # Step 1: Apply type override if configured
         type_ref = @type_overrides[xsd_type_ref] || xsd_type_ref
 
         # Remove namespace prefix to get type name
-        type_name = type_ref.split(':').last
+        type_name = type_ref.split(":").last
 
         # Step 2: Check if this is a mapped type in ShapeChange config
         mapped = @type_mapping_cache[type_name]

@@ -14,7 +14,7 @@ module Lutaml
         end
 
         def run
-          puts "\n" + "=" * 70
+          puts "\n#{'=' * 70}"
           puts "  LUTAML-KLIN: XSD Schema Generator"
           puts "=" * 70
           puts ""
@@ -59,7 +59,7 @@ module Lutaml
             puts ""
           end
         rescue StandardError => e
-          puts "\n" + "=" * 70
+          puts "\n#{'=' * 70}"
           puts "  ❌  ERROR"
           puts "=" * 70
           puts ""

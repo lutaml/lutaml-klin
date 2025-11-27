@@ -102,11 +102,12 @@ module Lutaml
                 if min_occurs == max_occurs_int
                   xsd_doc.add_facet(restriction, "length", min_occurs.to_s)
                 else
-                  if min_occurs > 0
+                  if min_occurs.positive?
                     xsd_doc.add_facet(restriction, "minLength", min_occurs.to_s)
                   end
                   if max_occurs_int != Float::INFINITY
-                    xsd_doc.add_facet(restriction, "maxLength", max_occurs_int.to_s)
+                    xsd_doc.add_facet(restriction, "maxLength",
+                                      max_occurs_int.to_s)
                   end
                 end
               end
@@ -196,7 +197,7 @@ module Lutaml
             end
 
             def add_facets(restriction, xsd_doc, base_type, length, pattern,
-                          min_value, max_value)
+                           min_value, max_value)
               # Add totalDigits for numeric types with length
               if facet_supported?("totalDigits", base_type) && length
                 xsd_doc.add_facet(restriction, "totalDigits", length)
@@ -235,13 +236,13 @@ module Lutaml
 
                   # Check for map entry to determine type content
                   map_entry = find_map_entry(supertype.name, context)
-                  if map_entry
-                    # Use base from map entry if not specified
-                    base_type ||= map_entry[:type]
-                    # Always use content from map entry
-                    type_content = map_entry[:content] || "simple/simple"
-                    break
-                  end
+                  next unless map_entry
+
+                  # Use base from map entry if not specified
+                  base_type ||= map_entry[:type]
+                  # Always use content from map entry
+                  type_content = map_entry[:content] || "simple/simple"
+                  break
                 end
               end
 
@@ -257,7 +258,10 @@ module Lutaml
             end
 
             def find_base_from_supertypes(uml_class, context)
-              return [nil, "simple/simple"] unless uml_class.respond_to?(:generalizations)
+              unless uml_class.respond_to?(:generalizations)
+                return [nil,
+                        "simple/simple"]
+              end
               return [nil, "simple/simple"] unless uml_class.generalizations
 
               base_type = nil
@@ -342,9 +346,10 @@ module Lutaml
               tag&.value
             end
 
-            def type_name(uml_class, context)
+            def type_name(uml_class, _context)
               # Check if local-basictype rule applies for anonymous types
-              if rule_checker.applies?("rule-xsd-cls-local-basictype", uml_class)
+              if rule_checker.applies?("rule-xsd-cls-local-basictype",
+                                       uml_class)
                 nil # Anonymous type
               else
                 "#{uml_class.name}Type"

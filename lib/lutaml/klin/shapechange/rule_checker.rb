@@ -11,6 +11,13 @@ module Lutaml
           @encoding_rule = encoding_rule_name
         end
 
+        # Check if a rule is enabled in the current encoding rule
+        # @param rule_id [String] Rule identifier
+        # @return [Boolean] true if rule is enabled
+        def rule_enabled?(rule_id)
+          @registry.has_rule?(rule_id, @encoding_rule)
+        end
+
         # Check if a rule applies to a UML element
         # @param rule_id [String] Rule identifier
         # @param element [Object] UML element (class, property, package)
@@ -21,7 +28,7 @@ module Lutaml
 
           # 2. Check if rule definition exists
           rule_def = @registry.rule_definition(rule_id)
-          return true unless rule_def  # If no definition, assume applies
+          return true unless rule_def # If no definition, assume applies
 
           # 3. Check element-specific conditions
           applies_to_element?(rule_def, element)
@@ -38,7 +45,7 @@ module Lutaml
           when "package"
             applies_to_package?(rule_def, element)
           else
-            true  # Universal rules ("all" scope)
+            true # Universal rules ("all" scope)
           end
         end
 
@@ -50,14 +57,16 @@ module Lutaml
           return false unless uml_class.respond_to?(:stereotype)
 
           class_stereotypes = Array(uml_class.stereotype)
-          rule_def.applies_to.any? { |required| class_stereotypes.include?(required) }
+          rule_def.applies_to.any? do |required|
+            class_stereotypes.include?(required)
+          end
         end
 
-        def applies_to_property?(rule_def, uml_property)
+        def applies_to_property?(_rule_def, _uml_property)
           true  # Property rules typically check other conditions
         end
 
-        def applies_to_package?(rule_def, uml_package)
+        def applies_to_package?(_rule_def, _uml_package)
           true  # Package rules typically universal
         end
       end

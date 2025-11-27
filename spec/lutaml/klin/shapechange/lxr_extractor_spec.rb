@@ -61,14 +61,16 @@ RSpec.describe Lutaml::Klin::Shapechange::LxrExtractor do
       expect(xsd_files).not_to be_empty
 
       # Should extract files like "urbanFunction.xsd", "urbanObject.xsd"
-      expect(xsd_files.any? { |f| f.include?("urbanFunction") || f.include?("urbanObject") }).to be true
+      expect(xsd_files.any? do |f|
+        f.include?("urbanFunction") || f.include?("urbanObject")
+      end).to be true
     end
 
     it "extracts XSD files from XmlNamespace location attributes" do
       xsd_files = extractor.extract_xsd_files(config)
 
       # Should include XSD locations from namespace elements
-      expect(xsd_files.any? { |f| f.end_with?('.xsd') }).to be true
+      expect(xsd_files.any? { |f| f.end_with?(".xsd") }).to be true
     end
 
     it "returns unique XSD file paths" do
@@ -105,10 +107,14 @@ RSpec.describe Lutaml::Klin::Shapechange::LxrExtractor do
       uro_mapping = mappings.find { |m| m[:prefix]&.strip == "uro" }
 
       expect(urf_mapping).not_to be_nil
-      expect(urf_mapping[:uri]).to include("geospatial.jp/iur/urf") if urf_mapping
+      if urf_mapping
+        expect(urf_mapping[:uri]).to include("geospatial.jp/iur/urf")
+      end
 
       expect(uro_mapping).not_to be_nil
-      expect(uro_mapping[:uri]).to include("geospatial.jp/iur/uro") if uro_mapping
+      if uro_mapping
+        expect(uro_mapping[:uri]).to include("geospatial.jp/iur/uro")
+      end
     end
 
     it "includes mappings from XmlNamespace elements" do
@@ -166,7 +172,7 @@ RSpec.describe Lutaml::Klin::Shapechange::LxrExtractor do
       mappings.each do |mapping|
         # Local paths should be in reference-docs/xsd/ structure
         if mapping[:to]
-          expect(mapping[:to]).to match(/reference-docs\/xsd\/|\.xsd/)
+          expect(mapping[:to]).to match(%r{reference-docs/xsd/|\.xsd})
         end
       end
     end
@@ -180,7 +186,7 @@ RSpec.describe Lutaml::Klin::Shapechange::LxrExtractor do
       # Should be able to extract from parsed config
       xsd_files = extractor.extract_xsd_files(config)
       namespace_mappings = extractor.extract_namespace_mappings(config)
-      schema_location_mappings = extractor.extract_schema_location_mappings(config)
+      extractor.extract_schema_location_mappings(config)
 
       expect(xsd_files).not_to be_empty
       expect(namespace_mappings).not_to be_empty

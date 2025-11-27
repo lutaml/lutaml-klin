@@ -37,7 +37,9 @@ module Lutaml
         # Set rules from array of strings
         # @param rule_names [Array<String>] Rule names to set
         def rules=(rule_names)
-          self.rule_elements = rule_names&.map { |name| Rule.new(name: name) } || []
+          self.rule_elements = rule_names&.map do |name|
+            Rule.new(name: name)
+          end || []
         end
 
         # Check if this encoding rule includes a specific rule

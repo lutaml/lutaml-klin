@@ -16,7 +16,7 @@ RSpec.describe "Complete Workflow Integration", :integration do
   end
 
   after do
-    FileUtils.rm_rf(output_dir) if File.exist?(output_dir)
+    FileUtils.rm_rf(output_dir)
   end
 
   describe "minimal test model workflow" do
@@ -47,7 +47,7 @@ RSpec.describe "Complete Workflow Integration", :integration do
                                    name: "testAttr",
                                    type: "String",
                                    documentation: "Test attribute",
-                                   multiplicity: "1"),
+                                   multiplicity: "1")
                           ])
 
       allow(uml_repo).to receive(:find_package)
@@ -219,7 +219,7 @@ RSpec.describe "Complete Workflow Integration", :integration do
                                       name: "unresolvedAttr",
                                       type: "UnknownType",
                                       documentation: "Unresolvable",
-                                      multiplicity: "1"),
+                                      multiplicity: "1")
                              ])
 
       allow(uml_repo).to receive(:find_package)
@@ -239,12 +239,10 @@ RSpec.describe "Complete Workflow Integration", :integration do
 
       # Mock XSD repository - String resolves, UnknownType doesn't
       allow(xsd_repo).to receive(:find_type) do |type_name, _namespace|
-        if type_name == "String" || type_name == "string"
+        if %w[String string].include?(type_name)
           double("XsdType",
                  name: "string",
                  namespace: "http://www.w3.org/2001/XMLSchema")
-        else
-          nil
         end
       end
 

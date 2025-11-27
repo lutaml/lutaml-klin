@@ -197,7 +197,8 @@ RSpec.describe Lutaml::Klin::Shapechange::RuleProcessors::PropertyRules::Codelis
       end
 
       it "resolves containing class from property" do
-        result = processor.process(property_with_in_class, context_without_containing_class)
+        result = processor.process(property_with_in_class,
+                                   context_without_containing_class)
 
         expect(result[:applies]).to be true
       end
