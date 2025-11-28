@@ -133,9 +133,9 @@ module Lutaml
               
               # Store base type information
               if base_type
-                metadata = current_mapping.transformation_info.get_metadata
+                metadata = current_mapping.transformation_info.metadata_hash
                 metadata[:base_type] = base_type
-                current_mapping.transformation_info.set_metadata(metadata)
+                current_mapping.transformation_info.metadata_hash = metadata
               end
             end
           end
