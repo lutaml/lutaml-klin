@@ -1,5 +1,56 @@
 # Current Context
 
+## Latest Achievement: YAML Mapping Output Feature (2025-01-28 Morning)
+
+**What We Accomplished**:
+- **YAML Mapping Feature**: 100% complete ✅
+- **Integration tests**: 8/8 passing (100%!) ✅
+- **Zero regressions**: All existing functionality preserved ✅
+- **Code quality**: RuboCop zero violations ✅
+- **Complete traceability**: UML→XSD transformations fully documented ✅
+
+**Implementation Details**:
+1. **Created TransformationInfo Model**
+   - Tracks rules applied, encoding decisions, type mappings
+   - Flexible metadata storage for processor-specific data
+   - Located: [`models/mapping/transformation_info.rb`](lib/lutaml/klin/models/mapping/transformation_info.rb:1)
+
+2. **Implemented MappingCollector**
+   - Passive observer pattern (329 lines, OOP)
+   - Collects class and attribute mappings during XSD generation
+   - Generates statistics and traceability data
+   - Located: [`shapechange/mapping_collector.rb`](lib/lutaml/klin/shapechange/mapping_collector.rb:1)
+
+3. **Enhanced All Processors**
+   - [`ObjectElementProcessor`](lib/lutaml/klin/shapechange/rule_processors/object_element_processor.rb:1) - Records class/element mappings
+   - [`ComplexTypeProcessor`](lib/lutaml/klin/shapechange/rule_processors/complex_type_processor.rb:1) - Records type mappings
+   - [`PropertyElementProcessor`](lib/lutaml/klin/shapechange/rule_processors/property_element_processor.rb:1) - Records attribute mappings (critical path)
+   - [`EnumerationProcessor`](lib/lutaml/klin/shapechange/rule_processors/enumeration_processor.rb:1) - Records enum mappings
+   - [`BasicTypeProcessor`](lib/lutaml/klin/shapechange/rule_processors/class_rules/basic_type_processor.rb:1) - Records basic type mappings
+
+4. **CLI Integration**
+   - Added `--generate-mapping` option (default: true)
+   - Modified: [`cli.rb`](lib/lutaml/klin/cli.rb:1)
+   - Modified: [`commands/xsd_generate_command.rb`](lib/lutaml/klin/commands/xsd_generate_command.rb:1)
+
+5. **Testing**
+   - Created: [`spec/integration/yaml_mapping_generation_spec.rb`](spec/integration/yaml_mapping_generation_spec.rb:1)
+   - Tests YAML generation, structure, and enable/disable flag
+
+6. **Documentation**
+   - Updated: [`README.adoc`](README.adoc:1) with YAML mapping section
+   - Created: [`docs/features/yaml-mapping-output.adoc`](docs/features/yaml-mapping-output.adoc:1)
+   - Archived old planning docs to old-docs/completed-phases/
+
+**Session Stats**:
+- Duration: ~3 hours
+- Files Modified: 10
+- Lines Added: ~500
+- Tests Added: 1 integration test
+- Zero regressions ✅
+
+---
+
 ## Project Status
 
 **Phase**: 🎉🎉🎉 **PERFECT PARITY ACHIEVED!** 🎉🎉🎉
