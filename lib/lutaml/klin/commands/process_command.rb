@@ -35,6 +35,8 @@ module Lutaml
         # @option options [String] :type_overrides Path to type overrides YAML
         # @option options [Boolean] :generate_mappings Generate YAML mappings
         # @option options [Boolean] :generate_spa Generate SPA website
+        # @option options [String] :spa_template_type SPA template type (alpine/vanilla)
+        # @option options [String] :spa_data_mode SPA data mode (embedded/linked)
         # @option options [Boolean] :validate Generate validation reports
         # @option options [Boolean] :verbose Enable verbose output
         def initialize(options)
@@ -67,6 +69,7 @@ module Lutaml
             type_overrides_path: options[:type_overrides],
             generate_mappings: options.fetch(:generate_mappings, true),
             generate_spa: options.fetch(:generate_spa, true),
+            spa_template_type: (options[:spa_template_type] || "alpine").to_sym,
             spa_data_mode: (options[:spa_data_mode] || "embedded").to_sym,
             validate: options.fetch(:validate, true),
             verbose: options.fetch(:verbose, false)

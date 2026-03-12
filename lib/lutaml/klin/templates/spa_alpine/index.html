@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UML-XSD Mapping Browser</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  
+  <!-- Alpine.js CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <!-- Prism.js for XML syntax highlighting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
+  
+  <!-- Embedded Data - No CORS issues with file:// protocol -->
+  <script id="embedded-data">
+    // Data will be injected here by SPA generator
+    window.MAPPING_DATA = %{MAPPINGS_JSON};
+    window.SEARCH_INDEX = %{SEARCH_INDEX_JSON};
+    window.STATISTICS = %{STATISTICS_JSON};
+  </script>
+</head>
+<body>
+  <div id="app" x-data="mappingBrowser" x-cloak>
+    <header>
+      <h1>📋 UML-XSD Mapping Browser</h1>
+      <div class="search-container">
+        <input 
+          type="text" 
+          x-model="searchQuery"
+          @input.debounce.300ms="handleSearch()"
+          placeholder="Search packages, classes, attributes..." 
+          autocomplete="off" 
+          aria-label="Search">
+        
+        <!-- Search Results Dropdown -->
+        <div 
+          x-show="searchResults.length > 0"
+          @click.outside="searchResults = []"
+          class="search-results"
+          role="listbox" 
+          aria-label="Search results">
+          <template x-for="result in searchResults" :key="result.id">
+            <div 
+              class="search-result-item"
+              @click="navigateToResult(result.type, result.id)"
+              role="option">
+              <strong x-text="result.title"></strong>
+              <span class="type-badge" x-text="result.type"></span>
+              <span 
+                :class="getStatusClass(result.resolution_status)" 
+                x-text="getStatusBadge(result.resolution_status)"
+                x-show="result.resolution_status"></span>
+              <div class="result-subtitle" x-text="result.qualified_name"></div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar">
+        <section>
+          <h2>📦 Packages</h2>
+          <div id="package-tree" role="tree">
+            <template x-for="pkg in filteredPackages" :key="pkg.id">
+              <div>
+                <div 
+                  class="package-item"
+                  :class="{ 'expanded': isPackageExpanded(pkg.id) }"
+                  @click="togglePackage(pkg.id)"
+                  role="treeitem"
+                  :aria-expanded="isPackageExpanded(pkg.id)">
+                  <span x-text="isPackageExpanded(pkg.id) ? '📂' : '📁'"></span>
+                  <span x-text="pkg.name"></span>
+                  <span class="count" x-text="pkg.classes ? pkg.classes.length : 0"></span>
+                </div>
+                
+                <!-- Classes List -->
+                <div
+                  x-show="isPackageExpanded(pkg.id)"
+                  class="class-list"
+                  role="group">
+                  <template x-for="cls in getPackageClasses(pkg.id)" :key="cls.id">
+                    <div
+                      class="class-item"
+                      :class="{ 'active': currentClassId === cls.id }"
+                      @click.stop="showClass(cls.id)"
+                      role="treeitem">
+                      <span
+                        :class="getStatusClass(cls.resolution_status)"
+                        x-text="getStatusBadge(cls.resolution_status)"></span>
+                      <span x-text="cls.uml_name"></span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+        </section>
+
+        <section>
+          <h2>🔍 Filters</h2>
+          <div class="filters">
+            <label>
+              <input type="checkbox" x-model="activeFilters.resolved" aria-label="Show resolved items">
+              <span class="badge-resolved">✓</span> Resolved
+            </label>
+            <label>
+              <input type="checkbox" x-model="activeFilters.partial" aria-label="Show partially resolved items">
+              <span class="badge-partial">⚠</span> Partial
+            </label>
+            <label>
+              <input type="checkbox" x-model="activeFilters.unresolved" aria-label="Show unresolved items">
+              <span class="badge-unresolved">✗</span> Unresolved
+            </label>
+          </div>
+        </section>
+
+        <section>
+          <h2>📊 Statistics</h2>
+          <div class="stats-summary" x-show="statistics">
+            <p>
+              <strong>Packages</strong>
+              <span x-text="statistics?.summary?.total_packages || 0"></span>
+            </p>
+            <p>
+              <strong>Classes</strong>
+              <span>
+                <span x-text="statistics?.summary?.resolved_classes || 0"></span>/<span x-text="statistics?.summary?.total_classes || 0"></span>
+              </span>
+            </p>
+            <p>
+              <strong>Attributes</strong>
+              <span>
+                <span x-text="statistics?.summary?.resolved_attributes || 0"></span>/<span x-text="statistics?.summary?.total_attributes || 0"></span>
+              </span>
+            </p>
+            <p>
+              <strong>Resolution</strong>
+              <span 
+                :style="{ color: getResolutionColor(statistics?.summary?.resolution_rate || 0) }"
+                x-text="(statistics?.summary?.resolution_rate || 0).toFixed(1) + '%'"></span>
+            </p>
+          </div>
+        </section>
+      </aside>
+
+      <main class="content">
+        <nav id="breadcrumb" aria-label="Breadcrumb">
+          <template x-for="(item, index) in breadcrumbs" :key="index">
+            <span>
+              <template x-if="index === breadcrumbs.length - 1">
+                <span x-text="item.name"></span>
+              </template>
+              <template x-if="index < breadcrumbs.length - 1">
+                <span>
+                  <a :href="item.url" x-text="item.name"></a>
+                  <span class="separator">›</span>
+                </span>
+              </template>
+            </span>
+          </template>
+        </nav>
+
+        <!-- Welcome View -->
+        <div x-show="currentView === 'welcome'" class="welcome">
+          <h2>Welcome to UML-XSD Mapping Browser</h2>
+          <p>Select a package or class from the tree on the left to view mapping details.</p>
+          <p>Use the search bar above to quickly find specific elements.</p>
+        </div>
+
+        <!-- Package View -->
+        <div x-show="currentView === 'package' && currentPackage">
+          <h2>📦 <span x-text="currentPackage?.name"></span></h2>
+          
+          <div class="detail-section">
+            <h3>Package Information</h3>
+            <div class="detail-row">
+              <div class="detail-label">Qualified Name:</div>
+              <div class="detail-value"><code x-text="currentPackage?.qualified_name"></code></div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Namespace:</div>
+              <div class="detail-value"><code x-text="currentPackage?.namespace"></code></div>
+            </div>
+            <template x-if="currentPackage?.namespace_prefix">
+              <div class="detail-row">
+                <div class="detail-label">Prefix:</div>
+                <div class="detail-value"><code x-text="currentPackage?.namespace_prefix"></code></div>
+              </div>
+            </template>
+            <template x-if="currentPackage?.schema_location">
+              <div class="detail-row">
+                <div class="detail-label">Schema Location:</div>
+                <div class="detail-value"><code x-text="currentPackage?.schema_location"></code></div>
+              </div>
+            </template>
+          </div>
+          
+          <h3>Classes (<span x-text="getPackageClasses(currentPackageId).length"></span>)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>UML Name</th>
+                <th>XSD Type</th>
+                <th>Method</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="cls in getPackageClasses(currentPackageId)" :key="cls.id">
+                <tr @click="showClass(cls.id)" style="cursor: pointer;">
+                  <td>
+                    <span
+                      :class="getStatusClass(cls.resolution_status)"
+                      x-text="getStatusBadge(cls.resolution_status)"></span>
+                  </td>
+                  <td><strong x-text="cls.uml_name"></strong></td>
+                  <td><code x-text="cls.xsd_type_name || 'N/A'"></code></td>
+                  <td x-text="cls.resolution_method || 'N/A'"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Class View -->
+        <div x-show="currentView === 'class' && currentClass">
+          <h2>
+            <span 
+              :class="getStatusClass(currentClass?.resolution_status)"
+              x-text="getStatusBadge(currentClass?.resolution_status)"></span>
+            <span x-text="currentClass?.uml_name"></span>
+          </h2>
+          
+          <div class="detail-section">
+            <h3>Class Information</h3>
+            <div class="detail-row">
+              <div class="detail-label">Qualified Name:</div>
+              <div class="detail-value"><code x-text="currentClass?.uml_qualified_name || 'N/A'"></code></div>
+            </div>
+            <template x-if="currentClass?.uml_stereotype">
+              <div class="detail-row">
+                <div class="detail-label">Stereotype:</div>
+                <div class="detail-value"><code x-text="currentClass?.uml_stereotype"></code></div>
+              </div>
+            </template>
+            <template x-if="currentClass?.uml_documentation">
+              <div class="detail-row">
+                <div class="detail-label">UML Documentation:</div>
+                <div class="detail-value" x-text="currentClass?.uml_documentation"></div>
+              </div>
+            </template>
+          </div>
+          
+          <!-- Schema Selector (Multi-Schema Mode) -->
+          <div x-show="currentClass?.schemas && currentClass.schemas.length > 1" class="schema-selector">
+            <h3>📊 Compare Schemas:</h3>
+            <div class="schema-tabs" role="tablist">
+              <template x-for="(schema, index) in currentClass?.schemas" :key="index">
+                <button
+                  class="schema-tab"
+                  :class="{ 'active': selectedSchemaIndex === index }"
+                  @click="selectedSchemaIndex = index"
+                  role="tab"
+                  :aria-selected="selectedSchemaIndex === index"
+                  x-text="schema.schema_name">
+                </button>
+              </template>
+            </div>
+          </div>
+          
+          <!-- Multi-Schema Details -->
+          <template x-if="currentClass?.schemas && currentClass.schemas.length > 0">
+            <template x-for="(schema, index) in currentClass.schemas" :key="index">
+              <div x-show="selectedSchemaIndex === index" class="schema-content">
+                <div class="detail-section">
+                  <h3>XSD Mapping - <span x-text="schema.schema_name"></span></h3>
+                  <div class="detail-row">
+                    <div class="detail-label">XSD Namespace:</div>
+                    <div class="detail-value"><code x-text="schema.xsd_namespace || 'N/A'"></code></div>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-label">XSD Element:</div>
+                    <div class="detail-value"><code x-text="schema.xsd_element_name || 'N/A'"></code></div>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-label">XSD Type:</div>
+                    <div class="detail-value"><code x-text="schema.xsd_type_name || 'N/A'"></code></div>
+                  </div>
+                </div>
+                
+                <div class="detail-section">
+                  <h3>Resolution Details</h3>
+                  <div class="detail-row">
+                    <div class="detail-label">Status:</div>
+                    <div class="detail-value">
+                      <span
+                        :class="getStatusClass(schema.resolution_status)"
+                        x-text="getStatusBadge(schema.resolution_status)"></span>
+                      <span x-text="schema.resolution_status"></span>
+                    </div>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-label">Method:</div>
+                    <div class="detail-value" x-text="schema.resolution_method || 'N/A'"></div>
+                  </div>
+                </div>
+                
+                <!-- XML Instance for this schema -->
+                <div class="detail-section xml-instance-section" x-show="schema.xml_instance">
+                  <h3>📄 XML Instance Example</h3>
+                  <p class="xml-description">Sample XML for <strong x-text="schema.schema_name"></strong> schema:</p>
+                  <pre class="xml-preview"><code class="language-markup" x-text="schema.xml_instance" x-init="$nextTick(() => Prism && Prism.highlightElement($el))"></code></pre>
+                </div>
+              </div>
+            </template>
+          </template>
+          
+          <!-- Single-Schema Details (Backward Compatible) -->
+          <template x-if="!currentClass?.schemas || currentClass.schemas.length === 0">
+            <div>
+              <div class="detail-section">
+                <h3>XSD Mapping</h3>
+                <div class="detail-row">
+                  <div class="detail-label">XSD Namespace:</div>
+                  <div class="detail-value"><code x-text="currentClass?.xsd_namespace || 'N/A'"></code></div>
+                </div>
+                <div class="detail-row">
+                  <div class="detail-label">XSD Element:</div>
+                  <div class="detail-value"><code x-text="currentClass?.xsd_element_name || 'N/A'"></code></div>
+                </div>
+                <div class="detail-row">
+                  <div class="detail-label">XSD Type:</div>
+                  <div class="detail-value"><code x-text="currentClass?.xsd_type_name || 'N/A'"></code></div>
+                </div>
+              </div>
+              
+              <div class="detail-section">
+                <h3>Resolution Details</h3>
+                <div class="detail-row">
+                  <div class="detail-label">Status:</div>
+                  <div class="detail-value">
+                    <span
+                      :class="getStatusClass(currentClass?.resolution_status)"
+                      x-text="getStatusBadge(currentClass?.resolution_status)"></span>
+                    <span x-text="currentClass?.resolution_status"></span>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <div class="detail-label">Method:</div>
+                  <div class="detail-value" x-text="currentClass?.resolution_method || 'N/A'"></div>
+                </div>
+              </div>
+              
+              <h3>Attributes (<span x-text="getClassAttributes(currentClass).length"></span>)</h3>
+              <template x-if="getClassAttributes(currentClass).length > 0">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Status</th>
+                      <th>UML Name</th>
+                      <th>UML Type</th>
+                      <th>XSD Type</th>
+                      <th>Multiplicity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="attr in getClassAttributes(currentClass)" :key="attr.uml_name">
+                      <template>
+                        <tr>
+                          <td>
+                            <span
+                              :class="getStatusClass(attr.resolution_status)"
+                              x-text="getStatusBadge(attr.resolution_status)"></span>
+                          </td>
+                          <td><strong x-text="attr.uml_name"></strong></td>
+                          <td><code x-text="attr.uml_type || 'N/A'"></code></td>
+                          <td><code x-text="attr.xsd_type || 'N/A'"></code></td>
+                          <td x-text="attr.uml_multiplicity || '1'"></td>
+                        </tr>
+                        <tr x-show="attr.resolution_error" class="error-row">
+                          <td colspan="5">
+                            <strong>Error:</strong> <span x-text="attr.resolution_error"></span>
+                          </td>
+                        </tr>
+                      </template>
+                    </template>
+                  </tbody>
+                </table>
+              </template>
+              <template x-if="getClassAttributes(currentClass).length === 0">
+                <p>No attributes defined.</p>
+              </template>
+              
+              <!-- XML Instance Example -->
+              <div class="detail-section xml-instance-section" x-show="currentClass?.xml_instance">
+                <h3>📄 XML Instance Example</h3>
+                <p class="xml-description">Sample XML showing UML-to-XSD mappings with inline comments:</p>
+                <pre class="xml-preview"><code class="language-markup" x-text="currentClass?.xml_instance" x-init="$nextTick(() => Prism && Prism.highlightElement($el))"></code></pre>
+              </div>
+            </div>
+          </template>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

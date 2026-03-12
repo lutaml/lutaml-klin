@@ -1,180 +1,139 @@
 # frozen_string_literal: true
 
-require_relative "../spa/generator"
+require_relative "../application/spa_workflow"
 
 module Lutaml
   module Klin
     module Commands
-      # CLI command for SPA (Single Page Application) generation
-      # Provides user-friendly interface to Generator class
+      # Command to generate SPA from existing mapping file
+      # Implements Process 3 in the standard workflow
       class SpaCommand
         attr_reader :options
 
         # @param options [Hash] Command options
-        # @option options [String] :lxr Path to LXR package file
-        # @option options [String] :yaml Path to YAML mapping file (optional)
-        # @option options [String] :output Output path (file or directory)
-        # @option options [Symbol, String] :mode Output mode (:embedded or :multi_file)
-        # @option options [String] :theme UI theme (default, dark, plateau)
-        # @option options [String] :title Custom website title
-        # @option options [String] :template_dir Custom template directory
-        # @option options [String] :assets_dir Custom assets directory
+        # @option options [Array<String>, String] :mapping Path(s) to mapping YAML file(s)
+        # @option options [String] :output Output directory path
+        # @option options [String] :template_type Template type (alpine/vanilla)
+        # @option options [String] :data_mode Data mode (embedded/linked)
+        # @option options [String] :title Custom SPA title (optional)
         # @option options [Boolean] :verbose Enable verbose output
         def initialize(options = {})
-          @options = normalize_options(options)
-          validate_options!
+          @options = options
         end
 
-        # Execute SPA generation command
+        # Execute the spa command
         # @return [void]
         def run
-          generator = Spa::Generator.new(
-            mode: @options[:mode]&.to_sym || :multi_file,
-            theme: @options[:theme] || "default",
-            title: @options[:title],
-            template_dir: @options[:template_dir],
-            assets_dir: @options[:assets_dir],
-            verbose: @options[:verbose]
+          validate_options!
+
+          log_header
+          log_config
+
+          workflow = Application::SpaWorkflow.new
+
+          # Convert single mapping to array for uniform handling
+          mapping_files = Array(options[:mapping])
+
+          output_path = workflow.generate_spa_from_files(
+            mapping_file_paths: mapping_files,
+            output_path: options[:output],
+            template_type: options[:template_type]&.to_sym || :alpine,
+            data_mode: options[:data_mode]&.to_sym || :embedded,
+            title: options[:title]
           )
 
-          schema = generator.generate(
-            @options[:lxr],
-            @options[:yaml],
-            @options[:output]
-          )
-
-          report_success(schema)
+          log_success(output_path)
+        rescue ArgumentError => e
+          error("Invalid input: #{e.message}")
+          exit(1)
         rescue StandardError => e
-          report_error(e)
-          raise
+          error("SPA generation failed: #{e.message}")
+          error(e.backtrace.join("\n")) if verbose?
+          exit(1)
         end
 
         private
 
-        # Normalize options to use symbol keys
-        # @param options [Hash] Raw options
-        # @return [Hash] Normalized options
-        def normalize_options(options)
-          return {} unless options
-
-          if options.respond_to?(:to_h)
-            options.to_h.transform_keys(&:to_sym)
-          else
-            options
-          end
-        end
-
         # Validate command options
-        # @raise [ArgumentError] If options are invalid
+        # @raise [ArgumentError] if options are invalid
         def validate_options!
-          unless @options[:lxr]
-            raise ArgumentError, "--lxr (LXR package path) is required"
+          unless options[:mapping]
+            raise ArgumentError, "Mapping file path is required (--mapping)"
           end
 
-          unless File.exist?(@options[:lxr])
-            raise ArgumentError, "LXR package not found: #{@options[:lxr]}"
+          unless options[:output]
+            raise ArgumentError, "Output directory is required (--output)"
           end
 
-          if @options[:yaml] && !File.exist?(@options[:yaml])
-            raise ArgumentError, "YAML mapping not found: #{@options[:yaml]}"
+          # Validate all mapping files exist
+          mapping_files = Array(options[:mapping])
+          mapping_files.each do |file|
+            unless File.exist?(file)
+              raise ArgumentError, "Mapping file not found: #{file}"
+            end
           end
-
-          validate_mode if @options[:mode]
-          validate_theme if @options[:theme]
         end
 
-        # Validate mode option
-        # @raise [ArgumentError] If mode is invalid
-        def validate_mode
-          valid_modes = %w[embedded multi-file multi_file]
-          mode_str = @options[:mode].to_s.tr("_", "-")
+        # Display command header
+        def log_header
+          return unless verbose?
 
-          return if valid_modes.include?(mode_str)
-
-          raise ArgumentError,
-                "Invalid mode: #{@options[:mode]}. " \
-                "Must be 'embedded' or 'multi-file'"
+          puts "\n#{'=' * 70}"
+          puts "  LUTAML-KLIN: Generate SPA from Mapping"
+          puts "=" * 70
+          puts ""
         end
 
-        # Validate theme option
-        # @raise [ArgumentError] If theme is invalid
-        def validate_theme
-          valid_themes = %w[default dark plateau]
-          return if valid_themes.include?(@options[:theme])
-
-          raise ArgumentError,
-                "Invalid theme: #{@options[:theme]}. " \
-                "Must be one of: #{valid_themes.join(', ')}"
-        end
-
-        # Report successful generation
-        # @param schema [Spa::Models::UnifiedSchema] Generated schema
-        def report_success(schema)
-          puts "\n✓ SPA generated successfully"
-          puts "  Mode: #{display_mode}"
-          puts "  Output: #{@options[:output] || default_output}"
-          puts "  Schemas: #{schema.schemas.size}"
-          puts "  Total components: #{total_components(schema)}"
-
-          return unless @options[:yaml]
-
-          mapped_count = count_mapped_components(schema)
-          puts "  UML-mapped components: #{mapped_count}"
-        end
-
-        # Report generation error
-        # @param error [Exception] Error that occurred
-        def report_error(error)
-          puts "\n✗ SPA generation failed"
-          puts "  Error: #{error.message}"
-          puts "  #{error.backtrace.first}" if @options[:verbose]
-        end
-
-        # Get display mode string
-        # @return [String] Mode for display
-        def display_mode
-          mode = @options[:mode]&.to_s || "multi-file"
-          mode.tr("_", "-")
-        end
-
-        # Get default output path
-        # @return [String] Default output
-        def default_output
-          if @options[:mode]&.to_sym == :embedded
-            "spa_output.html"
+        # Display configuration
+        def log_config
+          mapping_files = Array(options[:mapping])
+          
+          if mapping_files.size == 1
+            puts "Generating SPA from mapping file..."
+            puts "  Mapping: #{mapping_files.first}"
           else
-            "spa_output/"
+            puts "Generating multi-schema SPA from #{mapping_files.size} mapping files..."
+            mapping_files.each_with_index do |file, idx|
+              puts "  Mapping #{idx + 1}: #{file}"
+            end
           end
+          
+          puts "  Output: #{options[:output]}"
+          puts "  Template: #{options[:template_type] || 'alpine'}"
+          puts "  Data Mode: #{options[:data_mode] || 'embedded'}"
+          puts ""
         end
 
-        # Count total components in schema
-        # @param schema [Spa::Models::UnifiedSchema] Schema
-        # @return [Integer] Total component count
-        def total_components(schema)
-          schema.elements.size +
-            schema.complex_types.size +
-            schema.simple_types.size +
-            schema.attributes.size
+        # Display success message
+        # @param output_path [String] Generated SPA path
+        def log_success(output_path)
+          puts ""
+          puts "=" * 70
+          puts "✅ SPA Generated Successfully!"
+          puts "=" * 70
+          puts ""
+          puts "Output: #{output_path}"
+
+          index_path = File.expand_path(File.join(output_path, "index.html"))
+          puts ""
+          puts "Open in browser:"
+          puts "  file://#{index_path}"
+          puts ""
+          puts "Or use:"
+          puts "  open #{index_path}"
+          puts ""
         end
 
-        # Count UML-mapped components
-        # @param schema [Spa::Models::UnifiedSchema] Schema
-        # @return [Integer] Mapped component count
-        def count_mapped_components(schema)
-          count = 0
-          count += schema.elements.count do |e|
-            e.respond_to?(:uml_mapping) && e.uml_mapping
-          end
-          count += schema.complex_types.count do |t|
-            t.respond_to?(:uml_mapping) && t.uml_mapping
-          end
-          count += schema.simple_types.count do |t|
-            t.respond_to?(:uml_mapping) && t.uml_mapping
-          end
-          count += schema.attributes.count do |a|
-            a.respond_to?(:uml_mapping) && a.uml_mapping
-          end
-          count
+        # Display error message
+        # @param message [String] Error message
+        def error(message)
+          warn "ERROR: #{message}"
+        end
+
+        # Check if verbose mode is enabled
+        # @return [Boolean]
+        def verbose?
+          options[:verbose] == true
         end
       end
     end

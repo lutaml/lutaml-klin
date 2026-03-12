@@ -4,6 +4,10 @@
 
 The SPA (Single Page Application) Generator creates an interactive, self-contained website for browsing and exploring UML-to-XSD mappings. The generated SPA is a pure HTML/CSS/JavaScript application that works offline and requires no build step or server-side processing.
 
+Lutaml-Klin provides two SPA template types:
+- **Alpine.js template** (default): Modern reactive UI with declarative components
+- **Vanilla JS template**: Traditional DOM manipulation for maximum compatibility
+
 ## Features
 
 - **📦 Package Tree Navigation**: Hierarchical view of all packages with expand/collapse
@@ -15,6 +19,116 @@ The SPA (Single Page Application) Generator creates an interactive, self-contain
 - **📱 Responsive Design**: Works on desktop, tablet, and mobile devices
 - **♿ Accessibility**: ARIA labels and keyboard navigation support
 - **🌙 Dark Mode**: Automatic dark mode based on user preferences
+
+## Template Types
+
+### Alpine.js Template (Recommended)
+
+The Alpine.js template uses [Alpine.js](https://alpinejs.dev/) for reactive UI components.
+
+**Advantages**:
+- Declarative syntax (easier to read and maintain)
+- Reactive updates (automatic UI synchronization)
+- Smaller codebase (~300 lines vs ~700 lines of JavaScript)
+- Modern JavaScript patterns
+- Better performance for large datasets
+
+**Architecture**:
+- Single Alpine.js component (`mappingBrowser`)
+- Reactive state management with `x-data`
+- Computed properties for derived state (`currentPackage`, `filteredPackages`)
+- Event-driven navigation with `@click`
+- Hash-based routing via `window.location.hash`
+
+**Usage (Ruby API)**:
+```ruby
+workflow = Lutaml::Klin::Application::SpaWorkflow.new
+workflow.generate_spa(
+  schema_mapping,
+  output_path,
+  template_type: :alpine  # Default
+)
+```
+
+**Usage (CLI)**:
+```bash
+lutaml-klin process \
+  --lur model.lur \
+  --lxr schemas.lxr \
+  --config config.xml \
+  --packages "**" \
+  --output output/ \
+  --spa \
+  --spa-template-type alpine
+```
+
+### Vanilla JavaScript Template
+
+The vanilla JavaScript template uses no external dependencies.
+
+**Advantages**:
+- Zero dependencies
+- Maximum browser compatibility (including IE11)
+- Works in restricted environments
+- Traditional patterns (familiar to all developers)
+
+**Architecture**:
+- Class-based JavaScript (`MappingBrowserApp`)
+- Manual DOM manipulation with `createElement`, `appendChild`
+- Explicit state management with instance variables
+- Event listeners attached manually
+
+**Usage (Ruby API)**:
+```ruby
+workflow = Lutaml::Klin::Application::SpaWorkflow.new
+workflow.generate_spa(
+  schema_mapping,
+  output_path,
+  template_type: :vanilla
+)
+```
+
+**Usage (CLI)**:
+```bash
+lutaml-klin process \
+  --lur model.lur \
+  --lxr schemas.lxr \
+  --config config.xml \
+  --packages "**" \
+  --output output/ \
+  --spa \
+  --spa-template-type vanilla
+```
+
+### Template Selection Guidelines
+
+**Choose Alpine.js when**:
+- Building new SPAs (recommended default)
+- Want modern reactive patterns
+- Prefer declarative code
+- Need better maintainability
+- Working with large datasets
+
+**Choose Vanilla JS when**:
+- External dependencies not allowed in your environment
+- Maximum browser compatibility required (IE11 support)
+- Team unfamiliar with Alpine.js
+- Integration with existing vanilla JS codebase
+- File size is absolutely critical (<100KB including all assets)
+
+### Template Comparison
+
+| Feature | Alpine.js | Vanilla JS |
+|---------|-----------|------------|
+| **Code Size** | ~300 lines JS | ~700 lines JS |
+| **Approach** | Declarative | Imperative |
+| **Reactivity** | Automatic | Manual |
+| **DOM Updates** | Automatic | Manual `createElement` |
+| **Dependencies** | Alpine.js CDN (~15KB) | None |
+| **Maintainability** | Easier | More effort |
+| **Browser Support** | Modern browsers | All browsers (incl. IE11) |
+| **Learning Curve** | Low (if familiar with Vue/Angular) | Very low |
+| **Performance** | Optimized reactivity | Direct DOM access |
 
 ## Architecture
 

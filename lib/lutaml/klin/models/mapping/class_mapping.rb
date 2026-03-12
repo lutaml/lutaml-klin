@@ -37,6 +37,10 @@ module Lutaml
         # Transformation tracking (XSD generation metadata)
         attribute :transformation_info, TransformationInfo
 
+        # Multi-schema support: array of schema-specific mappings
+        # Used when merging multiple schema mappings for SPA generation
+        attribute :schemas, :string, collection: true, default: -> { [] }
+
         yaml do
           map "uml_name", to: :uml_name
           map "uml_package", to: :uml_package
@@ -55,6 +59,7 @@ module Lutaml
           map "resolution_confidence", to: :resolution_confidence
           map "attribute_mappings", to: :attribute_mappings
           map "transformation_info", to: :transformation_info
+          map "schemas", to: :schemas
         end
 
         # Check if the class mapping and all its attributes are fully resolved

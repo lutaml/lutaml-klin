@@ -2,7 +2,9 @@
 
 require "json"
 require "fileutils"
+require "yaml"
 require_relative "../domain/services/spa_generator"
+require_relative "../models/mapping/schema_mapping"
 
 module Lutaml
   module Klin
@@ -34,7 +36,10 @@ module Lutaml
         attr_reader :spa_generator
 
         # Template directory path (relative to this file)
-        TEMPLATE_DIR = File.expand_path("../../templates/spa", __dir__)
+        TEMPLATE_DIR = File.expand_path("../templates/spa", __dir__)
+        
+        # Alpine.js template directory path
+        TEMPLATE_DIR_ALPINE = File.expand_path("../templates/spa_alpine", __dir__)
 
         # Initialize the SPA workflow
         #
@@ -42,6 +47,148 @@ module Lutaml
         def initialize(spa_generator: nil)
           @spa_generator = spa_generator ||
                            Domain::Services::SpaGenerator.new
+        end
+
+        # Generate a complete SPA from a mapping file
+        #
+        # This is the main entry point for Process 3 in the standard workflow.
+        # It loads a pre-generated mapping YAML file and generates an SPA
+        # without recomputing the mapping.
+        #
+        # @param mapping_file_path [String] Path to mapping YAML file
+        # @param output_path [String] Output directory path
+        # @param template_type [Symbol] :alpine (default) or :vanilla
+        # @param data_mode [Symbol] :embedded (default) or :linked
+        # @param title [String, nil] Optional custom title
+        # @return [String] Path to the generated SPA directory
+        #
+        # @raise [ArgumentError] if file not found or invalid
+        # @raise [RuntimeError] if generation fails
+        #
+        # @example Generate SPA from mapping file
+        #   workflow = SpaWorkflow.new
+        #   workflow.generate_spa_from_file(
+        #     mapping_file_path: "urbanObject_mapping.yaml",
+        #     output_path: "spa/",
+        #     template_type: :alpine
+        #   )
+        def generate_spa_from_file(
+          mapping_file_path:,
+          output_path:,
+          template_type: :alpine,
+          data_mode: :embedded,
+          title: nil
+        )
+          # 1. Validate file exists
+          unless File.exist?(mapping_file_path)
+            raise ArgumentError, "Mapping file not found: #{mapping_file_path}"
+          end
+
+          # 2. Load YAML
+          require "yaml"
+          mapping_yaml = File.read(mapping_file_path)
+
+          # 3. Parse to SchemaMapping
+          begin
+            schema_mapping = Lutaml::Klin::Mapping::SchemaMapping.from_yaml(mapping_yaml)
+          rescue StandardError => e
+            raise ArgumentError, "Invalid mapping file: #{e.message}"
+          end
+
+          # 4. Validate mapping has data
+          if schema_mapping.package_mappings.nil? ||
+             schema_mapping.package_mappings.empty?
+            raise ArgumentError,
+                  "Mapping file contains no package mappings"
+          end
+
+          # 5. Call existing generate_spa() method
+          options = {
+            template_type: template_type,
+            data_mode: data_mode
+          }
+          options[:title] = title if title
+
+          generate_spa(schema_mapping, output_path, options)
+        end
+
+        # Generate SPA from multiple mapping files (multi-schema comparison)
+        #
+        # This method enables side-by-side comparison of UML-to-XSD mappings
+        # across different schemas (e.g., URO vs URF). It merges mappings by
+        # UML qualified name, creating a unified view where each class can show
+        # mappings to multiple XSD schemas.
+        #
+        # @param mapping_file_paths [Array<String>] Paths to mapping YAML files
+        # @param output_path [String] Output directory path
+        # @param template_type [Symbol] :alpine (default) or :vanilla
+        # @param data_mode [Symbol] :embedded (default) or :linked
+        # @param title [String, nil] Optional custom title
+        # @return [String] Path to generated SPA directory
+        #
+        # @raise [ArgumentError] if files not found or invalid
+        # @raise [RuntimeError] if generation fails
+        #
+        # @example Generate multi-schema SPA
+        #   workflow = SpaWorkflow.new
+        #   workflow.generate_spa_from_files(
+        #     mapping_file_paths: ["uro_mapping.yaml", "urf_mapping.yaml"],
+        #     output_path: "spa/",
+        #     template_type: :alpine
+        #   )
+        def generate_spa_from_files(
+          mapping_file_paths:,
+          output_path:,
+          template_type: :alpine,
+          data_mode: :embedded,
+          title: nil
+        )
+          # Handle single file case - delegate to existing method
+          if mapping_file_paths.size == 1
+            return generate_spa_from_file(
+              mapping_file_path: mapping_file_paths.first,
+              output_path: output_path,
+              template_type: template_type,
+              data_mode: data_mode,
+              title: title
+            )
+          end
+
+          # Multi-file case: load and merge mappings
+          # 1. Validate all files exist
+          mapping_file_paths.each do |path|
+            unless File.exist?(path)
+              raise ArgumentError, "Mapping file not found: #{path}"
+            end
+          end
+
+          # 2. Load all SchemaMapping objects with metadata
+          schema_mappings = mapping_file_paths.map do |path|
+            yaml_content = File.read(path)
+            
+            begin
+              mapping = Lutaml::Klin::Mapping::SchemaMapping.from_yaml(yaml_content)
+            rescue StandardError => e
+              raise ArgumentError, "Invalid mapping file #{path}: #{e.message}"
+            end
+
+            # Extract schema name from file or mapping metadata
+            schema_name = extract_schema_name(path, mapping)
+
+            { name: schema_name, mapping: mapping, path: path }
+          end
+
+          # 3. Merge mappings by UML class qualified name
+          merged_mapping = merge_schema_mappings(schema_mappings)
+
+          # 4. Generate SPA with merged data
+          options = {
+            template_type: template_type,
+            data_mode: data_mode
+          }
+          options[:title] = title if title
+
+          generate_spa(merged_mapping, output_path, options)
         end
 
         # Generate a complete SPA for the given schema mapping
@@ -58,6 +205,7 @@ module Lutaml
         # @option options [String] :title Custom title for the SPA
         # @option options [String] :description Custom description
         # @option options [Symbol] :data_mode :embedded (default) or :linked
+        # @option options [Symbol] :template_type :alpine (default) or :vanilla
         # @return [String] Path to the generated SPA directory
         #
         # @raise [RuntimeError] if generation fails
@@ -67,8 +215,12 @@ module Lutaml
         #
         # @example Generate with linked data (requires HTTP server)
         #   workflow.generate_spa(mapping, "_site", data_mode: :linked)
+        #
+        # @example Generate with vanilla JS template
+        #   workflow.generate_spa(mapping, "_site", template_type: :vanilla)
         def generate_spa(schema_mapping, output_path = "_site", options = {})
-          # Default to embedded mode for better out-of-the-box experience
+          # Default to Alpine.js template and embedded mode
+          options[:template_type] ||= :alpine
           options[:data_mode] ||= :embedded
 
           # 1. Create directory structure
@@ -154,7 +306,9 @@ module Lutaml
         # @param data_files [Hash] Generated data structures
         # @param options [Hash] Generation options
         def generate_assets(output_path, data_files, options)
-          if templates_exist?
+          template_type = options[:template_type] || :alpine
+          
+          if templates_exist?(template_type)
             copy_templates(output_path, data_files, options)
           else
             generate_minimal_assets(output_path, data_files, options)
@@ -163,40 +317,70 @@ module Lutaml
 
         # Check if template files exist
         #
+        # @param template_type [Symbol] Template type to check
         # @return [Boolean] true if template directory exists
-        def templates_exist?
-          File.directory?(TEMPLATE_DIR)
+        def templates_exist?(template_type = :alpine)
+          template_dir = select_template_directory(template_type)
+          template_directory_exists?(template_dir)
+        end
+
+        # Select template directory based on type
+        #
+        # @param template_type [Symbol] :alpine or :vanilla
+        # @return [String] Path to template directory
+        def select_template_directory(template_type)
+          case template_type.to_sym
+          when :alpine
+            TEMPLATE_DIR_ALPINE
+          when :vanilla
+            TEMPLATE_DIR
+          else
+            TEMPLATE_DIR_ALPINE # Default to Alpine.js
+          end
+        end
+
+        # Check if template directory exists and has required files
+        #
+        # @param template_dir [String] Path to template directory
+        # @return [Boolean] true if directory exists with index.html
+        def template_directory_exists?(template_dir)
+          Dir.exist?(template_dir) &&
+            File.exist?(File.join(template_dir, "index.html"))
         end
 
         # Copy template files to output directory and inject data
         #
         # @param output_path [String] Base output path
         # @param data_files [Hash] Generated data structures
-        # @param options [Hash] Options (e.g., title, data_mode)
+        # @param options [Hash] Options (e.g., title, data_mode, template_type)
         def copy_templates(output_path, data_files, options)
+          # Select template directory based on type
+          template_type = options[:template_type] || :alpine
+          template_dir = select_template_directory(template_type)
+          
           # Read template HTML
-          template_html = File.read(File.join(TEMPLATE_DIR, "index.html"))
+          template_html = File.read(File.join(template_dir, "index.html"))
 
           # Inject data based on mode
           html_with_data = if options[:data_mode] == :embedded
             # Embedded mode - inject JSON directly into HTML
             template_html
-                             .gsub("%<MAPPINGS_JSON>s", JSON.generate(data_files[:mappings]))
-                             .gsub("%<SEARCH_INDEX_JSON>s", JSON.generate(data_files[:search_index]))
-                             .gsub("%<STATISTICS_JSON>s", JSON.generate(data_files[:statistics]))
+                             .gsub("%{MAPPINGS_JSON}", JSON.generate(data_files[:mappings]))
+                             .gsub("%{SEARCH_INDEX_JSON}", JSON.generate(data_files[:search_index]))
+                             .gsub("%{STATISTICS_JSON}", JSON.generate(data_files[:statistics]))
           else
             # Linked mode - use empty placeholders, load from files
             template_html
-                             .gsub("%<MAPPINGS_JSON>s", "{}")
-                             .gsub("%<SEARCH_INDEX_JSON>s", "{}")
-                             .gsub("%<STATISTICS_JSON>s", "{}")
+                             .gsub("%{MAPPINGS_JSON}", "{}")
+                             .gsub("%{SEARCH_INDEX_JSON}", "{}")
+                             .gsub("%{STATISTICS_JSON}", "{}")
                            end
 
           # Write HTML
           File.write(File.join(output_path, "index.html"), html_with_data)
 
           # Copy CSS
-          css_source = File.join(TEMPLATE_DIR, "assets", "css", "style.css")
+          css_source = File.join(template_dir, "assets", "css", "style.css")
           if File.exist?(css_source)
             FileUtils.cp(
               css_source,
@@ -205,7 +389,7 @@ module Lutaml
           end
 
           # Copy JavaScript
-          js_source = File.join(TEMPLATE_DIR, "assets", "js", "app.js")
+          js_source = File.join(template_dir, "assets", "js", "app.js")
           return unless File.exist?(js_source)
 
           FileUtils.cp(
@@ -681,6 +865,172 @@ module Lutaml
         # @param data [Hash] Data to write
         def write_json_file(path, data)
           File.write(path, JSON.pretty_generate(data))
+        end
+
+        # Extract schema name from filename or mapping metadata
+        #
+        # @param file_path [String] Path to mapping file
+        # @param mapping [SchemaMapping] The schema mapping object
+        # @return [String] Schema name (e.g., "URO", "URF")
+        def extract_schema_name(file_path, mapping)
+          # Try to get from mapping metadata (package name)
+          if mapping.package_mappings&.first&.uml_name
+            return mapping.package_mappings.first.uml_name
+          end
+
+          # Fall back to filename parsing
+          basename = File.basename(file_path, ".*")
+          
+          # urbanObject_mapping.yaml → URO
+          # urbanFunction_mapping.yaml → URF
+          if basename.include?("Object")
+            "URO"
+          elsif basename.include?("Function")
+            "URF"
+          else
+            # Generic case: use first part before underscore, uppercase
+            basename.split("_").first.upcase
+          end
+        end
+
+        # Merge multiple schema mappings into one with multi-schema support
+        #
+        # This method combines mappings from multiple schemas by UML qualified
+        # name, creating a unified structure where each class has schema variants.
+        #
+        # @param schema_mappings [Array<Hash>] Array of {name:, mapping:, path:}
+        # @return [SchemaMapping] Merged schema mapping with multi-schema data
+        def merge_schema_mappings(schema_mappings)
+          # Start with first mapping as base
+          base_mapping = schema_mappings.first[:mapping]
+
+          # Create merged mapping structure
+          merged = Lutaml::Klin::Mapping::SchemaMapping.new(
+            version: base_mapping.version,
+            generated_at: Time.now.utc.iso8601,
+            source_lur: base_mapping.source_lur,
+            source_lxr: base_mapping.source_lxr,
+            source_config: base_mapping.source_config
+          )
+
+          # Build lookup table: qualified_name => {schema_name => data}
+          class_lookup = Hash.new { |h, k| h[k] = {} }
+
+          schema_mappings.each do |schema_data|
+            schema_name = schema_data[:name]
+            mapping = schema_data[:mapping]
+
+            mapping.package_mappings.each do |pkg|
+              (pkg.class_mappings || []).each do |cls|
+                qualified_name = cls.uml_qualified_name ||
+                                 "#{pkg.uml_package_name}::#{cls.uml_name}"
+
+                class_lookup[qualified_name][schema_name] = {
+                  class_mapping: cls,
+                  package_mapping: pkg
+                }
+              end
+            end
+          end
+
+          # Create merged package mappings
+          merged.package_mappings = []
+
+          # Group by package name
+          package_groups = {}
+          class_lookup.each do |qualified_name, schemas|
+            # Get package name from first schema
+            first_pkg = schemas.values.first[:package_mapping]
+            pkg_name = first_pkg.uml_package_name
+
+            package_groups[pkg_name] ||= {
+              package_info: first_pkg,
+              classes: {}
+            }
+
+            package_groups[pkg_name][:classes][qualified_name] = schemas
+          end
+
+          # Build merged packages
+          package_groups.each do |pkg_name, data|
+            pkg_info = data[:package_info]
+
+            merged_pkg = Lutaml::Klin::Mapping::PackageMapping.new(
+              uml_name: pkg_info.uml_name,
+              uml_package_name: pkg_info.uml_package_name,
+              xsd_namespace: pkg_info.xsd_namespace,
+              xsd_namespace_prefix: pkg_info.xsd_namespace_prefix,
+              created_at: Time.now.utc.iso8601
+            )
+
+            # Build merged classes with multi-schema data
+            merged_pkg.class_mappings = data[:classes].map do |qualified_name, schemas|
+              create_multi_schema_class(qualified_name, schemas)
+            end
+
+            merged.package_mappings << merged_pkg
+          end
+
+          merged
+        end
+
+        # Create a ClassMapping with multiple schema variants
+        #
+        # For multi-schema SPAs, we store schema-specific XSD mappings as
+        # serialized YAML in the schemas attribute. This preserves all
+        # mapping details while maintaining backward compatibility.
+        #
+        # @param qualified_name [String] UML qualified name
+        # @param schemas [Hash] Hash of schema_name => {class_mapping:, package_mapping:}
+        # @return [ClassMapping] Merged class mapping with schemas array
+        def create_multi_schema_class(qualified_name, schemas)
+          # Use first schema as base for UML data
+          first_schema = schemas.values.first
+          base_class = first_schema[:class_mapping]
+
+          # Create new class mapping with base UML data
+          merged_class = Lutaml::Klin::Mapping::ClassMapping.new(
+            uml_name: base_class.uml_name,
+            uml_qualified_name: qualified_name,
+            uml_stereotype: base_class.uml_stereotype,
+            uml_documentation: base_class.uml_documentation
+          )
+
+          # Store multi-schema metadata as YAML strings
+          # (lutaml-model doesn't support nested hashes, so we serialize)
+          merged_class.schemas = schemas.map do |schema_name, data|
+            cls = data[:class_mapping]
+            
+            # Build schema metadata hash
+            schema_data = {
+              "schema_name" => schema_name,
+              "xsd_namespace" => cls.xsd_namespace,
+              "xsd_element_name" => cls.xsd_element_name,
+              "xsd_type_name" => cls.xsd_type_name,
+              "xsd_documentation" => cls.xsd_documentation,
+              "resolution_status" => cls.resolution_status,
+              "resolution_method" => cls.resolution_method,
+              "resolution_confidence" => cls.resolution_confidence,
+              "attribute_mappings" => (cls.attribute_mappings || []).map do |attr|
+                {
+                  "uml_name" => attr.uml_name,
+                  "uml_type" => attr.uml_type,
+                  "uml_multiplicity" => attr.uml_multiplicity,
+                  "xsd_name" => attr.xsd_name,
+                  "xsd_type" => attr.xsd_type,
+                  "xsd_min_occurs" => attr.xsd_min_occurs,
+                  "xsd_max_occurs" => attr.xsd_max_occurs,
+                  "resolution_status" => attr.resolution_status,
+                  "resolution_method" => attr.resolution_method
+                }
+              end
+            }
+            
+            # Serialize to YAML for storage
+            schema_data.to_yaml
+          end
+
+          merged_class
         end
       end
     end

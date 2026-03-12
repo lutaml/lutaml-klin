@@ -299,6 +299,15 @@ module Lutaml
             --output output/ \\
             --type-overrides overrides.yaml
 
+          # Use vanilla JavaScript template instead of Alpine.js
+          lutaml-klin process \\
+            --lur model.lur \\
+            --lxr schemas.lxr \\
+            --config config.xml \\
+            --packages "**" \\
+            --spa-template-type vanilla \\
+            --output output/
+
           # Verbose mode shows cache hits/misses
           lutaml-klin process \\
             --lur model.lur \\
@@ -328,6 +337,8 @@ module Lutaml
                                  desc: "Generate YAML mappings"
       option :generate_spa, type: :boolean, default: true,
                             desc: "Generate SPA website"
+      option :spa_template_type, default: "alpine",
+                                 desc: "SPA template type: alpine (default) or vanilla"
       option :spa_data_mode, default: "embedded",
                              desc: "SPA data mode: embedded or linked"
       option :validate, type: :boolean, default: true,
@@ -482,58 +493,81 @@ module Lutaml
         exit 1
       end
 
-      desc "spa OUTPUT",
-           "Generate interactive HTML documentation from LXR package"
+      desc "spa", "Generate SPA from mapping file(s)"
       long_desc <<~DESC
-        Generate an Enhanced HTML Single Page Application (SPA) for XSD schema documentation.
+        Generate an interactive Single Page Application (SPA) for browsing
+        UML-to-XSD mappings from one or more pre-existing mapping YAML files.
 
-        Modes:
-        1. Multi-file (default): Separate HTML, CSS, JS, and JSON files
-           lutaml-klin spa docs/ --lxr schemas.lxr
+        This is Process 3 in the standard workflow:
+          1. Generate XSD + Mapping (lutaml-klin xsd)
+          2. Create Complete LXR (lutaml-xsd package composition)
+          3. Generate SPA (lutaml-klin spa) ← This command
 
-        2. Embedded: Single HTML file with inlined assets
-           lutaml-klin spa schema.html --lxr schemas.lxr --mode embedded
+        The SPA provides:
+        - Interactive package tree navigation
+        - Real-time search across classes and attributes
+        - Resolution status filtering
+        - Deep linking support
+        - Responsive design for desktop and mobile
 
-        With PLATEAU UML mapping:
-           lutaml-klin spa uro_docs/ --lxr plateau.lxr --yaml mappings/uro.yaml --theme plateau
+        Multi-Schema Support:
+        - When multiple --mapping files are provided, the SPA shows how
+          the same UML model maps to different XSD schemas side-by-side
+        - Perfect for comparing URO vs URF schemas, different versions, etc.
+
+        Template Types:
+        - Alpine.js (default): Modern reactive UI with automatic updates
+        - Vanilla JS: Traditional JavaScript with zero dependencies
 
         Examples:
-          # Generate multi-file SPA
-          lutaml-klin spa docs/ --lxr plateau_schemas.lxr
+          # Single schema (basic usage)
+          lutaml-klin spa \\
+            --mapping urbanObject_mapping.yaml \\
+            --output spa/
 
-          # Generate with UML traceability
-          lutaml-klin spa docs/ --lxr plateau.lxr --yaml mappings/uro.yaml --theme plateau
+          # Multi-schema comparison (URO + URF)
+          lutaml-klin spa \\
+            --mapping urbanObject_mapping.yaml \\
+            --mapping urbanFunction_mapping.yaml \\
+            --output spa/
 
-          # Generate single embedded HTML file
-          lutaml-klin spa schema.html --lxr schemas.lxr --mode embedded
+          # Generate with vanilla JavaScript template
+          lutaml-klin spa \\
+            --mapping urbanObject_mapping.yaml \\
+            --output spa/ \\
+            --template-type vanilla
 
-          # Custom theme and verbose output
-          lutaml-klin spa docs/ --lxr schemas.lxr --theme dark --verbose
+          # With custom title
+          lutaml-klin spa \\
+            --mapping urbanObject_mapping.yaml \\
+            --mapping urbanFunction_mapping.yaml \\
+            --output spa/ \\
+            --title "PLATEAU URO vs URF Comparison"
+
+          # For HTTP server deployment (linked data)
+          lutaml-klin spa \\
+            --mapping urbanObject_mapping.yaml \\
+            --output spa/ \\
+            --data-mode linked
       DESC
-      option :lxr, type: :string, required: true,
-                   desc: "Path to LXR (XSD Schema Repository) package"
-      option :yaml, type: :string,
-                    desc: "Path to YAML mapping file (adds UML traceability)"
-      option :mode, type: :string, default: "multi-file",
-                    enum: %w[multi-file embedded],
-                    desc: "Output mode: multi-file or embedded"
-      option :theme, type: :string, default: "default",
-                     enum: %w[default dark plateau],
-                     desc: "UI theme"
+      option :mapping, type: :array, required: true,
+                       desc: "Path(s) to mapping YAML file(s) - specify multiple times for multi-schema comparison"
+      option :output, type: :string, required: true,
+                      desc: "Output directory for SPA"
+      option :template_type, type: :string, default: "alpine",
+                             enum: %w[alpine vanilla],
+                             desc: "SPA template type (alpine or vanilla)"
+      option :data_mode, type: :string, default: "embedded",
+                         enum: %w[embedded linked],
+                         desc: "Data mode (embedded for file://, linked for http://)"
       option :title, type: :string,
-                     desc: "Custom website title"
-      option :include_stats, type: :boolean, default: true,
-                             desc: "Include repository statistics"
-      option :template_dir, type: :string,
-                            desc: "Custom template directory"
-      option :assets_dir, type: :string,
-                          desc: "Custom assets directory"
-      def spa(output_path)
-        command = Commands::SpaCommand.new(options.merge(output: output_path))
+                     desc: "Custom SPA title (optional)"
+      def spa
+        command = Commands::SpaCommand.new(options)
         command.run
       rescue StandardError => e
         say "Error: #{e.message}", :red
-        say e.backtrace.first, :red if options[:verbose]
+        say e.backtrace.first(5).join("\n"), :red if options[:verbose]
         exit 1
       end
 

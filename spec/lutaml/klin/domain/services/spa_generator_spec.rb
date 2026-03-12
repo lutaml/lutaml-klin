@@ -67,46 +67,59 @@ RSpec.describe Lutaml::Klin::Domain::Services::SpaGenerator do
 
     it "generates a valid mappings JSON structure" do
       expect(result).to be_a(Hash)
-      expect(result[:version]).to eq("1.0")
-      expect(result[:generated_at]).to eq("2024-01-01T00:00:00Z")
-      expect(result[:packages]).to be_an(Array)
+      expect(result[:metadata]).to be_a(Hash)
+      expect(result[:metadata][:version]).to eq("1.0")
+      expect(result[:metadata][:generated_at]).to eq("2024-01-01T00:00:00Z")
+      expect(result[:packages]).to be_a(Hash)
       expect(result[:packages].size).to eq(1)
+      expect(result[:classes]).to be_a(Hash)
+      expect(result[:attributes]).to be_a(Hash)
     end
 
     it "includes package details" do
-      pkg = result[:packages].first
+      pkg = result[:packages].values.first
       expect(pkg[:name]).to eq("TestPackage")
       expect(pkg[:qualified_name]).to eq("Model::TestPackage")
       expect(pkg[:namespace]).to eq("http://example.org/test")
       expect(pkg[:namespace_prefix]).to eq("test")
+      expect(pkg[:classes]).to be_an(Array)
+      expect(pkg[:classes].size).to eq(1)
     end
 
     it "includes class details" do
-      cls = result[:packages].first[:classes].first
-      expect(cls[:uml_name]).to eq("TestClass")
-      expect(cls[:uml_qualified_name]).to eq("Model::TestPackage::TestClass")
-      expect(cls[:uml_stereotype]).to eq("FeatureType")
-      expect(cls[:uml_documentation]).to eq("A test class")
+      cls = result[:classes].values.first
+      expect(cls[:name]).to eq("TestClass")
+      expect(cls[:qualified_name]).to eq("Model::TestPackage::TestClass")
+      expect(cls[:stereotype]).to eq("FeatureType")
+      expect(cls[:definition]).to eq("A test class")
       expect(cls[:xsd_type_name]).to eq("test:TestClassType")
       expect(cls[:resolution_status]).to eq("resolved")
       expect(cls[:resolution_method]).to eq("shapechange")
       expect(cls[:resolution_confidence]).to eq(0.95)
+      expect(cls[:attributes]).to be_an(Array)
+      expect(cls[:attributes].size).to eq(1)
+      expect(cls[:xml_instance]).to be_a(String)
     end
 
     it "includes attribute details" do
-      attr = result[:packages].first[:classes].first[:attributes].first
-      expect(attr[:uml_name]).to eq("testAttribute")
+      attr = result[:attributes].values.first
+      expect(attr[:name]).to eq("testAttribute")
       expect(attr[:uml_type]).to eq("CharacterString")
       expect(attr[:xsd_type]).to eq("xs:string")
       expect(attr[:resolution_status]).to eq("resolved")
+      expect(attr[:xsd_min_occurs]).to eq("1")
+      expect(attr[:xsd_max_occurs]).to eq("1")
     end
 
     it "generates stable IDs" do
-      pkg_id = result[:packages].first[:id]
+      pkg_id = result[:packages].keys.first
       expect(pkg_id).to match(/^pkg_/)
 
-      cls_id = result[:packages].first[:classes].first[:id]
+      cls_id = result[:classes].keys.first
       expect(cls_id).to match(/^class_/)
+
+      attr_id = result[:attributes].keys.first
+      expect(attr_id).to match(/^attr_/)
     end
   end
 
@@ -189,7 +202,9 @@ RSpec.describe Lutaml::Klin::Domain::Services::SpaGenerator do
 
       it "generates valid empty structures" do
         mappings = generator.generate_mappings_json(schema_mapping)
-        expect(mappings[:packages]).to eq([])
+        expect(mappings[:packages]).to eq({})
+        expect(mappings[:classes]).to eq({})
+        expect(mappings[:attributes]).to eq({})
 
         search_index = generator.generate_search_index(schema_mapping)
         expect(search_index[:index]).to eq([])
@@ -204,6 +219,7 @@ RSpec.describe Lutaml::Klin::Domain::Services::SpaGenerator do
         Lutaml::Klin::Mapping::ClassMapping.new.tap do |cm|
           cm.uml_name = "PartialClass"
           cm.uml_qualified_name = "Model::PartialClass"
+          cm.xsd_element_name = "PartialClass"
           cm.resolution_status = "partial"
           cm.resolution_method = "shapechange"
           cm.attribute_mappings = []
@@ -212,7 +228,7 @@ RSpec.describe Lutaml::Klin::Domain::Services::SpaGenerator do
 
       it "includes partial resolution status" do
         result = generator.generate_mappings_json(schema_mapping)
-        cls = result[:packages].first[:classes].first
+        cls = result[:classes].values.first
         expect(cls[:resolution_status]).to eq("partial")
       end
     end
@@ -223,6 +239,7 @@ RSpec.describe Lutaml::Klin::Domain::Services::SpaGenerator do
           cm.uml_name = "NilClass"
           cm.uml_qualified_name = nil
           cm.uml_stereotype = nil
+          cm.xsd_element_name = nil
           cm.xsd_type_name = nil
           cm.resolution_status = "unresolved"
           cm.attribute_mappings = []
@@ -231,10 +248,11 @@ RSpec.describe Lutaml::Klin::Domain::Services::SpaGenerator do
 
       it "handles nil values gracefully" do
         result = generator.generate_mappings_json(schema_mapping)
-        cls = result[:packages].first[:classes].first
-        expect(cls[:uml_qualified_name]).to be_nil
-        expect(cls[:uml_stereotype]).to be_nil
+        cls = result[:classes].values.first
+        expect(cls[:qualified_name]).to include("NilClass")
+        expect(cls[:stereotype]).to be_nil
         expect(cls[:xsd_type_name]).to be_nil
+        expect(cls[:xml_instance]).to be_nil
       end
     end
   end

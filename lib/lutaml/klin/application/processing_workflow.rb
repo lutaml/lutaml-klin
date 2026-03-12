@@ -81,6 +81,10 @@ module Lutaml
         # @param generate_mappings [Boolean] Generate YAML mappings
         #   (default: true)
         # @param generate_spa [Boolean] Generate SPA website (default: true)
+        # @param spa_template_type [Symbol] SPA template type :alpine or :vanilla
+        #   (default: :alpine)
+        # @param spa_data_mode [Symbol] SPA data mode :embedded or :linked
+        #   (default: :embedded)
         # @param validate [Boolean] Generate validation reports (default: true)
         # @param verbose [Boolean] Enable verbose output (default: false)
         # @return [Domain::ProcessingResult] The processing result
@@ -90,7 +94,7 @@ module Lutaml
                     package_filter: "**", output_path: "_site",
                     type_overrides_path: nil,
                     generate_mappings: true, generate_spa: true,
-                    spa_data_mode: :embedded,
+                    spa_template_type: :alpine, spa_data_mode: :embedded,
                     validate: true, verbose: false)
           start_time = Time.now
 
@@ -192,6 +196,7 @@ module Lutaml
             spa_path = generate_spa_site(
               schema_mapping,
               output_path,
+              template_type: spa_template_type,
               data_mode: spa_data_mode
             )
             output_paths[:spa] = spa_path
@@ -426,15 +431,18 @@ module Lutaml
         #
         # @param schema_mapping [Mapping::SchemaMapping] The schema mapping
         # @param output_path [String] Base output directory
+        # @param template_type [Symbol] Template type: :alpine or :vanilla
         # @param data_mode [Symbol] Data mode: :embedded or :linked
         # @return [String] Path to SPA directory
-        def generate_spa_site(schema_mapping, output_path, data_mode: :embedded)
+        def generate_spa_site(schema_mapping, output_path,
+                              template_type: :alpine, data_mode: :embedded)
           workflow = SpaWorkflow.new
 
           spa_dir = File.join(output_path, "spa")
           workflow.generate_spa(
             schema_mapping,
             spa_dir,
+            template_type: template_type,
             data_mode: data_mode
           )
         end

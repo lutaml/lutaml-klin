@@ -42,7 +42,7 @@ Lutaml-Klin follows a clean 4-layer architecture with strict separation of conce
 ----
 ┌────────────────────────────────────────────────────────────┐
 │  Input: Pre-built Packages (Built Once, Used Many Times)   │
-│                                                             │
+│                                                            │
 │  LUR Package (.lur)     LXR Package (.lxr)                 │
 │  UML Model from XMI     XSD Schemas                        │
 │  Built by: lutaml       Built by: lutaml-xsd               │
@@ -52,7 +52,7 @@ Lutaml-Klin follows a clean 4-layer architecture with strict separation of conce
                             ▼
 ┌────────────────────────────────────────────────────────────┐
 │  lutaml-klin: Pure Orchestration (No Parsing!)             │
-│                                                             │
+│                                                            │
 │  1. Load LUR → UmlRepository API                           │
 │  2. Load LXR → SchemaRepository API                        │
 │  3. Load ShapeChange Config                                │
@@ -62,8 +62,8 @@ Lutaml-Klin follows a clean 4-layer architecture with strict separation of conce
                             │
                             ▼
 ┌────────────────────────────────────────────────────────────┐
-│  Output: Three Formats                                      │
-│                                                             │
+│  Output: Three Formats                                     │
+│                                                            │
 │  ├─ YAML Mappings (per package)                            │
 │  ├─ Validation Reports (JSON/Markdown)                     │
 │  └─ SPA Website (Interactive HTML/JS)                      │
@@ -74,8 +74,8 @@ Lutaml-Klin follows a clean 4-layer architecture with strict separation of conce
 [source]
 ----
 ┌──────────────────────────────────────────────────────┐
-│           Type Resolution Strategies                  │
-│          (Ordered by Priority)                        │
+│           Type Resolution Strategies                 │
+│          (Ordered by Priority)                       │
 └──────────────────────────────────────────────────────┘
                         │
         ┌───────────────┼───────────────┐
@@ -91,13 +91,13 @@ Lutaml-Klin follows a clean 4-layer architecture with strict separation of conce
      └──────────────────┴──────────────────┘
                         │
                         ▼
-              ┌──────────────────┐
+              ┌───────────────────┐
               │ Resolution Result │
               │  - Status         │
               │  - Method         │
               │  - Confidence     │
               │  - Metadata       │
-              └──────────────────┘
+              └───────────────────┘
 ----
 
 For detailed architecture documentation, see link:MAPPING_WORKFLOW_ARCHITECTURE.md[Mapping Workflow Architecture].
@@ -1004,8 +1004,40 @@ The interactive SPA website provides:
 * **Filtering**: Filter by resolution status, package, stereotype
 * **Navigation**: Browse package hierarchy
 * **Details view**: See complete mapping details for each class
+* **XML Instance Examples**: Sample XML for each class showing UML attribute mappings with inline comments
 * **Statistics dashboard**: Overall resolution statistics
 * **Export capability**: Download filtered results as JSON
+
+==== XML Instance Examples
+
+Each class detail page includes an automatically generated XML instance example that shows:
+
+* Complete XML structure for the class
+* Inline comments mapping each element to its UML attribute
+* Sample values demonstrating the XSD data types
+* Accurate cardinality (minOccurs/maxOccurs) for each element
+
+.Example XML instance with mapping comments
+[example]
+====
+[source,xml]
+----
+<!-- UML: Building::buildingID : CharacterString [0..1] -->
+<!-- XSD: buildingID : xs:string (minOccurs=0, maxOccurs=1) -->
+<uro:buildingID>Sample buildingID 1</uro:buildingID>
+
+<!-- UML: Building::class : CodeType [0..1] -->
+<!-- XSD: class : gml:CodeType (minOccurs=0, maxOccurs=1) -->
+<uro:class>Sample class 1</uro:class>
+
+<!-- UML: Building::function : CodeType [0..*] -->
+<!-- XSD: function : gml:CodeType (minOccurs=0, maxOccurs=unbounded) -->
+<uro:function>Sample function 1</uro:function>
+<uro:function>Sample function 2</uro:function>
+----
+
+These examples are displayed with syntax highlighting using Prism.js, making it easy to understand the UML-to-XSD transformation for each class.
+====
 
 [[examples]]
 == Examples
@@ -1368,33 +1400,265 @@ UML Type: "CharacterString"
 === General
 
 The SPA (Single Page Application) generator creates an interactive website for
-exploring UML-XSD mappings.
+exploring UML-XSD mappings. Two template types are available:
+
+* **Alpine.js template** (recommended): Reactive, declarative UI with improved maintainability
+* **Vanilla JS template** (legacy): Traditional DOM manipulation for maximum compatibility
 
 === Features
 
 * **Responsive design**: Works on desktop and mobile
-* **Search**: Full-text search across all mappings
+* **Search**: Full-text search with debouncing across all mappings
 * **Filtering**: Filter by package, stereotype, resolution status
-* **Navigation**: Tree view of package hierarchy
+* **Navigation**: Tree view of package hierarchy with expand/collapse
 * **Details**: Complete mapping details with resolution metadata
-* **Statistics**: Real-time resolution statistics
-* **Export**: Download filtered results as JSON or YAML
+* **XML Instance Examples**: Sample XML for each class showing UML↔XSD mappings with inline comments
+* **Syntax Highlighting**: Color-coded XML with Prism.js for improved readability
+* **Statistics**: Real-time resolution statistics dashboard
+* **Hash-based routing**: Deep linking support for packages and classes
+* **Accessibility**: Full ARIA attributes for screen readers
+* **Dark mode**: Automatic dark mode support via CSS media queries
 
-=== Customization
+=== CLI Usage
 
-The SPA can be customized through options:
+==== Alpine.js Template (Recommended)
+
+The Alpine.js template provides a modern, reactive UI with declarative data binding:
+
+[source,shell]
+----
+lutaml-klin process \
+  --lur model.lur \
+  --lxr schemas.lxr \
+  --config config.xml \
+  --packages "**" \
+  --output output/ \
+  --spa \
+  --template-type alpine
+----
+
+Or use the standalone `spa` command:
+
+[source,shell]
+----
+lutaml-klin spa \
+  --mapping output/mappings/complete.yaml \
+  --output output/spa/ \
+  --template-type alpine
+----
+
+==== Vanilla JavaScript Template (Legacy)
+
+For environments without Alpine.js support or maximum compatibility:
+
+[source,shell]
+----
+lutaml-klin process \
+  --lur model.lur \
+  --lxr schemas.lxr \
+  --config config.xml \
+  --packages "**" \
+  --output output/ \
+  --spa \
+  --template-type vanilla
+----
+
+=== Ruby API Usage
+
+==== With Alpine.js Template
 
 [source,ruby]
 ----
+require 'lutaml/klin'
+
+# Load mapping
+mapping = Lutaml::Klin::Models::Mapping::SchemaMapping.from_yaml(
+  File.read("output/mappings/complete.yaml")
+)
+
+# Create SPA workflow
 spa = Lutaml::Klin::Application::SpaWorkflow.new
 
+# Generate Alpine.js-based website
 spa.generate_spa(
-  mapping: mapping,
-  output_path: "output/spa/",
-  title: "My Project Mappings",
-  theme: "dark",  # or "light"
-  enable_search: true,
-  enable_export: true
+  mapping,
+  "output/spa/",
+  template_type: :alpine,  # Use Alpine.js template
+  data_mode: :embedded     # Embed data for file:// access
+)
+
+puts "Alpine.js SPA generated at: output/spa/index.html"
+----
+
+==== With Vanilla JS Template
+
+[source,ruby]
+----
+# Generate vanilla JavaScript website
+spa.generate_spa(
+  mapping,
+  "output/spa/",
+  template_type: :vanilla,  # Use vanilla JS template
+  data_mode: :embedded
+)
+----
+
+=== Template Comparison
+
+[cols="1,2,2"]
+|===
+| Feature | Alpine.js | Vanilla JS
+
+| Reactive Data Binding
+| ✅ Automatic with x-model
+| ❌ Manual DOM manipulation
+
+| Code Maintainability
+| ✅ Declarative templates
+| ⚠️ Imperative code
+
+| File Size
+| ⚠️ +15KB (CDN)
+| ✅ No dependencies
+
+| Browser Support
+| ⚠️ Modern browsers
+| ✅ All browsers
+
+| Development Speed
+| ✅ Faster with less code
+| ⚠️ More verbose
+
+| Performance
+| ✅ Optimized reactivity
+| ✅ Direct DOM access
+|===
+
+**Recommendation**: Use Alpine.js template for new projects. Use vanilla JS template only if:
+
+* You need IE11 support
+* CDN access is blocked
+* File size is critical (<100KB total)
+
+=== Generate SPA from Mapping File
+
+If you already have a mapping YAML file from the `xsd` command, you can
+generate just the SPA without regenerating the mapping:
+
+[source,bash]
+----
+lutaml-klin spa \
+  --mapping urbanObject_mapping.yaml \
+  --output spa/ \
+  --template-type alpine
+----
+
+This is significantly faster than running the complete `process` command when
+you only need the visualization.
+
+==== Three-Process Workflow
+
+For maximum flexibility, you can separate the workflow into three independent
+processes:
+
+[source,bash]
+----
+# Process 1: Generate XSD + Mapping
+lutaml-klin xsd \
+  --lur plateau.lur \
+  --config ShapeChangeConfig.xml \
+  --packages "uro,urf" \
+  --output step1/
+
+# Outputs:
+#   step1/urbanObject.xsd
+#   step1/urbanObject_mapping.yaml (URO package - all classes)
+#   step1/urbanFunction.xsd
+#   step1/urbanFunction_mapping.yaml (URF package - all classes)
+
+# Process 2: Create Complete LXR (optional)
+# Uses lutaml-xsd package composition feature
+# See lutaml-xsd documentation for details
+
+# Process 3: Generate SPAs (one per mapping file)
+lutaml-klin spa --mapping step1/urbanObject_mapping.yaml --output spa_uro/
+lutaml-klin spa --mapping step1/urbanFunction_mapping.yaml --output spa_urf/
+----
+
+This workflow provides:
+
+* **Fast iteration**: Only regenerate what changed
+* **Flexibility**: Generate SPAs for specific packages
+* **Efficiency**: Skip expensive recomputation
+* **Composability**: Combine processes as needed
+
+NOTE: Process 2 uses lutaml-xsd's package composition feature for creating
+comprehensive LXR packages from multiple sources. See the lutaml-xsd
+documentation for details on package composition and merging.
+
+=== Template Architecture
+
+==== Alpine.js Template
+
+The Alpine.js template uses a component-based architecture:
+
+[source]
+----
+spa_alpine/
+├── index.html              # Main template with x-data component
+└── assets/
+    ├── js/
+    │   └── app.js         # Alpine.js component definition
+    └── css/
+        └── style.css      # Styles with [x-cloak] support
+----
+
+**Key Features**:
+
+* Single `mappingBrowser` component manages all state
+* Computed properties for derived data (`currentPackage`, `filteredPackages`)
+* Actions for user interactions (`togglePackage`, `showClass`)
+* Hash-based routing with `window.location.hash`
+* Debounced search with `@input.debounce.300ms`
+
+==== Vanilla JS Template
+
+The vanilla JS template uses a class-based architecture:
+
+[source]
+----
+spa/
+├── index.html              # Static HTML structure
+└── assets/
+    ├── js/
+    │   └── app.js         # MappingBrowserApp class
+    └── css/
+        └── style.css      # Standard styles
+----
+
+=== Customization
+
+Both templates support data embedding for `file://` protocol access:
+
+[source,ruby]
+----
+spa.generate_spa(
+  mapping,
+  "output/spa/",
+  template_type: :alpine,
+  data_mode: :embedded  # Embed data in HTML (default)
+)
+----
+
+For HTTP server deployment, use linked data mode:
+
+[source,ruby]
+----
+spa.generate_spa(
+  mapping,
+  "output/spa/",
+  template_type: :alpine,
+  data_mode: :linked   # Separate JSON files
 )
 ----
 
