@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "liquid", "~> 5"
   spec.add_dependency "lutaml"
-  spec.add_dependency "lutaml-model", "~> 0.7"
+  spec.add_dependency "lutaml-model", "~> 0.8.114"
   spec.add_dependency "lutaml-xsd"
   spec.add_dependency "moxml"
   spec.add_dependency "sqlite3"
